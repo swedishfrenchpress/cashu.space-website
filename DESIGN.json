@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-21T00:00:00Z",
+  "title": "Design System: Cashu",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7"]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Ink",
+        "canonical": "oklch(0% 0 0)",
+        "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7"]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft",
+        "canonical": "oklch(15% 0 0)",
+        "tonalRamp": ["#09090b", "#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8"]
+      },
+      "ink-hover": {
+        "role": "neutral",
+        "displayName": "Ink Hover",
+        "canonical": "oklch(22% 0 0)",
+        "tonalRamp": ["#09090b", "#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8"]
+      },
+      "slate": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "canonical": "oklch(36% 0 0)",
+        "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7"]
+      },
+      "mist": {
+        "role": "neutral",
+        "displayName": "Mist",
+        "canonical": "oklch(54% 0 0)",
+        "tonalRamp": ["#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5"]
+      },
+      "fog": {
+        "role": "neutral",
+        "displayName": "Fog",
+        "canonical": "oklch(68% 0 0)",
+        "tonalRamp": ["#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5"]
+      },
+      "hair": {
+        "role": "neutral",
+        "displayName": "Hair",
+        "canonical": "oklch(91% 0 0)",
+        "tonalRamp": ["#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5", "#fafafa"]
+      },
+      "chalk": {
+        "role": "neutral",
+        "displayName": "Chalk",
+        "canonical": "oklch(96% 0 0)",
+        "tonalRamp": ["#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5", "#fafafa"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline only. Set tight, weight 600, sized to fill the viewport."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section openings. The second-tier voice on a page."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Subheaders and card titles. Ranks above body, below section openings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading copy. Capped at 65 to 75ch line length."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, navigation, captions, the legal disclaimer."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Inline code, addresses, transaction ids. Geist Mono."
+      },
+      "pixel": {
+        "displayName": "Pixel Notation",
+        "purpose": "Protocol artefacts only: amounts, mint ids, version strings. Geist Pixel Square."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-quart-out",
+        "value": "cubic-bezier(0.25, 1, 0.5, 1)",
+        "purpose": "Default easing for state transitions (hover, focus). Exponential ease-out."
+      },
+      {
+        "name": "duration-fast",
+        "value": "150ms",
+        "purpose": "Button and link state transitions."
+      },
+      {
+        "name": "duration-base",
+        "value": "250ms",
+        "purpose": "Section transitions, fade-ins."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The principal CTA. Solid Ink pill on Paper. Used at the hero CTA row and inside the navigation.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Get a wallet <span aria-hidden=\"true\">→</span></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; background: #000000; color: #ffffff; padding: 14px 24px; border: none; border-radius: 9999px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-primary:hover { background: #27272a; } .ds-btn-primary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quieter, smaller pill on Chalk. Used for tertiary actions in the navigation (Read the docs).",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Read the docs</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; background: #f4f4f5; color: #18181b; padding: 10px 20px; border: none; border-radius: 9999px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-secondary:hover { background: #e4e4e7; } .ds-btn-secondary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Top-bar navigation links. Slate at rest, Ink on hover. No underline, no active background.",
+      "html": "<a class=\"ds-nav-link\" href=\"#wallets\">Wallets</a>",
+      "css": ".ds-nav-link { color: #3f3f46; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.4; text-decoration: none; transition: color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-nav-link:hover { color: #000000; } .ds-nav-link:focus-visible { outline: 2px solid #000000; outline-offset: 4px; border-radius: 2px; }"
+    },
+    {
+      "name": "Hero Display Headline",
+      "kind": "custom",
+      "refersTo": "typography.display",
+      "description": "The signature hero treatment. GT-Standard at clamp(3.75rem, 9vw, 9rem), weight 600, line-height 0.95, letter-spacing −0.02em. Wraps deliberately.",
+      "html": "<h1 class=\"ds-hero-display\">Bearer ecash<br>for bitcoin</h1>",
+      "css": ".ds-hero-display { color: #000000; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: clamp(3.75rem, 9vw, 9rem); font-weight: 600; line-height: 0.95; letter-spacing: -0.02em; margin: 0; }"
+    },
+    {
+      "name": "Pixel Notation",
+      "kind": "custom",
+      "refersTo": "typography.pixel",
+      "description": "Inline protocol artefact set in Geist Pixel Square. Use for amounts, mint ids, version strings inside human prose.",
+      "html": "<p class=\"ds-body\">Your balance is <span class=\"ds-pixel\">21,000 sats</span> across two mints.</p>",
+      "css": ".ds-body { color: #000000; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.5; margin: 0; max-width: 65ch; } .ds-pixel { font-family: 'GeistPixelSquare', 'Geist Mono', monospace; font-size: 1rem; font-weight: 500; line-height: 1; letter-spacing: 0.04em; }"
+    },
+    {
+      "name": "Hairline Divider",
+      "kind": "custom",
+      "refersTo": "divider",
+      "description": "The system's only structural separator. A single 1px line in Hair, full content width.",
+      "html": "<hr class=\"ds-divider\" />",
+      "css": ".ds-divider { border: none; height: 1px; background: #e4e4e7; margin: 0; }"
+    },
+    {
+      "name": "Placeholder Surface",
+      "kind": "card",
+      "refersTo": "placeholder-surface",
+      "description": "Temporary surface awaiting a real asset (hero image, mint screenshot). Chalk background, Fog caption, 16px radius. Replace before shipping; never final.",
+      "html": "<div class=\"ds-placeholder\" role=\"img\" aria-label=\"Hero image placeholder\">hero image placeholder</div>",
+      "css": ".ds-placeholder { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; width: 100%; background: #f4f4f5; color: #a1a1aa; border-radius: 16px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Open Specification",
+    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of pill buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.",
+    "keyCharacteristics": [
+      "Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.",
+      "Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).",
+      "Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.",
+      "Pill buttons, hairline divider, no shadows — depth is conveyed by position and weight, never by elevation.",
+      "Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast."
+    ],
+    "rules": [
+      { "name": "The No-Colour Rule", "body": "The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface 'needs' colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch.", "section": "colors" },
+      { "name": "The Two-Black Rule", "body": "Ink (#000000) and Ink Soft (#18181b) are the only two text colours that may sit on Paper. Slate, Mist, Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.", "section": "colors" },
+      { "name": "The One Face Rule", "body": "GT-Standard carries everything readable. Geist Mono is technical notation; Geist Pixel Square is protocol notation. Three families, three jobs, no overlap.", "section": "typography" },
+      { "name": "The Big-Or-Quiet Rule", "body": "Type is either Display (≥3.75rem) or quiet (≤1.125rem). The middle ground is avoided. Hierarchy is achieved by jumping scale, not by stair-stepping.", "section": "typography" },
+      { "name": "The No-Shadow Rule", "body": "box-shadow is forbidden on any container. If a card 'needs' elevation, it needs spacing instead.", "section": "elevation" },
+      { "name": "The Hairline Rule", "body": "Structural separation between sections is achieved with a single 1px line in Hair (#e4e4e7), full content width, never bolder. No double rules, no decorative rules.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do carry the No-Colour Rule. Greys may shift by lightness, never by hue.",
+      "Do set the hero headline in Display (GT-Standard 600, ≥3.75rem, line-height 0.95). The headline earns the page.",
+      "Do keep body copy at 65–75ch max width. Long reads are an editorial feature, not an accident.",
+      "Do use Geist Pixel Square only for protocol notation (amounts, ids, version strings). It is signal, not style.",
+      "Do name implementations by name. Cashu is a directory; wallets and mints appear as plain wordmarks, no logos required at first pass.",
+      "Do treat 1px Hair lines as the only structural divider. Sections separate by space first, hairline second."
+    ],
+    "donts": [
+      "Don't introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins.",
+      "Don't add Web3 / DeFi tropes: pastel gradients, blob shapes, playful money-flow illustrations. Cashu is bitcoin-native and deliberately not crypto-coded.",
+      "Don't dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS 'YOUR DATA, SECURED™' copy. Privacy is a property of the protocol, stated plainly.",
+      "Don't use box-shadow on any container. No drop shadow, inner shadow, or coloured glow. The system is flat by doctrine.",
+      "Don't use border-left or border-right greater than 1px as a coloured stripe on cards or callouts.",
+      "Don't use background-clip: text with a gradient (gradient text). One solid colour, emphasis by weight or size.",
+      "Don't introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.",
+      "Don't centre body copy. Long-form reading sets flush left, ragged right.",
+      "Don't use stock photography of smiling teams, abstract blockchain visuals, or any hero treatment that could appear unchanged on a fintech site.",
+      "Don't ship Chalk placeholder surfaces in final layouts. They are scaffolding only."
+    ]
+  }
+}
