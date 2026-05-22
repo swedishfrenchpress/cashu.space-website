@@ -13,8 +13,14 @@ export default function StatementWithMedia() {
           Get a wallet        </a>
 
         <div className="w-full aspect-[16/9] bg-black overflow-hidden relative">
+          <img
+            src="/mountains.jpg"
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+          />
           <div className="absolute inset-0 flex items-end p-6 lg:p-10">
-            <p className="font-pixel uppercase tracking-wider text-[11px] text-zinc-400 max-w-[40ch]">
+            <p className="font-pixel uppercase tracking-wider text-[11px] text-zinc-200 max-w-[40ch]">
               Fig. 03 · A token is a bearer object — pass it in a chat, a QR, a
               file. No accounts, no balances asked.
             </p>
