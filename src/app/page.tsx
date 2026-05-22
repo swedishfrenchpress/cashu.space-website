@@ -1,11 +1,8 @@
 import { CashuMark } from "@/components/cashu-mark";
 import ImplementationsGrid from "@/components/implementations-grid";
 import MarqueeStrip from "@/components/marquee-strip";
-import ProtocolProperties from "@/components/protocol-properties";
-import ShaderEffect from "@/components/shader-effect";
 import SiteFooter from "@/components/site-footer";
 import StatementWithMedia from "@/components/statement-with-media";
-import StatsBand from "@/components/stats-band";
 import TabbedFeature from "@/components/tabbed-feature";
 
 export default function Home() {
@@ -21,53 +18,39 @@ export default function Home() {
         </a>
       </header>
 
-      <section className="page-shell pt-24 lg:pt-32 pb-16 lg:pb-24">
-        <div className="grid grid-cols-12 gap-y-10 gap-x-6 lg:gap-x-12 items-center">
-          <div className="col-span-12 lg:col-span-7 flex flex-col gap-8">
-            <h1 className="text-[clamp(3rem,8vw,7rem)] font-semibold tracking-tight leading-[0.95]">
-              Cashu
-            </h1>
-            <p className="text-lg lg:text-xl font-semibold leading-snug max-w-[40ch]">
+      <section className="pt-24 lg:pt-32 pb-16 lg:pb-24">
+        <div className="page-shell">
+          <div className="flex flex-col gap-10 lg:gap-12">
+            <h1
+              className="font-semibold max-w-[22ch]"
+              style={{
+                fontSize: "clamp(3.75rem, 9vw, 9rem)",
+                lineHeight: 0.95,
+                letterSpacing: "-0.02em",
+              }}
+            >
               Electronic cash for payments online, in person, and around the
               world.
-            </p>
+            </h1>
             <div className="flex flex-wrap items-center gap-3">
               <a
                 href="/docs"
-                className="inline-flex items-center bg-zinc-100 hover:bg-zinc-200 transition-colors px-5 py-3 text-sm font-medium text-zinc-900"
+                className="inline-flex items-center gap-2 bg-black text-white px-6 py-3.5 text-sm font-medium hover:bg-zinc-800 transition-colors"
               >
-                Documentation              </a>
+                Read the spec <span aria-hidden>→</span>
+              </a>
               <a
                 href="https://github.com/cashubtc"
-                className="inline-flex items-center bg-zinc-100 hover:bg-zinc-200 transition-colors px-5 py-3 text-sm font-medium text-zinc-900"
+                className="inline-flex items-center bg-zinc-100 text-zinc-900 px-5 py-2.5 text-sm font-medium hover:bg-zinc-200 transition-colors"
               >
-                GitHub              </a>
+                GitHub
+              </a>
               <a
                 href="/blog"
-                className="inline-flex items-center bg-zinc-100 hover:bg-zinc-200 transition-colors px-5 py-3 text-sm font-medium text-zinc-900"
+                className="inline-flex items-center bg-zinc-100 text-zinc-900 px-5 py-2.5 text-sm font-medium hover:bg-zinc-200 transition-colors"
               >
-                Blog              </a>
-            </div>
-          </div>
-
-          <div className="col-span-12 lg:col-span-5 flex justify-center lg:justify-end">
-            <div
-              className="relative w-full"
-              style={{ maxWidth: "560px", aspectRatio: "1 / 1" }}
-            >
-              <img
-                src="/flatiron.png"
-                alt=""
-                aria-hidden
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <ShaderEffect
-                imageSrc="/cashu-no-bg.png"
-                darkMode={true}
-                width={560}
-                height={560}
-                className="absolute inset-0 w-full h-full"
-              />
+                Blog
+              </a>
             </div>
           </div>
         </div>
@@ -75,9 +58,7 @@ export default function Home() {
 
       <MarqueeStrip />
       <TabbedFeature />
-      <StatsBand />
       <StatementWithMedia />
-      <ProtocolProperties />
       <ImplementationsGrid />
       <SiteFooter />
     </div>

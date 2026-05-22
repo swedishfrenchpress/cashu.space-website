@@ -119,17 +119,17 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The principal CTA. Solid Ink pill on Paper. Used at the hero CTA row and inside the navigation.",
+      "description": "The principal CTA. Solid Ink button on Paper, sharp corners. Used at the hero CTA row and inside the navigation.",
       "html": "<button class=\"ds-btn-primary\" type=\"button\">Get a wallet <span aria-hidden=\"true\">→</span></button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; background: #000000; color: #ffffff; padding: 14px 24px; border: none; border-radius: 9999px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-primary:hover { background: #27272a; } .ds-btn-primary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; background: #000000; color: #ffffff; padding: 14px 24px; border: none; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-primary:hover { background: #27272a; } .ds-btn-primary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Quieter, smaller pill on Chalk. Used for tertiary actions in the navigation (Read the docs).",
+      "description": "Quieter, smaller button on Chalk, sharp corners. Used for tertiary actions in the navigation (Read the docs).",
       "html": "<button class=\"ds-btn-secondary\" type=\"button\">Read the docs</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; background: #f4f4f5; color: #18181b; padding: 10px 20px; border: none; border-radius: 9999px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-secondary:hover { background: #e4e4e7; } .ds-btn-secondary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; background: #f4f4f5; color: #18181b; padding: 10px 20px; border: none; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-secondary:hover { background: #e4e4e7; } .ds-btn-secondary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
     },
     {
       "name": "Nav Link",
@@ -174,12 +174,12 @@
   ],
   "narrative": {
     "northStar": "The Open Specification",
-    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of pill buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.",
+    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.",
     "keyCharacteristics": [
       "Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.",
       "Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).",
       "Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.",
-      "Pill buttons, hairline divider, no shadows — depth is conveyed by position and weight, never by elevation.",
+      "Sharp-cornered buttons, hairline divider, no shadows — depth is conveyed by position and weight, never by elevation.",
       "Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast."
     ],
     "rules": [

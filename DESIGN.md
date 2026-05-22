@@ -55,7 +55,7 @@ typography:
     lineHeight: 1
     letterSpacing: "0.04em"
 rounded:
-  pill: "9999px"
+  none: "0"
   card: "16px"
 spacing:
   xs: "8px"
@@ -70,7 +70,7 @@ components:
   button-primary:
     backgroundColor: "{colors.ink}"
     textColor: "{colors.paper}"
-    rounded: "{rounded.pill}"
+    rounded: "{rounded.none}"
     padding: "14px 24px"
     typography: "{typography.label}"
   button-primary-hover:
@@ -79,7 +79,7 @@ components:
   button-secondary:
     backgroundColor: "{colors.chalk}"
     textColor: "{colors.ink-soft}"
-    rounded: "{rounded.pill}"
+    rounded: "{rounded.none}"
     padding: "10px 20px"
     typography: "{typography.label}"
   button-secondary-hover:
@@ -107,7 +107,7 @@ components:
 
 cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad. Visitors should feel they are looking at *the* document for Cashu, the way bitcoin.org once felt like *the* document for Bitcoin.
 
-The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of pill buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no glassmorphism, no animated tickers, no testimonial carousels.
+The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no glassmorphism, no animated tickers, no testimonial carousels.
 
 Motion is permitted under one condition: it must depict real protocol structure. The hero overlays mint markers and animated dotted lines between them to show Lightning Network bridging — a true property of the protocol — never a decorative flow. See the Honest-Network Rule in §4.
 
@@ -191,17 +191,17 @@ Components are restrained to a small canonical set: two buttons, a nav link, a d
 
 ### Buttons
 
-- **Shape:** Pill (radius `9999px`). No rectangular or rounded-rect buttons in this system.
+- **Shape:** Sharp. `border-radius: 0`. No pills, no rounded-rect buttons in this system — the spec aesthetic reads sharper with hard corners than soft ones.
 - **Primary** (`button-primary`): Background Ink (`#000000`), text Paper (`#ffffff`), padding `14px 24px`, label-weight type. Hover transitions background to Ink Hover (`#27272a`) over 150ms.
 - **Secondary** (`button-secondary`): Background Chalk (`#f4f4f5`), text Ink Soft (`#18181b`), padding `10px 20px`, label-weight type. Hover transitions background to Hair (`#e4e4e7`).
-- **Focus:** A 2px outline in Ink offset 2px from the pill. No glow, no ring colour change.
+- **Focus:** A 2px outline in Ink offset 2px from the button edge. No glow, no ring colour change.
 - **Iconography:** The primary CTA carries a single trailing arrow glyph (`→`) as a plain text character — not an SVG icon. The minimalism is the point.
 
 ### Navigation
 
 - **Style:** Top bar, full-width, padding matches page-x (`24px` mobile / `48px` sm / `80px` lg).
 - **Links** (`nav-link`): Label-weight, colour Slate (`#3f3f46`). Hover transitions colour to Ink. No underline, no active background.
-- **Mobile:** Links collapse below the `md` breakpoint; the brand wordmark and the two pill buttons remain.
+- **Mobile:** Links collapse below the `md` breakpoint; the brand wordmark and the two buttons remain.
 
 ### Divider
 

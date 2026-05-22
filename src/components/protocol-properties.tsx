@@ -1,63 +1,85 @@
-const PROPERTIES = [
-  "Bearer",
-  "Offline-capable",
-  "Open spec",
-  "MIT-licensed",
-  "Lightning-native",
-  "Chaumian blind signatures",
-  "No accounts",
-  "No custodial APIs",
-  "Self-hostable",
-  "Interoperable wallets",
-  "Auditable mints",
-  "Free to use",
-];
+type Card = {
+  titleLead: string;
+  titleEm: string;
+  body: string;
+  marquee: string;
+  icon: (props: { className?: string }) => React.ReactElement;
+};
 
-const FEATURES = [
+const CARDS: Card[] = [
   {
-    title: "Bearer by design",
+    titleLead: "Bearer by",
+    titleEm: "design",
     body: "A Cashu token is the money. Hold it, send it, redeem it. No ledger reconciles the owner — possession is the proof.",
+    marquee: "Bearer ecash · Cashu protocol · Open spec · ",
     icon: BearerIcon,
   },
   {
-    title: "Private by default",
+    titleLead: "Private by",
+    titleEm: "default",
     body: "Blind signatures mean the mint cannot link who minted a token to who redeems it. Privacy is a property of the math, not a policy.",
+    marquee: "Blind signatures · Cashu protocol · Open spec · ",
     icon: PrivacyIcon,
   },
   {
-    title: "No accounts, no logins",
+    titleLead: "No accounts,",
+    titleEm: "no logins",
     body: "Cashu wallets do not register users. There is nothing to sign up for, nothing to recover, nothing to leak.",
+    marquee: "No accounts · Cashu protocol · Open spec · ",
     icon: AccountsIcon,
   },
 ];
 
+function MarqueeCard({ card }: { card: Card }) {
+  const repeated = card.marquee.repeat(16);
+  const Icon = card.icon;
+  return (
+    <article className="relative aspect-[3/4] bg-white border border-zinc-200 overflow-hidden">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute top-3 left-10 right-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400"
+      >
+        {repeated}
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute bottom-3 left-10 right-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400"
+      >
+        {repeated}
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-3 top-10 bottom-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400 [writing-mode:vertical-rl] rotate-180"
+      >
+        {repeated}
+      </span>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-3 top-10 bottom-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400 [writing-mode:vertical-rl]"
+      >
+        {repeated}
+      </span>
+
+      <div className="absolute inset-10 lg:inset-12 flex flex-col">
+        <Icon className="h-7 w-7 text-black" />
+        <div className="mt-auto flex flex-col gap-5">
+          <h3 className="font-semibold tracking-tight leading-[1.05] text-[clamp(1.875rem,2.6vw,2.25rem)]">
+            {card.titleLead} <em className="italic font-semibold">{card.titleEm}</em>
+          </h3>
+          <p className="text-zinc-600 text-sm leading-relaxed">{card.body}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function ProtocolProperties() {
   return (
     <section className="page-shell pt-16 lg:pt-24 pb-16 lg:pb-24">
-      <div className="bg-zinc-100 p-8 sm:p-12 lg:p-16 xl:p-20 flex flex-col gap-12 lg:gap-16">
-        <ul className="flex flex-wrap gap-2">
-          {PROPERTIES.map((p) => (
-            <li
-              key={p}
-              className="inline-flex items-center bg-white border border-zinc-200 px-4 py-2 text-xs text-zinc-700"
-            >
-              {p}
-            </li>
-          ))}
-        </ul>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-          {FEATURES.map(({ title, body, icon: Icon }) => (
-            <div
-              key={title}
-              className="bg-white p-8 lg:p-10 flex flex-col gap-4"
-            >
-              <Icon className="h-7 w-7 text-black" />
-              <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
-              <p className="text-zinc-600 text-sm leading-relaxed">{body}</p>
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
+        {CARDS.map((card) => (
+          <MarqueeCard key={card.titleLead} card={card} />
+        ))}
       </div>
     </section>
   );
