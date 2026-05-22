@@ -183,6 +183,12 @@ export default function TabbedFeature() {
             className="absolute inset-0 h-full w-full object-cover opacity-0 animate-[fadeIn_200ms_ease-out_forwards]"
           />
           <div
+            aria-hidden
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
+            <div className="bg-white aspect-[16/9] w-[78%] max-w-full" />
+          </div>
+          <div
             key={active.id}
             className="absolute inset-0 flex items-end p-6 lg:p-10 opacity-0 animate-[fadeIn_200ms_ease-out_forwards]"
           >
