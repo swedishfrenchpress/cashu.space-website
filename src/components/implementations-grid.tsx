@@ -15,11 +15,8 @@ export default function ImplementationsGrid() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-4 lg:gap-6">
-          {/* FIG. 04 — Open source ecash · tall left, black */}
+          {/* Open source ecash · tall left, black */}
           <div className="lg:row-span-2 bg-black text-white p-8 lg:p-10 flex flex-col gap-8 min-h-[420px] lg:min-h-[560px]">
-            <span className="font-pixel uppercase tracking-wider text-[11px] text-zinc-500">
-              Fig. 04
-            </span>
             <div className="flex-1" />
             <div className="flex flex-col gap-3">
               <h3 className="text-2xl lg:text-3xl font-semibold tracking-tight leading-tight">
@@ -31,11 +28,8 @@ export default function ImplementationsGrid() {
             </div>
           </div>
 
-          {/* FIG. 05 — Bearer token · wide top right, chalk */}
+          {/* Bearer token · wide top right, chalk */}
           <div className="lg:col-span-2 bg-zinc-100 p-8 lg:p-10 flex flex-col gap-6 min-h-[240px]">
-            <span className="font-pixel uppercase tracking-wider text-[11px] text-zinc-500">
-              Fig. 05
-            </span>
             <div className="flex-1" />
             <div className="flex flex-col gap-3 max-w-[52ch]">
               <h3 className="text-2xl lg:text-3xl font-semibold tracking-tight leading-tight">
@@ -48,11 +42,8 @@ export default function ImplementationsGrid() {
             </div>
           </div>
 
-          {/* FIG. 06 — Privacy focused · bottom right left, white with hair */}
+          {/* Privacy focused · bottom right left, white with hair */}
           <div className="bg-white border border-zinc-200 p-8 lg:p-10 flex flex-col gap-6 min-h-[240px]">
-            <span className="font-pixel uppercase tracking-wider text-[11px] text-zinc-500">
-              Fig. 06
-            </span>
             <div className="flex-1" />
             <div className="flex flex-col gap-3">
               <h3 className="text-xl lg:text-2xl font-semibold tracking-tight leading-tight">
@@ -65,11 +56,8 @@ export default function ImplementationsGrid() {
             </div>
           </div>
 
-          {/* FIG. 07 — Ecash for the Web · bottom right right, white with hair */}
+          {/* Ecash for the Web · bottom right right, white with hair */}
           <div className="bg-white border border-zinc-200 p-8 lg:p-10 flex flex-col gap-6 min-h-[240px]">
-            <span className="font-pixel uppercase tracking-wider text-[11px] text-zinc-500">
-              Fig. 07
-            </span>
             <div className="flex-1" />
             <div className="flex flex-col gap-3">
               <h3 className="text-xl lg:text-2xl font-semibold tracking-tight leading-tight">

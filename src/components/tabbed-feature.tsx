@@ -186,15 +186,7 @@ export default function TabbedFeature() {
             aria-hidden
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
           >
-            <div className="bg-white aspect-[16/9] w-[78%] max-w-full" />
-          </div>
-          <div
-            key={active.id}
-            className="absolute inset-0 flex items-end p-6 lg:p-10 opacity-0 animate-[fadeIn_200ms_ease-out_forwards]"
-          >
-            <span className="font-pixel uppercase tracking-wider text-[11px] text-zinc-200">
-              Fig. 02 · {active.label}
-            </span>
+            <div className="bg-white aspect-square h-[78%] max-h-full" />
           </div>
         </div>
 
