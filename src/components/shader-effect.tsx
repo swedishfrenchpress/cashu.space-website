@@ -111,6 +111,11 @@ void main() {
 
   float brightness = (gridColor.r + gridColor.g + gridColor.b) / 3.0;
 
+  // Treat transparent pixels as page background so a transparent-bg PNG
+  // doesn't invert into a sea of dots in light mode.
+  float bgBrightness = u_darkMode > 0.5 ? 0.0 : 1.0;
+  brightness = mix(bgBrightness, brightness, gridColor.a);
+
   // Invert brightness for light mode so dark parts of logo get bigger dots
   float adjustedBrightness = u_darkMode > 0.5 ? brightness : (1.0 - brightness);
   
@@ -480,8 +485,10 @@ export default function ShaderEffect({
       ref={canvasRef}
       className={className}
       style={{
-        width: `${width}px`,
-        height: `${height}px`,
+        width: '100%',
+        maxWidth: `${width}px`,
+        aspectRatio: `${width} / ${height}`,
+        height: 'auto',
         display: 'block',
       }}
     />

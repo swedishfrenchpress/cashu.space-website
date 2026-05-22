@@ -27,7 +27,7 @@ Voice: declarative, concrete, never marketing-coded. Short sentences. No hype ve
 ## Anti-references
 
 - **Generic crypto landing pages** — neon gradients on black, animated 3D coins, vague "the future of finance" copy, gradient text. The training-data reflex for anything bitcoin-adjacent. Cashu is not a coin.
-- **Web3 / DeFi aesthetics (Uniswap, OpenSea)** — pastel gradients, blob shapes, playful money-flow illustrations. Cashu is bitcoin-native and deliberately not crypto-coded. Looking like Web3 would actively mislead the audience.
+- **Web3 / DeFi aesthetics (Uniswap, OpenSea)** — pastel gradients, blob shapes, decorative network animations that misrepresent how the protocol works. Cashu is bitcoin-native and deliberately not crypto-coded. Looking like Web3 would actively mislead the audience. (Note: motion is permitted when it depicts real protocol structure — see Design Principle 6 below.)
 - **Privacy theater** — locks, shields, padlocks, ALL-CAPS warnings, fear-driven copy ("YOUR DATA, SECURED™"). Cashu is private as a property of the protocol, not as a sales pitch. Never sell privacy with fear.
 
 ## Design Principles
@@ -37,6 +37,7 @@ Voice: declarative, concrete, never marketing-coded. Short sentences. No hype ve
 3. **Privacy as fact, not pitch.** Mention privacy properties plainly when the structure calls for them. Never with fear iconography, never as the headline emotion. The protocol's properties are facts; the site states them and moves on.
 4. **Editorial pacing.** Massive display type at the hero, generous whitespace between sections, long single-column reads. The hero earns its size; nothing competes with it. Sections breathe.
 5. **Credit the protocol, not the product.** Link to the spec. Name the implementations. List the wallets and mints by name. Cashu is a community of builders — the site should feel like a directory and manifesto, not a SaaS product page with a single hero CTA.
+6. **Honest motion.** Motion and network visuals are permitted when they depict real protocol structure — Lightning Network bridges between mints, peer-to-peer token transfer between users. They are never decorative or speculative. If a visualisation suggests connections that don't exist in the protocol (e.g. mints "talking" to each other, which Cashu doesn't do), it's the wrong visual.
 
 ## Accessibility & Inclusion
 
