@@ -1,5 +1,4 @@
 import { CashuMark } from "@/components/cashu-mark";
-import ClosingCta from "@/components/closing-cta";
 import ImplementationsGrid from "@/components/implementations-grid";
 import MarqueeStrip from "@/components/marquee-strip";
 import ProtocolProperties from "@/components/protocol-properties";
@@ -52,13 +51,24 @@ export default function Home() {
           </div>
 
           <div className="col-span-12 lg:col-span-5 flex justify-center lg:justify-end">
-            <ShaderEffect
-              imageSrc="/cashu-no-bg.png"
-              darkMode={false}
-              width={560}
-              height={560}
-              className="max-w-full"
-            />
+            <div
+              className="relative w-full"
+              style={{ maxWidth: "560px", aspectRatio: "1 / 1" }}
+            >
+              <img
+                src="/flatiron.png"
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <ShaderEffect
+                imageSrc="/cashu-no-bg.png"
+                darkMode={true}
+                width={560}
+                height={560}
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -69,7 +79,6 @@ export default function Home() {
       <StatementWithMedia />
       <ProtocolProperties />
       <ImplementationsGrid />
-      <ClosingCta />
       <SiteFooter />
     </div>
   );

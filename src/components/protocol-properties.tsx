@@ -35,24 +35,6 @@ export default function ProtocolProperties() {
   return (
     <section className="page-shell pt-16 lg:pt-24 pb-16 lg:pb-24">
       <div className="bg-zinc-100 p-8 sm:p-12 lg:p-16 xl:p-20 flex flex-col gap-12 lg:gap-16">
-        <div className="flex flex-col gap-6 max-w-[60ch]">
-          <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-semibold tracking-tight leading-[1.05]">
-            Property of the protocol, not policy of a company
-          </h2>
-          <p className="text-zinc-600 text-base lg:text-lg leading-relaxed">
-            Cashu is not a service you subscribe to. It is a specification
-            anyone can read, implement, and run — the guarantees come from the
-            math, not from a vendor&rsquo;s terms of service.
-          </p>
-          <div>
-            <a
-              href="/spec"
-              className="inline-flex items-center bg-black hover:bg-zinc-800 transition-colors px-6 py-3.5 text-sm font-medium text-white"
-            >
-              Read the spec            </a>
-          </div>
-        </div>
-
         <ul className="flex flex-wrap gap-2">
           {PROPERTIES.map((p) => (
             <li
