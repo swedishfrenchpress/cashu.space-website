@@ -113,6 +113,14 @@ export default function RootLayout({
       className={`${gtStandard.variable} ${GeistMono.variable} ${GeistPixelSquare.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <div
+          hidden
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html:
+              "<!--\n  cashu.space — the open specification\n\n  document  landing\n  spec      https://github.com/cashubtc/nuts\n  source    https://github.com/cashubtc\n\n  no company. no token. no treasury.\n-->",
+          }}
+        />
         <ConsoleSignature />
         {children}
       </body>

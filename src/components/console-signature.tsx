@@ -34,6 +34,11 @@ export default function ConsoleSignature() {
       fieldLabel,
       fieldValue,
     );
+    console.log(
+      "%cpatches %chttps://github.com/cashubtc/nuts/pulls",
+      fieldLabel,
+      fieldValue,
+    );
   }, []);
 
   return null;
