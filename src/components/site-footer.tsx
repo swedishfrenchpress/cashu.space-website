@@ -1,12 +1,9 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import Reveal from "./reveal";
 
-// Only links that actually resolve. Dead /docs, /blog, /press, /faq, /brand,
-// /contributors, /libraries, /mints/run, /spec/nuts, /tokens, Nostr, Telegram
-// are removed until those pages exist — see /impeccable audit P1.
 type FooterLink = { label: string; href: string; external?: boolean };
+type AiProvider = "openai" | "claude" | "gemini";
 
 const COLUMNS: { heading: string; links: FooterLink[] }[] = [
   {
@@ -35,145 +32,218 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
       },
     ],
   },
+  {
+    heading: "Resources",
+    links: [
+      {
+        label: "GitHub",
+        href: "https://github.com/cashubtc",
+        external: true,
+      },
+      {
+        label: "Whitepaper",
+        href: "https://github.com/cashubtc/nuts/blob/main/00.md",
+        external: true,
+      },
+    ],
+  },
+  {
+    heading: "Community",
+    links: [
+      {
+        label: "Nostr",
+        href: "https://njump.me/cashu",
+        external: true,
+      },
+      {
+        label: "Telegram",
+        href: "https://t.me/CashuBTC",
+        external: true,
+      },
+      {
+        label: "OpenCash",
+        href: "https://opencash.dev/",
+        external: true,
+      },
+    ],
+  },
 ];
 
-function clamp01(n: number) {
-  return Math.max(0, Math.min(1, n));
+const AI_PROMPT = "Explain the Cashu protocol — what it is, how it works, and why it matters.";
+
+const AI_LINKS: { name: string; href: string; mark: AiProvider }[] = [
+  {
+    name: "ChatGPT",
+    href: `https://chatgpt.com/?q=${encodeURIComponent(AI_PROMPT)}`,
+    mark: "openai",
+  },
+  {
+    name: "Claude",
+    href: `https://claude.ai/new?q=${encodeURIComponent(AI_PROMPT)}`,
+    mark: "claude",
+  },
+  {
+    name: "Gemini",
+    href: `https://gemini.google.com/app?q=${encodeURIComponent(AI_PROMPT)}`,
+    mark: "gemini",
+  },
+];
+
+function ExternalLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
+      {children}
+    </a>
+  );
 }
 
 export default function SiteFooter() {
-  const wordmarkRef = useRef<HTMLDivElement | null>(null);
-  // Scroll progress 0..1 — 0 when the wordmark is fully below the fold,
-  // 1 when it has fully entered. Drives a slow parallax settle on the
-  // giant cashu lockup; pairs with the static translateY(8%) bleed so the
-  // mark feels like it RISES into its resting position.
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const node = wordmarkRef.current;
-    if (!node) return;
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setProgress(1);
-      return;
-    }
-
-    let rafId = 0;
-    const tick = () => {
-      rafId = 0;
-      const rect = node.getBoundingClientRect();
-      const vh = window.innerHeight;
-      // Map: rect.top = vh → progress 0; rect.top = vh * 0.4 → progress 1.
-      const enter = vh;
-      const settle = vh * 0.4;
-      const span = enter - settle;
-      if (span <= 0) return;
-      setProgress(clamp01((enter - rect.top) / span));
-    };
-
-    const onScroll = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(tick);
-    };
-
-    tick();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
-
-  // 14% → 8% parallax rise as the section enters view. The 8% endpoint
-  // matches the static bleed value the wordmark was designed with.
-  const settleVh = 14 - progress * 6;
-
   return (
-    <footer className="relative isolate overflow-hidden bg-black text-white">
-      {/* Monochrome bloom — radial light source behind the wordmark.
-          Shifts by lightness only, per the No-Colour Rule. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[120%]"
-        style={{
-          background:
-            "radial-gradient(120% 80% at 50% 110%, #a1a1aa 0%, #71717a 18%, #3f3f46 34%, #18181b 58%, #000000 80%)",
-        }}
-      />
-      {/* Paper grain — sibling motif to the closing-CTA grain overlay. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.04] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\")",
-        }}
-      />
-
-      <div className="relative page-shell pt-20 lg:pt-28 pb-10 lg:pb-14">
-        <div className="grid grid-cols-2 gap-x-8 gap-y-12 max-w-[36rem]">
-          {COLUMNS.map((col, i) => (
-            <Reveal key={col.heading} delay={i * 80}>
-              <div className="flex flex-col gap-4">
-                <h3 className="t-title text-white">{col.heading}</h3>
-                <ul className="flex flex-col gap-3">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        {...(link.external
-                          ? {
-                              target: "_blank",
-                              rel: "noopener noreferrer",
-                            }
-                          : {})}
-                        className="t-label text-zinc-300 hover:text-white transition-colors focus-ring--on-ink"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={120}>
-          <div className="mt-20 lg:mt-28 flex flex-col gap-2 max-w-[36ch]">
-            <p className="t-body text-zinc-300">
-              An open protocol for bearer ecash on bitcoin. Operated by no one,
-              implemented by many.
-            </p>
-            <p className="t-label text-zinc-500">
-              © 2026 · Released under MIT
-            </p>
-          </div>
-        </Reveal>
+    <footer className="footer-specimen relative isolate">
+      {/* Photographic backdrop — grayscale + darken applied in CSS to honour
+          the No-Colour Rule. */}
+      <div className="footer-photo" aria-hidden>
+        <Image
+          src="/keyboard.png"
+          alt=""
+          fill
+          sizes="100vw"
+          priority={false}
+        />
       </div>
 
-      {/* Wordmark — anchored to the bottom edge, bleeds past the viewport.
-          Solid white (not gradient text — forbidden), the bloom sits behind.
-          Scroll-driven settle: rises from ~14% to ~8% as the footer enters. */}
-      <div
-        ref={wordmarkRef}
-        aria-hidden
-        className="relative w-full leading-none select-none pointer-events-none"
-      >
-        <div
-          className="w-full text-white font-semibold tracking-[-0.04em] text-center"
-          style={{
-            fontSize: "clamp(8rem, 26vw, 24rem)",
-            lineHeight: 0.78,
-            transform: `translateY(${settleVh}%)`,
-            willChange: "transform",
-          }}
-        >
-          cashu
+      <div className="page-shell relative" style={{ paddingBlock: "clamp(64px, 9vw, 160px)" }}>
+        <div className="footer-card">
+          {/* Top: cashu mark + four nav columns */}
+          <div className="footer-card__top">
+            <Reveal>
+              <Link href="/" aria-label="Cashu home" className="footer-mark focus-ring">
+                <Image
+                  src="/cashu-no-bg.png"
+                  alt="Cashu"
+                  width={48}
+                  height={48}
+                />
+              </Link>
+            </Reveal>
+
+            <div className="footer-card__columns">
+              {COLUMNS.map((col, i) => (
+                <Reveal key={col.heading} delay={80 * (i + 1)}>
+                  <div className="flex flex-col gap-4">
+                    <h3 className="t-title" style={{ color: "#71717a" }}>
+                      {col.heading}
+                    </h3>
+                    <ul className="flex flex-col gap-3">
+                      {col.links.map((link) => (
+                        <li key={link.label}>
+                          {link.external ? (
+                            <ExternalLink
+                              href={link.href}
+                              className="footer-link t-label focus-ring"
+                            >
+                              {link.label}
+                            </ExternalLink>
+                          ) : (
+                            <a
+                              href={link.href}
+                              className="footer-link t-label focus-ring"
+                            >
+                              {link.label}
+                            </a>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+
+          {/* Massive wordmark — pure text, selectable, GT-Standard 600 */}
+          <div className="footer-wordmark" aria-hidden>
+            cashu
+          </div>
+
+          {/* Bottom: socials + legal on left, Ask-AI on right */}
+          <div className="footer-card__bottom">
+            <div className="footer-card__bottom-left">
+              <div className="footer-socials">
+                <ExternalLink
+                  href="https://x.com/CashuBTC"
+                  className="footer-social focus-ring"
+                >
+                  <span className="sr-only">X (Twitter)</span>
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </ExternalLink>
+                <ExternalLink
+                  href="https://github.com/cashubtc"
+                  className="footer-social focus-ring"
+                >
+                  <span className="sr-only">GitHub</span>
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.77.12 3.06.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.14c0 .31.21.68.79.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
+                  </svg>
+                </ExternalLink>
+              </div>
+              <div className="footer-legal">
+                <span className="t-label">© 2026</span>
+                <span className="footer-legal__sep" aria-hidden>·</span>
+                <span className="t-label">MIT Licensed</span>
+                <span className="footer-legal__sep" aria-hidden>·</span>
+                <ExternalLink
+                  href="https://github.com/cashubtc/nuts"
+                  className="footer-link t-label focus-ring"
+                >
+                  Read the spec
+                </ExternalLink>
+              </div>
+            </div>
+
+            <div className="footer-card__bottom-right">
+              <span className="t-label footer-ask-label">Ask AI about Cashu</span>
+              <div className="footer-ai">
+                {AI_LINKS.map((ai) => (
+                  <ExternalLink
+                    key={ai.name}
+                    href={ai.href}
+                    className="footer-ai__link focus-ring"
+                  >
+                    <span className="sr-only">Ask {ai.name} about Cashu</span>
+                    <span
+                      aria-hidden
+                      className={`footer-ai__mark footer-ai__mark--${ai.mark}`}
+                    />
+                  </ExternalLink>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Disclaimer — credit the protocol, name the constraint */}
+          <p className="footer-disclaimer t-body">
+            Cashu is a free, open protocol for Chaumian ecash. It has no company,
+            no token, no treasury — only a specification and the implementations
+            that follow it. Mints are operated by independent parties; balances
+            held with a mint are a claim on that mint, not a deposit. Read the
+            spec before trusting anyone, including us.
+          </p>
         </div>
       </div>
     </footer>

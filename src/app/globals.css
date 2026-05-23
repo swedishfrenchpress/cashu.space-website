@@ -415,6 +415,35 @@ body {
   outline-color: #ffffff;
 }
 
+/*
+ * .btn-with-count — chip modifier that splits the chip into label + data cells
+ * separated by a 1px hairline. The right-side cell carries mono numerics with
+ * cap-tracking and uppercase reset, because the count is data, not a label.
+ * Compose on any base chip. Default divider tone matches the Paper rim;
+ * .btn-primary (Ink ground) overrides to a 22% white hair so the rule reads
+ * against the dark fill.
+ */
+.btn-with-count {
+  padding-right: 0;
+}
+
+.btn-with-count__meta {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 16px;
+  padding: 12px 24px;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  border-left: 1px solid #e4e4e7;
+}
+
+.btn-primary.btn-with-count .btn-with-count__meta {
+  border-left-color: rgba(255, 255, 255, 0.22);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn-primary,
   .btn-secondary,
@@ -428,5 +457,257 @@ body {
   .btn-secondary:active,
   .btn-primary--on-ink:active {
     transform: none;
+  }
+}
+
+/*
+ * Footer — "Specimen card on a photograph". A sharp-cornered Paper card
+ * floats on a grayscale photographic backdrop. Inverts the Twilight Stack:
+ * the photograph is the ambience, the card is the document. No box-shadow
+ * on the card — separation comes from photo contrast + a 1px Hair rim
+ * (Hairline Rule). The keyboard photo gets grayscale + darken in CSS so
+ * the No-Colour Rule holds regardless of source asset.
+ */
+.footer-specimen {
+  background-color: #000000;
+}
+
+.footer-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.footer-photo img {
+  object-fit: cover;
+  filter: grayscale(1) brightness(0.55) contrast(1.05);
+}
+
+.footer-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 100%);
+  pointer-events: none;
+}
+
+.footer-card {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #e4e4e7;
+  padding: clamp(28px, 4vw, 56px);
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-card__top {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+
+.footer-mark {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #18181b;
+}
+
+.footer-mark img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.footer-card__columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(24px, 3vw, 48px);
+}
+
+.footer-link {
+  color: #3f3f46;
+  text-decoration: none;
+  transition: color var(--dur-base) var(--ease-out-quart);
+}
+
+.footer-link:hover,
+.footer-link:focus-visible {
+  color: #000000;
+}
+
+.footer-wordmark {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(7rem, 22vw, 18rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: #000000;
+  margin-block: clamp(56px, 9vw, 144px) clamp(32px, 5vw, 72px);
+  user-select: text;
+  text-align: center;
+}
+
+.footer-card__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: clamp(20px, 2vw, 32px);
+  border-top: 1px solid #e4e4e7;
+  flex-wrap: wrap;
+}
+
+.footer-card__bottom-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+  flex-wrap: wrap;
+}
+
+.footer-socials {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #18181b;
+  text-decoration: none;
+  transition: color var(--dur-base) var(--ease-out-quart);
+}
+
+.footer-social:hover,
+.footer-social:focus-visible {
+  color: #000000;
+}
+
+.footer-social svg {
+  width: 18px;
+  height: 18px;
+}
+
+.footer-legal {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #71717a;
+  flex-wrap: wrap;
+}
+
+.footer-legal__sep {
+  color: #a1a1aa;
+  user-select: none;
+}
+
+.footer-card__bottom-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer-ask-label {
+  color: #71717a;
+}
+
+.footer-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/*
+ * AI provider marks — rendered as masked currentColor blocks so they tint
+ * with hover. Source SVGs are kept in /public/ai/ for direct serving and
+ * the mask URL drives the icon shape. No chromatic accent.
+ */
+.footer-ai__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: #71717a;
+  text-decoration: none;
+  transition: color var(--dur-base) var(--ease-out-quart);
+}
+
+.footer-ai__link:hover,
+.footer-ai__link:focus-visible {
+  color: #000000;
+}
+
+.footer-ai__mark {
+  width: 22px;
+  height: 22px;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.footer-ai__mark--openai {
+  -webkit-mask-image: url("/ai/openai.svg");
+  mask-image: url("/ai/openai.svg");
+}
+
+.footer-ai__mark--claude {
+  -webkit-mask-image: url("/ai/claude.svg");
+  mask-image: url("/ai/claude.svg");
+}
+
+.footer-ai__mark--gemini {
+  -webkit-mask-image: url("/ai/gemini.svg");
+  mask-image: url("/ai/gemini.svg");
+}
+
+.footer-disclaimer {
+  margin-top: clamp(24px, 3vw, 40px);
+  width: 100%;
+  max-width: none;
+  color: #71717a;
+  text-wrap: wrap;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .footer-card__top {
+    grid-template-columns: 1fr;
+  }
+  .footer-card__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-card__columns {
+    grid-template-columns: 1fr;
+  }
+  .footer-card__bottom {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

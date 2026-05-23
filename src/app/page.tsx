@@ -1,5 +1,6 @@
 import ImplementationsGrid from "@/components/implementations-grid";
 import MarqueeStrip from "@/components/marquee-strip";
+import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
@@ -49,6 +50,7 @@ export default function Home() {
       <TabbedFeature />
       <StatementWithMedia />
       <ImplementationsGrid />
+      <ReferenceImplementations />
       <SiteFooter />
     </div>
   );
