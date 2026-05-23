@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-05-21T00:00:00Z",
+  "generatedAt": "2026-05-23T00:00:00Z",
   "title": "Design System: Cashu",
   "extensions": {
     "colorMeta": {
@@ -209,6 +209,14 @@
       "description": "Temporary surface awaiting a real asset (hero image, mint screenshot). Chalk background, Fog caption, 16px radius. Replace before shipping; never final.",
       "html": "<div class=\"ds-placeholder\" role=\"img\" aria-label=\"Hero image placeholder\">hero image placeholder</div>",
       "css": ".ds-placeholder { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; width: 100%; background: #f4f4f5; color: #a1a1aa; border-radius: 16px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; }"
+    },
+    {
+      "name": "Twilight Stack (Closing CTA)",
+      "kind": "custom",
+      "refersTo": "components.twilight-stack",
+      "description": "The page-closing CTA pattern. Ink section with a monochrome radial bloom anchored just below the lower edge and a fractal-noise paper-grain overlay. Carries the .btn-primary--on-ink slab as its single CTA. Reserved for closing-CTA and footer surfaces — not a card, not a hero, never on Paper.",
+      "html": "<section class=\"ds-twilight\"><div class=\"ds-twilight__bloom\" aria-hidden=\"true\"></div><div class=\"ds-twilight__grain\" aria-hidden=\"true\"></div><div class=\"ds-twilight__content\"><h2 class=\"ds-twilight__title\">Cashu, in your pocket.</h2><a class=\"ds-twilight__cta\" href=\"/wallets\">Get a wallet</a></div></section>",
+      "css": ".ds-twilight { position: relative; isolation: isolate; overflow: hidden; padding: 80px 32px; background: #000000; color: #ffffff; } .ds-twilight__bloom { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(100% 60% at 50% 110%, #a1a1aa 0%, #71717a 18%, #3f3f46 34%, #18181b 58%, #000000 80%); } .ds-twilight__grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.04; mix-blend-mode: overlay; background-image: url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\"); } .ds-twilight__content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 40px; } .ds-twilight__title { font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 600; line-height: 0.95; letter-spacing: -0.02em; text-align: center; max-width: 18ch; margin: 0; } .ds-twilight__cta { display: inline-flex; align-items: center; gap: 8px; background: #ffffff; color: #18181b; padding: 16px 32px; border: 1px solid rgba(0,0,0,0.06); border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.9375rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.005em; text-decoration: none; cursor: pointer; box-shadow: 0 0 0 1px #3f3f46, 0 1px 2px rgba(0,0,0,0.20), 0 2px 4px rgba(0,0,0,0.32), inset 0 1px 20px rgba(255,255,255,0.50); transition: transform 150ms cubic-bezier(0.25,1,0.5,1), box-shadow 150ms cubic-bezier(0.25,1,0.5,1); } .ds-twilight__cta:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px #52525b, 0 2px 4px rgba(0,0,0,0.24), 0 4px 8px rgba(0,0,0,0.36), inset 0 1px 20px rgba(255,255,255,0.60); }"
     }
   ],
   "narrative": {
@@ -227,7 +235,10 @@
       { "name": "The One Face Rule", "body": "GT-Standard carries everything readable. Geist Mono is technical notation; Geist Pixel Square is protocol notation. Three families, three jobs, no overlap.", "section": "typography" },
       { "name": "The Big-Or-Quiet Rule", "body": "Type is either Display (≥3.75rem) or quiet (≤1.125rem). The middle ground is avoided. Hierarchy is achieved by jumping scale, not by stair-stepping.", "section": "typography" },
       { "name": "The No-Shadow Rule", "body": "box-shadow is forbidden on every container except .btn-primary, .btn-secondary, and .btn-primary--on-ink. Buttons are the only invitation-to-press in the system and earn the only lift. If a card 'needs' elevation, it needs spacing instead — the button exception is non-transferable.", "section": "elevation" },
-      { "name": "The Hairline Rule", "body": "Structural separation between sections is achieved with a single 1px line in Hair (#e4e4e7), full content width, never bolder. No double rules, no decorative rules.", "section": "elevation" }
+      { "name": "The Hairline Rule", "body": "Structural separation between sections is achieved with a single 1px line in Hair (#e4e4e7), full content width, never bolder. No double rules, no decorative rules.", "section": "elevation" },
+      { "name": "The Honest-Network Rule", "body": "Network visualisations and motion are permitted only when they reflect real protocol structure — Lightning Network bridges between mints, peer-to-peer token transfer between users. Forbidden: decorative flow, speculative connections, mints 'talking' to mints (which Cashu doesn't do), or any animation that exists for aesthetic energy rather than to convey a true property of the protocol.", "section": "elevation" },
+      { "name": "The Two-CTA Rule", "body": "Primary buttons across the site serve two jobs and two only: get a wallet and read the spec. These are the outcomes PRODUCT.md elevates above mint trust, and the visual hierarchy follows. Every other interactive surface — GitHub, blog, tab switchers, secondary navigation — is .btn-secondary or nav-link. If a third 'primary' CTA appears on a single page, collapse one before shipping.", "section": "overview" },
+      { "name": "The Twilight Stack", "body": "The page-closing CTA and the site footer share one continuous treatment so the bottom of every page reads as a single twilight band. Pattern: an Ink section with a monochrome radial bloom (origin 50% 110%, stepping Fog → Mist → Slate → Ink Soft → Ink, all within the existing grey ramp) and an opacity-0.04 SVG fractal-noise paper-grain overlay in mix-blend overlay. Reserved for closing-CTA + footer surfaces only. Never on Paper, never on cards, never on heroes.", "section": "components" }
     ],
     "dos": [
       "Do carry the No-Colour Rule. Greys may shift by lightness, never by hue.",

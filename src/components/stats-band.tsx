@@ -2,14 +2,10 @@ export default function StatsBand() {
   return (
     <section className="page-shell pt-24 lg:pt-32 pb-16 lg:pb-24">
       <div className="flex flex-col items-center gap-6 lg:gap-8">
-        <span className="font-pixel uppercase tracking-wider text-[11px] text-zinc-500 inline-flex items-center gap-2">
-          <span aria-hidden>+</span>
-          Open protocol
-        </span>
-        <h2 className="text-center text-[clamp(2rem,4.5vw,3.5rem)] font-semibold tracking-tight leading-[1.05] max-w-[24ch]">
+        <h2 className="text-center t-headline max-w-[24ch]">
           Real bitcoin, in the spaces bitcoin couldn&rsquo;t reach
         </h2>
-        <p className="text-center text-zinc-500 max-w-[60ch] text-base lg:text-lg leading-relaxed">
+        <p className="text-center text-zinc-500 max-w-[60ch] t-body-lead">
           Pressure-tested by independent mints, wallets, and the developers
           building on the spec.
         </p>
@@ -58,16 +54,17 @@ function StatCard({
     <div
       className={`${surface} p-8 lg:p-10 flex flex-col justify-between gap-12 lg:gap-16 min-h-[280px] lg:min-h-[320px]`}
     >
-      <p
-        className={`${captionColor} text-base lg:text-lg leading-snug max-w-[24ch]`}
-      >
+      <p className={`${captionColor} t-body-lead max-w-[24ch]`}>
         {caption}
       </p>
       <div className="flex flex-col gap-2">
-        <span className="text-[clamp(2.5rem,5vw,4rem)] font-semibold tracking-tight leading-none">
+        <span
+          className="font-semibold tracking-tight leading-none"
+          style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
+        >
           {value}
         </span>
-        <span className={`${labelColor} text-sm`}>{label}</span>
+        <span className={`${labelColor} t-label`}>{label}</span>
       </div>
     </div>
   );

@@ -8,13 +8,13 @@ brand
 
 Bitcoiners curious about ecash — people already inside the Bitcoin world who've heard about Chaumian ecash (Cashu, Fedimint, eCash in general) and want to understand what Cashu is, try a wallet, or point a friend at a clear explanation. Mid-technical: they know what a Lightning invoice is, they've installed at least one self-custodial wallet, they're sovereign-minded about money.
 
-They visit cashu.space to (1) understand the protocol in under a minute, (2) find a trusted wallet to download, (3) decide whether to trust a mint, and (4) link the spec to other developers.
+They visit cashu.space to (1) understand the protocol in under a minute, (2) find a trusted wallet to download, (3) link the spec to other developers, and (4) decide whether to trust a mint. Wallet routing and spec linking are elevated above mint trust — those are the two outcomes the site optimises for after comprehension.
 
 ## Product Purpose
 
 cashu.space is the canonical landing page for Cashu, an open Chaumian-ecash protocol for Bitcoin. It exists to introduce Cashu to bitcoiners, route them to wallets and mints, and signal — through tone and craft — that this is a serious open protocol, not a coin, not a company, not a crypto product.
 
-Success: a visitor leaves having (a) installed a wallet, (b) bookmarked the spec, or (c) understood Cashu well enough to explain it to one other person. No conversion funnels, no sign-ups, no email capture.
+Success, in priority order: a visitor leaves having (a) installed a wallet, (b) bookmarked the spec, or (c) understood Cashu well enough to explain it to one other person. Mint selection is a secondary outcome — relevant when the visitor is ready, never the headline ask. No conversion funnels, no sign-ups, no email capture.
 
 ## Brand Personality
 

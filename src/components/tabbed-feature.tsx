@@ -7,6 +7,7 @@ import {
   useState,
   type RefObject,
 } from "react";
+import Reveal from "./reveal";
 
 type TabId = "wallets" | "mints" | "spec" | "tokens";
 
@@ -164,9 +165,11 @@ export default function TabbedFeature() {
             : "flex flex-col items-center gap-12 lg:gap-16 pt-16 lg:pt-24 pb-24 lg:pb-32"
         }
       >
-        <h2 className="page-shell w-full text-center text-[clamp(2rem,4vw,3rem)] font-semibold tracking-tight leading-[1.05]">
-          Free, open-source electronic cash.
-        </h2>
+        <Reveal className="page-shell w-full">
+          <h2 className="text-center t-headline">
+            Free, open-source electronic cash.
+          </h2>
+        </Reveal>
 
         <div
           className={
@@ -214,7 +217,7 @@ export default function TabbedFeature() {
 
         <p
           key={`caption-${active.id}`}
-          className="page-shell w-full max-w-[60ch] text-center text-zinc-700 text-base lg:text-lg leading-relaxed opacity-0 animate-[fadeIn_200ms_ease-out_forwards]"
+          className="page-shell w-full max-w-[60ch] text-center text-zinc-700 t-body-lead opacity-0 animate-[fadeIn_200ms_ease-out_forwards]"
         >
           {active.caption}
         </p>

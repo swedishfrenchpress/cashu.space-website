@@ -12,6 +12,83 @@
   padding-inline: clamp(24px, 6vw, 96px);
 }
 
+/*
+ * Type system — DESIGN.md §3. Single source of truth for hierarchy.
+ * Anything sized outside these classes is a one-off and should justify itself.
+ *
+ *   t-display    Page peaks: hero, page-closing CTA, route H1s.
+ *   t-headline   Section openings.
+ *   t-title      Subheaders, card titles. The "quiet" side of Big-Or-Quiet.
+ *   t-body       Reading copy. Cap at 65–75ch via max-w-prose where applicable.
+ *   t-body-lead  Section intros and lead paragraphs. One step above body.
+ *   t-label      Buttons, nav, captions, link affordances, small metadata.
+ *   t-mono       Code, addresses, transaction ids. Geist Mono.
+ *   t-pixel      Protocol notation only (amounts, ids, version strings).
+ */
+.t-display {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3.75rem, 9vw, 9rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.t-headline {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.t-title {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.t-body {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.t-body-lead {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+}
+
+.t-label {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.t-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.t-pixel {
+  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -30,6 +107,31 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* The browser default is chromatic blue — outside the No-Colour Rule. */
+::selection {
+  background: #000000;
+  color: #ffffff;
+}
+::-moz-selection {
+  background: #000000;
+  color: #ffffff;
+}
+
+/*
+ * Motion tokens — DESIGN.md §4 Honest-Network Rule, /impeccable animate.
+ * Exponential ease-out curves only; no bounce, no elastic. Editorial pacing —
+ * entrances are deliberate (520–720ms), feedback is brisk (150–200ms).
+ */
+:root {
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-reveal: 620ms;
+  --dur-reveal-slow: 880ms;
 }
 
 @keyframes mint-flow {
@@ -60,11 +162,92 @@ body {
 
 .marquee-track {
   animation: marquee var(--marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-pause:hover .marquee-track {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
+  }
+}
+
+/*
+ * Reveal — the system's one entrance pattern. An element starts at
+ * opacity:0 and translateY(8px); a `.is-revealed` class restores it via
+ * a quart-ease over var(--dur-reveal). Triggered by Reveal client wrapper
+ * either on mount (above-the-fold) or via IntersectionObserver (below).
+ *
+ * The translate is intentionally small. Editorial pacing reads as a
+ * settle, not an arrival animation.
+ */
+.reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-quart),
+    transform var(--dur-reveal) var(--ease-out-quart);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal--fade {
+  transform: none;
+}
+
+.reveal--slow {
+  transition-duration: var(--dur-reveal-slow);
+}
+
+/*
+ * Draw-on — SVG line art animates from invisible to fully drawn. Uses
+ * stroke-dasharray + stroke-dashoffset on a per-shape basis with
+ * pathLength="1" so authors don't need to compute path length manually.
+ * Honest-Network: the line being drawn IS the structure being described.
+ */
+.draw-on {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1100ms var(--ease-out-quart);
+  transition-delay: var(--draw-delay, 0ms);
+}
+
+.draw-on--filled {
+  opacity: 0;
+  transition: opacity 480ms var(--ease-out-quart);
+  transition-delay: var(--draw-delay, 0ms);
+}
+
+.is-revealed .draw-on,
+.draw-on.is-revealed {
+  stroke-dashoffset: 0;
+}
+
+.is-revealed .draw-on--filled,
+.draw-on--filled.is-revealed {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .draw-on,
+  .draw-on--filled {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    transition: none;
   }
 }
 

@@ -63,10 +63,10 @@ function MarqueeCard({ card }: { card: Card }) {
       <div className="absolute inset-10 lg:inset-12 flex flex-col">
         <Icon className="h-7 w-7 text-black" />
         <div className="mt-auto flex flex-col gap-5">
-          <h3 className="font-semibold tracking-tight leading-[1.05] text-[clamp(1.875rem,2.6vw,2.25rem)]">
-            {card.titleLead} <em className="italic font-semibold">{card.titleEm}</em>
+          <h3 className="t-title">
+            {card.titleLead} <em className="italic">{card.titleEm}</em>
           </h3>
-          <p className="text-zinc-600 text-sm leading-relaxed">{card.body}</p>
+          <p className="t-body text-zinc-600">{card.body}</p>
         </div>
       </div>
     </article>

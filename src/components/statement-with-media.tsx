@@ -90,6 +90,24 @@ export default function StatementWithMedia() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // The page tells visitors "copy ecash, paste ecash, that's it." The
+  // sent-bubble below makes good on that — a click puts the demo token on
+  // the clipboard so the section *demonstrates* its own claim.
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  const handleCopyToken = () => {
+    if (typeof navigator === "undefined" || !navigator.clipboard) return;
+    navigator.clipboard.writeText(TOKEN_FRAGMENT).then(
+      () => setCopied(true),
+      () => {},
+    );
+  };
 
   useEffect(() => {
     const node = sectionRef.current;
@@ -170,7 +188,7 @@ export default function StatementWithMedia() {
       />
 
       <div className="page-shell flex flex-col items-center gap-10 lg:gap-14 relative z-10">
-        <h2 className="text-center text-[clamp(2.25rem,5vw,4rem)] font-semibold tracking-tight leading-[1.05] max-w-[20ch]">
+        <h2 className="text-center t-headline max-w-[20ch]">
           Copy ecash. Paste ecash. That&rsquo;s it.
         </h2>
 
@@ -235,9 +253,51 @@ export default function StatementWithMedia() {
                 <Bubble side="left">
                   can you please send me $10 for lunch?
                 </Bubble>
-                <Bubble side="right" mono>
-                  {TOKEN_FRAGMENT}
-                </Bubble>
+                <div className="relative self-end max-w-[88%]">
+                  <button
+                    type="button"
+                    onClick={handleCopyToken}
+                    aria-label="Copy demo token to clipboard"
+                    className="relative block w-full text-left p-0 m-0 border-0 bg-transparent appearance-none cursor-pointer transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-black motion-reduce:hover:translate-y-0"
+                  >
+                    <div
+                      className="rounded-[28px] px-7 py-5"
+                      style={{ backgroundColor: SENT_COLOR }}
+                    >
+                      <span
+                        className="font-mono tracking-tight text-[22px] lg:text-[28px] leading-snug text-white"
+                        style={{ wordBreak: "break-all" }}
+                      >
+                        {TOKEN_FRAGMENT}
+                      </span>
+                    </div>
+                    <svg
+                      aria-hidden
+                      width="20"
+                      height="24"
+                      viewBox="0 0 20 24"
+                      className="absolute"
+                      style={{ bottom: -1, right: -6 }}
+                    >
+                      <path
+                        d="M0 0 Q 0 20 20 23 Q 9 22 9 0 Z"
+                        fill={SENT_COLOR}
+                      />
+                    </svg>
+                  </button>
+                  <span
+                    aria-live="polite"
+                    className="pointer-events-none absolute top-full right-3 mt-1.5 t-pixel select-none whitespace-nowrap"
+                    style={{
+                      color: "rgba(255,255,255,0.6)",
+                      opacity: copied ? 1 : 0,
+                      transition:
+                        "opacity 220ms cubic-bezier(0.25, 1, 0.5, 1)",
+                    }}
+                  >
+                    {copied ? "copied · demo" : ""}
+                  </span>
+                </div>
                 <Bubble side="left">thank you!</Bubble>
               </div>
             </div>

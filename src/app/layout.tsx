@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { GeistPixelSquare } from "geist/font/pixel";
+import ConsoleSignature from "@/components/console-signature";
 import "./globals.css";
 
 const gtStandard = localFont({
@@ -87,7 +88,10 @@ export default function RootLayout({
       lang="en"
       className={`${gtStandard.variable} ${GeistSans.variable} ${GeistMono.variable} ${GeistPixelSquare.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ConsoleSignature />
+        {children}
+      </body>
     </html>
   );
 }
