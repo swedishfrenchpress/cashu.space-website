@@ -113,23 +113,20 @@ export default function ImplementationsGrid() {
         <hr className="border-0 h-px bg-zinc-200 -mt-4 lg:-mt-6" aria-hidden />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-4 lg:gap-6">
-          {/* Open source ecash · tall left, black, bleeds to viewport edge.
-              The page-shell escape — used once, on purpose. The network
-              figure becomes a low-opacity watermark; the type sits flush-
-              bottom-left, aligned to where the page-shell content edge
-              would put it. The card becomes a poster, not a card. */}
+          {/* Open source ecash · tall left, black. The network figure sits
+              as a low-opacity watermark behind the type, which is flush-
+              bottom-left — gives this card its own internal shape so the
+              bento isn't four identical layouts at different sizes. The
+              card stays inside the page-shell so the grid reads centered. */}
           <Reveal slow className="lg:row-span-2">
-            <div className="bleed-left-shell relative bg-black text-white min-h-[420px] lg:min-h-[560px] h-full overflow-hidden">
+            <div className="relative bg-black text-white min-h-[420px] lg:min-h-[560px] h-full overflow-hidden">
               <div
                 aria-hidden
                 className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-25"
               >
-                <NetworkFigure className="w-[120%] h-[120%] max-w-none text-zinc-400" />
+                <NetworkFigure className="w-[105%] h-[105%] max-w-none text-zinc-400" />
               </div>
-              <div
-                style={{ paddingLeft: "var(--bleed-pl)" }}
-                className="relative z-10 flex flex-col h-full justify-end gap-3 py-8 lg:py-10 pr-8 lg:pr-10"
-              >
+              <div className="relative z-10 flex flex-col h-full justify-end gap-3 p-8 lg:p-10">
                 <h3 className="t-title">Open source ecash</h3>
                 <p className="t-body text-zinc-300 max-w-[34ch]">
                   Cashu is a free and open-source protocol. Anyone can run a mint.

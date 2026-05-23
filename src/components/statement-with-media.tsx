@@ -196,10 +196,11 @@ export default function StatementWithMedia() {
       />
 
       <div className="page-shell relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-        {/* Left column on lg+ — the claim is published, not chanted. Display
-            type, flush-left, sits beside the demo it's claiming about. */}
-        <div className="lg:col-span-5 flex flex-col gap-8 lg:gap-10 items-start">
-          <h2 className="t-display max-w-[12ch]">
+        {/* Left column on lg+ — narrower (4/12) so the demo on the right
+            reads larger. Headline at t-headline; t-display was too dominant
+            for this column and pushed the claim into too many wrapped lines. */}
+        <div className="lg:col-span-4 flex flex-col gap-8 lg:gap-10 items-start">
+          <h2 className="t-headline max-w-[16ch]">
             Copy ecash. Paste ecash. That&rsquo;s it.
           </h2>
 
@@ -211,7 +212,7 @@ export default function StatementWithMedia() {
             <svg
               viewBox="-50 -80 882 320"
               aria-hidden
-              className="block h-[88px] lg:h-[120px] w-auto"
+              className="block h-[88px] lg:h-[112px] w-auto"
               preserveAspectRatio="xMidYMid meet"
             >
             <g
@@ -249,10 +250,10 @@ export default function StatementWithMedia() {
         </a>
         </div>
 
-        {/* Right column on lg+ — the chat-bubble demo lives at 7/12 width
-            so the claim and the proof sit side-by-side, parallax phones
-            still gutter the layout via the absolute siblings above. */}
-        <div className="lg:col-span-7 relative w-full">
+        {/* Right column on lg+ — the chat-bubble demo lives at 8/12 width
+            so the proof reads bigger than the claim. Parallax phones still
+            gutter the layout via the absolute siblings above. */}
+        <div className="lg:col-span-8 relative w-full">
           <div className="w-full aspect-[16/9] bg-zinc-900 overflow-hidden relative">
             <Image
               src="/cheers.png"

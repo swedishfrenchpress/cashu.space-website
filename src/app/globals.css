@@ -31,28 +31,6 @@
 .section-y-air { padding-block: var(--section-air); }
 
 /*
- * Bleed-left — escapes the page-shell to the viewport's left edge. Used
- * exactly once on the homepage (Implementations tall black card), per the
- * "break the page-shell once, on purpose" rule.
- *
- * The utility only sets margin-left; it exposes --bleed-pl so consumers
- * can re-pad inner content (via inline style) to align with the page-shell
- * content edge. Inline style sidesteps Tailwind padding shorthand conflicts.
- *
- * Activates at lg+; below that the card stays inside the shell as a normal
- * grid item with --bleed-pl falling back to a sensible inset.
- */
-.bleed-left-shell {
-  --bleed-pl: 2rem;
-}
-@media (min-width: 1024px) {
-  .bleed-left-shell {
-    --bleed-pl: calc(var(--page-x) + max(0px, (100vw - var(--page-max)) / 2) + 2.5rem);
-    margin-left: calc(-1 * (var(--page-x) + max(0px, (100vw - var(--page-max)) / 2)));
-  }
-}
-
-/*
  * Type system — DESIGN.md §3. Single source of truth for hierarchy.
  * Anything sized outside these classes is a one-off and should justify itself.
  *
