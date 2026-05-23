@@ -146,6 +146,8 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 **The No-Colour Rule.** The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface "needs" colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch.
 
+**The Hero-Photograph Exception.** The home hero photograph (`/hero-handoff.jpg`) is the single permitted color image on the site — a documentary moment of a Cashu handoff, kept in its source palette so the human gesture carries. Every other photograph still desaturates via `grayscale(1) contrast(1.05)` (see the footer keyboard, phone parallax, and tabbed-feature landscapes). The rule otherwise holds in full: no chromatic accent in type, chrome, backgrounds, borders, icons, or motion.
+
 **The Two-Black Rule.** Ink (`#000000`) and Ink Soft (`#18181b`) are the only two text colours that may sit on Paper. Slate / Mist / Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.
 
 ## 3. Typography

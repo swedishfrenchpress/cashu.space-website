@@ -711,3 +711,95 @@ body {
     align-items: flex-start;
   }
 }
+
+/*
+ * Hero — "Handoff". Full-bleed photograph + GT-Standard wordmark that
+ * crosses the photo→Paper boundary. Same mental model as
+ * .footer-specimen: image is the ambience, wordmark is the document.
+ * The photo is the single exception to the No-Colour Rule (DESIGN.md §2)
+ * — do not add grayscale() here.
+ */
+.hero-handoff {
+  position: relative;
+  background-color: #ffffff;
+  padding-top: clamp(16px, 2vw, 32px);
+}
+
+.hero-handoff__photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: visible;
+  /* container query unit (cqi) on the photo lets the wordmark scale
+     relative to the photo width rather than the viewport — matters now
+     that the photo lives inside page-shell. */
+  container-type: inline-size;
+}
+
+@media (min-width: 768px) {
+  .hero-handoff__photo {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.hero-handoff__photo-img {
+  object-fit: cover;
+}
+
+.hero-handoff__scrim {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 55%;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  pointer-events: none;
+}
+
+.hero-handoff__wordmark {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 32%);
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(4rem, 17cqi, 13rem);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: #ffffff;
+  white-space: nowrap;
+  pointer-events: none;
+  margin: 0;
+  z-index: 2;
+}
+
+.hero-handoff__statement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  padding-top: clamp(2rem, 4vw, 4rem);
+  padding-bottom: clamp(72px, 10vw, 160px);
+}
+
+.hero-handoff__lead {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  max-width: 28ch;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.hero-handoff__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
