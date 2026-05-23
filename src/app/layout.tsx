@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 import { GeistPixelSquare } from "geist/font/pixel";
 import ConsoleSignature from "@/components/console-signature";
+import Keymap from "@/components/keymap";
 import "./globals.css";
 
 const gtStandard = localFont({
@@ -122,6 +123,7 @@ export default function RootLayout({
           }}
         />
         <ConsoleSignature />
+        <Keymap />
         {children}
       </body>
     </html>

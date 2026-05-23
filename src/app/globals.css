@@ -1155,3 +1155,75 @@ html {
     display: none;
   }
 }
+/*
+ * Keymap — vim-style chord navigation (g h / g w / g s / g i, ? = help).
+ * Editorial-RFC affordance for the technical audience. The toast renders the
+ * pressed chord as protocol notation (.t-pixel) — the rendered keystrokes are
+ * the protocol artefact, which is exactly what the pixel face exists to mark.
+ * Toast and help sheet stay flat (no shadow); doctrine holds.
+ */
+.keymap-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  padding: 8px 14px;
+  background: #f4f4f5;
+  color: #18181b;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out-quart);
+}
+
+.keymap-toast--visible {
+  opacity: 1;
+}
+
+.keymap-help {
+  border: 1px solid #e4e4e7;
+  background: #ffffff;
+  color: #18181b;
+  padding: 0;
+  width: min(360px, calc(100% - 48px));
+  max-width: none;
+  margin: auto;
+}
+
+.keymap-help::backdrop {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.keymap-help__sheet {
+  padding: 24px 28px;
+}
+
+.keymap-help__title {
+  margin-bottom: 16px;
+  color: #18181b;
+}
+
+.keymap-help__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.keymap-help__table td {
+  padding: 8px 0;
+  vertical-align: baseline;
+}
+
+.keymap-help__chord {
+  padding-right: 28px;
+  color: #18181b;
+  white-space: nowrap;
+}
+
+.keymap-help__label {
+  color: #71717a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keymap-toast {
+    transition: none;
+  }
+}
