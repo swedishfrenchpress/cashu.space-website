@@ -99,7 +99,7 @@ export default function StatementWithMedia() {
   // the clipboard so the section *demonstrates* its own claim.
   useEffect(() => {
     if (!copied) return;
-    const t = setTimeout(() => setCopied(false), 1500);
+    const t = setTimeout(() => setCopied(false), 1380);
     return () => clearTimeout(t);
   }, [copied]);
 
@@ -275,7 +275,7 @@ export default function StatementWithMedia() {
                   <button
                     type="button"
                     onClick={handleCopyToken}
-                    aria-label="Copy demo token to clipboard"
+                    aria-label="Copy ecash token to clipboard"
                     className="relative block w-full text-left p-0 m-0 border-0 bg-transparent appearance-none cursor-pointer transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-px focus-ring--on-ink motion-reduce:hover:translate-y-0"
                   >
                     <div
@@ -303,17 +303,22 @@ export default function StatementWithMedia() {
                       />
                     </svg>
                   </button>
+                  {/* iMessage-style "delivered" receipt — centered below the
+                      token bubble. Leverages the section's chat metaphor so
+                      the moment reads as confirmation, not chrome. */}
                   <span
                     aria-live="polite"
-                    className="pointer-events-none absolute top-full right-3 mt-1.5 t-pixel select-none whitespace-nowrap"
+                    className="pointer-events-none absolute top-full left-1/2 mt-2 text-sm text-white/90 select-none whitespace-nowrap motion-reduce:!translate-x-[-50%] motion-reduce:!translate-y-0"
                     style={{
-                      color: "rgba(255,255,255,0.6)",
                       opacity: copied ? 1 : 0,
+                      transform: copied
+                        ? "translate(-50%, 0)"
+                        : "translate(-50%, -2px)",
                       transition:
-                        "opacity 220ms cubic-bezier(0.25, 1, 0.5, 1)",
+                        "opacity 180ms cubic-bezier(0.25, 1, 0.5, 1), transform 180ms cubic-bezier(0.25, 1, 0.5, 1)",
                     }}
                   >
-                    {copied ? "copied · demo" : ""}
+                    Copied
                   </span>
                 </div>
                 <Bubble side="left">thank you!</Bubble>
