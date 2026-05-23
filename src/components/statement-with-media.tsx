@@ -166,7 +166,7 @@ export default function StatementWithMedia() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-black text-white pt-16 lg:pt-24 pb-16 lg:pb-24"
+      className="relative overflow-hidden bg-black text-white section-y-default"
     >
       <Image
         src="/wallets/phone-left.png"
@@ -195,22 +195,25 @@ export default function StatementWithMedia() {
         }}
       />
 
-      <div className="page-shell flex flex-col items-center gap-10 lg:gap-14 relative z-10">
-        <h2 className="text-center t-headline max-w-[20ch]">
-          Copy ecash. Paste ecash. That&rsquo;s it.
-        </h2>
+      <div className="page-shell relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        {/* Left column on lg+ — the claim is published, not chanted. Display
+            type, flush-left, sits beside the demo it's claiming about. */}
+        <div className="lg:col-span-5 flex flex-col gap-8 lg:gap-10 items-start">
+          <h2 className="t-display max-w-[12ch]">
+            Copy ecash. Paste ecash. That&rsquo;s it.
+          </h2>
 
-        <a
-          href="/wallets"
-          aria-label="Get a wallet"
-          className="inline-block transition-opacity duration-150 ease-out hover:opacity-80 focus-visible:opacity-80 focus-ring--on-ink"
-        >
-          <svg
-            viewBox="-50 -80 882 320"
-            aria-hidden
-            className="block h-[100px] lg:h-[142px] w-auto"
-            preserveAspectRatio="xMidYMid meet"
+          <a
+            href="/wallets"
+            aria-label="Get a wallet"
+            className="inline-block transition-opacity duration-150 ease-out hover:opacity-80 focus-visible:opacity-80 focus-ring--on-ink"
           >
+            <svg
+              viewBox="-50 -80 882 320"
+              aria-hidden
+              className="block h-[88px] lg:h-[120px] w-auto"
+              preserveAspectRatio="xMidYMid meet"
+            >
             <g
               transform="translate(0.79 132.17)"
               style={{
@@ -244,8 +247,12 @@ export default function StatementWithMedia() {
             </g>
           </svg>
         </a>
+        </div>
 
-        <div className="relative w-full">
+        {/* Right column on lg+ — the chat-bubble demo lives at 7/12 width
+            so the claim and the proof sit side-by-side, parallax phones
+            still gutter the layout via the absolute siblings above. */}
+        <div className="lg:col-span-7 relative w-full">
           <div className="w-full aspect-[16/9] bg-zinc-900 overflow-hidden relative">
             <Image
               src="/cheers.png"

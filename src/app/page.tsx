@@ -12,7 +12,7 @@ export default function Home() {
     <div className="flex flex-col flex-1 bg-white text-black">
       <SiteHeader />
 
-      <section className="pt-16 lg:pt-24 pb-16 lg:pb-24">
+      <section className="section-y-air">
         <div className="page-shell">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div className="flex flex-col gap-6 lg:gap-8">
@@ -26,18 +26,16 @@ export default function Home() {
                 </p>
               </Reveal>
               <Reveal immediate delay={360}>
-                {/* Hero CTAs — placeholders until the wallets / spec / blog
-                    routes are wired. See /impeccable audit P1 (Two-CTA Rule)
-                    for the eventual rebalance. */}
+                {/* Two primaries, by doctrine: PRODUCT.md elevates "get a
+                    wallet" and "read the spec" as the two outcomes. No third
+                    CTA, no secondary affordance. GitHub lives in the footer;
+                    blog isn't wired yet. */}
                 <div className="flex flex-wrap items-center gap-3">
+                  <a href="/wallets" className="btn-primary">
+                    Get a wallet
+                  </a>
                   <a href="/docs" className="btn-primary">
                     Read the spec
-                  </a>
-                  <a href="https://github.com/cashubtc" className="btn-secondary">
-                    GitHub
-                  </a>
-                  <a href="/blog" className="btn-secondary">
-                    Blog
                   </a>
                 </div>
               </Reveal>

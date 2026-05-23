@@ -87,7 +87,7 @@ function WebFigure({ className }: { className?: string }) {
 
 export default function ImplementationsGrid() {
   return (
-    <section className="page-shell pt-16 lg:pt-24 pb-16 lg:pb-24">
+    <section className="page-shell section-y-air">
       <div className="flex flex-col gap-12 lg:gap-16">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <Reveal>
@@ -96,20 +96,40 @@ export default function ImplementationsGrid() {
             </h2>
           </Reveal>
           <Reveal delay={120}>
-            <a href="/spec" className="btn-primary self-start">
+            {/* Demoted to secondary: the hero already carries "Read the spec"
+                as a primary. Two-CTA Rule (DESIGN.md §1) forbids a third
+                primary on a single page; this CTA is the section handoff,
+                not a competing ask. */}
+            <a href="/spec" className="btn-secondary self-start">
               Read the spec
             </a>
           </Reveal>
         </div>
 
+        {/* Hairline — the section pivots from narrative ("what Cashu is") to
+            directory ("what Cashu is made of"). Single 1px Hair line per the
+            Hairline Rule (DESIGN.md §4). The doctrine fires exactly once on
+            the homepage. */}
+        <hr className="border-0 h-px bg-zinc-200 -mt-4 lg:-mt-6" aria-hidden />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-4 lg:gap-6">
-          {/* Open source ecash · tall left, black */}
+          {/* Open source ecash · tall left, black, bleeds to viewport edge.
+              The page-shell escape — used once, on purpose. The network
+              figure becomes a low-opacity watermark; the type sits flush-
+              bottom-left, aligned to where the page-shell content edge
+              would put it. The card becomes a poster, not a card. */}
           <Reveal slow className="lg:row-span-2">
-            <div className="bg-black text-white p-8 lg:p-10 flex flex-col gap-8 min-h-[420px] lg:min-h-[560px] h-full">
-              <div className="flex-1 flex items-center justify-center">
-                <NetworkFigure className="w-48 h-48 lg:w-60 lg:h-60" />
+            <div className="bleed-left-shell relative bg-black text-white min-h-[420px] lg:min-h-[560px] h-full overflow-hidden">
+              <div
+                aria-hidden
+                className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-25"
+              >
+                <NetworkFigure className="w-[120%] h-[120%] max-w-none text-zinc-400" />
               </div>
-              <div className="flex flex-col gap-3">
+              <div
+                style={{ paddingLeft: "var(--bleed-pl)" }}
+                className="relative z-10 flex flex-col h-full justify-end gap-3 py-8 lg:py-10 pr-8 lg:pr-10"
+              >
                 <h3 className="t-title">Open source ecash</h3>
                 <p className="t-body text-zinc-300 max-w-[34ch]">
                   Cashu is a free and open-source protocol. Anyone can run a mint.

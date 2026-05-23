@@ -197,13 +197,16 @@ export default function TabbedFeature() {
     <section
       ref={wrapperRef}
       className="relative"
-      style={isJacking ? { height: `${TABS.length * 100}vh` } : undefined}
+      // 70vh per tab instead of 100vh — sticky still pins full-screen, but the
+      // scroll budget the section claims is 30% lighter so the page reaches
+      // the next section without a long blur-wash for less-engaged readers.
+      style={isJacking ? { height: `${TABS.length * 70}vh` } : undefined}
     >
       <div
         className={
           isJacking
             ? "sticky top-0 h-screen w-full flex flex-col items-center justify-center gap-6 lg:gap-8 py-8"
-            : "flex flex-col items-center gap-12 lg:gap-16 pt-16 lg:pt-24 pb-24 lg:pb-32"
+            : "section-y-default flex flex-col items-center gap-12 lg:gap-16"
         }
       >
         {/* Headline — each tab's claim is the section header when active.
