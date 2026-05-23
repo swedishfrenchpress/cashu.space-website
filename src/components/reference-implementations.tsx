@@ -178,11 +178,11 @@ function Spec() {
           v0 · CBOR encoding
         </span>
       </div>
-      {/* pl tuned to clear the floating Card's right edge (~180px from spec's
-         left at lg+) with a hair of breathing room. The prior pl-[260px]
-         created an empty band between card and code; pl-[200px] sits the
-         opening brace cleanly past the card. */}
-      <pre className="t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pl-[200px] lg:pr-10 overflow-x-auto leading-7">
+      {/* Spec is now the left column of a 2:1 grid (right column holds the
+         directory + live transfer vignette). The overlap with the floating
+         Card was removed when the Card moved into the right column, so the
+         pre's left padding drops back to the standard rhythm. */}
+      <pre className="t-mono text-zinc-100 px-6 py-7 lg:px-8 lg:py-9 overflow-x-auto leading-7">
         <span className="text-zinc-500">{`// Token v4  ·  CBOR encoding`}</span>{"\n\n"}
         {`{\n  "t": [{\n    "i": `}
         <span className="t-pixel">{`h'00…d2'`}</span>
@@ -200,13 +200,13 @@ function Spec() {
   );
 }
 
-/* Card — the floating implementations directory. Paper on Ink. Flat, no
-   shadow (the lift comes from z-index and overlap, not elevation). Three
-   featured rows + a quiet link to the rest. Featured repos are picked by
-   language coverage (Python/Rust/TypeScript) rather than star count, so the
-   card directly mirrors the lead's "Active across Python, Rust, and
-   TypeScript" claim. Stars are GitHub counts, not protocol artefacts, so
-   they stay in t-mono — not t-pixel. */
+/* Card — the implementations directory. Paper specimen sitting on Ink at
+   the top of the right column. Flat, no shadow. Three featured rows + a
+   quiet link to the rest. Featured repos are picked by language coverage
+   (Python/Rust/TypeScript) rather than star count, so the card directly
+   mirrors the lead's "Active across Python, Rust, and TypeScript" claim.
+   Stars are GitHub counts, not protocol artefacts, so they stay in t-mono
+   — not t-pixel. */
 const FEATURED = ["nutshell", "cdk", "coco"] as const;
 
 function Card() {
@@ -245,6 +245,138 @@ function Card() {
   );
 }
 
+/* National flag glyphs for the live-transfer vignette. Documented scoped
+   exception to the No-Colour Rule (DESIGN.md §2) — same precedent as the
+   language marks above: monochrome silhouettes cannot do the country-level
+   recognition the vignette needs. Kept small and framed with a 1px Hair
+   rim so they read as specimen labels, not chrome. */
+function SwedenFlag() {
+  return (
+    <svg
+      viewBox="0 0 16 10"
+      width="36"
+      height="22"
+      aria-hidden
+      className="shrink-0 border border-zinc-200"
+    >
+      <rect width="16" height="10" fill="#006AA7" />
+      <rect y="4" width="16" height="2" fill="#FECC00" />
+      <rect x="5" width="2" height="10" fill="#FECC00" />
+    </svg>
+  );
+}
+
+function ArgentinaFlag() {
+  return (
+    <svg
+      viewBox="0 0 16 10"
+      width="36"
+      height="22"
+      aria-hidden
+      className="shrink-0 border border-zinc-200"
+    >
+      <rect width="16" height="10" fill="#74ACDF" />
+      <rect y="3.33" width="16" height="3.34" fill="#FFFFFF" />
+      <circle cx="8" cy="5" r="0.9" fill="#F6B40E" />
+    </svg>
+  );
+}
+
+/* Vertical transit indicator — dotted hair + downward chevron. Sits between
+   sender and receiver in the right-column stack. The dotted line is the
+   protocol path; the chevron is the direction of value. */
+function VerticalArrow() {
+  return (
+    <svg
+      viewBox="0 0 24 120"
+      width="24"
+      height="80"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      aria-hidden
+      className="text-zinc-500"
+    >
+      <line x1="12" y1="2" x2="12" y2="108" strokeDasharray="3 5" />
+      <path
+        d="M 6 108 L 12 118 L 18 108"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/* Live-transfer vignette — two Paper wallet specimens stacked vertically.
+   Sweden sends, Argentina receives. The cards sit at the bottom of the
+   right column beneath the Implementations directory Card and demonstrate
+   the spec in operation: two wallets, one protocol, no third party. */
+function SenderCard() {
+  return (
+    <div className="bg-white text-black border border-zinc-200 flex flex-col">
+      <div className="flex items-center gap-3 px-5 lg:px-6 pt-5 pb-4">
+        <SwedenFlag />
+        <div className="flex flex-col">
+          <span className="t-label text-zinc-500 uppercase tracking-wider">
+            Sender
+          </span>
+          <span className="t-title">Stockholm, Sweden</span>
+        </div>
+      </div>
+      <hr className="border-0 h-px bg-zinc-200" aria-hidden />
+      <dl className="px-5 lg:px-6 py-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 items-baseline">
+        <dt className="t-label text-zinc-500 uppercase">Send</dt>
+        <dd className="t-pixel">2 400 sat</dd>
+        <dt className="t-label text-zinc-500 uppercase">To</dt>
+        <dd className="t-mono text-black truncate">cashu wallet</dd>
+        <dt className="t-label text-zinc-500 uppercase">Note</dt>
+        <dd className="t-body text-zinc-400">none</dd>
+      </dl>
+      <hr className="border-0 h-px bg-zinc-200" aria-hidden />
+      <div className="px-5 lg:px-6 py-4 flex justify-end">
+        <span className="btn-primary" role="presentation">
+          Send
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ReceiverCard() {
+  return (
+    <div className="bg-white text-black border border-zinc-200 flex flex-col">
+      <div className="flex items-center gap-3 px-5 lg:px-6 pt-5 pb-4">
+        <ArgentinaFlag />
+        <div className="flex flex-col">
+          <span className="t-label text-zinc-500 uppercase tracking-wider">
+            Receiver
+          </span>
+          <span className="t-title">Buenos Aires, Argentina</span>
+        </div>
+      </div>
+      <hr className="border-0 h-px bg-zinc-200" aria-hidden />
+      <div className="px-5 lg:px-6 py-6 flex flex-col gap-1.5">
+        <span className="t-label text-zinc-500 uppercase tracking-wider">
+          Just received
+        </span>
+        <span className="t-pixel" style={{ fontSize: "1.5rem" }}>
+          + 2 400 sat
+        </span>
+        <span className="t-mono text-zinc-500">
+          from cashu wallet · just now
+        </span>
+      </div>
+      <hr className="border-0 h-px bg-zinc-200" aria-hidden />
+      <div className="px-5 lg:px-6 py-4 flex items-baseline justify-between gap-3">
+        <span className="t-label text-zinc-500 uppercase tracking-wider">
+          From sender
+        </span>
+        <span className="t-mono text-black">nothing</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ReferenceImplementations() {
   return (
     <section className="bg-black text-white section-y-air">
@@ -261,20 +393,28 @@ export default function ReferenceImplementations() {
           </Reveal>
         </div>
 
-        {/* The Spec is the centerpiece — full-width on mobile, capped and
-            centered on lg+. The Card stacks above the Spec on mobile, then
-            on lg+ pulls into absolute position over the Spec's upper-left
-            corner so the dark code surface is visible above, below, and to
-            the right of the white card. The Spec's pre carries enough left
-            padding on lg+ that the code text starts to the right of the
-            overlap zone instead of hiding behind the card. */}
+        {/* 2:1 grid on lg+, single column below. Left: the spec, the
+            centerpiece. Right: a vertical sidebar — the Implementations
+            directory at the top (mirroring the "Active across Python,
+            Rust, and TypeScript" lead with real repos), and the live
+            transfer vignette below it (proving the spec by showing two
+            wallets in operation). On mobile, the order is directory →
+            spec → vignette so the reader meets the project list before
+            the code dump. */}
         <Reveal slow delay={240}>
-          <div className="relative">
-            <div className="mb-6 lg:mb-0 lg:absolute lg:left-0 lg:top-16 lg:w-[340px] lg:z-10">
-              <Card />
-            </div>
-            <div className="lg:mx-auto lg:max-w-3xl lg:px-0">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-8 lg:gap-12 items-start">
+            <div className="order-2 lg:order-1">
               <Spec />
+            </div>
+            <div className="order-1 lg:order-2 flex flex-col gap-6 lg:gap-8">
+              <Card />
+              <div className="flex flex-col items-stretch">
+                <SenderCard />
+                <div className="flex items-center justify-center py-3" aria-hidden>
+                  <VerticalArrow />
+                </div>
+                <ReceiverCard />
+              </div>
             </div>
           </div>
         </Reveal>

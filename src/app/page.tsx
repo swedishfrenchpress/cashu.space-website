@@ -8,7 +8,6 @@ import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 import StatementWithMedia from "@/components/statement-with-media";
 import TabbedFeature from "@/components/tabbed-feature";
-import TransferDemo from "@/components/transfer-demo";
 
 export default function Home() {
   return (
@@ -60,7 +59,6 @@ export default function Home() {
       <div id="why-cashu">
         <StatementWithMedia />
       </div>
-      <TransferDemo />
       <div id="implementations">
         <ImplementationsGrid />
       </div>
