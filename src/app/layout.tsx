@@ -74,7 +74,7 @@ const gtStandard = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cashu.space"),
+  metadataBase: new URL("https://cashu-space-website.vercel.app"),
   title: "Cashu",
   description:
     "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
@@ -82,12 +82,12 @@ export const metadata: Metadata = {
     title: "Cashu",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
-    url: "https://cashu.space",
+    url: "https://cashu-space-website.vercel.app",
     siteName: "Cashu",
     type: "website",
     images: [
       {
-        url: "/og.png",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Two hands exchange US dollar bills against the NYC Flatiron district, flanked by a cashu wallet showing a balance of ₿3,878 on an antifiat mint.",
@@ -99,7 +99,7 @@ export const metadata: Metadata = {
     title: "Cashu",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
-    images: ["/og.png"],
+    images: ["/og-image.jpg"],
   },
 };
 
