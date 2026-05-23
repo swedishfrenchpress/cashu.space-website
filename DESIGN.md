@@ -173,13 +173,15 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 ## 4. Elevation
 
-The system is flat. No drop shadows, no inner shadows, no glow. Depth is conveyed by position (whitespace, grid order), by weight (type doing the lifting), and by a single 1px hairline rule.
+The system is flat with one exception: the button. Every other container — cards, sections, callouts, nav, dividers, placeholder surfaces — sits on Paper without ambient depth. Depth in the layout is conveyed by position (whitespace, grid order), by weight (type doing the lifting), and by a single 1px hairline rule.
 
-This is intentional and doctrinal: the Open Specification north star rejects ambient depth. Surfaces sit on Paper, divided by lines and space.
+The button is the system's only invitation-to-press, and earns the only lift. It carries a darker rim, two layered drop shadows, and an inner top highlight — the *lifted ink chip* — codified in §5.
+
+This scoping is intentional and doctrinal: the Open Specification north star rejects ambient depth on the page, but a CTA that asks for a click is allowed to look like it can be clicked.
 
 ### Named Rules
 
-**The No-Shadow Rule.** `box-shadow` is forbidden on any container. If a card "needs" elevation, it needs spacing instead.
+**The No-Shadow Rule.** `box-shadow` is forbidden on every container *except* `.btn-primary` and `.btn-secondary`. If a card "needs" elevation, it needs spacing instead. The button exception is non-transferable — no other surface inherits it.
 
 **The Hairline Rule.** Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.
 
@@ -189,13 +191,22 @@ This is intentional and doctrinal: the Open Specification north star rejects amb
 
 Components are restrained to a small canonical set: two buttons, a nav link, a divider, and a placeholder surface. New components must justify themselves against the No-Colour and No-Shadow rules before being added.
 
-### Buttons
+### Buttons — The Lifted Ink Slab
 
-- **Shape:** Sharp. `border-radius: 0`. No pills, no rounded-rect buttons in this system — the spec aesthetic reads sharper with hard corners than soft ones.
-- **Primary** (`button-primary`): Background Ink (`#000000`), text Paper (`#ffffff`), padding `14px 24px`, label-weight type. Hover transitions background to Ink Hover (`#27272a`) over 150ms.
-- **Secondary** (`button-secondary`): Background Chalk (`#f4f4f5`), text Ink Soft (`#18181b`), padding `10px 20px`, label-weight type. Hover transitions background to Hair (`#e4e4e7`).
-- **Focus:** A 2px outline in Ink offset 2px from the button edge. No glow, no ring colour change.
+The button is the only surface in the system that breaks the flatness doctrine. It is a **sharp-cornered slab** that sits *above* the page on a stack of shadows. The rationale: a button is the only element that asks for a press, and the only one that earns visible affordance. Sharpness is doctrinal — there are no rounded buttons anywhere on cashu.space.
+
+- **Shape:** Sharp. `border-radius: 0`. Always. No pills, no rounded corners, no soft rectangles. The lift comes from shadow, not from silhouette.
+- **Primary** (`.btn-primary`): Background Ink Soft (`#18181b`), text Paper (`#ffffff`), padding `14px 28px`, label-weight type. Carries a 1px semi-transparent white inside-stroke, a true-black rim shadow (`box-shadow: 0 0 0 1px #000000`), two layered drop shadows (`0 1px 2px rgba(9,9,11,0.08)` and `0 2px 4px rgba(9,9,11,0.16)`), and a white inner top highlight (`inset 0 1px 20px rgba(255,255,255,0.16)`).
+- **Secondary** (`.btn-secondary`): Background Paper (`#ffffff`), text Ink Soft (`#18181b`), padding `10px 22px`. Rim is Hair (`box-shadow: 0 0 0 1px #e4e4e7`) so the slab reads against Paper without the white-on-white edge disappearing. Same drop-shadow ramp at half opacity. No inner highlight (invisible on white).
+- **On-ink variant** (`.btn-primary--on-ink`): For the page-closing CTA sitting on an Ink section. Paper fill, Slate rim (`box-shadow: 0 0 0 1px #3f3f46`), deeper drop shadows (`0 1px 2px rgba(0,0,0,0.20)` and `0 2px 4px rgba(0,0,0,0.32)`) so the slab reads against black, and a stronger inner top highlight (`rgba(255,255,255,0.50)`) so the lift is unmistakable.
+- **Large modifier** (`.btn-primary--lg`): Padding `16px 32px`, font-size `0.9375rem`. Use for the page-closing CTA only.
+- **States:** Hover lifts the slab by `translateY(-1px)` and deepens drop shadow 3; active settles by `translateY(1px)` and reduces the shadows by roughly half. Motion uses the existing `ease-quart-out` curve at `150ms`. Under `prefers-reduced-motion: reduce`, the translate is dropped — only the shadows change.
+- **Focus:** A 2px outline at 4px offset (Ink on light sections, Paper on Ink sections). No glow, no ring colour shift.
 - **Iconography:** The primary CTA carries a single trailing arrow glyph (`→`) as a plain text character — not an SVG icon. The minimalism is the point.
+
+#### What stays flat (no shadow)
+
+The lift exception applies *only* to the three `.btn-*` classes above. Every other surface in the system is flat and sharp: cards, sections, callouts, nav, dividers, placeholder surfaces. A new component is not allowed to inherit the button exception by association.
 
 ### Navigation
 
@@ -232,7 +243,7 @@ When the protocol's own quantities or identifiers appear in body copy — sats a
 - **Don't** introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Never on cashu.space.
 - **Don't** add Web3 / DeFi tropes: pastel gradients, blob shapes, decorative network animations that misrepresent how the protocol works (e.g. mints "talking" to mints, which Cashu doesn't do). Motion is permitted only under the Honest-Network Rule — see §4.
 - **Don't** dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS "YOUR DATA, SECURED™" copy. Privacy is a property of the protocol, stated plainly.
-- **Don't** use `box-shadow` on any container. No drop shadow, inner shadow, or coloured glow. The system is flat by doctrine.
+- **Don't** use `box-shadow` on any container except `.btn-primary` / `.btn-secondary` / `.btn-primary--on-ink`. Buttons are the system's only lifted surface — every other container is flat. No drop shadow, no inner shadow, no coloured glow anywhere else.
 - **Don't** use `border-left` / `border-right` >1px as a coloured stripe on cards or callouts. Side-stripes are forbidden in impeccable's universal bans and doubly forbidden here.
 - **Don't** use `background-clip: text` with a gradient (gradient text). One solid colour, emphasis by weight or size.
 - **Don't** introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.

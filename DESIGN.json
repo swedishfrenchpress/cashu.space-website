@@ -89,7 +89,38 @@
         "purpose": "Protocol artefacts only: amounts, mint ids, version strings. Geist Pixel Square."
       }
     },
-    "shadows": [],
+    "shadows": [
+      {
+        "name": "btn-rim",
+        "value": "0 0 0 1px #000000",
+        "purpose": "The darker bezel rim under a primary chip. True-black ring directly outside the Ink Soft fill so the chip edge reads."
+      },
+      {
+        "name": "btn-rim-secondary",
+        "value": "0 0 0 1px #e4e4e7",
+        "purpose": "Hair-coloured rim for the secondary (Paper-fill) chip on Paper sections — defines the edge without ink."
+      },
+      {
+        "name": "btn-rim-on-ink",
+        "value": "0 0 0 1px #3f3f46",
+        "purpose": "Slate rim for the on-ink chip variant sitting on a black section. Darker than Hair so the rim reads against Ink."
+      },
+      {
+        "name": "btn-elev-1",
+        "value": "0 1px 2px rgba(9, 9, 11, 0.08)",
+        "purpose": "Tight inner drop shadow on a chip. Y offset 1, blur 2."
+      },
+      {
+        "name": "btn-elev-2",
+        "value": "0 2px 4px rgba(9, 9, 11, 0.16)",
+        "purpose": "Wider drop shadow on a chip. Y offset 2, blur 4. Pairs with btn-elev-1 for the resting-state lift."
+      },
+      {
+        "name": "btn-inner-highlight",
+        "value": "inset 0 1px 20px rgba(255, 255, 255, 0.16)",
+        "purpose": "The white top-edge highlight inside the primary Ink Soft chip. Reads as ambient light on a glossy ink surface."
+      }
+    ],
     "motion": [
       {
         "name": "ease-quart-out",
@@ -116,20 +147,28 @@
   },
   "components": [
     {
-      "name": "Primary Button",
+      "name": "Primary Button (Lifted Ink Slab)",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The principal CTA. Solid Ink button on Paper, sharp corners. Used at the hero CTA row and inside the navigation.",
-      "html": "<button class=\"ds-btn-primary\" type=\"button\">Get a wallet <span aria-hidden=\"true\">→</span></button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; background: #000000; color: #ffffff; padding: 14px 24px; border: none; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-primary:hover { background: #27272a; } .ds-btn-primary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
+      "description": "The principal CTA. Ink Soft slab on Paper with sharp corners (border-radius 0 — doctrinal), a true-black rim, layered drop shadows, and a white inner top highlight. The only surface in the system permitted to carry box-shadow. Hover lifts by translateY(-1px); active settles by translateY(1px).",
+      "html": "<a class=\"btn-primary\" href=\"/docs\">Read the spec <span aria-hidden=\"true\">→</span></a>",
+      "css": ".btn-primary { display: inline-flex; align-items: center; gap: 8px; background: #18181b; color: #ffffff; padding: 14px 28px; border: 1px solid rgba(255,255,255,0.22); border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.005em; cursor: pointer; box-shadow: 0 0 0 1px #000000, 0 1px 2px rgba(9,9,11,0.08), 0 2px 4px rgba(9,9,11,0.16), inset 0 1px 20px rgba(255,255,255,0.16); transition: transform 150ms cubic-bezier(0.25,1,0.5,1), box-shadow 150ms cubic-bezier(0.25,1,0.5,1), background-color 150ms cubic-bezier(0.25,1,0.5,1); } .btn-primary:hover { background: #27272a; transform: translateY(-1px); box-shadow: 0 0 0 1px #000000, 0 2px 4px rgba(9,9,11,0.10), 0 4px 8px rgba(9,9,11,0.20), inset 0 1px 20px rgba(255,255,255,0.18); } .btn-primary:active { transform: translateY(1px); box-shadow: 0 0 0 1px #000000, 0 1px 1px rgba(9,9,11,0.06), 0 1px 2px rgba(9,9,11,0.10), inset 0 1px 20px rgba(255,255,255,0.12); } .btn-primary:focus-visible { outline: 2px solid #000000; outline-offset: 4px; } @media (prefers-reduced-motion: reduce) { .btn-primary { transition: box-shadow 150ms linear, background-color 150ms linear; } .btn-primary:hover, .btn-primary:active { transform: none; } }"
     },
     {
-      "name": "Secondary Button",
+      "name": "Secondary Button (Paper Slab)",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Quieter, smaller button on Chalk, sharp corners. Used for tertiary actions in the navigation (Read the docs).",
-      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Read the docs</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; background: #f4f4f5; color: #18181b; padding: 10px 20px; border: none; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background-color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-btn-secondary:hover { background: #e4e4e7; } .ds-btn-secondary:focus-visible { outline: 2px solid #000000; outline-offset: 2px; }"
+      "description": "Quieter slab. Sharp corners (border-radius 0). Paper fill on Paper sections with a Hair rim and the same lift mechanics as the primary at reduced intensity. No inner highlight (invisible on white). Used for the hero's GitHub / Blog row, tab selectors, and other tertiary actions.",
+      "html": "<a class=\"btn-secondary\" href=\"https://github.com/cashubtc\">GitHub</a>",
+      "css": ".btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: #ffffff; color: #18181b; padding: 10px 22px; border: 1px solid rgba(0,0,0,0.04); border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.005em; cursor: pointer; box-shadow: 0 0 0 1px #e4e4e7, 0 1px 2px rgba(9,9,11,0.04), 0 2px 4px rgba(9,9,11,0.08); transition: transform 150ms cubic-bezier(0.25,1,0.5,1), box-shadow 150ms cubic-bezier(0.25,1,0.5,1), background-color 150ms cubic-bezier(0.25,1,0.5,1); } .btn-secondary:hover { background: #fafafa; transform: translateY(-1px); box-shadow: 0 0 0 1px #a1a1aa, 0 2px 4px rgba(9,9,11,0.06), 0 4px 8px rgba(9,9,11,0.10); } .btn-secondary:active { transform: translateY(1px); box-shadow: 0 0 0 1px #d4d4d8, 0 1px 1px rgba(9,9,11,0.04), 0 1px 2px rgba(9,9,11,0.06); } .btn-secondary:focus-visible { outline: 2px solid #000000; outline-offset: 4px; } @media (prefers-reduced-motion: reduce) { .btn-secondary { transition: box-shadow 150ms linear, background-color 150ms linear; } .btn-secondary:hover, .btn-secondary:active { transform: none; } }"
+    },
+    {
+      "name": "Primary Button — On Ink (Paper Slab on Black)",
+      "kind": "button",
+      "refersTo": "button-primary-on-ink",
+      "description": "The closing-CTA variant. Sharp corners. Paper slab on an Ink section with a Slate rim and deeper drop shadows so the slab reads against black, plus a stronger inner top highlight. Pairs with .btn-primary--lg for the large closing scale.",
+      "html": "<a class=\"btn-primary--on-ink btn-primary--lg\" href=\"/wallets\">Get a wallet</a>",
+      "css": ".btn-primary--on-ink { display: inline-flex; align-items: center; gap: 8px; background: #ffffff; color: #18181b; padding: 14px 28px; border: 1px solid rgba(0,0,0,0.06); border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.005em; cursor: pointer; box-shadow: 0 0 0 1px #3f3f46, 0 1px 2px rgba(0,0,0,0.20), 0 2px 4px rgba(0,0,0,0.32), inset 0 1px 20px rgba(255,255,255,0.50); transition: transform 150ms cubic-bezier(0.25,1,0.5,1), box-shadow 150ms cubic-bezier(0.25,1,0.5,1); } .btn-primary--on-ink:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px #52525b, 0 2px 4px rgba(0,0,0,0.24), 0 4px 8px rgba(0,0,0,0.36), inset 0 1px 20px rgba(255,255,255,0.60); } .btn-primary--on-ink:active { transform: translateY(1px); box-shadow: 0 0 0 1px #3f3f46, 0 1px 1px rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,0.24), inset 0 1px 20px rgba(255,255,255,0.40); } .btn-primary--on-ink:focus-visible { outline: 2px solid #ffffff; outline-offset: 4px; } .btn-primary--lg { padding: 16px 32px; font-size: 0.9375rem; }"
     },
     {
       "name": "Nav Link",
@@ -174,12 +213,12 @@
   ],
   "narrative": {
     "northStar": "The Open Specification",
-    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.",
+    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered lifted-ink slabs (the only surfaces in the system that carry shadow), generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.",
     "keyCharacteristics": [
       "Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.",
       "Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).",
       "Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.",
-      "Sharp-cornered buttons, hairline divider, no shadows — depth is conveyed by position and weight, never by elevation.",
+      "One lifted surface (the sharp-cornered button slab with rim + drop shadow + inner highlight) on an otherwise flat page — every other container is flat, separated by a hairline divider and generous whitespace. Sharp corners site-wide, including on the lifted button. Only the CTA is allowed to look pressable.",
       "Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast."
     ],
     "rules": [
@@ -187,7 +226,7 @@
       { "name": "The Two-Black Rule", "body": "Ink (#000000) and Ink Soft (#18181b) are the only two text colours that may sit on Paper. Slate, Mist, Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.", "section": "colors" },
       { "name": "The One Face Rule", "body": "GT-Standard carries everything readable. Geist Mono is technical notation; Geist Pixel Square is protocol notation. Three families, three jobs, no overlap.", "section": "typography" },
       { "name": "The Big-Or-Quiet Rule", "body": "Type is either Display (≥3.75rem) or quiet (≤1.125rem). The middle ground is avoided. Hierarchy is achieved by jumping scale, not by stair-stepping.", "section": "typography" },
-      { "name": "The No-Shadow Rule", "body": "box-shadow is forbidden on any container. If a card 'needs' elevation, it needs spacing instead.", "section": "elevation" },
+      { "name": "The No-Shadow Rule", "body": "box-shadow is forbidden on every container except .btn-primary, .btn-secondary, and .btn-primary--on-ink. Buttons are the only invitation-to-press in the system and earn the only lift. If a card 'needs' elevation, it needs spacing instead — the button exception is non-transferable.", "section": "elevation" },
       { "name": "The Hairline Rule", "body": "Structural separation between sections is achieved with a single 1px line in Hair (#e4e4e7), full content width, never bolder. No double rules, no decorative rules.", "section": "elevation" }
     ],
     "dos": [
@@ -202,7 +241,7 @@
       "Don't introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins.",
       "Don't add Web3 / DeFi tropes: pastel gradients, blob shapes, playful money-flow illustrations. Cashu is bitcoin-native and deliberately not crypto-coded.",
       "Don't dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS 'YOUR DATA, SECURED™' copy. Privacy is a property of the protocol, stated plainly.",
-      "Don't use box-shadow on any container. No drop shadow, inner shadow, or coloured glow. The system is flat by doctrine.",
+      "Don't use box-shadow on any container except .btn-primary / .btn-secondary / .btn-primary--on-ink. Buttons are the system's only lifted surface. Cards, sections, callouts, nav, dividers, and placeholder surfaces all stay flat.",
       "Don't use border-left or border-right greater than 1px as a coloured stripe on cards or callouts.",
       "Don't use background-clip: text with a gradient (gradient text). One solid colour, emphasis by weight or size.",
       "Don't introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.",

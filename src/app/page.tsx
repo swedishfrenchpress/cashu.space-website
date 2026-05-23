@@ -34,22 +34,13 @@ export default function Home() {
                 the world.
               </h1>
               <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href="/docs"
-                  className="inline-flex items-center gap-2 bg-black text-white px-6 py-3.5 text-sm font-medium hover:bg-zinc-800 transition-colors"
-                >
+                <a href="/docs" className="btn-primary">
                   Read the spec <span aria-hidden>→</span>
                 </a>
-                <a
-                  href="https://github.com/cashubtc"
-                  className="inline-flex items-center bg-zinc-100 text-zinc-900 px-5 py-2.5 text-sm font-medium hover:bg-zinc-200 transition-colors"
-                >
+                <a href="https://github.com/cashubtc" className="btn-secondary">
                   GitHub
                 </a>
-                <a
-                  href="/blog"
-                  className="inline-flex items-center bg-zinc-100 text-zinc-900 px-5 py-2.5 text-sm font-medium hover:bg-zinc-200 transition-colors"
-                >
+                <a href="/blog" className="btn-secondary">
                   Blog
                 </a>
               </div>

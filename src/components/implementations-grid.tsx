@@ -6,10 +6,7 @@ export default function ImplementationsGrid() {
           <h2 className="text-[clamp(2rem,4.5vw,3.5rem)] font-semibold tracking-tight leading-[1.05] max-w-[18ch]">
             Properties of the protocol
           </h2>
-          <a
-            href="/spec"
-            className="inline-flex items-center self-start bg-black hover:bg-zinc-800 transition-colors px-6 py-3.5 text-sm font-medium text-white whitespace-nowrap"
-          >
+          <a href="/spec" className="btn-primary self-start">
             Read the spec
           </a>
         </div>

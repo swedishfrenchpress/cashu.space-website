@@ -165,7 +165,7 @@ export default function TabbedFeature() {
         }
       >
         <h2 className="page-shell w-full text-center text-[clamp(2rem,4vw,3rem)] font-semibold tracking-tight leading-[1.05]">
-          Cashu where bitcoin flows.
+          Free, open-source electronic cash.
         </h2>
 
         <div
@@ -193,7 +193,7 @@ export default function TabbedFeature() {
         <div
           role="tablist"
           aria-label="Cashu pillars"
-          className="page-shell w-full flex gap-3 overflow-x-auto justify-center scrollbar-none"
+          className="page-shell w-full flex flex-wrap gap-4 lg:gap-5 justify-center py-3"
         >
           {TABS.map((tab, i) => {
             const isActive = i === activeIndex;
@@ -204,11 +204,7 @@ export default function TabbedFeature() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveIndex(i)}
-                className={
-                  isActive
-                    ? "inline-flex items-center bg-black text-white px-5 py-3 text-sm font-medium tracking-tight whitespace-nowrap transition-colors"
-                    : "inline-flex items-center bg-transparent text-zinc-500 hover:text-black border border-zinc-200 px-5 py-3 text-sm font-medium tracking-tight whitespace-nowrap transition-colors"
-                }
+                className={isActive ? "btn-primary" : "btn-secondary"}
               >
                 <span>{tab.label}</span>
               </button>
@@ -223,11 +219,7 @@ export default function TabbedFeature() {
           {active.caption}
         </p>
 
-        <a
-          key={`cta-${active.id}`}
-          href={active.href}
-          className="inline-flex items-center bg-black hover:bg-zinc-800 transition-colors px-6 py-3.5 text-sm font-medium text-white"
-        >
+        <a key={`cta-${active.id}`} href={active.href} className="btn-primary">
           {active.cta}
         </a>
       </div>
