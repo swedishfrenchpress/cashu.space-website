@@ -710,7 +710,10 @@ html {
 .hero-handoff {
   position: relative;
   background-color: #ffffff;
-  padding-top: clamp(16px, 2vw, 32px);
+  /* Lets the sticky glass pill breathe above the photograph — the prior
+     clamp ran 16–32px which read as cramped on laptop+ viewports where
+     the nav and the photo nearly touch. */
+  padding-top: clamp(40px, 5vw, 88px);
 }
 
 .hero-handoff__photo {
@@ -1155,6 +1158,7 @@ html {
     display: none;
   }
 }
+
 /*
  * Keymap — vim-style chord navigation (g h / g w / g s / g i, ? = help).
  * Editorial-RFC affordance for the technical audience. The toast renders the
