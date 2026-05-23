@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 import ImplementationsGrid from "@/components/implementations-grid";
-import MarqueeStrip from "@/components/marquee-strip";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
@@ -54,7 +53,6 @@ export default function Home() {
         </div>
       </section>
 
-      <MarqueeStrip />
       <TabbedFeature />
       <div id="why-cashu">
         <StatementWithMedia />

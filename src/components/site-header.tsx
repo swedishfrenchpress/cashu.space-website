@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import Reveal from "./reveal";
 
 type SiteHeaderProps = {
@@ -16,19 +20,40 @@ const NAV_ITEMS = [
 
 /**
  * Contained capsule navigation. Logo left, anchor links centered, primary
- * chip right — adapted from a fintech-style pill nav but sharpened to the
- * cashu register: zero radius, 1px Hair rim, no shadow on the container.
- * Buttons remain the only surface allowed to lift (DESIGN.md §5).
+ * chip right at lg+; brand + hamburger toggle below lg, with the panel
+ * dropping the four nav items + the GitHub CTA into a glass card beneath
+ * the pill. The pill itself stays sharp on doctrine (DESIGN.md §4) —
+ * glassmorphism and rounded geometry are scoped to the navbar exception.
  */
 export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
   const ctaClass = onInk ? "btn-primary--on-ink" : "btn-primary";
+
+  // Close the panel on Escape — standard menu accessibility.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen]);
+
+  // Auto-close on route change so the menu doesn't linger after navigation.
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
   return (
     <header className="site-header-shell">
       <div className="page-shell">
         <Reveal immediate variant="fade" as="div">
           <nav
             aria-label="Primary"
-            className={`site-nav${onInk ? " site-nav--on-ink" : ""}`}
+            className={`site-nav${onInk ? " site-nav--on-ink" : ""}${
+              isOpen ? " is-open" : ""
+            }`}
           >
             <Link href="/" className="site-nav__brand focus-ring">
               <Image
@@ -56,12 +81,70 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
               href="https://github.com/cashubtc"
               target="_blank"
               rel="noopener noreferrer"
-              className={ctaClass}
+              className={`${ctaClass} site-nav__cta`}
             >
               View on GitHub
             </a>
+
+            <button
+              type="button"
+              className="site-nav__toggle focus-ring"
+              aria-expanded={isOpen}
+              aria-controls="site-nav-panel"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              onClick={() => setIsOpen((o) => !o)}
+            >
+              <span
+                className={`site-nav__toggle-icon${
+                  isOpen ? " is-open" : ""
+                }`}
+                aria-hidden
+              >
+                <span />
+                <span />
+              </span>
+            </button>
           </nav>
         </Reveal>
+
+        {/* Mobile-only collapsible panel. Uses the grid-template-rows
+            0fr→1fr trick to animate to auto height without javascript
+            measurement. Rendered always for stable accessibility tree;
+            hidden visually & from AT when closed. */}
+        <div
+          id="site-nav-panel"
+          className={`site-nav-panel${onInk ? " site-nav-panel--on-ink" : ""}${
+            isOpen ? " is-open" : ""
+          }`}
+          aria-hidden={!isOpen}
+        >
+          <div className="site-nav-panel__inner">
+            <ul className="site-nav-panel__list">
+              {NAV_ITEMS.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="site-nav-panel__link focus-ring"
+                    onClick={() => setIsOpen(false)}
+                    tabIndex={isOpen ? 0 : -1}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="https://github.com/cashubtc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${ctaClass} site-nav-panel__cta`}
+              tabIndex={isOpen ? 0 : -1}
+              onClick={() => setIsOpen(false)}
+            >
+              View on GitHub
+            </a>
+          </div>
+        </div>
       </div>
     </header>
   );
