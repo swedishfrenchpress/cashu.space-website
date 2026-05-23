@@ -169,10 +169,20 @@ function LangMark({ lang }: { lang: string }) {
 function Spec() {
   return (
     <div className="bg-[#18181b] w-full">
-      <div className="bg-[#27272a] border-b border-zinc-800 px-5 py-3">
-        <span className="t-mono text-zinc-400">cashubtc/nuts/nut-00.md</span>
+      {/* Header strip — slim, two-cell: file path left, spec metadata right.
+         Earns the strip space by carrying information instead of leaving the
+         right half blank like a browser tab. */}
+      <div className="flex items-center justify-between gap-6 bg-[#27272a] border-b border-zinc-800 px-5 py-3 t-mono">
+        <span className="text-zinc-400 truncate">cashubtc/nuts/nut-00.md</span>
+        <span className="hidden sm:inline text-zinc-500 whitespace-nowrap">
+          v0 · CBOR encoding
+        </span>
       </div>
-      <pre className="t-mono text-zinc-100 p-6 lg:p-8 lg:pl-[260px] overflow-x-auto leading-relaxed">
+      {/* pl tuned to clear the floating Card's right edge (~180px from spec's
+         left at lg+) with a hair of breathing room. The prior pl-[260px]
+         created an empty band between card and code; pl-[200px] sits the
+         opening brace cleanly past the card. */}
+      <pre className="t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pl-[200px] lg:pr-10 overflow-x-auto leading-7">
         <span className="text-zinc-500">{`// Token v4  ·  CBOR encoding`}</span>{"\n\n"}
         {`{\n  "t": [{\n    "i": `}
         <span className="t-pixel">{`h'00…d2'`}</span>
@@ -277,7 +287,7 @@ export default function ReferenceImplementations() {
               rel="noopener noreferrer"
               className="btn-primary--on-ink"
             >
-              Browse on GitHub →
+              Browse on GitHub
             </a>
           </div>
         </Reveal>

@@ -8,6 +8,7 @@ import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 import StatementWithMedia from "@/components/statement-with-media";
 import TabbedFeature from "@/components/tabbed-feature";
+import TransferDemo from "@/components/transfer-demo";
 
 export default function Home() {
   return (
@@ -30,16 +31,6 @@ export default function Home() {
             sizes="(min-width: 1280px) 1088px, 100vw"
             className="hero-handoff__photo-img"
           />
-          <div className="hero-handoff__scrim" aria-hidden />
-          <Reveal
-            as="h1"
-            immediate
-            slow
-            delay={120}
-            className="hero-handoff__wordmark"
-          >
-            Cashu
-          </Reveal>
         </div>
         <div className="hero-handoff__statement">
           <Reveal immediate delay={260}>
@@ -67,8 +58,13 @@ export default function Home() {
 
       <MarqueeStrip />
       <TabbedFeature />
-      <StatementWithMedia />
-      <ImplementationsGrid />
+      <div id="why-cashu">
+        <StatementWithMedia />
+      </div>
+      <TransferDemo />
+      <div id="implementations">
+        <ImplementationsGrid />
+      </div>
       <ReferenceImplementations />
       <SiteFooter />
     </div>
