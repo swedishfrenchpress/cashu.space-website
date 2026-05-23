@@ -103,10 +103,10 @@ export default function WalletsPage() {
                       href={wallet.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_auto] items-center gap-4 md:gap-8 py-6 lg:py-7 transition-colors hover:bg-zinc-950 focus-visible:bg-zinc-950 focus-ring--on-ink"
+                      className="group grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_auto] items-center gap-4 sm:gap-6 md:gap-8 py-5 sm:py-6 lg:py-7 transition-colors hover:bg-zinc-950 focus-visible:bg-zinc-950 focus-ring--on-ink"
                     >
                       <span className="t-title">{wallet.name}</span>
-                      <span className="hidden md:flex items-center gap-2">
+                      <span className="hidden sm:flex items-center gap-2">
                         {wallet.platforms.map((p) => (
                           <span
                             key={p}

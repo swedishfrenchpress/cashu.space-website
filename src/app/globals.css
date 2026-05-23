@@ -120,6 +120,14 @@ body {
   color: var(--foreground);
 }
 
+/* Defense in depth: any future intrinsic-wide child (marquee, code block,
+   long token string) cannot create horizontal page scroll. `clip` is
+   preferred over `hidden` because it does not establish a scroll container
+   — keeping `position: sticky` on the nav working as expected. */
+html {
+  overflow-x: clip;
+}
+
 /*
  * Focus ring — single sitewide utility. DESIGN.md §5 spec: 2px outline at
  * 4px offset, Ink on light surfaces, Paper on Ink. Use on any interactive
@@ -192,6 +200,22 @@ body {
 
 .marquee-pause:hover .marquee-track {
   animation-play-state: paused;
+}
+
+/*
+ * The marquee track is intrinsically ~3.2k px wide (`w-max`). The
+ * surrounding column-flex chain (body → flex flex-col → section) gives
+ * every flex item `min-width: auto`, which equals the item's min-content
+ * size — that propagates the track's max-content right up to the body,
+ * locking the document to 1280px (the page-shell max-width) on every
+ * viewport below desktop. `min-width: 0` here breaks that chain so the
+ * overflow-hidden wrapper actually constrains the marquee to its
+ * containing column instead of inflating the page. Doctrine: this is a
+ * structural fix, not a visual change.
+ */
+.marquee-pause {
+  min-width: 0;
+  width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -728,12 +752,21 @@ body {
 .hero-handoff__photo {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  /* 3/2 on phones is more cinematic than 4/3 and keeps the CTAs higher in
+     the fold on 360–414px viewports. Bumps to 4/3 on small tablets and
+     16/9 on desktop where the photo earns its full landscape. */
+  aspect-ratio: 3 / 2;
   overflow: visible;
   /* container query unit (cqi) on the photo lets the wordmark scale
      relative to the photo width rather than the viewport — matters now
      that the photo lives inside page-shell. */
   container-type: inline-size;
+}
+
+@media (min-width: 640px) {
+  .hero-handoff__photo {
+    aspect-ratio: 4 / 3;
+  }
 }
 
 @media (min-width: 768px) {
@@ -753,7 +786,9 @@ body {
   text-align: center;
   gap: clamp(1.25rem, 2vw, 1.75rem);
   padding-top: clamp(1.5rem, 3vw, 2.75rem);
-  padding-bottom: clamp(40px, 5vw, 80px);
+  /* Tight on phones so the marquee enters the fold; generous on desktop
+     where the hero earns the breathing room. */
+  padding-bottom: clamp(28px, 5vw, 80px);
 }
 
 /* Hero peak — bumped to a page-peak scale so the lead carries the same
@@ -762,7 +797,9 @@ body {
    <25-char monument the Display scale is designed for. */
 .hero-handoff__lead {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(2.5rem, 6vw, 5rem);
+  /* Floor at 2.25rem so the lead doesn't crowd 320px iPhones; ceiling
+     still 5rem on desktop to keep the page-peak weight. */
+  font-size: clamp(2.25rem, 6vw, 5rem);
   font-weight: 600;
   line-height: 1.02;
   letter-spacing: -0.02em;
@@ -925,12 +962,29 @@ body {
   color: #ffffff;
 }
 
-@media (max-width: 820px) {
+/* Nav-link visibility aligned to Tailwind's lg (1024px). Below lg the
+   four labels + brand + CTA can crowd the pill; collapsing the labels keeps
+   the brand and CTA confidently sized at small-laptop and tablet widths. */
+@media (max-width: 1023.98px) {
   .site-nav {
     grid-template-columns: auto auto;
     justify-content: space-between;
   }
   .site-nav__list {
     display: none;
+  }
+}
+
+/* On phones the GitHub label can crowd the pill; tighten the CTA padding
+   so the pill stays comfortably centred at 360–400px viewports. */
+@media (max-width: 480px) {
+  .site-nav .btn-primary,
+  .site-nav .btn-primary--on-ink {
+    padding: 9px 16px;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+  .site-nav {
+    padding-left: 16px;
   }
 }

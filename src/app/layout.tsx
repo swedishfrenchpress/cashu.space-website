@@ -73,9 +73,33 @@ const gtStandard = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://cashu.space"),
   title: "Cashu",
   description:
     "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
+  openGraph: {
+    title: "Cashu",
+    description:
+      "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
+    url: "https://cashu.space",
+    siteName: "Cashu",
+    type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Two hands exchange US dollar bills against the NYC Flatiron district, flanked by a cashu wallet showing a balance of ₿3,878 on an antifiat mint.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cashu",
+    description:
+      "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({

@@ -182,8 +182,12 @@ const DISPLAY_TITLE_STYLE: CSSProperties = {
 
 export default function TabbedFeature() {
   const wrapperRef = useRef<HTMLElement | null>(null);
+  // Scroll-jacking is gated to lg+ (1024px). At md (768–1023px) the section
+  // ran 280vh tall on iPad-portrait windows, which read as heavy — moving
+  // the trigger up keeps tablets on the stacked layout. `pointer: fine`
+  // already excludes touchscreens.
   const isJacking = useMediaQuery(
-    "(min-width: 768px) and (prefers-reduced-motion: no-preference) and (pointer: fine)",
+    "(min-width: 1024px) and (prefers-reduced-motion: no-preference) and (pointer: fine)",
   );
   const [progress, setProgress] = useScrollProgress(
     wrapperRef,
@@ -206,7 +210,7 @@ export default function TabbedFeature() {
         className={
           isJacking
             ? "sticky top-0 h-screen w-full flex flex-col items-center justify-center gap-6 lg:gap-8 py-8"
-            : "section-y-default flex flex-col items-center gap-12 lg:gap-16"
+            : "section-y-default flex flex-col items-center gap-10 md:gap-12 lg:gap-16"
         }
       >
         {/* Headline — each tab's claim is the section header when active.
@@ -272,7 +276,7 @@ export default function TabbedFeature() {
         <div
           role="tablist"
           aria-label="Cashu pillars"
-          className="page-shell w-full flex flex-wrap gap-4 lg:gap-5 justify-center py-3"
+          className="page-shell w-full flex flex-wrap gap-3 sm:gap-4 lg:gap-5 justify-center py-3"
         >
           {TABS.map((tab, i) => {
             const isActive = i === activeIndex;

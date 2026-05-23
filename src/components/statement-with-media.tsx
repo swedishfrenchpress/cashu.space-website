@@ -37,9 +37,9 @@ function Bubble({ side, children, mono = false }: BubbleProps) {
         isRight ? "self-end" : "self-start"
       }`}
     >
-      <div className="rounded-2xl px-6 py-4 lg:px-7 lg:py-5" style={{ backgroundColor: bg }}>
+      <div className="rounded-2xl px-4 py-3 md:px-6 md:py-4 lg:px-7 lg:py-5" style={{ backgroundColor: bg }}>
         <span
-          className={`${mono ? "t-mono" : "t-body-lead"} lg:text-2xl`}
+          className={`${mono ? "t-mono" : "t-body"} md:text-lg lg:text-2xl`}
           style={{
             color: fg,
             wordBreak: mono ? "break-all" : "normal",
@@ -168,14 +168,18 @@ export default function StatementWithMedia() {
       ref={sectionRef}
       className="relative overflow-hidden bg-black text-white section-y-default"
     >
+      {/* Parallax phones are gated to lg+. At md (iPad portrait) the
+          section isn't wide enough for the 240px-wide phones AND the chat
+          panel to coexist — the phones crowd into the center and overlap
+          the bubbles. The chat itself reads clearly without them. */}
       <Image
         src="/wallets/phone-left.png"
         alt=""
         aria-hidden
         width={610}
         height={1240}
-        sizes="(min-width: 1024px) 305px, 240px"
-        className="hidden md:block absolute left-[3%] lg:left-[5%] top-0 z-0 w-[240px] lg:w-[305px] h-auto pointer-events-none select-none grayscale contrast-[1.05]"
+        sizes="305px"
+        className="hidden lg:block absolute left-[5%] top-0 z-0 w-[280px] xl:w-[305px] h-auto pointer-events-none select-none"
         style={{
           transform: `translateY(${leftTranslateVh}vh) rotate(-5deg)`,
           willChange: "transform",
@@ -187,8 +191,8 @@ export default function StatementWithMedia() {
         aria-hidden
         width={610}
         height={1240}
-        sizes="(min-width: 1024px) 305px, 240px"
-        className="hidden md:block absolute right-[3%] lg:right-[5%] top-0 z-0 w-[240px] lg:w-[305px] h-auto pointer-events-none select-none grayscale contrast-[1.05]"
+        sizes="305px"
+        className="hidden lg:block absolute right-[5%] top-0 z-0 w-[280px] xl:w-[305px] h-auto pointer-events-none select-none"
         style={{
           transform: `translateY(${rightTranslateVh}vh) rotate(5deg)`,
           willChange: "transform",
@@ -254,19 +258,25 @@ export default function StatementWithMedia() {
             so the proof reads bigger than the claim. Parallax phones still
             gutter the layout via the absolute siblings above. */}
         <div className="lg:col-span-8 relative w-full">
-          <div className="w-full aspect-[16/9] bg-zinc-900 overflow-hidden relative">
+          {/* Aspect-ratio is the right frame on desktop where the cheers
+              photograph fills the panel and the parallax phones gutter
+              the layout. On phones and tablets the 16/9 box compresses
+              three bubbles into too little vertical room — so the panel
+              uses a flexible min-height stack until lg, then switches
+              to the landscape frame. */}
+          <div className="w-full bg-zinc-900 overflow-hidden relative min-h-[440px] sm:min-h-[480px] md:min-h-[520px] lg:aspect-[16/9] lg:min-h-0">
             <Image
               src="/cheers.png"
               alt=""
               aria-hidden
               fill
-              sizes="100vw"
+              sizes="(min-width: 1024px) 60vw, 100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 flex items-center justify-center px-6 py-8 lg:py-12">
+            <div className="absolute inset-0 flex items-center justify-center px-4 py-7 sm:px-6 sm:py-8 lg:py-12">
               <div
-                className="flex flex-col gap-5 lg:gap-6 w-full"
-                style={{ maxWidth: "min(88%, 920px)" }}
+                className="flex flex-col gap-3 sm:gap-4 md:gap-5 lg:gap-6 w-full"
+                style={{ maxWidth: "min(92%, 920px)" }}
               >
                 <Bubble side="left">
                   can you please send me $10 for lunch?
@@ -279,11 +289,11 @@ export default function StatementWithMedia() {
                     className="relative block w-full text-left p-0 m-0 border-0 bg-transparent appearance-none cursor-pointer transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-px focus-ring--on-ink motion-reduce:hover:translate-y-0"
                   >
                     <div
-                      className="rounded-2xl px-6 py-4 lg:px-7 lg:py-5"
+                      className="rounded-2xl px-4 py-3 md:px-6 md:py-4 lg:px-7 lg:py-5"
                       style={{ backgroundColor: SENT_BG }}
                     >
                       <span
-                        className="t-body-lead lg:text-2xl text-white"
+                        className="t-body md:text-lg lg:text-2xl text-white"
                         style={{ wordBreak: "break-all" }}
                       >
                         {TOKEN_FRAGMENT}

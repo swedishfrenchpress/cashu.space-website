@@ -84,8 +84,8 @@ function WalletFigure({ className }: { className?: string }) {
 export default function ImplementationsGrid() {
   return (
     <section className="page-shell section-y-air">
-      <div className="flex flex-col gap-12 lg:gap-16">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+      <div className="flex flex-col gap-10 md:gap-12 lg:gap-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
           <Reveal>
             <h2 className="t-headline max-w-[18ch]">
               Properties of the protocol
@@ -108,14 +108,19 @@ export default function ImplementationsGrid() {
             the homepage. */}
         <hr className="border-0 h-px bg-zinc-200 -mt-4 lg:-mt-6" aria-hidden />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-4 lg:gap-6">
+        {/* Layout: 1 col on phone, 2 col on tablet (Card 1 spans the left
+            column full-height while Cards 2–4 stack down the right), 3 col
+            on desktop (Card 1 tall left, Card 2 wide top-right, Cards 3+4
+            paired bottom-right). The tablet treatment keeps the bento
+            shape from collapsing into a long single-column scroll. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-3 lg:grid-cols-3 lg:grid-rows-2 gap-4 lg:gap-6">
           {/* Open source ecash · tall left, black. The network figure sits
               as a low-opacity watermark behind the type, which is flush-
               bottom-left — gives this card its own internal shape so the
               bento isn't four identical layouts at different sizes. The
               card stays inside the page-shell so the grid reads centered. */}
-          <Reveal slow className="lg:row-span-2">
-            <div className="relative bg-black text-white min-h-[420px] lg:min-h-[560px] h-full overflow-hidden">
+          <Reveal slow className="md:row-span-3 lg:row-span-2">
+            <div className="relative bg-black text-white min-h-[420px] md:min-h-[520px] lg:min-h-[560px] h-full overflow-hidden">
               <div
                 aria-hidden
                 className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-25"
@@ -132,8 +137,8 @@ export default function ImplementationsGrid() {
           </Reveal>
 
           {/* Bearer token · wide top right, chalk */}
-          <Reveal slow delay={120} className="lg:col-span-2">
-            <div className="bg-zinc-100 p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
+          <Reveal slow delay={120} className="md:col-start-2 md:row-start-1 lg:col-start-auto lg:row-start-auto lg:col-span-2">
+            <div className="bg-zinc-100 p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
               <div className="flex-1 flex items-center justify-center">
                 <MoneyFigure className="w-36 h-36 lg:w-44 lg:h-44" />
               </div>
@@ -148,8 +153,8 @@ export default function ImplementationsGrid() {
           </Reveal>
 
           {/* Privacy focused · bottom right left, white with hair */}
-          <Reveal slow delay={240}>
-            <div className="bg-white border border-zinc-200 p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
+          <Reveal slow delay={240} className="md:col-start-2 md:row-start-2">
+            <div className="bg-white border border-zinc-200 p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
               <div className="flex-1 flex items-center justify-center">
                 <LockFigure className="w-32 h-32 lg:w-40 lg:h-40" />
               </div>
@@ -164,8 +169,8 @@ export default function ImplementationsGrid() {
           </Reveal>
 
           {/* Ecash for the Web · bottom right right, white with hair */}
-          <Reveal slow delay={360}>
-            <div className="bg-white border border-zinc-200 p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
+          <Reveal slow delay={360} className="md:col-start-2 md:row-start-3 lg:col-start-auto lg:row-start-auto">
+            <div className="bg-white border border-zinc-200 p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
               <div className="flex-1 flex items-center justify-center">
                 <WalletFigure className="w-32 h-32 lg:w-40 lg:h-40" />
               </div>
