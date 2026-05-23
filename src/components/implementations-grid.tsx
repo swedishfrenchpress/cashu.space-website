@@ -127,13 +127,24 @@ export default function ImplementationsGrid() {
               card stays inside the page-shell so the grid reads centered. */}
           <Reveal slow className="md:row-span-3 lg:row-span-2">
             <div className="relative bg-black text-white min-h-[420px] md:min-h-[520px] lg:min-h-[560px] h-full overflow-hidden">
+              {/* md+ watermark — bleeds past the card edges as the original
+                  composition intended. Hidden on mobile in favor of the inline
+                  figure below, which centers properly in the column. */}
               <div
                 aria-hidden
-                className="absolute inset-0 pointer-events-none flex items-center justify-center"
+                className="hidden md:flex absolute inset-0 pointer-events-none items-center justify-center"
               >
                 <GlobeFigure className="w-[105%] h-[105%] max-w-none text-white" />
               </div>
-              <div className="relative z-10 flex flex-col h-full justify-end gap-3 p-8 lg:p-10">
+              <div className="relative z-10 flex flex-col h-full p-8 lg:p-10 md:justify-end gap-6 md:gap-3">
+                {/* Mobile-only inline figure — centers in the space above the
+                    headline so the card reads balanced rather than top-loaded. */}
+                <div
+                  aria-hidden
+                  className="md:hidden flex-1 flex items-center justify-center"
+                >
+                  <GlobeFigure className="w-44 h-44 text-white" />
+                </div>
                 <h3 className="t-title">Open source ecash</h3>
                 <p className="t-body text-zinc-300 max-w-[34ch]">
                   Cashu is a free and open-source protocol. Anyone can run a mint.
