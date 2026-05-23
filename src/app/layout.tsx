@@ -114,6 +114,9 @@ export default function RootLayout({
       className={`${gtStandard.variable} ${GeistMono.variable} ${GeistPixelSquare.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <div
           hidden
           suppressHydrationWarning

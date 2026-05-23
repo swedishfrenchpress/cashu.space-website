@@ -4,7 +4,9 @@ const FIGURE_PROPS = {
   viewBox: "0 0 120 120",
   fill: "none",
   stroke: "currentColor",
-  strokeWidth: 1,
+  // 1.5 reads as architectural — RFC figure, not pencil sketch. 1px hair
+  // disappears against the white cards at 128–176px display sizes.
+  strokeWidth: 1.5,
   strokeLinecap: "round",
   strokeLinejoin: "round",
   "aria-hidden": true,
@@ -92,11 +94,15 @@ export default function ImplementationsGrid() {
             </h2>
           </Reveal>
           <Reveal delay={120}>
-            {/* Demoted to secondary: the hero already carries "Read the spec"
-                as a primary. Two-CTA Rule (DESIGN.md §1) forbids a third
-                primary on a single page; this CTA is the section handoff,
-                not a competing ask. */}
-            <a href="/spec" className="btn-secondary self-start">
+            {/* Section handoff CTA — Read the spec lives in canonical docs at
+                docs.cashu.space. Stays secondary by Two-CTA Rule (DESIGN.md §1);
+                this is the handoff, not a competing ask. */}
+            <a
+              href="https://docs.cashu.space/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary self-start"
+            >
               Read the spec
             </a>
           </Reveal>
@@ -123,9 +129,9 @@ export default function ImplementationsGrid() {
             <div className="relative bg-black text-white min-h-[420px] md:min-h-[520px] lg:min-h-[560px] h-full overflow-hidden">
               <div
                 aria-hidden
-                className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-25"
+                className="absolute inset-0 pointer-events-none flex items-center justify-center"
               >
-                <GlobeFigure className="w-[105%] h-[105%] max-w-none text-zinc-400" />
+                <GlobeFigure className="w-[105%] h-[105%] max-w-none text-white" />
               </div>
               <div className="relative z-10 flex flex-col h-full justify-end gap-3 p-8 lg:p-10">
                 <h3 className="t-title">Open source ecash</h3>

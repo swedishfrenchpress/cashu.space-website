@@ -167,6 +167,23 @@ html {
   --dur-reveal-slow: 880ms;
 }
 
+/*
+ * Spec pane left padding clears the floating Implementations Card on lg+.
+ * The offset is the Card's effective right edge (340px width, sitting at
+ * left: 0 in the absolute parent) plus a breathing-room hair (≈40px). Lives
+ * as a token so we can tune it in one place instead of inline magic numbers
+ * scattered across the component.
+ */
+:root {
+  --spec-card-offset: 200px;
+}
+
+@media (min-width: 1024px) {
+  .spec-pane {
+    padding-left: var(--spec-card-offset);
+  }
+}
+
 @keyframes mint-flow {
   to {
     stroke-dashoffset: -56;
@@ -606,59 +623,16 @@ html {
   color: #71717a;
 }
 
+/*
+ * Ask-AI block — quiet text-link row "Ask AI about Cashu  ChatGPT · Claude · Gemini".
+ * Lifted from a 22px masked-icon row to plain text links; the doctrine
+ * leans on type, and the icons read as decorative at that scale anyway.
+ */
 .footer-ai {
   display: inline-flex;
   align-items: center;
   gap: 14px;
-}
-
-/*
- * AI provider marks — rendered as masked currentColor blocks so they tint
- * with hover. Source SVGs are kept in /public/ai/ for direct serving and
- * the mask URL drives the icon shape. No chromatic accent.
- */
-.footer-ai__link {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  color: #71717a;
-  text-decoration: none;
-  transition: color var(--dur-base) var(--ease-out-quart);
-}
-
-.footer-ai__link:hover,
-.footer-ai__link:focus-visible {
-  color: #000000;
-}
-
-.footer-ai__mark {
-  width: 22px;
-  height: 22px;
-  background-color: currentColor;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
-
-.footer-ai__mark--openai {
-  -webkit-mask-image: url("/ai/openai.svg");
-  mask-image: url("/ai/openai.svg");
-}
-
-.footer-ai__mark--claude {
-  -webkit-mask-image: url("/ai/claude.svg");
-  mask-image: url("/ai/claude.svg");
-}
-
-.footer-ai__mark--gemini {
-  -webkit-mask-image: url("/ai/gemini.svg");
-  mask-image: url("/ai/gemini.svg");
+  flex-wrap: wrap;
 }
 
 .footer-disclaimer {
@@ -667,6 +641,35 @@ html {
   max-width: none;
   color: #71717a;
   text-wrap: wrap;
+}
+
+/*
+ * Skip-to-content — appears only on keyboard focus. Carries Ink/Paper for
+ * highest contrast against either site theme; doctrine-flat (no shadow,
+ * sharp corner). Lives at the top of <body> in layout.tsx; each page sets
+ * id="main-content" on the start of its meaningful content (past the nav).
+ */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 10px 16px;
+  background: #000000;
+  color: #ffffff;
+  text-decoration: none;
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: translateY(calc(-100% - 16px));
+  transition: transform var(--dur-fast) var(--ease-out-quart);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
 .sr-only {
@@ -746,16 +749,33 @@ html {
   object-fit: cover;
 }
 
+/*
+ * Asymmetric layout: lead flush-left under the photo, CTAs flush-left
+ * beneath on mobile / pulled to the opposite edge on lg+. Breaks the
+ * centered-stack landing-page template the brand register warns against
+ * ("Don't default to centering everything"). On lg+ the lead column caps
+ * narrow so the CTA cluster has room to live on the opposite side without
+ * the row stretching to negative tension.
+ */
 .hero-handoff__statement {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: clamp(1.25rem, 2vw, 1.75rem);
-  padding-top: clamp(1.5rem, 3vw, 2.75rem);
+  align-items: flex-start;
+  text-align: left;
+  gap: clamp(1.5rem, 2.5vw, 2.25rem);
+  padding-top: clamp(1.75rem, 3vw, 3rem);
   /* Tight on phones so the next section enters the fold; generous on
      desktop where the hero earns the breathing room. */
-  padding-bottom: clamp(28px, 5vw, 80px);
+  padding-bottom: clamp(32px, 6vw, 96px);
+}
+
+@media (min-width: 1024px) {
+  .hero-handoff__statement {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: clamp(2rem, 4vw, 4rem);
+    align-items: end;
+  }
 }
 
 /* Hero peak — bumped to a page-peak scale so the lead carries the same
@@ -765,8 +785,9 @@ html {
 .hero-handoff__lead {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
   /* Floor at 2.25rem so the lead doesn't crowd 320px iPhones; ceiling
-     still 5rem on desktop to keep the page-peak weight. */
-  font-size: clamp(2.25rem, 6vw, 5rem);
+     5.5rem on desktop — now that the lead anchors the left, it can carry
+     a touch more weight than the prior centered shape. */
+  font-size: clamp(2.25rem, 6.25vw, 5.5rem);
   font-weight: 600;
   line-height: 1.02;
   letter-spacing: -0.02em;
@@ -779,7 +800,7 @@ html {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.75rem;
 }
 

@@ -14,12 +14,15 @@ export default function Home() {
       <SiteHeader />
 
       {/* Hero — "Handoff". A photograph of a real Cashu moment (cash-in
-          against an antifiat-mint wallet) carries the page; a giant
-          GT-Standard wordmark bleeds across the photo→Paper boundary,
-          borrowing the Without Studio specimen layout. The photograph
-          is the *single permitted color image* on the site — every
-          other photo desaturates per DESIGN.md §2. */}
-      <section className="hero-handoff page-shell">
+          against an antifiat-mint wallet) carries the page. Beneath the
+          photo, the lead and CTAs land asymmetric: lead flush-left,
+          CTAs flush-left under it on mobile / pulled to the opposite
+          edge on lg+. The centered stack the brand register warns
+          against ("Don't default to centering everything") is
+          deliberately avoided here. The photograph is the *single
+          permitted color image* on the site — every other photo
+          desaturates per DESIGN.md §2. */}
+      <section id="main-content" className="hero-handoff page-shell">
         <div className="hero-handoff__photo">
           <Image
             src="/hero-handoff.jpg"
@@ -37,15 +40,22 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal immediate delay={380}>
-            {/* Two primaries, by doctrine: PRODUCT.md elevates "get a
-                wallet" and "read the spec" as the two outcomes. No third
-                CTA, no secondary affordance. GitHub lives in the footer;
-                blog isn't wired yet. */}
+            {/* Get-a-wallet is the page's primary ask (PRODUCT.md
+                outcome #1); Read-the-spec is the doctrine-equal second
+                outcome but reads quieter on the hero so the page has a
+                clear lead click. Both primaries return sitewide on
+                deeper pages — the hero just nominates which to click
+                first. No third CTA: GitHub lives in the footer. */}
             <div className="hero-handoff__cta-row">
               <a href="/wallets" className="btn-primary">
                 Get a wallet
               </a>
-              <a href="/docs" className="btn-primary">
+              <a
+                href="https://docs.cashu.space/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+              >
                 Read the spec
               </a>
             </div>

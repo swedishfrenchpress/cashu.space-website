@@ -20,6 +20,7 @@ type Tab = {
   caption: string;
   cta: string;
   href: string;
+  external?: boolean;
   image: string;
 };
 
@@ -51,7 +52,8 @@ const TABS: Tab[] = [
     caption:
       "Documented in version-controlled NUTs. Read them, fork them, propose your own.",
     cta: "Read the spec",
-    href: "/spec",
+    href: "https://docs.cashu.space/",
+    external: true,
     image: "/peaks.jpg",
   },
   {
@@ -73,7 +75,9 @@ const TABS: Tab[] = [
 // instead of dragging at the speed of your scroll wheel.
 const MEDIA_BLUR_PX = 14;
 const TEXT_BLUR_PX = 5;
-const SNAP_MS = 320;
+// 240ms reads as brisk-but-not-jumpy. The prior 320ms felt like a hesitation
+// for fast scrollers — perceptibly delayed without adding storytelling.
+const SNAP_MS = 240;
 const SNAP_EASE = "cubic-bezier(0.25, 1, 0.5, 1)"; // ease-out-quart — decisive entry, smooth tail
 
 function useMediaQuery(query: string): boolean {
@@ -304,7 +308,7 @@ export default function TabbedFeature() {
                 <p
                   key={`caption-${tab.id}`}
                   aria-hidden={!isActive}
-                  className="col-start-1 row-start-1 max-w-[60ch] justify-self-center text-center text-zinc-700 t-body-lead"
+                  className="col-start-1 row-start-1 max-w-[60ch] justify-self-center text-center text-zinc-900 t-body-lead"
                   style={layerStyle(isActive, TEXT_BLUR_PX)}
                 >
                   {tab.caption}
@@ -312,7 +316,7 @@ export default function TabbedFeature() {
               );
             })
           ) : (
-            <p className="col-start-1 row-start-1 max-w-[60ch] justify-self-center text-center text-zinc-700 t-body-lead">
+            <p className="col-start-1 row-start-1 max-w-[60ch] justify-self-center text-center text-zinc-900 t-body-lead">
               {active.caption}
             </p>
           )}
@@ -327,6 +331,9 @@ export default function TabbedFeature() {
                 <a
                   key={`cta-${tab.id}`}
                   href={tab.href}
+                  {...(tab.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
                   aria-hidden={!isActive}
                   tabIndex={isActive ? 0 : -1}
                   className="btn-primary col-start-1 row-start-1 justify-self-center"
@@ -337,7 +344,13 @@ export default function TabbedFeature() {
               );
             })
           ) : (
-            <a href={active.href} className="btn-primary col-start-1 row-start-1 justify-self-center">
+            <a
+              href={active.href}
+              {...(active.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+              className="btn-primary col-start-1 row-start-1 justify-self-center"
+            >
               {active.cta}
             </a>
           )}

@@ -18,10 +18,13 @@ export default function NotFound() {
         </Reveal>
       </header>
 
-      <section className="page-shell flex-1 flex items-center pt-16 lg:pt-24 pb-24 lg:pb-32">
+      <section
+        id="main-content"
+        className="page-shell flex-1 flex items-center pt-16 lg:pt-24 pb-24 lg:pb-32"
+      >
         <div className="flex flex-col gap-8 lg:gap-10 max-w-[60ch]">
           <Reveal immediate delay={80}>
-            <span className="t-pixel text-zinc-500">nut:404</span>
+            <span className="t-mono text-zinc-500">nut:404</span>
           </Reveal>
           <Reveal immediate slow delay={160}>
             <h1 className="t-display">Not specified.</h1>

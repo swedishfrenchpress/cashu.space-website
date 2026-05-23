@@ -5,20 +5,20 @@ type Repo = {
   url: string;
   tag: string;
   lang: string;
-  stars: number;
-  forks: number;
 };
 
-/* Hand-maintained snapshot of the cashubtc org. Refresh by hand on releases —
-   numbers drift slowly and the site is static-first by doctrine. */
+/* Canonical repo list for the cashubtc org. Star/fork counts intentionally
+   omitted — the site is "a directory and manifesto, not a product page"
+   (PRODUCT.md). The tag carries the "what is this" signal; the language
+   mark carries the "real X, real Y" signal. Both age well. */
 const REPOS: Repo[] = [
-  { name: "nutshell",      url: "https://github.com/cashubtc/nutshell",      tag: "Wallet & mint",   lang: "Python",     stars: 479, forks: 168 },
-  { name: "nuts",          url: "https://github.com/cashubtc/nuts",          tag: "Spec",            lang: "—",          stars: 228, forks:  77 },
-  { name: "cdk",           url: "https://github.com/cashubtc/cdk",           tag: "Dev kit",         lang: "Rust",       stars: 217, forks: 127 },
-  { name: "eNuts",         url: "https://github.com/cashubtc/eNuts",         tag: "Mobile wallet",   lang: "TypeScript", stars: 209, forks:  34 },
-  { name: "cashu.me",      url: "https://github.com/cashubtc/cashu.me",      tag: "Web wallet",      lang: "TypeScript", stars: 206, forks: 102 },
-  { name: "awesome-cashu", url: "https://github.com/cashubtc/awesome-cashu", tag: "Resources",       lang: "—",          stars: 205, forks:  22 },
-  { name: "coco",          url: "https://github.com/cashubtc/coco",          tag: "Wallet toolkit",  lang: "TypeScript", stars:  37, forks:  19 },
+  { name: "nutshell",      url: "https://github.com/cashubtc/nutshell",      tag: "Wallet & mint",   lang: "Python"     },
+  { name: "nuts",          url: "https://github.com/cashubtc/nuts",          tag: "Spec",            lang: "—"          },
+  { name: "cdk",           url: "https://github.com/cashubtc/cdk",           tag: "Dev kit",         lang: "Rust"       },
+  { name: "eNuts",         url: "https://github.com/cashubtc/eNuts",         tag: "Mobile wallet",   lang: "TypeScript" },
+  { name: "cashu.me",      url: "https://github.com/cashubtc/cashu.me",      tag: "Web wallet",      lang: "TypeScript" },
+  { name: "awesome-cashu", url: "https://github.com/cashubtc/awesome-cashu", tag: "Resources",       lang: "—"          },
+  { name: "coco",          url: "https://github.com/cashubtc/coco",          tag: "Wallet toolkit",  lang: "TypeScript" },
 ];
 
 /* Language marks — full-color brand glyphs. This is a deliberate, scoped
@@ -178,11 +178,10 @@ function Spec() {
           v0 · CBOR encoding
         </span>
       </div>
-      {/* pl tuned to clear the floating Card's right edge (~180px from spec's
-         left at lg+) with a hair of breathing room. The prior pl-[260px]
-         created an empty band between card and code; pl-[200px] sits the
-         opening brace cleanly past the card. */}
-      <pre className="t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pl-[200px] lg:pr-10 overflow-x-auto leading-7">
+      {/* Left padding on lg+ clears the floating Card's right edge with a
+         hair of breathing room. The offset lives on the .spec-pane class so
+         the magic number doesn't sit inline — see globals.css. */}
+      <pre className="spec-pane t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pr-10 overflow-x-auto leading-7">
         <span className="text-zinc-500">{`// Token v4  ·  CBOR encoding`}</span>{"\n\n"}
         {`{\n  "t": [{\n    "i": `}
         <span className="t-pixel">{`h'00…d2'`}</span>
@@ -203,11 +202,13 @@ function Spec() {
 /* Card — the floating implementations directory. Paper on Ink. Flat, no
    shadow (the lift comes from z-index and overlap, not elevation). Three
    featured rows + a quiet link to the rest. Featured repos are picked by
-   language coverage (Python/Rust/TypeScript) rather than star count, so the
-   card directly mirrors the lead's "Active across Python, Rust, and
-   TypeScript" claim. Stars are GitHub counts, not protocol artefacts, so
-   they stay in t-mono — not t-pixel. */
+   language coverage (Python/Rust/TypeScript) so the card mirrors the lead's
+   "Active across Python, Rust, and TypeScript" claim. Each row carries the
+   language mark on the left and the project's role on the right — name in
+   the middle. No stars: the visitor isn't choosing between nutshell and cdk
+   by GitHub vanity counts. */
 const FEATURED = ["nutshell", "cdk", "coco"] as const;
+const REMAINING = REPOS.length - FEATURED.length;
 
 function Card() {
   const featured = FEATURED.map((name) => REPOS.find((r) => r.name === name)!);
@@ -228,7 +229,7 @@ function Card() {
             <LangMark lang={repo.lang} />
             <span className="t-title truncate">{repo.name}</span>
           </span>
-          <span className="t-mono text-zinc-500 whitespace-nowrap">★ {repo.stars}</span>
+          <span className="t-label text-zinc-500 whitespace-nowrap">{repo.tag}</span>
         </a>
       ))}
       <div className="px-5 py-4">
@@ -238,7 +239,7 @@ function Card() {
           rel="noopener noreferrer"
           className="t-label text-black hover:text-zinc-600 transition-colors focus-ring"
         >
-          3 more on GitHub →
+          {REMAINING} more on GitHub →
         </a>
       </div>
     </div>
@@ -247,7 +248,7 @@ function Card() {
 
 export default function ReferenceImplementations() {
   return (
-    <section className="bg-black text-white section-y-air">
+    <section className="bg-black text-white section-y-default">
       <div className="page-shell flex flex-col gap-12 lg:gap-16">
         <div className="flex flex-col gap-6 max-w-[44ch]">
           <Reveal>
@@ -255,8 +256,9 @@ export default function ReferenceImplementations() {
           </Reveal>
           <Reveal delay={120}>
             <p className="t-body-lead text-zinc-400">
-              Active across Python, Rust, and TypeScript: ~1.5K stars, ~500
-              developers on the cashubtc org, and counting.
+              Active across Python, Rust, and TypeScript. The cashubtc
+              organization hosts the spec, the SDKs, and the reference
+              wallets.
             </p>
           </Reveal>
         </div>

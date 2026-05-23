@@ -3,7 +3,6 @@ import Link from "next/link";
 import Reveal from "./reveal";
 
 type FooterLink = { label: string; href: string; external?: boolean };
-type AiProvider = "openai" | "claude" | "gemini";
 
 const COLUMNS: { heading: string; links: FooterLink[] }[] = [
   {
@@ -71,21 +70,18 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
 
 const AI_PROMPT = "Explain the Cashu protocol: what it is, how it works, and why it matters.";
 
-const AI_LINKS: { name: string; href: string; mark: AiProvider }[] = [
+const AI_LINKS: { name: string; href: string }[] = [
   {
     name: "ChatGPT",
     href: `https://chatgpt.com/?q=${encodeURIComponent(AI_PROMPT)}`,
-    mark: "openai",
   },
   {
     name: "Claude",
     href: `https://claude.ai/new?q=${encodeURIComponent(AI_PROMPT)}`,
-    mark: "claude",
   },
   {
     name: "Gemini",
     href: `https://gemini.google.com/app?q=${encodeURIComponent(AI_PROMPT)}`,
-    mark: "gemini",
   },
 ];
 
@@ -144,7 +140,7 @@ export default function SiteFooter() {
               {COLUMNS.map((col, i) => (
                 <Reveal key={col.heading} delay={80 * (i + 1)}>
                   <div className="flex flex-col gap-4">
-                    <h3 className="t-title" style={{ color: "#71717a" }}>
+                    <h3 className="t-title text-zinc-500">
                       {col.heading}
                     </h3>
                     <ul className="flex flex-col gap-3">
@@ -219,18 +215,18 @@ export default function SiteFooter() {
             <div className="footer-card__bottom-right">
               <span className="t-label footer-ask-label">Ask AI about Cashu</span>
               <div className="footer-ai">
-                {AI_LINKS.map((ai) => (
-                  <ExternalLink
-                    key={ai.name}
-                    href={ai.href}
-                    className="footer-ai__link focus-ring"
-                  >
-                    <span className="sr-only">Ask {ai.name} about Cashu</span>
-                    <span
-                      aria-hidden
-                      className={`footer-ai__mark footer-ai__mark--${ai.mark}`}
-                    />
-                  </ExternalLink>
+                {AI_LINKS.map((ai, i) => (
+                  <span key={ai.name} className="inline-flex items-center gap-3">
+                    {i > 0 && (
+                      <span className="footer-legal__sep" aria-hidden>·</span>
+                    )}
+                    <ExternalLink
+                      href={ai.href}
+                      className="footer-link t-label focus-ring"
+                    >
+                      {ai.name}
+                    </ExternalLink>
+                  </span>
                 ))}
               </div>
             </div>

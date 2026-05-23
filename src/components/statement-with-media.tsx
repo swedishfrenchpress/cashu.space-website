@@ -204,7 +204,20 @@ export default function StatementWithMedia() {
             reads larger. Headline at t-headline; t-display was too dominant
             for this column and pushed the claim into too many wrapped lines. */}
         <div className="lg:col-span-4 flex flex-col gap-8 lg:gap-10 items-start">
-          <h2 className="t-headline max-w-[16ch]">
+          {/* Manifesto sentence — sub-peak of the page. Bespoke scale just
+              under the hero's lead so the two voice peaks rhyme without
+              competing (Big-Or-Quiet Rule, DESIGN.md §3). */}
+          <h2
+            className="max-w-[16ch]"
+            style={{
+              fontFamily:
+                "var(--font-gt), ui-sans-serif, system-ui, sans-serif",
+              fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
+              fontWeight: 600,
+              lineHeight: 0.95,
+              letterSpacing: "-0.02em",
+            }}
+          >
             Copy ecash. Paste ecash. That&rsquo;s it.
           </h2>
 

@@ -11,10 +11,12 @@ type SiteHeaderProps = {
   onInk?: boolean;
 };
 
-const NAV_ITEMS = [
+type NavItem = { label: string; href: string; external?: boolean };
+
+const NAV_ITEMS: NavItem[] = [
   { label: "Wallets", href: "/wallets" },
   { label: "Why Cashu?", href: "/#why-cashu" },
-  { label: "Spec", href: "/docs" },
+  { label: "Spec", href: "https://docs.cashu.space/", external: true },
   { label: "Implementations", href: "/#implementations" },
 ];
 
@@ -70,9 +72,20 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
             <ul className="site-nav__list">
               {NAV_ITEMS.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="site-nav__link focus-ring">
-                    {item.label}
-                  </Link>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="site-nav__link focus-ring"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link href={item.href} className="site-nav__link focus-ring">
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -122,14 +135,27 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
             <ul className="site-nav-panel__list">
               {NAV_ITEMS.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="site-nav-panel__link focus-ring"
-                    onClick={() => setIsOpen(false)}
-                    tabIndex={isOpen ? 0 : -1}
-                  >
-                    {item.label}
-                  </Link>
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="site-nav-panel__link focus-ring"
+                      onClick={() => setIsOpen(false)}
+                      tabIndex={isOpen ? 0 : -1}
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="site-nav-panel__link focus-ring"
+                      onClick={() => setIsOpen(false)}
+                      tabIndex={isOpen ? 0 : -1}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

@@ -13,58 +13,38 @@ type Wallet = {
   name: string;
   platforms: string[];
   href: string;
-  note?: string;
 };
 
-// Canonical project URLs. Order: most-platforms first, then alphabetical.
-const WALLETS: Wallet[] = [
+type WalletGroup = {
+  heading: string;
+  subheading: string;
+  wallets: Wallet[];
+};
+
+// Grouped by surface so visitors land on the right list without scanning
+// per-row chips. Within each group: broadest platform support first, then
+// alphabetical. The per-row platform chips still distinguish iOS vs Android
+// within Mobile for visitors who care.
+const WALLET_GROUPS: WalletGroup[] = [
   {
-    name: "eNuts",
-    platforms: ["iOS", "Android"],
-    href: "https://www.enuts.cash",
-    note: "Mobile",
+    heading: "Mobile",
+    subheading: "Phone wallets. Hold ecash in your pocket.",
+    wallets: [
+      { name: "eNuts",     platforms: ["iOS", "Android"], href: "https://www.enuts.cash" },
+      { name: "Cashu Pro", platforms: ["iOS", "Android"], href: "https://github.com/cashubtc" },
+      { name: "Macadamia", platforms: ["iOS"],            href: "https://macadamia.cash" },
+      { name: "Minibits",  platforms: ["Android"],        href: "https://www.minibits.cash" },
+    ],
   },
   {
-    name: "Cashu Pro",
-    platforms: ["iOS", "Android"],
-    href: "https://github.com/cashubtc",
-    note: "Mobile",
-  },
-  {
-    name: "Macadamia",
-    platforms: ["iOS"],
-    href: "https://macadamia.cash",
-    note: "Mobile",
-  },
-  {
-    name: "Minibits",
-    platforms: ["Android"],
-    href: "https://www.minibits.cash",
-    note: "Mobile",
-  },
-  {
-    name: "Athenut",
-    platforms: ["Web"],
-    href: "https://athenut.com",
-    note: "Browser",
-  },
-  {
-    name: "Boardwalk",
-    platforms: ["Web"],
-    href: "https://boardwalkcash.com",
-    note: "Browser",
-  },
-  {
-    name: "Cashu.me",
-    platforms: ["Web"],
-    href: "https://wallet.cashu.me",
-    note: "Browser",
-  },
-  {
-    name: "Nutstash",
-    platforms: ["Web"],
-    href: "https://nutstash.app",
-    note: "Browser",
+    heading: "Web",
+    subheading: "Browser wallets. No install, runs anywhere.",
+    wallets: [
+      { name: "Athenut",  platforms: ["Web"], href: "https://athenut.com" },
+      { name: "Boardwalk",platforms: ["Web"], href: "https://boardwalkcash.com" },
+      { name: "Cashu.me", platforms: ["Web"], href: "https://wallet.cashu.me" },
+      { name: "Nutstash", platforms: ["Web"], href: "https://nutstash.app" },
+    ],
   },
 ];
 
@@ -75,9 +55,9 @@ export default function WalletsPage() {
 
       <div className="page-shell flex flex-col gap-12 lg:gap-16 pt-16 lg:pt-24">
         <Reveal immediate as="header">
-          <div className="flex flex-col gap-6 max-w-[60ch]">
+          <div id="main-content" className="flex flex-col gap-6 max-w-[60ch]">
             <h1 className="t-display">Wallets.</h1>
-            <p className="t-body-lead text-zinc-300 max-w-[60ch]">
+            <p className="t-body-lead text-zinc-100 max-w-[60ch]">
               Any client that implements the cashu protocol is conformant. The
               list below is non-exhaustive, a snapshot of wallets people use
               today, not an endorsement.
@@ -85,19 +65,33 @@ export default function WalletsPage() {
           </div>
         </Reveal>
 
-        <section aria-labelledby="wallets-table-heading">
-          <h2 id="wallets-table-heading" className="sr-only">
-            Wallet directory
-          </h2>
-          <Reveal immediate delay={160}>
-            <div className="border-t border-zinc-800">
+        {WALLET_GROUPS.map((group, gi) => (
+          <section
+            key={group.heading}
+            aria-labelledby={`wallets-group-${group.heading.toLowerCase()}`}
+            className="flex flex-col gap-6 lg:gap-8"
+          >
+            <Reveal immediate delay={160 + gi * 60}>
+              <div className="flex items-baseline justify-between gap-6 border-b border-zinc-800 pb-4 lg:pb-5">
+                <h2
+                  id={`wallets-group-${group.heading.toLowerCase()}`}
+                  className="t-headline"
+                >
+                  {group.heading}
+                </h2>
+                <p className="t-label text-zinc-500 max-w-[36ch] text-right hidden sm:block">
+                  {group.subheading}
+                </p>
+              </div>
+            </Reveal>
+            <Reveal immediate delay={220 + gi * 60}>
               <ul className="divide-y divide-zinc-800">
-                {WALLETS.map((wallet, i) => (
+                {group.wallets.map((wallet, i) => (
                   <Reveal
                     key={wallet.name}
                     as="li"
                     immediate
-                    delay={260 + i * 60}
+                    delay={280 + gi * 60 + i * 50}
                   >
                     <a
                       href={wallet.href}
@@ -126,9 +120,9 @@ export default function WalletsPage() {
                   </Reveal>
                 ))}
               </ul>
-            </div>
-          </Reveal>
-        </section>
+            </Reveal>
+          </section>
+        ))}
 
         <Reveal as="footer">
           <div className="flex flex-col gap-3 pt-8 border-t border-zinc-900">
