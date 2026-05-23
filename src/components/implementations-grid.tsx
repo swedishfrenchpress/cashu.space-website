@@ -156,8 +156,8 @@ export default function ImplementationsGrid() {
               <div className="flex flex-col gap-3">
                 <h3 className="t-title">Privacy focused</h3>
                 <p className="t-body text-zinc-900 max-w-[40ch]">
-                  Blind signatures preserve user privacy. Transactions are
-                  peer-to-peer.
+                  Blind signatures unlink the mint from the holder. Payments
+                  are peer-to-peer.
                 </p>
               </div>
             </div>
@@ -172,8 +172,8 @@ export default function ImplementationsGrid() {
               <div className="flex flex-col gap-3">
                 <h3 className="t-title">Ecash for the Web</h3>
                 <p className="t-body text-zinc-900 max-w-[40ch]">
-                  Ecash payments can be included in web requests. Use Cashu for
-                  your website or application.
+                  Tokens fit in HTTP headers, URLs, and JSON. Wire cashu into
+                  any web flow.
                 </p>
               </div>
             </div>

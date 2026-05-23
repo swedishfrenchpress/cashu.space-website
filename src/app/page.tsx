@@ -35,8 +35,7 @@ export default function Home() {
         <div className="hero-handoff__statement">
           <Reveal immediate delay={260}>
             <p className="hero-handoff__lead text-zinc-900">
-              Electronic cash for payments online, in person, and around the
-              world.
+              Ecash for bitcoin. Instant, bearer, peer-to-peer.
             </p>
           </Reveal>
           <Reveal immediate delay={380}>

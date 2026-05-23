@@ -78,8 +78,8 @@ export default function TransferDemo() {
           </Reveal>
           <Reveal delay={120}>
             <p className="t-body-lead text-zinc-600">
-              2,400 sats from Stockholm to Buenos Aires. The protocol doesn’t
-              ask who you are.
+              2,400 sats from Stockholm to Buenos Aires. Two wallets, one
+              protocol, no middlemen.
             </p>
           </Reveal>
         </div>
@@ -93,7 +93,7 @@ export default function TransferDemo() {
                   <span className="t-label text-zinc-500 uppercase tracking-wider">
                     Sender
                   </span>
-                  <span className="t-title">Sweden — Stockholm</span>
+                  <span className="t-title">Stockholm, Sweden</span>
                 </div>
               </div>
               <hr className="border-0 h-px bg-zinc-200" aria-hidden />
@@ -103,7 +103,7 @@ export default function TransferDemo() {
                 <dt className="t-label text-zinc-500 uppercase">To</dt>
                 <dd className="t-mono text-black">cashu wallet</dd>
                 <dt className="t-label text-zinc-500 uppercase">Note</dt>
-                <dd className="t-body text-zinc-400">—</dd>
+                <dd className="t-body text-zinc-400">none</dd>
               </dl>
               <hr className="border-0 h-px bg-zinc-200" aria-hidden />
               <div className="px-7 py-5 flex justify-end">
@@ -127,7 +127,7 @@ export default function TransferDemo() {
                   <span className="t-label text-zinc-500 uppercase tracking-wider">
                     Receiver
                   </span>
-                  <span className="t-title">Argentina — Buenos Aires</span>
+                  <span className="t-title">Buenos Aires, Argentina</span>
                 </div>
               </div>
               <hr className="border-0 h-px bg-zinc-200" aria-hidden />

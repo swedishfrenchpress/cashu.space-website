@@ -29,7 +29,7 @@ const TABS: Tab[] = [
     label: "Wallets",
     title: "Hold ecash on your phone.",
     caption:
-      "Pick a wallet, hold ecash on your phone. Cashu wallets are independent, open-source, and free.",
+      "Independent, open-source, and free. Run a cashu wallet on iOS, Android, or in the browser.",
     cta: "Explore wallets",
     href: "/wallets",
     image: "/canyon.jpg",
@@ -37,9 +37,9 @@ const TABS: Tab[] = [
   {
     id: "mints",
     label: "Mints",
-    title: "Redeem ecash for bitcoin.",
+    title: "Backed by bitcoin.",
     caption:
-      "Mints redeem ecash for bitcoin over Lightning. Run your own or trust a community-operated one.",
+      "Mints bridge Lightning and ecash. Run your own, or trust a community-operated one.",
     cta: "Explore mints",
     href: "/mints",
     image: "/forest.jpg",
@@ -49,7 +49,7 @@ const TABS: Tab[] = [
     label: "Spec",
     title: "Every byte, in the open.",
     caption:
-      "The protocol is a public specification. Every byte is documented; every NUT is open for review.",
+      "Documented in version-controlled NUTs. Read them, fork them, propose your own.",
     cta: "Read the spec",
     href: "/spec",
     image: "/peaks.jpg",
@@ -59,7 +59,7 @@ const TABS: Tab[] = [
     label: "Tokens",
     title: "Send money like a message.",
     caption:
-      "Cashu tokens are bearer blobs of bitcoin. Send them in a chat, a QR, an email, a file.",
+      "Tokens are bearer strings of bitcoin. Send them in a chat, a QR, an email, a file.",
     cta: "Understand tokens",
     href: "/tokens",
     image: "/flatiron-ascii.jpg",

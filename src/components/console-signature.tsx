@@ -20,7 +20,7 @@ export default function ConsoleSignature() {
       "font: 400 11px/1.4 ui-monospace, SFMono-Regular, monospace; color: #71717a;";
 
     console.log(
-      "%ccashu%c — an open protocol for bearer ecash on bitcoin",
+      "%ccashu%c   an open protocol for bearer ecash on bitcoin",
       headLabel,
       headProse,
     );

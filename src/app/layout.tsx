@@ -74,7 +74,8 @@ const gtStandard = localFont({
 
 export const metadata: Metadata = {
   title: "Cashu",
-  description: "Cashu — ecash for bitcoin.",
+  description:
+    "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
 };
 
 export default function RootLayout({

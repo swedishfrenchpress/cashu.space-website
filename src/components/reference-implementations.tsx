@@ -255,8 +255,8 @@ export default function ReferenceImplementations() {
           </Reveal>
           <Reveal delay={120}>
             <p className="t-body-lead text-zinc-400">
-              Active across Python, Rust, and TypeScript — ~1.5K stars and
-              ~500 developers on the cashubtc org, and counting.
+              Active across Python, Rust, and TypeScript: ~1.5K stars, ~500
+              developers on the cashubtc org, and counting.
             </p>
           </Reveal>
         </div>

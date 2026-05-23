@@ -41,7 +41,7 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
         external: true,
       },
       {
-        label: "Whitepaper",
+        label: "NUT-00",
         href: "https://github.com/cashubtc/nuts/blob/main/00.md",
         external: true,
       },
@@ -69,7 +69,7 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
   },
 ];
 
-const AI_PROMPT = "Explain the Cashu protocol — what it is, how it works, and why it matters.";
+const AI_PROMPT = "Explain the Cashu protocol: what it is, how it works, and why it matters.";
 
 const AI_LINKS: { name: string; href: string; mark: AiProvider }[] = [
   {
@@ -238,11 +238,11 @@ export default function SiteFooter() {
 
           {/* Disclaimer — credit the protocol, name the constraint */}
           <p className="footer-disclaimer t-body">
-            Cashu is a free, open protocol for Chaumian ecash. It has no company,
-            no token, no treasury — only a specification and the implementations
-            that follow it. Mints are operated by independent parties; balances
-            held with a mint are a claim on that mint, not a deposit. Read the
-            spec before trusting anyone, including us.
+            Cashu is a free, open protocol for Chaumian ecash. It has no
+            company, no token, no treasury. Only a specification, and the
+            implementations that follow it. Mints are operated by independent
+            parties; balances held with a mint are a claim on that mint, not a
+            deposit. Read the spec before trusting anyone, including us.
           </p>
         </div>
       </div>
