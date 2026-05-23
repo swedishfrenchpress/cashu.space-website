@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Reveal from "@/components/reveal";
+import SiteHeader from "@/components/site-header";
 
 export const metadata: Metadata = {
   title: "Wallets · cashu.space",
@@ -15,63 +16,64 @@ type Wallet = {
   note?: string;
 };
 
-// Placeholder list — fill in canonical URLs before shipping. Order:
-// most-platforms first, then alphabetical.
+// Canonical project URLs. Order: most-platforms first, then alphabetical.
 const WALLETS: Wallet[] = [
   {
     name: "eNuts",
     platforms: ["iOS", "Android"],
-    href: "#",
-    note: "Mobile",
-  },
-  {
-    name: "Minibits",
-    platforms: ["Android"],
-    href: "#",
-    note: "Mobile",
-  },
-  {
-    name: "Macadamia",
-    platforms: ["iOS"],
-    href: "#",
+    href: "https://www.enuts.cash",
     note: "Mobile",
   },
   {
     name: "Cashu Pro",
     platforms: ["iOS", "Android"],
-    href: "#",
+    href: "https://github.com/cashubtc",
     note: "Mobile",
   },
   {
-    name: "Cashu.me",
-    platforms: ["Web"],
-    href: "#",
-    note: "Browser",
+    name: "Macadamia",
+    platforms: ["iOS"],
+    href: "https://macadamia.cash",
+    note: "Mobile",
   },
   {
-    name: "Nutstash",
+    name: "Minibits",
+    platforms: ["Android"],
+    href: "https://www.minibits.cash",
+    note: "Mobile",
+  },
+  {
+    name: "Athenut",
     platforms: ["Web"],
-    href: "#",
+    href: "https://athenut.com",
     note: "Browser",
   },
   {
     name: "Boardwalk",
     platforms: ["Web"],
-    href: "#",
+    href: "https://boardwalkcash.com",
     note: "Browser",
   },
   {
-    name: "Athenut",
+    name: "Cashu.me",
     platforms: ["Web"],
-    href: "#",
+    href: "https://wallet.cashu.me",
+    note: "Browser",
+  },
+  {
+    name: "Nutstash",
+    platforms: ["Web"],
+    href: "https://nutstash.app",
     note: "Browser",
   },
 ];
 
 export default function WalletsPage() {
   return (
-    <main className="bg-black text-white min-h-screen pt-20 lg:pt-32 pb-24 lg:pb-32">
-      <div className="page-shell flex flex-col gap-12 lg:gap-16">
+    <main className="bg-black text-white min-h-screen pb-24 lg:pb-32">
+      <SiteHeader onInk />
+
+      <div className="page-shell flex flex-col gap-12 lg:gap-16 pt-16 lg:pt-24">
         <Reveal immediate as="header">
           <div className="flex flex-col gap-6 max-w-[60ch]">
             <h1 className="t-display">Wallets.</h1>
@@ -101,7 +103,7 @@ export default function WalletsPage() {
                       href={wallet.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_auto] items-center gap-4 md:gap-8 py-6 lg:py-7 transition-colors hover:bg-zinc-950 focus-visible:bg-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+                      className="group grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_auto] items-center gap-4 md:gap-8 py-6 lg:py-7 transition-colors hover:bg-zinc-950 focus-visible:bg-zinc-950 focus-ring--on-ink"
                     >
                       <span className="t-title">{wallet.name}</span>
                       <span className="hidden md:flex items-center gap-2">
@@ -137,7 +139,7 @@ export default function WalletsPage() {
             <p>
               <Link
                 href="/"
-                className="t-label text-zinc-300 hover:text-white transition-colors underline underline-offset-4 decoration-zinc-700 hover:decoration-white"
+                className="t-label text-zinc-300 hover:text-white transition-colors underline underline-offset-4 decoration-zinc-700 hover:decoration-white focus-ring--on-ink"
               >
                 ← Back to cashu.space
               </Link>

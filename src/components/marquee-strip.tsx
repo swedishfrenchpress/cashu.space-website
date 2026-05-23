@@ -1,4 +1,19 @@
-const ITEMS = Array.from({ length: 10 }, () => "cashu.me");
+// Real implementations — mirrors the /wallets directory plus library/mint
+// projects under github.com/cashubtc. Update here when projects are added.
+const ITEMS = [
+  "eNuts",
+  "Minibits",
+  "Macadamia",
+  "Cashu Pro",
+  "Cashu.me",
+  "Nutstash",
+  "Boardwalk",
+  "Athenut",
+  "cashu-ts",
+  "nutshell",
+  "cdk",
+  "moksha",
+];
 
 export default function MarqueeStrip() {
   const sequence = [...ITEMS, ...ITEMS];

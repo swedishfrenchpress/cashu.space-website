@@ -1,13 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const TOKEN_FRAGMENT =
   "cashuBo2F0gaJhaUgArSaMTR9YJmFwgaJhYRhkYXAfaZpZGGAuQ8m1ndA3PnxKlXQv4Yj2VbRwT8eUkLh";
-const SENT_COLOR = "#3F5F87";
-const RECEIVED_COLOR = "#E5E5EA";
-const RECEIVED_TEXT = "#18181b";
-const CTA_COLOR = "#4ade80";
+// Bubble palette — monochrome on the bubbles. The "sent" side reads as the
+// protagonist (Ink Soft), the "received" side as a quiet counter-voice
+// (Hair on Paper). The cursive CTA breaks the No-Colour Rule on purpose,
+// per user override: Bitcoin orange signals "this is bitcoin-native" and
+// inherits Bitcoin's own brand color, not a generic crypto neon.
+const SENT_BG = "#18181b";       // Ink Soft
+const SENT_FG = "#ffffff";       // Paper
+const RECEIVED_BG = "#e4e4e7";   // Hair
+const RECEIVED_FG = "#18181b";   // Ink Soft
+const CURSIVE_FG = "#f7931a";    // Bitcoin orange (intentional exception to the No-Colour Rule)
 
 // Path data for "get a wallet" in Over the Rainbow at 140px.
 // Regenerate with: node scripts/generate-cursive-svg.mjs
@@ -22,22 +29,17 @@ type BubbleProps = {
 
 function Bubble({ side, children, mono = false }: BubbleProps) {
   const isRight = side === "right";
-  const bg = isRight ? SENT_COLOR : RECEIVED_COLOR;
-  const fg = isRight ? "#ffffff" : RECEIVED_TEXT;
+  const bg = isRight ? SENT_BG : RECEIVED_BG;
+  const fg = isRight ? SENT_FG : RECEIVED_FG;
   return (
     <div
       className={`relative max-w-[88%] ${
         isRight ? "self-end" : "self-start"
       }`}
     >
-      <div
-        className="rounded-[28px] px-7 py-5"
-        style={{ backgroundColor: bg }}
-      >
+      <div className="rounded-2xl px-6 py-4 lg:px-7 lg:py-5" style={{ backgroundColor: bg }}>
         <span
-          className={`${
-            mono ? "font-mono tracking-tight" : "font-sans"
-          } text-[22px] lg:text-[28px] leading-snug`}
+          className={`${mono ? "t-mono" : "t-body-lead"} lg:text-2xl`}
           style={{
             color: fg,
             wordBreak: mono ? "break-all" : "normal",
@@ -166,21 +168,27 @@ export default function StatementWithMedia() {
       ref={sectionRef}
       className="relative overflow-hidden bg-black text-white pt-16 lg:pt-24 pb-16 lg:pb-24"
     >
-      <img
+      <Image
         src="/wallets/phone-left.png"
         alt=""
         aria-hidden
-        className="hidden md:block absolute left-[3%] lg:left-[5%] top-0 z-0 w-[240px] lg:w-[305px] pointer-events-none select-none grayscale contrast-[1.05]"
+        width={610}
+        height={1240}
+        sizes="(min-width: 1024px) 305px, 240px"
+        className="hidden md:block absolute left-[3%] lg:left-[5%] top-0 z-0 w-[240px] lg:w-[305px] h-auto pointer-events-none select-none grayscale contrast-[1.05]"
         style={{
           transform: `translateY(${leftTranslateVh}vh) rotate(-5deg)`,
           willChange: "transform",
         }}
       />
-      <img
+      <Image
         src="/wallets/phone-right.png"
         alt=""
         aria-hidden
-        className="hidden md:block absolute right-[3%] lg:right-[5%] top-0 z-0 w-[240px] lg:w-[305px] pointer-events-none select-none grayscale contrast-[1.05]"
+        width={610}
+        height={1240}
+        sizes="(min-width: 1024px) 305px, 240px"
+        className="hidden md:block absolute right-[3%] lg:right-[5%] top-0 z-0 w-[240px] lg:w-[305px] h-auto pointer-events-none select-none grayscale contrast-[1.05]"
         style={{
           transform: `translateY(${rightTranslateVh}vh) rotate(5deg)`,
           willChange: "transform",
@@ -195,7 +203,7 @@ export default function StatementWithMedia() {
         <a
           href="/wallets"
           aria-label="Get a wallet"
-          className="inline-block transition-opacity duration-150 ease-out hover:opacity-80 focus-visible:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-black"
+          className="inline-block transition-opacity duration-150 ease-out hover:opacity-80 focus-visible:opacity-80 focus-ring--on-ink"
         >
           <svg
             viewBox="-50 -80 882 320"
@@ -209,11 +217,11 @@ export default function StatementWithMedia() {
                 clipPath: `inset(0 ${clipInsetRight}% 0 0)`,
               }}
             >
-              <path d={GET_A_WALLET_PATH_D} fill={CTA_COLOR} />
+              <path d={GET_A_WALLET_PATH_D} fill={CURSIVE_FG} />
             </g>
             <g
               fill="none"
-              stroke={CTA_COLOR}
+              stroke={CURSIVE_FG}
               strokeWidth="6"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -239,11 +247,13 @@ export default function StatementWithMedia() {
 
         <div className="relative w-full">
           <div className="w-full aspect-[16/9] bg-zinc-900 overflow-hidden relative">
-            <img
+            <Image
               src="/cheers.png"
               alt=""
               aria-hidden
-              className="absolute inset-0 h-full w-full object-cover"
+              fill
+              sizes="100vw"
+              className="object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center px-6 py-8 lg:py-12">
               <div
@@ -258,14 +268,14 @@ export default function StatementWithMedia() {
                     type="button"
                     onClick={handleCopyToken}
                     aria-label="Copy demo token to clipboard"
-                    className="relative block w-full text-left p-0 m-0 border-0 bg-transparent appearance-none cursor-pointer transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-black motion-reduce:hover:translate-y-0"
+                    className="relative block w-full text-left p-0 m-0 border-0 bg-transparent appearance-none cursor-pointer transition-transform duration-150 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-px focus-ring--on-ink motion-reduce:hover:translate-y-0"
                   >
                     <div
-                      className="rounded-[28px] px-7 py-5"
-                      style={{ backgroundColor: SENT_COLOR }}
+                      className="rounded-2xl px-6 py-4 lg:px-7 lg:py-5"
+                      style={{ backgroundColor: SENT_BG }}
                     >
                       <span
-                        className="font-mono tracking-tight text-[22px] lg:text-[28px] leading-snug text-white"
+                        className="t-body-lead lg:text-2xl text-white"
                         style={{ wordBreak: "break-all" }}
                       >
                         {TOKEN_FRAGMENT}
@@ -281,7 +291,7 @@ export default function StatementWithMedia() {
                     >
                       <path
                         d="M0 0 Q 0 20 20 23 Q 9 22 9 0 Z"
-                        fill={SENT_COLOR}
+                        fill={SENT_BG}
                       />
                     </svg>
                   </button>

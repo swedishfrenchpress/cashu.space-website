@@ -3,45 +3,39 @@
 import { useEffect, useRef, useState } from "react";
 import Reveal from "./reveal";
 
-const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
-  [
-    {
-      heading: "Protocol",
-      links: [
-        { label: "Specification", href: "/spec" },
-        { label: "Documentation", href: "/docs" },
-        { label: "NUTs", href: "/spec/nuts" },
-        { label: "Tokens", href: "/tokens" },
-      ],
-    },
-    {
-      heading: "Implementations",
-      links: [
-        { label: "Wallets", href: "/wallets" },
-        { label: "Mints", href: "/mints" },
-        { label: "Libraries", href: "/libraries" },
-        { label: "Run a mint", href: "/mints/run" },
-      ],
-    },
-    {
-      heading: "Community",
-      links: [
-        { label: "GitHub", href: "https://github.com/cashubtc" },
-        { label: "Nostr", href: "#" },
-        { label: "Telegram", href: "#" },
-        { label: "Contributors", href: "/contributors" },
-      ],
-    },
-    {
-      heading: "Resources",
-      links: [
-        { label: "Blog", href: "/blog" },
-        { label: "FAQ", href: "/faq" },
-        { label: "Brand", href: "/brand" },
-        { label: "Press", href: "/press" },
-      ],
-    },
-  ];
+// Only links that actually resolve. Dead /docs, /blog, /press, /faq, /brand,
+// /contributors, /libraries, /mints/run, /spec/nuts, /tokens, Nostr, Telegram
+// are removed until those pages exist — see /impeccable audit P1.
+type FooterLink = { label: string; href: string; external?: boolean };
+
+const COLUMNS: { heading: string; links: FooterLink[] }[] = [
+  {
+    heading: "Protocol",
+    links: [
+      {
+        label: "Specification",
+        href: "https://github.com/cashubtc/nuts",
+        external: true,
+      },
+      {
+        label: "NUTs",
+        href: "https://github.com/cashubtc/nuts#nuts",
+        external: true,
+      },
+    ],
+  },
+  {
+    heading: "Implementations",
+    links: [
+      { label: "Wallets", href: "/wallets" },
+      {
+        label: "Source",
+        href: "https://github.com/cashubtc",
+        external: true,
+      },
+    ],
+  },
+];
 
 function clamp01(n: number) {
   return Math.max(0, Math.min(1, n));
@@ -121,7 +115,7 @@ export default function SiteFooter() {
       />
 
       <div className="relative page-shell pt-20 lg:pt-28 pb-10 lg:pb-14">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-12 max-w-[36rem]">
           {COLUMNS.map((col, i) => (
             <Reveal key={col.heading} delay={i * 80}>
               <div className="flex flex-col gap-4">
@@ -131,7 +125,13 @@ export default function SiteFooter() {
                     <li key={link.label}>
                       <a
                         href={link.href}
-                        className="t-label text-zinc-300 hover:text-white transition-colors"
+                        {...(link.external
+                          ? {
+                              target: "_blank",
+                              rel: "noopener noreferrer",
+                            }
+                          : {})}
+                        className="t-label text-zinc-300 hover:text-white transition-colors focus-ring--on-ink"
                       >
                         {link.label}
                       </a>

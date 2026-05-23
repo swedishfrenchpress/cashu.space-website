@@ -27,7 +27,7 @@ export default function NotFound() {
             <h1 className="t-display">Not specified.</h1>
           </Reveal>
           <Reveal immediate delay={300}>
-            <p className="t-body-lead text-zinc-600 max-w-[52ch]">
+            <p className="t-body-lead text-zinc-900 max-w-[52ch]">
               This path does not appear in the protocol. The page may have
               moved, or it may never have existed.
             </p>
@@ -35,7 +35,7 @@ export default function NotFound() {
           <Reveal immediate delay={420}>
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link href="/" className="btn-primary">
-                Back to cashu.space <span aria-hidden>→</span>
+                Back to cashu.space
               </Link>
               <a
                 href="https://github.com/cashubtc"

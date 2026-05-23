@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #18181b;
   --page-max: 1280px;
 }
 
@@ -97,16 +97,23 @@
   --font-pixel: var(--font-geist-pixel-square);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/*
+ * Focus ring — single sitewide utility. DESIGN.md §5 spec: 2px outline at
+ * 4px offset, Ink on light surfaces, Paper on Ink. Use on any interactive
+ * element that doesn't already inherit from .btn-* / .btn-primary--on-ink.
+ */
+.focus-ring:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 4px;
+}
+.focus-ring--on-ink:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
 }
 
 /* The browser default is chromatic blue — outside the No-Colour Rule. */
@@ -268,15 +275,18 @@ body {
 .btn-primary--on-ink {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  /* No icons inside buttons. The label is the whole button. */
   border: 1px solid transparent;
   border-radius: 0;
-  padding: 14px 28px;
+  /* Same size for primary and secondary — no hierarchy by box, only by fill. */
+  padding: 12px 24px;
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.2;
-  letter-spacing: -0.005em;
+  letter-spacing: 0.06em;
+  /* All-caps button copy is a doctrinal rule — see DESIGN.md §5 Buttons. */
+  text-transform: uppercase;
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
@@ -322,7 +332,6 @@ body {
   background-color: #ffffff;
   color: #18181b;
   border-color: rgba(0, 0, 0, 0.04);
-  padding: 10px 22px;
   box-shadow:
     0 0 0 1px #e4e4e7,
     0 1px 2px rgba(9, 9, 11, 0.04),
@@ -375,12 +384,6 @@ body {
     0 1px 1px rgba(0, 0, 0, 0.16),
     0 1px 2px rgba(0, 0, 0, 0.24),
     inset 0 1px 20px rgba(255, 255, 255, 0.40);
-}
-
-/* Larger scale, for the page-closing CTA. */
-.btn-primary--lg {
-  padding: 16px 32px;
-  font-size: 0.9375rem;
 }
 
 .btn-primary:focus-visible,

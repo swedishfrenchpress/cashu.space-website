@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -243,12 +244,15 @@ export default function TabbedFeature() {
           {(isJacking ? TABS : [active]).map((tab, i) => {
             const isActive = isJacking ? i === activeIndex : true;
             return (
-              <img
+              <Image
                 key={`img-${tab.id}`}
                 src={tab.image}
                 alt=""
                 aria-hidden
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                priority={i === 0}
+                sizes="(min-width: 1280px) 1280px, 100vw"
+                className="object-cover"
                 style={isJacking ? layerStyle(isActive, MEDIA_BLUR_PX) : undefined}
               />
             );
