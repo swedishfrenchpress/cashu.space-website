@@ -20,47 +20,103 @@ const REPOS: Repo[] = [
   { name: "awesome-cashu", url: "https://github.com/cashubtc/awesome-cashu", tag: "Resources",     lang: "—",          stars: 205, forks:  22 },
 ];
 
+/* Spec — the centerpiece. Renders as a faux file pane: filename strip on top,
+   monochrome Geist Mono body underneath. No window-chrome dots, no syntax
+   highlighting beyond grey/pixel swaps. Pixel notation is reserved for the
+   protocol artefacts (mint id, sat amount) per DESIGN.md §3. */
+function Spec() {
+  return (
+    <div className="bg-[#18181b] w-full">
+      <div className="bg-[#27272a] border-b border-zinc-800 px-5 py-3">
+        <span className="t-mono text-zinc-400">cashubtc/nuts/nut-00.md</span>
+      </div>
+      <pre className="t-mono text-zinc-100 p-6 lg:p-8 lg:pl-[260px] overflow-x-auto leading-relaxed">
+        <span className="text-zinc-500">{`// Token v4  ·  CBOR encoding`}</span>{"\n\n"}
+        {`{\n  "t": [{\n    "i": `}
+        <span className="t-pixel">{`h'00…d2'`}</span>
+        {`,        `}
+        <span className="text-zinc-500">{`// mint id`}</span>
+        {`\n    "p": [{\n      "a": `}
+        <span className="t-pixel">{`64`}</span>
+        {`,              `}
+        <span className="text-zinc-500">{`// sats`}</span>
+        {`\n      "s": "ecash…"      `}
+        <span className="text-zinc-500">{`// blinded sig`}</span>
+        {`\n    }]\n  }],\n  "m": "https://mint.example.com",\n  "u": "sat"\n}`}
+      </pre>
+    </div>
+  );
+}
+
+/* Card — the floating implementations directory. Paper on Ink. Flat, no
+   shadow (the lift comes from z-index and overlap, not elevation). Three
+   rows + a quiet link to the rest. Stars are GitHub counts, not protocol
+   artefacts, so they stay in t-mono — not t-pixel. */
+function Card() {
+  const top = REPOS.slice(0, 3);
+  return (
+    <div className="bg-white text-black w-full divide-y divide-zinc-200">
+      <div className="px-5 py-4">
+        <span className="t-label text-zinc-500 uppercase tracking-wider">Implementations</span>
+      </div>
+      {top.map((repo) => (
+        <a
+          key={repo.name}
+          href={repo.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-baseline justify-between gap-4 px-5 py-3 transition-colors hover:bg-zinc-50 focus-ring"
+        >
+          <span className="t-title">{repo.name}</span>
+          <span className="t-mono text-zinc-500 whitespace-nowrap">★ {repo.stars}</span>
+        </a>
+      ))}
+      <div className="px-5 py-4">
+        <a
+          href="https://github.com/cashubtc"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="t-label text-black hover:text-zinc-600 transition-colors focus-ring"
+        >
+          3 more on GitHub →
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function ReferenceImplementations() {
   return (
-    <section className="page-shell section-y-air">
-      <div className="flex flex-col gap-12 lg:gap-16">
+    <section className="bg-black text-white section-y-air">
+      <div className="page-shell flex flex-col gap-12 lg:gap-16">
         <div className="flex flex-col gap-6 max-w-[44ch]">
           <Reveal>
             <h2 className="t-headline">Built in the open.</h2>
           </Reveal>
           <Reveal delay={120}>
-            <p className="t-body-lead text-zinc-700">
+            <p className="t-body-lead text-zinc-400">
               Six independent implementations across Python, Rust, and TypeScript.
               Anyone can read the spec, run a mint, or fork a wallet.
             </p>
           </Reveal>
         </div>
 
-        {/* Single Reveal wraps the whole manifest — rows reveal as a block.
-            Per-row stagger would compete with the "read as a lockfile" intent. */}
+        {/* The Spec is the centerpiece — full-width on mobile, capped and
+            centered on lg+. The Card stacks above the Spec on mobile, then
+            on lg+ pulls into absolute position over the Spec's upper-left
+            corner so the dark code surface is visible above, below, and to
+            the right of the white card. The Spec's pre carries enough left
+            padding on lg+ that the code text starts to the right of the
+            overlap zone instead of hiding behind the card. */}
         <Reveal slow delay={240}>
-          <ul className="bg-zinc-100 divide-y divide-zinc-200">
-            {REPOS.map((repo) => (
-              <li key={repo.name}>
-                <a
-                  href={repo.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col gap-2 px-6 py-5 lg:grid lg:grid-cols-[1.4fr_1.6fr_minmax(8rem,auto)_4rem_5rem] lg:gap-x-6 lg:items-baseline lg:px-8 lg:py-6 transition-colors hover:bg-zinc-50 focus-ring"
-                >
-                  <span className="t-title">{repo.name}</span>
-                  <span className="t-label text-zinc-700">{repo.tag}</span>
-                  {/* Meta line — flex-wrap row on mobile, dissolves into the
-                      parent grid on lg+ via display:contents (lg:contents). */}
-                  <div className="flex flex-wrap items-baseline gap-x-4 lg:contents">
-                    <span className="t-mono text-zinc-500">{repo.lang}</span>
-                    <span className="t-mono text-zinc-900 whitespace-nowrap lg:text-right">★ {repo.stars}</span>
-                    <span className="t-mono text-zinc-500 whitespace-nowrap lg:text-right">{repo.forks} forks</span>
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="relative">
+            <div className="mb-6 lg:mb-0 lg:absolute lg:left-0 lg:top-16 lg:w-[340px] lg:z-10">
+              <Card />
+            </div>
+            <div className="lg:mx-auto lg:max-w-3xl lg:px-0">
+              <Spec />
+            </div>
+          </div>
         </Reveal>
 
         <Reveal delay={360}>
@@ -68,16 +124,13 @@ export default function ReferenceImplementations() {
             <p className="t-label text-zinc-500">
               cashubtc · 500 followers · ~1.5K stars across implementations
             </p>
-            {/* Secondary, not primary: hero owns the two homepage primaries.
-                The chip carries an in-chip mono count via .btn-with-count. */}
             <a
               href="https://github.com/cashubtc"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary btn-with-count"
+              className="btn-primary--on-ink"
             >
-              <span>Browse on GitHub →</span>
-              <span className="btn-with-count__meta">★ 1.5K</span>
+              Browse on GitHub →
             </a>
           </div>
         </Reveal>
