@@ -295,7 +295,8 @@ html {
  */
 .btn-primary,
 .btn-secondary,
-.btn-primary--on-ink {
+.btn-primary--on-ink,
+.btn-secondary--on-ink {
   display: inline-flex;
   align-items: center;
   /* No icons inside buttons. The label is the whole button. */
@@ -411,13 +412,49 @@ html {
 
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible,
-.btn-primary--on-ink:focus-visible {
+.btn-primary--on-ink:focus-visible,
+.btn-secondary--on-ink:focus-visible {
   outline: 2px solid #000000;
   outline-offset: 4px;
 }
 
-.btn-primary--on-ink:focus-visible {
+.btn-primary--on-ink:focus-visible,
+.btn-secondary--on-ink:focus-visible {
   outline-color: #ffffff;
+}
+
+/* Secondary chip on Ink ground — the quiet companion to btn-primary--on-ink.
+   Dark fill with a faint white rim and inner highlight so it lifts off the
+   Ink background without claiming primary status. The doctrine override
+   (allowed shadow) is the same scope as the other chip recipes. */
+.btn-secondary--on-ink {
+  background-color: #18181b;
+  color: #fafafa;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 1px 2px rgba(0, 0, 0, 0.30),
+    0 2px 4px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.btn-secondary--on-ink:hover {
+  background-color: #27272a;
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.34),
+    0 4px 8px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.btn-secondary--on-ink:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 1px 1px rgba(0, 0, 0, 0.22),
+    0 1px 2px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /*
@@ -452,15 +489,18 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .btn-primary,
   .btn-secondary,
-  .btn-primary--on-ink {
+  .btn-primary--on-ink,
+  .btn-secondary--on-ink {
     transition: box-shadow 150ms linear, background-color 150ms linear, border-color 150ms linear;
   }
   .btn-primary:hover,
   .btn-secondary:hover,
   .btn-primary--on-ink:hover,
+  .btn-secondary--on-ink:hover,
   .btn-primary:active,
   .btn-secondary:active,
-  .btn-primary--on-ink:active {
+  .btn-primary--on-ink:active,
+  .btn-secondary--on-ink:active {
     transform: none;
   }
 }
@@ -624,15 +664,32 @@ html {
 }
 
 /*
- * Ask-AI block — quiet text-link row "Ask AI about Cashu  ChatGPT · Claude · Gemini".
- * Lifted from a 22px masked-icon row to plain text links; the doctrine
- * leans on type, and the icons read as decorative at that scale anyway.
+ * Ask-AI block — quiet logo+label row "ChatGPT · Claude · Gemini".
+ * Each link pairs the provider mark with its name. The marks ride at
+ * 14px so they read as wordmark companions, not as decorative chrome —
+ * brand identity reserved here is a documented exception to the
+ * No-Colour Rule, scoped to third-party logos only.
  */
 .footer-ai {
   display: inline-flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
+}
+
+.footer-ai__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-ai__logo {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  /* Lock the SVG height — Next/Image's default `width: auto` on one axis
+     can produce subpixel drift when the parent flex line wraps. */
+  flex-shrink: 0;
 }
 
 .footer-disclaimer {
@@ -704,104 +761,158 @@ html {
 }
 
 /*
- * Hero — "Handoff". Full-bleed photograph + GT-Standard wordmark that
- * crosses the photo→Paper boundary. Same mental model as
- * .footer-specimen: image is the ambience, wordmark is the document.
- * The photo is the single exception to the No-Colour Rule (DESIGN.md §2)
- * — do not add grayscale() here.
+ * Hero — "Spec opener". RFC-styled asymmetric layout on Paper:
+ * editorial eyebrow, Display headline (GT-Standard per CLAUDE.md),
+ * lead paragraph, paired CTAs in the left column; right column reserves
+ * room for a pixelated protocol visualization (designed later). A faint
+ * vertical column ruler runs behind the content and a single hairline
+ * sits at the section base — the page reads like the cover of a
+ * published specification, not a marketing splash.
  */
-.hero-handoff {
+.hero-spec {
   position: relative;
+  isolation: isolate;
   background-color: #ffffff;
-  /* Lets the sticky glass pill breathe above the photograph — the prior
-     clamp ran 16–32px which read as cramped on laptop+ viewports where
-     the nav and the photo nearly touch. */
-  padding-top: clamp(40px, 5vw, 88px);
+  color: #18181b;
+  overflow: hidden;
+  /* Lets the sticky glass pill breathe above the headline at laptop+. */
+  padding-top: clamp(72px, 9vw, 144px);
+  padding-bottom: clamp(64px, 9vw, 160px);
 }
 
-.hero-handoff__photo {
+/* Faint vertical column ruler — the published-spec backdrop. Subtle
+   enough that body content reads as the foreground, present enough that
+   the page feels measured rather than empty. */
+.hero-spec__columns {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(9, 9, 11, 0.05) 0,
+    rgba(9, 9, 11, 0.05) 1px,
+    transparent 1px,
+    transparent calc(100% / 32)
+  );
+  /* Soft mask so the lines fade at the page edges rather than slamming
+     into the viewport sides — keeps them from feeling decorative. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.hero-spec__inner {
   position: relative;
-  width: 100%;
-  /* 3/2 on phones is more cinematic than 4/3 and keeps the CTAs higher in
-     the fold on 360–414px viewports. Bumps to 4/3 on small tablets and
-     16/9 on desktop where the photo earns its full landscape. */
-  aspect-ratio: 3 / 2;
-  overflow: visible;
-  /* container query unit (cqi) on the photo lets the wordmark scale
-     relative to the photo width rather than the viewport — matters now
-     that the photo lives inside page-shell. */
-  container-type: inline-size;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
 }
 
-@media (min-width: 640px) {
-  .hero-handoff__photo {
-    aspect-ratio: 4 / 3;
+@media (min-width: 1024px) {
+  .hero-spec__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    column-gap: clamp(2rem, 4vw, 4rem);
   }
 }
 
-@media (min-width: 768px) {
-  .hero-handoff__photo {
-    aspect-ratio: 16 / 9;
-  }
-}
-
-.hero-handoff__photo-img {
-  object-fit: cover;
-}
-
-/*
- * Asymmetric layout: lead flush-left under the photo, CTAs flush-left
- * beneath on mobile / pulled to the opposite edge on lg+. Breaks the
- * centered-stack landing-page template the brand register warns against
- * ("Don't default to centering everything"). On lg+ the lead column caps
- * narrow so the CTA cluster has room to live on the opposite side without
- * the row stretching to negative tension.
- */
-.hero-handoff__statement {
+.hero-spec__content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  gap: clamp(1.5rem, 2.5vw, 2.25rem);
-  padding-top: clamp(1.75rem, 3vw, 3rem);
-  /* Tight on phones so the next section enters the fold; generous on
-     desktop where the hero earns the breathing room. */
-  padding-bottom: clamp(32px, 6vw, 96px);
+  gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-@media (min-width: 1024px) {
-  .hero-handoff__statement {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: clamp(2rem, 4vw, 4rem);
-    align-items: end;
-  }
-}
-
-/* Hero peak — bumped to a page-peak scale so the lead carries the same
-   weight as the TabbedFeature title and the route-level Display H1s. Still
-   sits just below true t-display since the copy is two sentences, not the
-   <25-char monument the Display scale is designed for. */
-.hero-handoff__lead {
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  /* Floor at 2.25rem so the lead doesn't crowd 320px iPhones; ceiling
-     5.5rem on desktop — now that the lead anchors the left, it can carry
-     a touch more weight than the prior centered shape. */
-  font-size: clamp(2.25rem, 6.25vw, 5.5rem);
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  max-width: 18ch;
-  text-wrap: balance;
+/* Editorial eyebrow. Small label-scale, slightly muted so the headline
+   reads as the page peak. Two short lines — a status note plus a hook —
+   echo the "release notice" beat the reference layout opens on. */
+.hero-spec__eyebrow {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: #71717a;
   margin: 0;
+  max-width: 52ch;
 }
 
-.hero-handoff__cta-row {
+/* Page peak. CLAUDE.md is explicit: hero headline = GT-Standard 600,
+   ≥3.75rem, line-height 0.95. Held to t-display proportions on a tight
+   max-width so the line break lands where the asymmetric grid expects. */
+.hero-spec__headline {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(3.75rem, 9vw, 8.5rem);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: #18181b;
+  margin: 0;
+  max-width: 14ch;
+  text-wrap: balance;
+}
+
+.hero-spec__body {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  color: #3f3f46;
+  margin: 0;
+  max-width: 44ch;
+}
+
+.hero-spec__cta-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
   gap: 0.75rem;
+  margin-top: clamp(0.5rem, 1vw, 1rem);
+}
+
+/* Right column. Sits as a sized reservation until the pixelated protocol
+   visual is designed — gives the asymmetric grid its shape today
+   without committing to placeholder art. */
+.hero-spec__art {
+  position: relative;
+  width: 100%;
+  min-height: clamp(240px, 32vw, 480px);
+}
+
+@media (max-width: 1023.98px) {
+  .hero-spec__art {
+    min-height: clamp(160px, 36vw, 280px);
+  }
+}
+
+/* Section-base hairline. One pixel of Hair (#e4e4e7) — quiet, but
+   present enough to mark the transition into the next section. */
+.hero-spec__rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: #e4e4e7;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /*

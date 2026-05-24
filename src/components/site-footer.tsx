@@ -70,18 +70,21 @@ const COLUMNS: { heading: string; links: FooterLink[] }[] = [
 
 const AI_PROMPT = "Explain the Cashu protocol: what it is, how it works, and why it matters.";
 
-const AI_LINKS: { name: string; href: string }[] = [
+const AI_LINKS: { name: string; href: string; icon: string }[] = [
   {
     name: "ChatGPT",
     href: `https://chatgpt.com/?q=${encodeURIComponent(AI_PROMPT)}`,
+    icon: "/ai/openai.svg",
   },
   {
     name: "Claude",
     href: `https://claude.ai/new?q=${encodeURIComponent(AI_PROMPT)}`,
+    icon: "/ai/claude.svg",
   },
   {
     name: "Gemini",
     href: `https://gemini.google.com/app?q=${encodeURIComponent(AI_PROMPT)}`,
+    icon: "/ai/gemini.svg",
   },
 ];
 
@@ -222,9 +225,21 @@ export default function SiteFooter() {
                     )}
                     <ExternalLink
                       href={ai.href}
-                      className="footer-link t-label focus-ring"
+                      className="footer-ai__link footer-link t-label focus-ring"
                     >
-                      {ai.name}
+                      {/* Static-asset SVG; rendered as a plain <img> so the
+                          Next.js image optimizer (which blocks SVG by
+                          default) stays out of the path. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={ai.icon}
+                        alt=""
+                        width={14}
+                        height={14}
+                        className="footer-ai__logo"
+                        aria-hidden
+                      />
+                      <span>{ai.name}</span>
                     </ExternalLink>
                   </span>
                 ))}

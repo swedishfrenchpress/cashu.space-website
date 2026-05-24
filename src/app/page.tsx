@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import ImplementationsGrid from "@/components/implementations-grid";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
@@ -13,54 +11,55 @@ export default function Home() {
     <div className="flex flex-col flex-1 bg-white text-black">
       <SiteHeader />
 
-      {/* Hero — "Handoff". A photograph of a real Cashu moment (cash-in
-          against an antifiat-mint wallet) carries the page. Beneath the
-          photo, the lead and CTAs land asymmetric: lead flush-left,
-          CTAs flush-left under it on mobile / pulled to the opposite
-          edge on lg+. The centered stack the brand register warns
-          against ("Don't default to centering everything") is
-          deliberately avoided here. The photograph is the *single
-          permitted color image* on the site — every other photo
-          desaturates per DESIGN.md §2. */}
-      <section id="main-content" className="hero-handoff page-shell">
-        <div className="hero-handoff__photo">
-          <Image
-            src="/hero-handoff.jpg"
-            alt="Two hands exchange US dollar bills across a Cashu wallet showing a balance of ₿3,878 on an antifiat mint, with the NYC Flatiron district in the background."
-            fill
-            priority
-            sizes="(min-width: 1280px) 1088px, 100vw"
-            className="hero-handoff__photo-img"
-          />
+      {/* Hero — "Spec opener". RFC-style asymmetric layout: editorial
+          eyebrow / Display headline / lead paragraph / paired CTAs flush
+          to a left column; right column reserves space for a pixelated
+          protocol visualization (designed later). Faint vertical column
+          ruler in the background and a hairline at the section base
+          carry the published-spec register the North Star calls for. */}
+      <section id="main-content" className="hero-spec">
+        <div className="hero-spec__columns" aria-hidden="true" />
+        <div className="hero-spec__inner page-shell">
+          <div className="hero-spec__content">
+            <Reveal immediate delay={120}>
+              <p className="hero-spec__eyebrow">
+                An open ecash protocol for bitcoin.
+                <br />
+                Spec, mints, and wallets — all open source. →
+              </p>
+            </Reveal>
+            <Reveal immediate delay={260}>
+              <h1 className="hero-spec__headline">Ecash for bitcoin.</h1>
+            </Reveal>
+            <Reveal immediate delay={380}>
+              <p className="hero-spec__body">
+                Instant, bearer, peer-to-peer. A protocol for digital cash
+                backed by Lightning, with blind-signed tokens you can hold
+                in any wallet.
+              </p>
+            </Reveal>
+            <Reveal immediate delay={500}>
+              <div className="hero-spec__cta-row">
+                <a href="/wallets" className="btn-primary">
+                  Get a wallet
+                </a>
+                <a
+                  href="https://docs.cashu.space/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary"
+                >
+                  Read the spec
+                </a>
+              </div>
+            </Reveal>
+          </div>
+          {/* Right column. Reserved for the pixelated protocol visual.
+              Empty placeholder for now — sized so the asymmetric grid
+              reads correctly even before the art lands. */}
+          <div className="hero-spec__art" aria-hidden="true" />
         </div>
-        <div className="hero-handoff__statement">
-          <Reveal immediate delay={260}>
-            <p className="hero-handoff__lead text-zinc-900">
-              Ecash for bitcoin. Instant, bearer, peer-to-peer.
-            </p>
-          </Reveal>
-          <Reveal immediate delay={380}>
-            {/* Get-a-wallet is the page's primary ask (PRODUCT.md
-                outcome #1); Read-the-spec is the doctrine-equal second
-                outcome but reads quieter on the hero so the page has a
-                clear lead click. Both primaries return sitewide on
-                deeper pages — the hero just nominates which to click
-                first. No third CTA: GitHub lives in the footer. */}
-            <div className="hero-handoff__cta-row">
-              <a href="/wallets" className="btn-primary">
-                Get a wallet
-              </a>
-              <a
-                href="https://docs.cashu.space/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary"
-              >
-                Read the spec
-              </a>
-            </div>
-          </Reveal>
-        </div>
+        <div className="hero-spec__rule" aria-hidden="true" />
       </section>
 
       <TabbedFeature />
