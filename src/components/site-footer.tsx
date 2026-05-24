@@ -173,11 +173,6 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          {/* Massive wordmark — pure text, selectable, GT-Standard 600 */}
-          <div className="footer-wordmark" aria-hidden>
-            cashu
-          </div>
-
           {/* Bottom: socials + legal on left, Ask-AI on right */}
           <div className="footer-card__bottom">
             <div className="footer-card__bottom-left">

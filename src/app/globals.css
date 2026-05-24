@@ -583,18 +583,6 @@ html {
   color: #000000;
 }
 
-.footer-wordmark {
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 600;
-  font-size: clamp(7rem, 22vw, 18rem);
-  line-height: 0.85;
-  letter-spacing: -0.04em;
-  color: #000000;
-  margin-block: clamp(56px, 9vw, 144px) clamp(32px, 5vw, 72px);
-  user-select: text;
-  text-align: center;
-}
-
 .footer-card__bottom {
   display: flex;
   align-items: center;
@@ -825,9 +813,9 @@ html {
    max-width so the line break lands where the asymmetric grid expects. */
 .hero-spec__headline {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(3.75rem, 9vw, 8.5rem);
+  font-size: clamp(2.75rem, 6.5vw, 6rem);
   font-weight: 600;
-  line-height: 0.95;
+  line-height: 0.98;
   letter-spacing: -0.02em;
   color: #18181b;
   margin: 0;
