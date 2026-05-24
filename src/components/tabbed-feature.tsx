@@ -322,39 +322,6 @@ export default function TabbedFeature() {
           )}
         </div>
 
-        {/* CTA — grid-stack mirrors the headline/caption pattern. */}
-        <div className="grid">
-          {isJacking ? (
-            TABS.map((tab, i) => {
-              const isActive = i === activeIndex;
-              return (
-                <a
-                  key={`cta-${tab.id}`}
-                  href={tab.href}
-                  {...(tab.external
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
-                  aria-hidden={!isActive}
-                  tabIndex={isActive ? 0 : -1}
-                  className="btn-primary col-start-1 row-start-1 justify-self-center"
-                  style={layerStyle(isActive, TEXT_BLUR_PX)}
-                >
-                  {tab.cta}
-                </a>
-              );
-            })
-          ) : (
-            <a
-              href={active.href}
-              {...(active.external
-                ? { target: "_blank", rel: "noopener noreferrer" }
-                : {})}
-              className="btn-primary col-start-1 row-start-1 justify-self-center"
-            >
-              {active.cta}
-            </a>
-          )}
-        </div>
       </div>
     </section>
   );

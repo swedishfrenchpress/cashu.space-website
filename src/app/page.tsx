@@ -1,3 +1,4 @@
+import BlindedGrid from "@/components/blinded-grid";
 import ImplementationsGrid from "@/components/implementations-grid";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
@@ -18,18 +19,13 @@ export default function Home() {
           ruler in the background and a hairline at the section base
           carry the published-spec register the North Star calls for. */}
       <section id="main-content" className="hero-spec">
-        <div className="hero-spec__columns" aria-hidden="true" />
         <div className="hero-spec__inner page-shell">
           <div className="hero-spec__content">
             <Reveal immediate delay={120}>
-              <p className="hero-spec__eyebrow">
-                An open ecash protocol for bitcoin.
-                <br />
-                Spec, mints, and wallets — all open source. →
-              </p>
+              <p className="hero-spec__eyebrow">CASHU</p>
             </Reveal>
             <Reveal immediate delay={260}>
-              <h1 className="hero-spec__headline">Ecash for bitcoin.</h1>
+              <h1 className="hero-spec__headline">Open source electronic cash.</h1>
             </Reveal>
             <Reveal immediate delay={380}>
               <p className="hero-spec__body">
@@ -38,28 +34,13 @@ export default function Home() {
                 in any wallet.
               </p>
             </Reveal>
-            <Reveal immediate delay={500}>
-              <div className="hero-spec__cta-row">
-                <a href="/wallets" className="btn-primary">
-                  Get a wallet
-                </a>
-                <a
-                  href="https://docs.cashu.space/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary"
-                >
-                  Read the spec
-                </a>
-              </div>
-            </Reveal>
           </div>
-          {/* Right column. Reserved for the pixelated protocol visual.
-              Empty placeholder for now — sized so the asymmetric grid
-              reads correctly even before the art lands. */}
-          <div className="hero-spec__art" aria-hidden="true" />
+          {/* Right column. The blinded-denomination grid — a Three.js
+              dither figure diagramming Cashu's blind-signature mechanism.
+              Cells of bit-pattern data cycle into halftone occlusion;
+              cursor proximity briefly unblinds nearby cells. */}
+          <BlindedGrid />
         </div>
-        <div className="hero-spec__rule" aria-hidden="true" />
       </section>
 
       <TabbedFeature />

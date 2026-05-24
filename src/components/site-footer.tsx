@@ -218,30 +218,26 @@ export default function SiteFooter() {
             <div className="footer-card__bottom-right">
               <span className="t-label footer-ask-label">Ask AI about Cashu</span>
               <div className="footer-ai">
-                {AI_LINKS.map((ai, i) => (
-                  <span key={ai.name} className="inline-flex items-center gap-3">
-                    {i > 0 && (
-                      <span className="footer-legal__sep" aria-hidden>·</span>
-                    )}
-                    <ExternalLink
-                      href={ai.href}
-                      className="footer-ai__link footer-link t-label focus-ring"
-                    >
-                      {/* Static-asset SVG; rendered as a plain <img> so the
-                          Next.js image optimizer (which blocks SVG by
-                          default) stays out of the path. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={ai.icon}
-                        alt=""
-                        width={14}
-                        height={14}
-                        className="footer-ai__logo"
-                        aria-hidden
-                      />
-                      <span>{ai.name}</span>
-                    </ExternalLink>
-                  </span>
+                {AI_LINKS.map((ai) => (
+                  <ExternalLink
+                    key={ai.name}
+                    href={ai.href}
+                    className="footer-ai__link focus-ring"
+                  >
+                    <span className="sr-only">{ai.name}</span>
+                    {/* Static-asset SVG; rendered as a plain <img> so the
+                        Next.js image optimizer (which blocks SVG by
+                        default) stays out of the path. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={ai.icon}
+                      alt=""
+                      width={14}
+                      height={14}
+                      className="footer-ai__logo"
+                      aria-hidden
+                    />
+                  </ExternalLink>
                 ))}
               </div>
             </div>

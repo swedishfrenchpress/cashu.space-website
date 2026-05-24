@@ -87,26 +87,11 @@ export default function ImplementationsGrid() {
   return (
     <section className="page-shell section-y-air">
       <div className="flex flex-col gap-10 md:gap-12 lg:gap-16">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
-          <Reveal>
-            <h2 className="t-headline max-w-[18ch]">
-              Properties of the protocol
-            </h2>
-          </Reveal>
-          <Reveal delay={120}>
-            {/* Section handoff CTA — Read the spec lives in canonical docs at
-                docs.cashu.space. Stays secondary by Two-CTA Rule (DESIGN.md §1);
-                this is the handoff, not a competing ask. */}
-            <a
-              href="https://docs.cashu.space/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary self-start"
-            >
-              Read the spec
-            </a>
-          </Reveal>
-        </div>
+        <Reveal>
+          <h2 className="t-headline max-w-[18ch]">
+            Properties of the protocol
+          </h2>
+        </Reveal>
 
         {/* Hairline — the section pivots from narrative ("what Cashu is") to
             directory ("what Cashu is made of"). Single 1px Hair line per the
