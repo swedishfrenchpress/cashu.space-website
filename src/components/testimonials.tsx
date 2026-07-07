@@ -31,27 +31,6 @@ const TESTIMONIALS: Testimonial[] = [
     handle: "@placeholder_three",
     initials: "P3",
   },
-  {
-    quote:
-      "Six implementations, one spec — and they interoperate. That's rare in this space and it's why we built on Cashu.",
-    name: "Placeholder Four",
-    handle: "@placeholder_four",
-    initials: "P4",
-  },
-  {
-    quote:
-      "No company, no token, no treasury. Just a protocol I can audit and a wallet I control. That's the whole pitch, and it delivers.",
-    name: "Placeholder Five",
-    handle: "@placeholder_five",
-    initials: "P5",
-  },
-  {
-    quote:
-      "Onboarding a user takes seconds because there's nothing to onboard. You hold the token, you hold the money.",
-    name: "Placeholder Six",
-    handle: "@placeholder_six",
-    initials: "P6",
-  },
 ];
 
 /**

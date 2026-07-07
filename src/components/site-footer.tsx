@@ -1,76 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
-import Reveal from "./reveal";
-
 // Footer — light, full-width band unified with the rest of the site. A
 // single hairline top border separates it from the section above; no
 // photographic backdrop, no floating card. Flat and sharp per doctrine.
-
-type FooterLink = { label: string; href: string; external?: boolean };
-
-const COLUMNS: { heading: string; links: FooterLink[] }[] = [
-  {
-    heading: "Protocol",
-    links: [
-      {
-        label: "Specification",
-        href: "https://github.com/cashubtc/nuts",
-        external: true,
-      },
-      {
-        label: "NUTs",
-        href: "https://github.com/cashubtc/nuts#nuts",
-        external: true,
-      },
-    ],
-  },
-  {
-    heading: "Implementations",
-    links: [
-      { label: "Wallets", href: "/wallets" },
-      {
-        label: "Source",
-        href: "https://github.com/cashubtc",
-        external: true,
-      },
-    ],
-  },
-  {
-    heading: "Resources",
-    links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/cashubtc",
-        external: true,
-      },
-      {
-        label: "NUT-00",
-        href: "https://github.com/cashubtc/nuts/blob/main/00.md",
-        external: true,
-      },
-    ],
-  },
-  {
-    heading: "Community",
-    links: [
-      {
-        label: "Nostr",
-        href: "https://njump.me/cashu",
-        external: true,
-      },
-      {
-        label: "Telegram",
-        href: "https://t.me/CashuBTC",
-        external: true,
-      },
-      {
-        label: "OpenCash",
-        href: "https://opencash.dev/",
-        external: true,
-      },
-    ],
-  },
-];
 
 const AI_PROMPT = "Explain the Cashu protocol: what it is, how it works, and why it matters.";
 
@@ -118,53 +48,6 @@ export default function SiteFooter() {
     <footer className="footer-specimen relative isolate">
       <div className="page-shell relative" style={{ paddingBlock: "clamp(64px, 9vw, 160px)" }}>
         <div className="footer-card">
-          {/* Top: cashu mark + four nav columns */}
-          <div className="footer-card__top">
-            <Reveal>
-              <Link href="/" aria-label="Cashu home" className="footer-mark focus-ring">
-                <Image
-                  src="/cashu-no-bg.png"
-                  alt="Cashu"
-                  width={48}
-                  height={48}
-                />
-              </Link>
-            </Reveal>
-
-            <div className="footer-card__columns">
-              {COLUMNS.map((col, i) => (
-                <Reveal key={col.heading} delay={80 * (i + 1)}>
-                  <div className="flex flex-col gap-4">
-                    <h3 className="t-title text-zinc-500">
-                      {col.heading}
-                    </h3>
-                    <ul className="flex flex-col gap-3">
-                      {col.links.map((link) => (
-                        <li key={link.label}>
-                          {link.external ? (
-                            <ExternalLink
-                              href={link.href}
-                              className="footer-link t-label focus-ring"
-                            >
-                              {link.label}
-                            </ExternalLink>
-                          ) : (
-                            <a
-                              href={link.href}
-                              className="footer-link t-label focus-ring"
-                            >
-                              {link.label}
-                            </a>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-
           {/* Bottom: socials + legal on left, Ask-AI on right */}
           <div className="footer-card__bottom">
             <div className="footer-card__bottom-left">
@@ -176,6 +59,15 @@ export default function SiteFooter() {
                   <span className="sr-only">X (Twitter)</span>
                   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </ExternalLink>
+                <ExternalLink
+                  href="https://primal.net/p/nprofile1qqs0y3tvskgs9gpgxxu5ahgz3fmms3rzmxt504qceqtz4a6pdgfwlkghwl6j8"
+                  className="footer-social focus-ring"
+                >
+                  <span className="sr-only">Nostr</span>
+                  <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M210.8 199.4c0 3.1-2.5 5.7-5.7 5.7h-68c-3.1 0-5.7-2.5-5.7-5.7v-15.5c.3-19 2.3-37.2 6.5-45.5 2.5-5 6.7-7.7 11.5-9.1 9.1-2.7 24.9-.9 31.7-1.2 0 0 20.4.8 20.4-10.7s-9.1-8.6-9.1-8.6c-10 .3-17.7-.4-22.6-2.4-8.3-3.3-8.6-9.2-8.6-11.2-.4-23.1-34.5-25.9-64.5-20.1-32.8 6.2.4 53.3.4 116.1v8.4c0 3.1-2.6 5.6-5.7 5.6H57.7c-3.1 0-5.7-2.5-5.7-5.7v-144c0-3.1 2.5-5.7 5.7-5.7h31.7c3.1 0 5.7 2.5 5.7 5.7 0 4.7 5.2 7.2 9 4.5 11.4-8.2 26-12.5 42.4-12.5 36.6 0 64.4 21.4 64.4 68.7v83.2ZM150 99.3c0-6.7-5.4-12.1-12.1-12.1s-12.1 5.4-12.1 12.1 5.4 12.1 12.1 12.1S150 106 150 99.3Z"/>
                   </svg>
                 </ExternalLink>
                 <ExternalLink
@@ -192,13 +84,6 @@ export default function SiteFooter() {
                 <span className="t-label">© 2026</span>
                 <span className="footer-legal__sep" aria-hidden>·</span>
                 <span className="t-label">MIT Licensed</span>
-                <span className="footer-legal__sep" aria-hidden>·</span>
-                <ExternalLink
-                  href="https://github.com/cashubtc/nuts"
-                  className="footer-link t-label focus-ring"
-                >
-                  Read the spec
-                </ExternalLink>
               </div>
             </div>
 

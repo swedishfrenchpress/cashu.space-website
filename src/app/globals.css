@@ -564,8 +564,6 @@ html {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding-top: clamp(20px, 2vw, 32px);
-  border-top: 1px solid #e4e4e7;
   flex-wrap: wrap;
 }
 
@@ -752,21 +750,37 @@ html {
   gap: clamp(2.5rem, 5vw, 4rem);
 }
 
-/* Row A — asymmetric lede. The headline holds the left; the lead
-   paragraph sits bottom-aligned in the right column (warp puts the
-   supporting copy top-right). Stacks to a single column on mobile. */
+/* Two-column lede. The wordmark → headline → lead → CTA stack holds the
+   left; the token specimen figure sits in the right column, centred against
+   the text block. Stacks to a single column on mobile (figure below CTA). */
 .hero-spec__top {
   display: flex;
   flex-direction: column;
-  gap: clamp(1.5rem, 3vw, 2.25rem);
+  gap: clamp(2rem, 4vw, 3rem);
 }
 
 @media (min-width: 1024px) {
   .hero-spec__top {
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    align-items: end;
-    column-gap: clamp(2rem, 4vw, 4rem);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: center;
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+  }
+}
+
+/* Right column — the RFC figure. On mobile it drops below the CTA, capped so
+   the portrait 4:5 specimen never becomes a full-width monolith; on desktop
+   it fills its grid cell. */
+.hero-spec__art {
+  width: 100%;
+  max-width: min(360px, 100%);
+  align-self: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .hero-spec__art {
+    max-width: none;
+    align-self: center;
   }
 }
 

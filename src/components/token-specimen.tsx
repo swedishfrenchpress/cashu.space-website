@@ -18,7 +18,7 @@ const FIELDS: { label: string; value: string; emphasised?: boolean }[] = [
 
 export default function TokenSpecimen() {
   return (
-    <Reveal immediate variant="fade" slow delay={200} className="w-full">
+    <Reveal immediate variant="fade" slow delay={560} className="w-full">
       <figure className="relative w-full aspect-[4/5] bg-white border border-zinc-200">
         {/* Corner crop marks — RFC-figure tell. Hairlines only, no chrome. */}
         <CropMark className="top-3 left-3" />
