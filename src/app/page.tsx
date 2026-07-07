@@ -1,4 +1,4 @@
-import BlindedGrid from "@/components/blinded-grid";
+import HiddenBill from "@/components/hidden-bill";
 import ImplementationsGrid from "@/components/implementations-grid";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
@@ -35,11 +35,13 @@ export default function Home() {
               </p>
             </Reveal>
           </div>
-          {/* Right column. The blinded-denomination grid — a Three.js
-              dither figure diagramming Cashu's blind-signature mechanism.
-              Cells of bit-pattern data cycle into halftone occlusion;
-              cursor proximity briefly unblinds nearby cells. */}
-          <BlindedGrid />
+          {/* Right column. A dithered banknote, almost entirely redacted
+              by halftone; a narrow vertical reveal slot drifts across it
+              exposing fragments of the bill at a time. Privacy as the
+              steady state, revelation as the rare event. Cursor proximity
+              opens a soft circular reveal — readers can shine a light on
+              any part of the bill they want to read. */}
+          <HiddenBill />
         </div>
       </section>
 
