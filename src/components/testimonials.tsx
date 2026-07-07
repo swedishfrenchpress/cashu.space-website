@@ -62,39 +62,43 @@ const TESTIMONIALS: Testimonial[] = [
 export default function Testimonials() {
   return (
     <section
-      className="testimonials page-shell section-y-default"
+      className="testimonials section-y-default"
       aria-label="What people say about Cashu"
     >
-      <header className="testimonials__head">
-        <Reveal>
-          <h2 className="t-headline">What people are building on Cashu.</h2>
-        </Reveal>
-      </header>
-
-      <div className="testimonials__grid">
-        {TESTIMONIALS.map((t, i) => (
-          <Reveal
-            as="figure"
-            key={t.handle}
-            className="testimonial-card"
-            delay={(i % 3) * 80}
-          >
-            <blockquote className="testimonial-card__quote t-body-lead">
-              “{t.quote}”
-            </blockquote>
-            <figcaption className="testimonial-card__author">
-              <span className="testimonial-card__avatar" aria-hidden>
-                {t.initials}
-              </span>
-              <span className="testimonial-card__meta">
-                <span className="testimonial-card__name t-title">{t.name}</span>
-                <span className="testimonial-card__handle t-label">
-                  {t.handle}
-                </span>
-              </span>
-            </figcaption>
+      <div className="page-shell">
+        <header className="testimonials__head">
+          <Reveal>
+            <h2 className="t-headline">What people are building on Cashu.</h2>
           </Reveal>
-        ))}
+        </header>
+
+        <div className="testimonials__grid">
+          {TESTIMONIALS.map((t, i) => (
+            <Reveal
+              as="figure"
+              key={t.handle}
+              className="testimonial-card"
+              delay={(i % 3) * 80}
+            >
+              <blockquote className="testimonial-card__quote t-body-lead">
+                “{t.quote}”
+              </blockquote>
+              <figcaption className="testimonial-card__author">
+                <span className="testimonial-card__avatar" aria-hidden>
+                  {t.initials}
+                </span>
+                <span className="testimonial-card__meta">
+                  <span className="testimonial-card__name t-title">
+                    {t.name}
+                  </span>
+                  <span className="testimonial-card__handle t-label">
+                    {t.handle}
+                  </span>
+                </span>
+              </figcaption>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

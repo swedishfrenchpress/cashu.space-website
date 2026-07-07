@@ -819,91 +819,13 @@ html {
   max-width: 44ch;
 }
 
-/* Row B — CTA row. Primary chip · copyable token field · quiet spec
-   link, mirroring warp's Download / install-command / Contact-Sales. */
+/* Row B — CTA row. Primary chip + secondary "View documentation" chip,
+   mirroring warp's Download / Docs pairing. */
 .hero-spec__cta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: clamp(0.75rem, 1.5vw, 1rem);
-}
-
-.hero-spec__spec-link {
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #18181b;
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-  padding-bottom: 2px;
-  transition: color var(--dur-base) var(--ease-out-quart);
-}
-
-.hero-spec__spec-link:hover,
-.hero-spec__spec-link:focus-visible {
-  color: #000000;
-}
-
-/* Copyable bearer-token field. Mono per the protocol-notation rule;
-   sharp, hair-rimmed, chalk ground — reads like a spec listing, not a
-   marketing input. The token itself is a truncated demo string. */
-.hero-cmd {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 100%;
-  padding: 8px 8px 8px 14px;
-  background-color: #f4f4f5;
-  border: 1px solid #e4e4e7;
-}
-
-.hero-cmd__prefix {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.8125rem;
-  color: #a1a1aa;
-  user-select: none;
-}
-
-.hero-cmd__text {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.8125rem;
-  color: #3f3f46;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: clamp(120px, 26vw, 260px);
-}
-
-.hero-cmd__copy {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-shrink: 0;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 8px;
-  color: #52525b;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: color var(--dur-fast) var(--ease-out-quart);
-}
-
-.hero-cmd__copy:hover {
-  color: #000000;
-}
-
-.hero-cmd__copy svg {
-  width: 15px;
-  height: 15px;
 }
 
 /*
@@ -1505,8 +1427,16 @@ html {
 }
 
 /* -------------------------------------------------------------------
- * Testimonials — flat, sharp, hairline-bordered cards.
+ * Testimonials — flat, sharp, hairline-bordered cards on a Chalk band.
+ * The full-bleed Chalk ground (a lightness shift, never a hue) is a quiet
+ * rhythm break from the surrounding Paper sections; the white cards read as
+ * subtly raised panels, edges held by the Hair hairline. Stays flat — no
+ * shadow (No-Shadow Rule).
  * ------------------------------------------------------------------- */
+.testimonials {
+  background-color: #f4f4f5; /* Chalk */
+}
+
 .testimonials__head {
   display: flex;
   flex-direction: column;

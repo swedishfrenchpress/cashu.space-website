@@ -1,5 +1,4 @@
 import Link from "next/link";
-import HeroCommand from "@/components/hero-command";
 import ImplementationsGrid from "@/components/implementations-grid";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
@@ -43,14 +42,13 @@ export default function Home() {
               <Link href="/wallets" className="btn-primary">
                 <span>Get a wallet</span>
               </Link>
-              <HeroCommand />
               <a
                 href="https://docs.cashu.space/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hero-spec__spec-link focus-ring"
+                className="btn-secondary"
               >
-                Read the spec
+                <span>View documentation</span>
               </a>
             </div>
           </Reveal>
