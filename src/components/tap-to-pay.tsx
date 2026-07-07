@@ -50,7 +50,7 @@ export default function TapToPay() {
           </Reveal>
           <Reveal delay={80}>
             <p className="t-body-lead video-feature__body">
-              Cashu tokens are bearer bitcoin — no accounts, no invoices, no
+              Cashu tokens are bearer bitcoin. No accounts, no invoices, no
               waiting. Tap, and value moves. The protocol makes room for
               experiences money never allowed before.
             </p>

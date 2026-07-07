@@ -12,7 +12,7 @@ type Testimonial = {
 const TESTIMONIALS: Testimonial[] = [
   {
     quote:
-      "Cashu is the first ecash system that actually feels like cash. I sent a token in a chat and it just worked — no accounts, no invoices.",
+      "Cashu is the first ecash system that actually feels like cash. I sent a token in a chat and it just worked. No accounts, no invoices.",
     name: "Placeholder One",
     handle: "@placeholder_one",
     initials: "P1",

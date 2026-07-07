@@ -10,7 +10,7 @@ const CARDS: Card[] = [
   {
     titleLead: "Bearer by",
     titleEm: "design",
-    body: "A Cashu token is the money. Hold it, send it, redeem it. No ledger reconciles the owner — possession is the proof.",
+    body: "A Cashu token is the money. Hold it, send it, redeem it. No ledger reconciles the owner. Possession is the proof.",
     marquee: "Bearer ecash · Cashu protocol · Open spec · ",
     icon: BearerIcon,
   },
