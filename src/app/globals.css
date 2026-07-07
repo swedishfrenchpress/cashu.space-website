@@ -506,42 +506,18 @@ html {
 }
 
 /*
- * Footer — "Specimen card on a photograph". A sharp-cornered Paper card
- * floats on a grayscale photographic backdrop. Inverts the Twilight Stack:
- * the photograph is the ambience, the card is the document. No box-shadow
- * on the card — separation comes from photo contrast + a 1px Hair rim
- * (Hairline Rule). The keyboard photo gets grayscale + darken in CSS so
- * the No-Colour Rule holds regardless of source asset.
+ * Footer — light, full-width band unified with the rest of the site.
+ * Formerly a Paper card floating on a grayscale photograph; now a plain
+ * Paper band separated from the section above by a single 1px Hair
+ * hairline. No backdrop, no card chrome — flat and sharp per doctrine.
  */
 .footer-specimen {
-  background-color: #000000;
-}
-
-.footer-photo {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.footer-photo img {
-  object-fit: cover;
-  filter: grayscale(1) brightness(0.55) contrast(1.05);
-}
-
-.footer-photo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 100%);
-  pointer-events: none;
+  background-color: #ffffff;
+  border-top: 1px solid #e4e4e7;
 }
 
 .footer-card {
   position: relative;
-  background-color: #ffffff;
-  border: 1px solid #e4e4e7;
-  padding: clamp(28px, 4vw, 56px);
   display: flex;
   flex-direction: column;
 }
@@ -773,11 +749,20 @@ html {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: clamp(2rem, 4vw, 3rem);
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+/* Row A — asymmetric lede. The headline holds the left; the lead
+   paragraph sits bottom-aligned in the right column (warp puts the
+   supporting copy top-right). Stacks to a single column on mobile. */
+.hero-spec__top {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 @media (min-width: 1024px) {
-  .hero-spec__inner {
+  .hero-spec__top {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: end;
@@ -813,9 +798,9 @@ html {
    max-width so the line break lands where the asymmetric grid expects. */
 .hero-spec__headline {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(2.75rem, 6.5vw, 6rem);
+  font-size: clamp(3rem, 7vw, 6.5rem);
   font-weight: 600;
-  line-height: 0.98;
+  line-height: 0.95;
   letter-spacing: -0.02em;
   color: #18181b;
   margin: 0;
@@ -847,6 +832,114 @@ html {
   .hero-spec__art {
     min-height: clamp(160px, 36vw, 280px);
   }
+}
+
+/* Row C — framed visual. The shader now sits in a large sharp grey
+   specimen panel (warp's screenshot slot, translated to monochrome):
+   chalk ground, hair rim, no shadow. The bill renders on transparent,
+   so the chalk shows through its redacted field. */
+.hero-spec__frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background-color: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  min-height: clamp(300px, 40vw, 560px);
+}
+
+.hero-spec__frame .hero-spec__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Row B — CTA row. Primary chip · copyable token field · quiet spec
+   link, mirroring warp's Download / install-command / Contact-Sales. */
+.hero-spec__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
+}
+
+.hero-spec__spec-link {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #18181b;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: color var(--dur-base) var(--ease-out-quart);
+}
+
+.hero-spec__spec-link:hover,
+.hero-spec__spec-link:focus-visible {
+  color: #000000;
+}
+
+/* Copyable bearer-token field. Mono per the protocol-notation rule;
+   sharp, hair-rimmed, chalk ground — reads like a spec listing, not a
+   marketing input. The token itself is a truncated demo string. */
+.hero-cmd {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 8px 8px 14px;
+  background-color: #f4f4f5;
+  border: 1px solid #e4e4e7;
+}
+
+.hero-cmd__prefix {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  color: #a1a1aa;
+  user-select: none;
+}
+
+.hero-cmd__text {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  color: #3f3f46;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: clamp(120px, 26vw, 260px);
+}
+
+.hero-cmd__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  color: #52525b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color var(--dur-fast) var(--ease-out-quart);
+}
+
+.hero-cmd__copy:hover {
+  color: #000000;
+}
+
+.hero-cmd__copy svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* Canvas fade-in. The slot paints empty for one frame, then the
@@ -1313,4 +1406,289 @@ html {
   .keymap-toast {
     transition: none;
   }
+}
+
+/* ===================================================================
+ * Warp-flavored restyle — section eyebrow + feature scroller + video
+ * + testimonials. Monochrome throughout: warp's tinted panels become
+ * chalk (#f4f4f5) grounds with hair (#e4e4e7) rims. Flat, sharp.
+ * =================================================================== */
+
+/* Small tracked uppercase label that opens a section — warp's "WHY WARP"
+   / "OPEN-SOURCE" eyebrows, translated to the mist grey. */
+.section-eyebrow {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #71717a;
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------
+ * Feature scroller — sticky left tab-list + scrolling right stack.
+ * ------------------------------------------------------------------- */
+.feature-scroller__head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
+  max-width: 30ch;
+  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.feature-scroller__body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 1024px) {
+  .feature-scroller__body {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: start;
+  }
+}
+
+/* Nav: horizontal jump-row on mobile, sticky vertical list on lg+. */
+.feature-nav {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.feature-nav::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .feature-nav {
+    position: sticky;
+    top: clamp(88px, 12vh, 148px);
+    flex-direction: column;
+    overflow: visible;
+  }
+}
+
+.feature-nav__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #a1a1aa;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    color var(--dur-base) var(--ease-out-quart),
+    background-color var(--dur-base) var(--ease-out-quart);
+}
+
+@media (min-width: 1024px) {
+  .feature-nav__item {
+    width: 100%;
+  }
+}
+
+.feature-nav__item:hover {
+  color: #3f3f46;
+}
+
+.feature-nav__item.is-active {
+  background-color: #18181b;
+  color: #ffffff;
+}
+
+.feature-nav__num {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.feature-track {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3.5rem, 8vw, 7rem);
+}
+
+.feature-block {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2rem);
+  scroll-margin-top: clamp(96px, 14vh, 168px);
+}
+
+/* Grey specimen panel behind the kept photo — warp's screenshot frame,
+   monochrome. Replaces the old white-square-on-photo overlay. */
+.feature-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #f4f4f5;
+  border: 1px solid #e4e4e7;
+}
+
+.feature-block__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  max-width: 52ch;
+}
+
+.feature-block__caption {
+  color: #3f3f46;
+}
+
+/* -------------------------------------------------------------------
+ * Video feature — full-bleed autoplay clip, monochrome darken overlay,
+ * text + on-ink CTA anchored to the lower-left.
+ * ------------------------------------------------------------------- */
+.video-feature {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #000000;
+  min-height: clamp(520px, 80vh, 780px);
+  display: flex;
+  align-items: flex-end;
+}
+
+.video-feature__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-feature__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 38%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
+}
+
+.video-feature__inner {
+  width: 100%;
+  padding-block: clamp(48px, 8vw, 120px);
+}
+
+.video-feature__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  max-width: 44ch;
+}
+
+.video-feature .section-eyebrow {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.video-feature__title {
+  color: #ffffff;
+  max-width: 18ch;
+}
+
+.video-feature__body {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* -------------------------------------------------------------------
+ * Testimonials — flat, sharp, hairline-bordered cards.
+ * ------------------------------------------------------------------- */
+.testimonials__head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
+  max-width: 40ch;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.testimonials__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+@media (min-width: 640px) {
+  .testimonials__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonials__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 2vw, 1.75rem);
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  border: 1px solid #e4e4e7;
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.testimonial-card__quote {
+  flex: 1;
+  color: #18181b;
+}
+
+.testimonial-card__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testimonial-card__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background-color: #18181b;
+  color: #ffffff;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.testimonial-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.testimonial-card__name {
+  color: #18181b;
+}
+
+.testimonial-card__handle {
+  color: #71717a;
 }

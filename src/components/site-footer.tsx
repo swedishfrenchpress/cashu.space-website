@@ -2,6 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./reveal";
 
+// Footer — light, full-width band unified with the rest of the site. A
+// single hairline top border separates it from the section above; no
+// photographic backdrop, no floating card. Flat and sharp per doctrine.
+
 type FooterLink = { label: string; href: string; external?: boolean };
 
 const COLUMNS: { heading: string; links: FooterLink[] }[] = [
@@ -112,18 +116,6 @@ function ExternalLink({
 export default function SiteFooter() {
   return (
     <footer className="footer-specimen relative isolate">
-      {/* Photographic backdrop — grayscale + darken applied in CSS to honour
-          the No-Colour Rule. */}
-      <div className="footer-photo" aria-hidden>
-        <Image
-          src="/keyboard.png"
-          alt=""
-          fill
-          sizes="100vw"
-          priority={false}
-        />
-      </div>
-
       <div className="page-shell relative" style={{ paddingBlock: "clamp(64px, 9vw, 160px)" }}>
         <div className="footer-card">
           {/* Top: cashu mark + four nav columns */}
