@@ -108,34 +108,32 @@ export default function TabbedFeature() {
   return (
     <section className="feature-scroller section-y-air" aria-label="Why Cashu">
       <div className="page-shell">
-        <header className="feature-scroller__head">
-          <Reveal>
-            <p className="section-eyebrow">Why Cashu</p>
-          </Reveal>
-          <Reveal delay={80}>
-            <h2 className="t-headline">The protocol, in four parts.</h2>
-          </Reveal>
-        </header>
-
         <div className="feature-scroller__body">
-          <nav className="feature-nav" aria-label="Cashu pillars">
-            {TABS.map((tab, i) => (
-              <button
-                key={tab.id}
-                type="button"
-                className={`feature-nav__item focus-ring${
-                  i === active ? " is-active" : ""
-                }`}
-                aria-current={i === active ? "true" : undefined}
-                onClick={() => scrollToBlock(i)}
-              >
-                <span className="feature-nav__num" aria-hidden>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="feature-nav__label">{tab.label}</span>
-              </button>
-            ))}
-          </nav>
+          <div className="feature-scroller__aside">
+            <Reveal>
+              <h2 className="t-headline feature-scroller__title">
+                The protocol, in four parts.
+              </h2>
+            </Reveal>
+            <nav className="feature-nav" aria-label="Cashu pillars">
+              {TABS.map((tab, i) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  className={`feature-nav__item focus-ring${
+                    i === active ? " is-active" : ""
+                  }`}
+                  aria-current={i === active ? "true" : undefined}
+                  onClick={() => scrollToBlock(i)}
+                >
+                  <span className="feature-nav__num" aria-hidden>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="feature-nav__label">{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
 
           <div className="feature-track">
             {TABS.map((tab, i) => (

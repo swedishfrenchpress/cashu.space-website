@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef } from "react";
 import Reveal from "./reveal";
 
@@ -45,24 +44,16 @@ export default function TapToPay() {
       <div className="video-feature__inner page-shell">
         <div className="video-feature__content">
           <Reveal>
-            <p className="section-eyebrow">Tap to pay</p>
-          </Reveal>
-          <Reveal delay={80}>
             <h2 className="t-headline video-feature__title">
               Push bitcoin like a message.
             </h2>
           </Reveal>
-          <Reveal delay={160}>
+          <Reveal delay={80}>
             <p className="t-body-lead video-feature__body">
               Cashu tokens are bearer bitcoin — no accounts, no invoices, no
               waiting. Tap, and value moves. The protocol makes room for
               experiences money never allowed before.
             </p>
-          </Reveal>
-          <Reveal delay={240}>
-            <Link href="/wallets" className="btn-primary--on-ink">
-              <span>See wallets</span>
-            </Link>
           </Reveal>
         </div>
       </div>

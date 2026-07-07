@@ -739,7 +739,7 @@ html {
   background-color: #ffffff;
   color: #18181b;
   overflow: hidden;
-  /* Lets the sticky glass pill breathe above the headline at laptop+. */
+  /* Clears the sticky glass bar and lets the headline breathe below it. */
   padding-top: clamp(72px, 9vw, 144px);
   padding-bottom: clamp(64px, 9vw, 160px);
 }
@@ -817,42 +817,6 @@ html {
   color: #3f3f46;
   margin: 0;
   max-width: 44ch;
-}
-
-/* Right column. Hosts the blinded-denomination shader canvas. The
-   slot reserves its dimensions before WebGL initialises so there's
-   no layout shift when the canvas mounts. */
-.hero-spec__art {
-  position: relative;
-  width: 100%;
-  min-height: clamp(240px, 32vw, 480px);
-}
-
-@media (max-width: 1023.98px) {
-  .hero-spec__art {
-    min-height: clamp(160px, 36vw, 280px);
-  }
-}
-
-/* Row C — framed visual. The shader now sits in a large sharp grey
-   specimen panel (warp's screenshot slot, translated to monochrome):
-   chalk ground, hair rim, no shadow. The bill renders on transparent,
-   so the chalk shows through its redacted field. */
-.hero-spec__frame {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  background-color: #f4f4f5;
-  border: 1px solid #e4e4e7;
-  min-height: clamp(300px, 40vw, 560px);
-}
-
-.hero-spec__frame .hero-spec__art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
 }
 
 /* Row B — CTA row. Primary chip · copyable token field · quiet spec
@@ -942,50 +906,35 @@ html {
   height: 15px;
 }
 
-/* Canvas fade-in. The slot paints empty for one frame, then the
-   shader's first render triggers `--ready` and the canvas transitions
-   in. Quart-out matches the Reveal entrance tempo elsewhere on the
-   page. */
-.hero-spec__art > canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 600ms cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.hero-spec__art--ready > canvas {
-  opacity: 1;
-}
-
 /*
- * Floating glass-pill navigation.
+ * Warp-style top bar.
  *
- * Documented surface exception to the system's flat/sharp doctrine
- * (DESIGN.md §4 No-Shadow Rule, §5 Sharp Buttons). The user explicitly
- * authorized rounded + glass + blur for the navbar only. The chip inside
- * the pill also inherits the rounded silhouette so the geometry stays
- * coherent — but its lift/shadow follow the existing chip recipe.
- *
- * The nav is sticky so the backdrop-filter has actual work to do: page
- * content slides under the glass as the user scrolls, which is the only
- * context where glassmorphism reads as glass and not as "milky pill".
+ * A full-width transparent glass strip pinned to the very top of the
+ * viewport — no floating gutters, no pill. The translucent ground +
+ * backdrop-blur live on the shell so the glass spans edge to edge; the
+ * inner row stays constrained to the page-shell. Glass + blur are the
+ * navbar's documented exception to the flat/sharp doctrine (DESIGN.md §4);
+ * the bar itself is square and carries only a hairline bottom rule, no
+ * drop shadow. The bar is sticky so page content slides under the glass as
+ * the user scrolls — the one context where glassmorphism reads as glass.
  */
 .site-header-shell {
   position: sticky;
-  top: clamp(12px, 1.5vw, 24px);
+  top: 0;
   z-index: 50;
-  padding-top: clamp(12px, 1.5vw, 24px);
-  pointer-events: none;
+
+  background-color: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(9, 9, 11, 0.08);
 }
 
-.site-header-shell > .page-shell {
-  pointer-events: none;
-}
-
-.site-header-shell .site-nav {
-  pointer-events: auto;
+/* Browsers without backdrop-filter (older Firefox) — opt into a denser
+   ground so the bar still reads as a surface over scrolling content. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header-shell {
+    background-color: rgba(255, 255, 255, 0.94);
+  }
 }
 
 .site-nav {
@@ -993,31 +942,7 @@ html {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: clamp(16px, 3vw, 32px);
-  padding: 8px 8px 8px 22px;
-  border-radius: 999px;
-
-  background-color: rgba(255, 255, 255, 0.62);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow:
-    0 0 0 1px rgba(9, 9, 11, 0.05),
-    0 1px 2px rgba(9, 9, 11, 0.04),
-    0 12px 32px rgba(9, 9, 11, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
-
-  transition:
-    background-color var(--dur-base) var(--ease-out-quart),
-    box-shadow var(--dur-base) var(--ease-out-quart);
-}
-
-/* Browsers without backdrop-filter (older Firefox) — opt into a denser
-   ground so the nav still reads as a contained surface. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav {
-    background-color: rgba(255, 255, 255, 0.92);
-  }
+  padding: 14px 0;
 }
 
 .site-nav__brand {
@@ -1064,31 +989,26 @@ html {
   color: #000000;
 }
 
-/* CTA inside the pill: round to match the silhouette. The lift, shadow,
-   and inner highlight from .btn-primary remain — only the corner geometry
-   changes for this scope. Padding shrinks slightly so the chip sits
-   visually inside the pill rather than dominating it. */
+/* CTA in the bar: square, per the Sharp Buttons rule (DESIGN.md §5) — the
+   pill exception is gone with the pill. The lift, shadow, and inner
+   highlight from .btn-primary remain; padding is trimmed so the chip sits
+   comfortably in the bar's height. */
 .site-nav .btn-primary,
 .site-nav .btn-primary--on-ink {
-  border-radius: 999px;
   padding: 10px 22px;
   font-size: 0.78125rem;
 }
 
-/* Ink-route variant: dark glass with white-hair rim and inner highlight. */
-.site-nav--on-ink {
-  background-color: rgba(24, 24, 27, 0.55);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 12px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+/* Ink-route variant: the dark glass ground lives on the shell so it spans
+   the full bar width; the nav row itself only recolours its text. */
+.site-header-shell--on-ink {
+  background-color: rgba(9, 9, 11, 0.55);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav--on-ink {
-    background-color: rgba(24, 24, 27, 0.92);
+  .site-header-shell--on-ink {
+    background-color: rgba(9, 9, 11, 0.94);
   }
 }
 
@@ -1130,7 +1050,6 @@ html {
   right: 0;
   height: 1.5px;
   background-color: currentColor;
-  border-radius: 2px;
   transition:
     transform var(--dur-base) var(--ease-out-quart),
     top var(--dur-base) var(--ease-out-quart),
@@ -1156,72 +1075,35 @@ html {
 }
 
 /*
- * Mobile dropdown panel. Same glass surface as the pill, taller corner
- * radius (28px) since the geometry is no longer a true pill. Animates with
- * the grid-template-rows 0fr→1fr trick — clean reveal to auto height with
- * no JS measurement. Pointer-events disabled when closed so links beneath
- * stay clickable.
+ * Mobile dropdown panel. The bar's glass ground (on the shell) already
+ * spans the open panel, so the panel itself is transparent — it drops the
+ * links into the same square, full-width sheet as the bar, flush beneath
+ * the row. Animates with the grid-template-rows 0fr→1fr trick — clean
+ * reveal to auto height with no JS measurement. Pointer-events disabled
+ * when closed so links beneath stay clickable.
  */
 .site-nav-panel {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  margin-top: 0;
   transition:
     grid-template-rows var(--dur-base) var(--ease-out-quart),
-    opacity var(--dur-fast) var(--ease-out-quart),
-    margin-top var(--dur-base) var(--ease-out-quart);
+    opacity var(--dur-fast) var(--ease-out-quart);
   pointer-events: none;
 }
 
 .site-nav-panel.is-open {
   grid-template-rows: 1fr;
   opacity: 1;
-  margin-top: 10px;
   pointer-events: auto;
 }
 
 .site-nav-panel__inner {
   overflow: hidden;
-
-  background-color: rgba(255, 255, 255, 0.62);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 28px;
-  box-shadow:
-    0 0 0 1px rgba(9, 9, 11, 0.05),
-    0 1px 2px rgba(9, 9, 11, 0.04),
-    0 12px 32px rgba(9, 9, 11, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
-
-  padding: 12px;
+  padding: 4px 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav-panel__inner {
-    background-color: rgba(255, 255, 255, 0.96);
-  }
-}
-
-.site-nav-panel--on-ink .site-nav-panel__inner {
-  background-color: rgba(24, 24, 27, 0.55);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 12px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav-panel--on-ink .site-nav-panel__inner {
-    background-color: rgba(24, 24, 27, 0.96);
-  }
+  gap: 2px;
 }
 
 .site-nav-panel__list {
@@ -1242,7 +1124,6 @@ html {
   letter-spacing: 0;
   color: #18181b;
   text-decoration: none;
-  border-radius: 18px;
   transition:
     background-color var(--dur-fast) var(--ease-out-quart),
     color var(--dur-fast) var(--ease-out-quart);
@@ -1264,26 +1145,25 @@ html {
   color: #ffffff;
 }
 
-/* CTA inside the panel: round to match the panel geometry, sit aligned
-   to the link rhythm via a small top margin. */
+/* CTA inside the panel: square per doctrine, stretched to the sheet width
+   and set off from the link rhythm with a small top margin. */
 .site-nav-panel__cta {
   margin-top: 8px;
   align-self: stretch;
   justify-content: center;
-  border-radius: 999px;
   font-size: 0.78125rem;
 }
 
 /* Nav-link visibility aligned to Tailwind's lg (1024px). Below lg the
-   four labels + brand + CTA can crowd the pill; collapsing the labels keeps
+   four labels + brand + CTA can crowd the bar; collapsing the labels keeps
    the brand and CTA confidently sized at small-laptop and tablet widths. */
 @media (max-width: 1023.98px) {
   .site-nav {
     /* Two slots: brand | toggle, with the toggle pushed to the right.
-       List/CTA are display:none, so they don't occupy grid cells. */
+       List/CTA are display:none, so they don't occupy grid cells. The row
+       aligns to the page-shell gutters like the rest of the page. */
     grid-template-columns: auto auto;
     justify-content: space-between;
-    padding-right: 8px;
   }
   .site-nav__list,
   .site-nav__cta {
@@ -1298,7 +1178,6 @@ html {
     padding: 0;
     margin: 0;
     border: 0;
-    border-radius: 999px;
     background-color: transparent;
     color: #18181b;
     cursor: pointer;
@@ -1317,14 +1196,6 @@ html {
   .site-nav--on-ink .site-nav__toggle:focus-visible {
     background-color: rgba(255, 255, 255, 0.12);
     color: #ffffff;
-  }
-}
-
-/* On phones tighten the pill padding so the brand and toggle balance at
-   360–400px viewports. */
-@media (max-width: 480px) {
-  .site-nav {
-    padding-left: 16px;
   }
 }
 
@@ -1428,16 +1299,10 @@ html {
 }
 
 /* -------------------------------------------------------------------
- * Feature scroller — sticky left tab-list + scrolling right stack.
+ * Feature scroller — sticky left column (heading + tab-list) tracks a
+ * scrolling right stack. The heading rides with the nav so "The protocol,
+ * in four parts." stays on screen for the whole section.
  * ------------------------------------------------------------------- */
-.feature-scroller__head {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.75rem, 1.5vw, 1rem);
-  max-width: 30ch;
-  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
-}
-
 .feature-scroller__body {
   display: flex;
   flex-direction: column;
@@ -1453,7 +1318,26 @@ html {
   }
 }
 
-/* Nav: horizontal jump-row on mobile, sticky vertical list on lg+. */
+/* Left column — heading + nav. Sticky on lg+ so both persist while the
+   feature blocks scroll past on the right. */
+.feature-scroller__aside {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+@media (min-width: 1024px) {
+  .feature-scroller__aside {
+    position: sticky;
+    top: clamp(88px, 12vh, 148px);
+  }
+}
+
+.feature-scroller__title {
+  max-width: 16ch;
+}
+
+/* Nav: horizontal jump-row on mobile, vertical list on lg+. */
 .feature-nav {
   display: flex;
   flex-direction: row;
@@ -1468,8 +1352,6 @@ html {
 
 @media (min-width: 1024px) {
   .feature-nav {
-    position: sticky;
-    top: clamp(88px, 12vh, 148px);
     flex-direction: column;
     overflow: visible;
   }
@@ -1576,16 +1458,28 @@ html {
   object-fit: cover;
 }
 
+/* Two stacked scrims. The vertical gradient bottom-weights the darken so
+   the lower-left copy has a legible ground; the horizontal one deepens the
+   left edge where the title and lead sit, without flattening the whole
+   frame to black. Copy was hard to read over the bright phone still — this
+   restores contrast while keeping the clip visible. */
 .video-feature__overlay {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(0, 0, 0, 0.2) 38%,
-    rgba(0, 0, 0, 0.78) 100%
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.35) 35%,
+      rgba(0, 0, 0, 0.88) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.2) 55%,
+      rgba(0, 0, 0, 0) 100%
+    );
 }
 
 .video-feature__inner {
@@ -1599,10 +1493,6 @@ html {
   align-items: flex-start;
   gap: clamp(1rem, 2vw, 1.5rem);
   max-width: 44ch;
-}
-
-.video-feature .section-eyebrow {
-  color: rgba(255, 255, 255, 0.72);
 }
 
 .video-feature__title {

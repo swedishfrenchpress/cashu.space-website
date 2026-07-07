@@ -67,9 +67,6 @@ export default function Testimonials() {
     >
       <header className="testimonials__head">
         <Reveal>
-          <p className="section-eyebrow">From the community</p>
-        </Reveal>
-        <Reveal delay={80}>
           <h2 className="t-headline">What people are building on Cashu.</h2>
         </Reveal>
       </header>

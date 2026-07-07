@@ -1,12 +1,10 @@
 import Link from "next/link";
 import HeroCommand from "@/components/hero-command";
-import HiddenBill from "@/components/hidden-bill";
 import ImplementationsGrid from "@/components/implementations-grid";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
-import StatementWithMedia from "@/components/statement-with-media";
 import TabbedFeature from "@/components/tabbed-feature";
 import TapToPay from "@/components/tap-to-pay";
 import Testimonials from "@/components/testimonials";
@@ -19,8 +17,7 @@ export default function Home() {
       {/* Hero — warp-style opener. Row A: editorial wordmark + Display
           headline on the left, lead paragraph bottom-right. Row B: a CTA
           row (primary chip · copyable bearer-token field · quiet spec
-          link). Row C: the blinded-denomination shader in a large sharp
-          grey specimen panel — warp's screenshot slot, kept monochrome. */}
+          link). */}
       <section id="main-content" className="hero-spec">
         <div className="hero-spec__inner page-shell">
           <div className="hero-spec__top">
@@ -58,24 +55,14 @@ export default function Home() {
             </div>
           </Reveal>
 
-          {/* A dithered banknote, almost entirely redacted by halftone; a
-              narrow vertical reveal slot drifts across it exposing fragments
-              at a time. Privacy as the steady state, revelation as the rare
-              event. Cursor proximity opens a soft circular reveal. */}
-          <Reveal immediate delay={560} variant="fade" slow>
-            <div className="hero-spec__frame">
-              <HiddenBill />
-            </div>
-          </Reveal>
         </div>
       </section>
 
-      <TabbedFeature />
+      <div id="why-cashu">
+        <TabbedFeature />
+      </div>
       <TapToPay />
       <Testimonials />
-      <div id="why-cashu">
-        <StatementWithMedia />
-      </div>
       <div id="implementations">
         <ImplementationsGrid />
       </div>

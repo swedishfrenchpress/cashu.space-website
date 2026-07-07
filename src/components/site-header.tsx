@@ -21,11 +21,12 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * Contained capsule navigation. Logo left, anchor links centered, primary
- * chip right at lg+; brand + hamburger toggle below lg, with the panel
- * dropping the four nav items + the GitHub CTA into a glass card beneath
- * the pill. The pill itself stays sharp on doctrine (DESIGN.md §4) —
- * glassmorphism and rounded geometry are scoped to the navbar exception.
+ * Warp-style top bar. A full-width transparent glass strip pinned to the top
+ * of the viewport: logo left, anchor links centered, primary chip right at
+ * lg+; brand + hamburger toggle below lg, with the panel dropping the four
+ * nav items + the GitHub CTA into a glass card beneath the bar. The glass
+ * background + backdrop-blur are the navbar's documented exception to the
+ * flat doctrine (DESIGN.md §4); the bar and its chip stay square.
  */
 export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +49,9 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
   }, [pathname]);
 
   return (
-    <header className="site-header-shell">
+    <header
+      className={`site-header-shell${onInk ? " site-header-shell--on-ink" : ""}`}
+    >
       <div className="page-shell">
         <Reveal immediate variant="fade" as="div">
           <nav
