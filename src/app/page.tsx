@@ -7,7 +7,6 @@ import SiteHeader from "@/components/site-header";
 import TabbedFeature from "@/components/tabbed-feature";
 import TapToPay from "@/components/tap-to-pay";
 import Testimonials from "@/components/testimonials";
-import TokenSpecimen from "@/components/token-specimen";
 
 export default function Home() {
   return (
@@ -53,7 +52,12 @@ export default function Home() {
             </div>
 
             <div className="hero-spec__art">
-              <TokenSpecimen />
+              {/* Placeholder: chalk box in the 4:5 footprint the hero art
+                  occupies. Drop the real hero figure in here when ready. */}
+              <div
+                className="w-full aspect-[4/5] bg-zinc-100 border border-zinc-200"
+                aria-hidden
+              />
             </div>
           </div>
         </div>

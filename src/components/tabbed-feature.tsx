@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Reveal from "./reveal";
@@ -146,16 +145,10 @@ export default function TabbedFeature() {
                 className="feature-block"
               >
                 <Reveal variant="fade" slow>
-                  <div className="feature-media">
-                    <Image
-                      src={tab.image}
-                      alt=""
-                      aria-hidden
-                      fill
-                      sizes="(min-width: 1024px) 62vw, 100vw"
-                      className="object-cover"
-                    />
-                  </div>
+                  {/* Placeholder: chalk box (background + hair rim from
+                      .feature-media). Swap back to <Image src={tab.image}> when
+                      real art is ready. */}
+                  <div className="feature-media" aria-hidden />
                 </Reveal>
                 <div className="feature-block__text">
                   <h3 className="t-headline feature-block__title">
