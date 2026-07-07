@@ -15,7 +15,7 @@ type NavItem = { label: string; href: string; external?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Wallets", href: "/wallets" },
-  { label: "Why Cashu?", href: "/#why-cashu" },
+  { label: "Cashu 101", href: "/#why-cashu" },
   { label: "Spec", href: "https://docs.cashu.space/", external: true },
   { label: "Implementations", href: "/#implementations" },
 ];
