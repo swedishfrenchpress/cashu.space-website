@@ -9,29 +9,30 @@ export const metadata: Metadata = {
     "A non-exhaustive directory of cashu wallets. Any client that implements the protocol is conformant.",
 };
 
-type Wallet = {
+type Entry = {
   name: string;
   platforms: string[];
   href: string;
 };
 
-type WalletGroup = {
+type DirectoryGroup = {
   heading: string;
   scope: string;
-  wallets: Wallet[];
+  entries: Entry[];
 };
 
 // Grouped by surface so visitors land on the right list without scanning
 // per-row fields. Within each group: broadest platform support first, then
 // alphabetical. The per-row platform field still distinguishes iOS vs
-// Android within Mobile for visitors who care.
-const WALLET_GROUPS: WalletGroup[] = [
+// Android within Mobile for visitors who care. Wallets first; mint-operator
+// tooling gets its own band at the end — it is not a wallet, so it is not
+// listed as one.
+const DIRECTORY_GROUPS: DirectoryGroup[] = [
   {
     heading: "Mobile",
     scope: "Ecash in your pocket — native iOS and Android apps.",
-    wallets: [
+    entries: [
       { name: "eNuts",     platforms: ["iOS", "Android"], href: "https://www.enuts.cash" },
-      { name: "Cashu Pro", platforms: ["iOS", "Android"], href: "https://github.com/cashubtc" },
       { name: "Macadamia", platforms: ["iOS"],            href: "https://macadamia.cash" },
       { name: "Minibits",  platforms: ["Android"],        href: "https://www.minibits.cash" },
     ],
@@ -39,11 +40,17 @@ const WALLET_GROUPS: WalletGroup[] = [
   {
     heading: "Web",
     scope: "Runs in any browser. Nothing to install, portable anywhere.",
-    wallets: [
+    entries: [
       { name: "Athenut",   platforms: ["Web"], href: "https://athenut.com" },
-      { name: "Boardwalk",  platforms: ["Web"], href: "https://boardwalkcash.com" },
+      { name: "Boardwalk", platforms: ["Web"], href: "https://boardwalkcash.com" },
       { name: "Cashu.me",  platforms: ["Web"], href: "https://wallet.cashu.me" },
-      { name: "Nutstash",  platforms: ["Web"], href: "https://nutstash.app" },
+    ],
+  },
+  {
+    heading: "Tools",
+    scope: "Not a wallet — software for running and managing your own mint.",
+    entries: [
+      { name: "Orchard", platforms: ["Web"], href: "https://orchard.space" },
     ],
   },
 ];
@@ -59,8 +66,8 @@ function hostOf(href: string): string {
 }
 
 // Distinct platforms across a group, in first-seen order.
-function platformsOf(group: WalletGroup): string[] {
-  return [...new Set(group.wallets.flatMap((w) => w.platforms))];
+function platformsOf(group: DirectoryGroup): string[] {
+  return [...new Set(group.entries.flatMap((e) => e.platforms))];
 }
 
 export default function WalletsPage() {
@@ -81,7 +88,7 @@ export default function WalletsPage() {
         </Reveal>
 
         <div className="flex flex-col gap-[clamp(4rem,8vw,6.5rem)] mt-[clamp(3.5rem,7vw,6rem)]">
-          {WALLET_GROUPS.map((group, gi) => {
+          {DIRECTORY_GROUPS.map((group, gi) => {
             const platforms = platformsOf(group);
             // Only carry the per-row / rail platform field when it adds
             // information: a single-platform surface (Web) already states its
@@ -92,12 +99,12 @@ export default function WalletsPage() {
             return (
             <section
               key={group.heading}
-              aria-labelledby={`wallets-group-${group.heading.toLowerCase()}`}
+              aria-labelledby={`wallets-group-${group.heading.toLowerCase().replace(/\s+/g, "-")}`}
               className="wallet-group"
             >
               <Reveal immediate delay={160 + gi * 60} className="wallet-group__rail">
                 <h2
-                  id={`wallets-group-${group.heading.toLowerCase()}`}
+                  id={`wallets-group-${group.heading.toLowerCase().replace(/\s+/g, "-")}`}
                   className="t-headline"
                 >
                   {group.heading}
@@ -110,9 +117,9 @@ export default function WalletsPage() {
 
               <Reveal immediate delay={220 + gi * 60}>
                 <ul className="wallet-list">
-                  {group.wallets.map((wallet, i) => (
+                  {group.entries.map((entry, i) => (
                     <Reveal
-                      key={wallet.name}
+                      key={entry.name}
                       as="li"
                       immediate
                       delay={280 + gi * 60 + i * 50}
@@ -120,29 +127,29 @@ export default function WalletsPage() {
                     >
                       <span className="wallet-row__id">
                         <a
-                          href={wallet.href}
+                          href={entry.href}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="wallet-row__name t-title focus-ring--on-ink"
                         >
-                          {wallet.name}
+                          {entry.name}
                         </a>
                         <span className="wallet-row__host">
-                          {hostOf(wallet.href)}
+                          {hostOf(entry.href)}
                         </span>
                       </span>
 
                       {showPlatform && (
                         <span className="wallet-row__platform">
-                          {wallet.platforms.join(" · ")}
+                          {entry.platforms.join(" · ")}
                         </span>
                       )}
 
                       <a
-                        href={wallet.href}
+                        href={entry.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`Open ${wallet.name}`}
+                        aria-label={`Open ${entry.name}`}
                         className="btn-secondary--on-ink wallet-open"
                       >
                         Open
