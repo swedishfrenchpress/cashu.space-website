@@ -506,81 +506,112 @@ html {
 }
 
 /*
- * Footer — "Specimen card on a photograph". A sharp-cornered Paper card
- * floats on a grayscale photographic backdrop. Inverts the Twilight Stack:
- * the photograph is the ambience, the card is the document. No box-shadow
- * on the card — separation comes from photo contrast + a 1px Hair rim
- * (Hairline Rule). The keyboard photo gets grayscale + darken in CSS so
- * the No-Colour Rule holds regardless of source asset.
+ * Footer — "The Twilight Stack" (DESIGN.md §5). The page closes on an Ink
+ * band: a monochrome radial bloom rising from just below the lower edge
+ * (50% 110%, Fog→Ink, every stop inside the grey ramp — the No-Colour Rule
+ * holds) over a faint feTurbulence paper-grain overlay. The black section
+ * above (ReferenceImplementations) flows straight in — the dark-on-dark
+ * seam is the point. Flat and sharp: no container shadow; the closing CTA
+ * carries the only lift on the surface.
  */
 .footer-specimen {
+  position: relative;
   background-color: #000000;
-}
-
-.footer-photo {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
   overflow: hidden;
 }
 
-.footer-photo img {
-  object-fit: cover;
-  filter: grayscale(1) brightness(0.55) contrast(1.05);
-}
-
-.footer-photo::after {
+/* Monochrome bloom — anchored 50% 110%, stops verbatim from DESIGN.md §5. */
+.footer-specimen::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.45) 100%);
+  z-index: 0;
   pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 110%,
+    #a1a1aa 0%,
+    #71717a 18%,
+    #3f3f46 34%,
+    #18181b 58%,
+    #000000 80%
+  );
+}
+
+/* Paper grain — fractal noise at 0.04, overlay blend. Below conscious
+   perception; its only job is to push the printed-RFC register on dark,
+   where flat black would otherwise read as digital. */
+.footer-specimen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Content rides above both overlays. */
+.footer-specimen .page-shell {
+  position: relative;
+  z-index: 1;
 }
 
 .footer-card {
   position: relative;
-  background-color: #ffffff;
-  border: 1px solid #e4e4e7;
-  padding: clamp(28px, 4vw, 56px);
   display: flex;
   flex-direction: column;
+  gap: clamp(36px, 5vw, 64px);
 }
 
-.footer-card__top {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: clamp(32px, 5vw, 72px);
-  align-items: start;
+/*
+ * Sign-off — the footer's compositional peak: a Display wordmark + one quiet
+ * line on the left, the closing CTA baseline-aligned on the right. This is
+ * the footer's only Display type; the rest of the surface stays quiet.
+ */
+.footer-signoff {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 48px);
+  flex-wrap: wrap;
 }
 
-.footer-mark {
-  display: inline-flex;
+.footer-signoff__mark {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(3.75rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.footer-signoff__line {
+  margin-top: 14px;
+  color: #a1a1aa;
+}
+
+/*
+ * RFC metadata strip — echoes the spec-pane header device (two-cell mono:
+ * spec path left, descriptor right), framed by a zinc-800 hairline. On the
+ * Ink ground the Hairline Rule translates to #27272a — a literal Hair line
+ * would glare white — matching the border under the code strip elsewhere.
+ */
+.footer-metastrip {
+  display: flex;
   align-items: center;
-  text-decoration: none;
-  color: #18181b;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid #27272a;
+  color: #a1a1aa;
+  flex-wrap: wrap;
 }
 
-.footer-mark img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-}
-
-.footer-card__columns {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(24px, 3vw, 48px);
-}
-
-.footer-link {
-  color: #3f3f46;
-  text-decoration: none;
-  transition: color var(--dur-base) var(--ease-out-quart);
-}
-
-.footer-link:hover,
-.footer-link:focus-visible {
-  color: #000000;
+.footer-metastrip__meta {
+  /* Fog, not Mist — #71717a on #000 is ~4.3:1 and misses AA for 14px text. */
+  color: #a1a1aa;
+  white-space: nowrap;
 }
 
 .footer-card__bottom {
@@ -588,8 +619,6 @@ html {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding-top: clamp(20px, 2vw, 32px);
-  border-top: 1px solid #e4e4e7;
   flex-wrap: wrap;
 }
 
@@ -607,19 +636,32 @@ html {
 }
 
 .footer-social {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  color: #18181b;
+  color: #a1a1aa;
   text-decoration: none;
   transition: color var(--dur-base) var(--ease-out-quart);
 }
 
+/* Expand the tap target to 44x44 for touch without shifting the 18px glyph
+   or the row's visual spacing — the pseudo is transparent and out of flow. */
+.footer-social::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
 .footer-social:hover,
 .footer-social:focus-visible {
-  color: #000000;
+  color: #ffffff;
 }
 
 .footer-social svg {
@@ -631,12 +673,12 @@ html {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #71717a;
+  color: #a1a1aa;
   flex-wrap: wrap;
 }
 
 .footer-legal__sep {
-  color: #a1a1aa;
+  color: #71717a;
   user-select: none;
 }
 
@@ -648,7 +690,7 @@ html {
 }
 
 .footer-ask-label {
-  color: #71717a;
+  color: #a1a1aa;
 }
 
 /*
@@ -666,9 +708,24 @@ html {
 }
 
 .footer-ai__link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+/* Tap target: 44px tall, widened to fill the gap between marks (contiguous,
+   no overlap, no visual shift) — lifts the 14px logos above the 24px AA
+   minimum (WCAG 2.5.8) for touch. Full 44px width would need the logos
+   spread apart, which we avoid to keep the row visually unchanged. */
+.footer-ai__link::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 44px;
+  transform: translate(-50%, -50%);
 }
 
 .footer-ai__logo {
@@ -680,12 +737,21 @@ html {
   flex-shrink: 0;
 }
 
+/* A monochrome mark (e.g. OpenAI's black glyph) would vanish on the Ink
+   ground — force it to Paper. Brand-coloured marks (Claude, Gemini) keep
+   their colour under the sanctioned third-party-logo exception and are not
+   given this class. */
+.footer-ai__logo--invert {
+  filter: brightness(0) invert(1);
+}
+
 .footer-disclaimer {
-  margin-top: clamp(24px, 3vw, 40px);
   width: 100%;
-  max-width: none;
-  color: #71717a;
-  text-wrap: wrap;
+  /* Cap the reading measure — this is a real paragraph, not a one-line legal
+     notice; the site's own 65–75ch rule (PRODUCT.md a11y) applies. */
+  max-width: 72ch;
+  color: #a1a1aa;
+  text-wrap: pretty;
 }
 
 /*
@@ -730,18 +796,12 @@ html {
 }
 
 @media (max-width: 900px) {
-  .footer-card__top {
-    grid-template-columns: 1fr;
-  }
-  .footer-card__columns {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .footer-signoff {
+    align-items: flex-start;
   }
 }
 
 @media (max-width: 560px) {
-  .footer-card__columns {
-    grid-template-columns: 1fr;
-  }
   .footer-card__bottom {
     flex-direction: column;
     align-items: flex-start;
@@ -763,7 +823,7 @@ html {
   background-color: #ffffff;
   color: #18181b;
   overflow: hidden;
-  /* Lets the sticky glass pill breathe above the headline at laptop+. */
+  /* Clears the sticky glass bar and lets the headline breathe below it. */
   padding-top: clamp(72px, 9vw, 144px);
   padding-bottom: clamp(64px, 9vw, 160px);
 }
@@ -773,15 +833,40 @@ html {
   z-index: 1;
   display: flex;
   flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+/* Two-column lede. The wordmark → headline → lead → CTA stack holds the
+   left; the token specimen figure sits in the right column, centred against
+   the text block. Stacks to a single column on mobile (figure below CTA). */
+.hero-spec__top {
+  display: flex;
+  flex-direction: column;
   gap: clamp(2rem, 4vw, 3rem);
 }
 
 @media (min-width: 1024px) {
-  .hero-spec__inner {
+  .hero-spec__top {
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    align-items: end;
-    column-gap: clamp(2rem, 4vw, 4rem);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: center;
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+  }
+}
+
+/* Right column — the RFC figure. On mobile it drops below the CTA, capped so
+   the portrait 4:5 specimen never becomes a full-width monolith; on desktop
+   it fills its grid cell. */
+.hero-spec__art {
+  width: 100%;
+  max-width: min(360px, 100%);
+  align-self: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .hero-spec__art {
+    max-width: none;
+    align-self: center;
   }
 }
 
@@ -793,29 +878,14 @@ html {
   gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-/* Protocol wordmark. CASHU sits above the page-peak headline as the
-   name of the protocol — sized between the body text and the Display
-   headline so the hierarchy reads wordmark → page peak → lead. Ink
-   colour and a slightly expanded tracking give it the presence the
-   brand requires while staying clearly subordinate to the H1. */
-.hero-spec__eyebrow {
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.04em;
-  color: #18181b;
-  margin: 0;
-}
-
 /* Page peak. CLAUDE.md is explicit: hero headline = GT-Standard 600,
    ≥3.75rem, line-height 0.95. Held to t-display proportions on a tight
    max-width so the line break lands where the asymmetric grid expects. */
 .hero-spec__headline {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(2.75rem, 6.5vw, 6rem);
+  font-size: clamp(3.75rem, 7vw, 6.5rem);
   font-weight: 600;
-  line-height: 0.98;
+  line-height: 0.95;
   letter-spacing: -0.02em;
   color: #18181b;
   margin: 0;
@@ -834,65 +904,44 @@ html {
   max-width: 44ch;
 }
 
-/* Right column. Hosts the blinded-denomination shader canvas. The
-   slot reserves its dimensions before WebGL initialises so there's
-   no layout shift when the canvas mounts. */
-.hero-spec__art {
-  position: relative;
-  width: 100%;
-  min-height: clamp(240px, 32vw, 480px);
-}
-
-@media (max-width: 1023.98px) {
-  .hero-spec__art {
-    min-height: clamp(160px, 36vw, 280px);
-  }
-}
-
-/* Canvas fade-in. The slot paints empty for one frame, then the
-   shader's first render triggers `--ready` and the canvas transitions
-   in. Quart-out matches the Reveal entrance tempo elsewhere on the
-   page. */
-.hero-spec__art > canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 600ms cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.hero-spec__art--ready > canvas {
-  opacity: 1;
+/* Row B — CTA row. Primary chip + secondary "View documentation" chip,
+   mirroring warp's Download / Docs pairing. */
+.hero-spec__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
 }
 
 /*
- * Floating glass-pill navigation.
+ * Warp-style top bar.
  *
- * Documented surface exception to the system's flat/sharp doctrine
- * (DESIGN.md §4 No-Shadow Rule, §5 Sharp Buttons). The user explicitly
- * authorized rounded + glass + blur for the navbar only. The chip inside
- * the pill also inherits the rounded silhouette so the geometry stays
- * coherent — but its lift/shadow follow the existing chip recipe.
- *
- * The nav is sticky so the backdrop-filter has actual work to do: page
- * content slides under the glass as the user scrolls, which is the only
- * context where glassmorphism reads as glass and not as "milky pill".
+ * A full-width transparent glass strip pinned to the very top of the
+ * viewport — no floating gutters, no pill. The translucent ground +
+ * backdrop-blur live on the shell so the glass spans edge to edge; the
+ * inner row stays constrained to the page-shell. Glass + blur are the
+ * navbar's documented exception to the flat/sharp doctrine (DESIGN.md §4);
+ * the bar itself is square and carries only a hairline bottom rule, no
+ * drop shadow. The bar is sticky so page content slides under the glass as
+ * the user scrolls — the one context where glassmorphism reads as glass.
  */
 .site-header-shell {
   position: sticky;
-  top: clamp(12px, 1.5vw, 24px);
+  top: 0;
   z-index: 50;
-  padding-top: clamp(12px, 1.5vw, 24px);
-  pointer-events: none;
+
+  background-color: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(9, 9, 11, 0.08);
 }
 
-.site-header-shell > .page-shell {
-  pointer-events: none;
-}
-
-.site-header-shell .site-nav {
-  pointer-events: auto;
+/* Browsers without backdrop-filter (older Firefox) — opt into a denser
+   ground so the bar still reads as a surface over scrolling content. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header-shell {
+    background-color: rgba(255, 255, 255, 0.94);
+  }
 }
 
 .site-nav {
@@ -900,31 +949,7 @@ html {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: clamp(16px, 3vw, 32px);
-  padding: 8px 8px 8px 22px;
-  border-radius: 999px;
-
-  background-color: rgba(255, 255, 255, 0.62);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  box-shadow:
-    0 0 0 1px rgba(9, 9, 11, 0.05),
-    0 1px 2px rgba(9, 9, 11, 0.04),
-    0 12px 32px rgba(9, 9, 11, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
-
-  transition:
-    background-color var(--dur-base) var(--ease-out-quart),
-    box-shadow var(--dur-base) var(--ease-out-quart);
-}
-
-/* Browsers without backdrop-filter (older Firefox) — opt into a denser
-   ground so the nav still reads as a contained surface. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav {
-    background-color: rgba(255, 255, 255, 0.92);
-  }
+  padding: 14px 0;
 }
 
 .site-nav__brand {
@@ -971,31 +996,26 @@ html {
   color: #000000;
 }
 
-/* CTA inside the pill: round to match the silhouette. The lift, shadow,
-   and inner highlight from .btn-primary remain — only the corner geometry
-   changes for this scope. Padding shrinks slightly so the chip sits
-   visually inside the pill rather than dominating it. */
+/* CTA in the bar: square, per the Sharp Buttons rule (DESIGN.md §5) — the
+   pill exception is gone with the pill. The lift, shadow, and inner
+   highlight from .btn-primary remain; padding is trimmed so the chip sits
+   comfortably in the bar's height. */
 .site-nav .btn-primary,
 .site-nav .btn-primary--on-ink {
-  border-radius: 999px;
   padding: 10px 22px;
   font-size: 0.78125rem;
 }
 
-/* Ink-route variant: dark glass with white-hair rim and inner highlight. */
-.site-nav--on-ink {
-  background-color: rgba(24, 24, 27, 0.55);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 12px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+/* Ink-route variant: the dark glass ground lives on the shell so it spans
+   the full bar width; the nav row itself only recolours its text. */
+.site-header-shell--on-ink {
+  background-color: rgba(9, 9, 11, 0.55);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav--on-ink {
-    background-color: rgba(24, 24, 27, 0.92);
+  .site-header-shell--on-ink {
+    background-color: rgba(9, 9, 11, 0.94);
   }
 }
 
@@ -1037,7 +1057,6 @@ html {
   right: 0;
   height: 1.5px;
   background-color: currentColor;
-  border-radius: 2px;
   transition:
     transform var(--dur-base) var(--ease-out-quart),
     top var(--dur-base) var(--ease-out-quart),
@@ -1063,72 +1082,35 @@ html {
 }
 
 /*
- * Mobile dropdown panel. Same glass surface as the pill, taller corner
- * radius (28px) since the geometry is no longer a true pill. Animates with
- * the grid-template-rows 0fr→1fr trick — clean reveal to auto height with
- * no JS measurement. Pointer-events disabled when closed so links beneath
- * stay clickable.
+ * Mobile dropdown panel. The bar's glass ground (on the shell) already
+ * spans the open panel, so the panel itself is transparent — it drops the
+ * links into the same square, full-width sheet as the bar, flush beneath
+ * the row. Animates with the grid-template-rows 0fr→1fr trick — clean
+ * reveal to auto height with no JS measurement. Pointer-events disabled
+ * when closed so links beneath stay clickable.
  */
 .site-nav-panel {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  margin-top: 0;
   transition:
     grid-template-rows var(--dur-base) var(--ease-out-quart),
-    opacity var(--dur-fast) var(--ease-out-quart),
-    margin-top var(--dur-base) var(--ease-out-quart);
+    opacity var(--dur-fast) var(--ease-out-quart);
   pointer-events: none;
 }
 
 .site-nav-panel.is-open {
   grid-template-rows: 1fr;
   opacity: 1;
-  margin-top: 10px;
   pointer-events: auto;
 }
 
 .site-nav-panel__inner {
   overflow: hidden;
-
-  background-color: rgba(255, 255, 255, 0.62);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 28px;
-  box-shadow:
-    0 0 0 1px rgba(9, 9, 11, 0.05),
-    0 1px 2px rgba(9, 9, 11, 0.04),
-    0 12px 32px rgba(9, 9, 11, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
-
-  padding: 12px;
+  padding: 4px 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav-panel__inner {
-    background-color: rgba(255, 255, 255, 0.96);
-  }
-}
-
-.site-nav-panel--on-ink .site-nav-panel__inner {
-  background-color: rgba(24, 24, 27, 0.55);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 12px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-nav-panel--on-ink .site-nav-panel__inner {
-    background-color: rgba(24, 24, 27, 0.96);
-  }
+  gap: 2px;
 }
 
 .site-nav-panel__list {
@@ -1149,7 +1131,6 @@ html {
   letter-spacing: 0;
   color: #18181b;
   text-decoration: none;
-  border-radius: 18px;
   transition:
     background-color var(--dur-fast) var(--ease-out-quart),
     color var(--dur-fast) var(--ease-out-quart);
@@ -1171,26 +1152,25 @@ html {
   color: #ffffff;
 }
 
-/* CTA inside the panel: round to match the panel geometry, sit aligned
-   to the link rhythm via a small top margin. */
+/* CTA inside the panel: square per doctrine, stretched to the sheet width
+   and set off from the link rhythm with a small top margin. */
 .site-nav-panel__cta {
   margin-top: 8px;
   align-self: stretch;
   justify-content: center;
-  border-radius: 999px;
   font-size: 0.78125rem;
 }
 
 /* Nav-link visibility aligned to Tailwind's lg (1024px). Below lg the
-   four labels + brand + CTA can crowd the pill; collapsing the labels keeps
+   four labels + brand + CTA can crowd the bar; collapsing the labels keeps
    the brand and CTA confidently sized at small-laptop and tablet widths. */
 @media (max-width: 1023.98px) {
   .site-nav {
     /* Two slots: brand | toggle, with the toggle pushed to the right.
-       List/CTA are display:none, so they don't occupy grid cells. */
+       List/CTA are display:none, so they don't occupy grid cells. The row
+       aligns to the page-shell gutters like the rest of the page. */
     grid-template-columns: auto auto;
     justify-content: space-between;
-    padding-right: 8px;
   }
   .site-nav__list,
   .site-nav__cta {
@@ -1205,7 +1185,6 @@ html {
     padding: 0;
     margin: 0;
     border: 0;
-    border-radius: 999px;
     background-color: transparent;
     color: #18181b;
     cursor: pointer;
@@ -1224,14 +1203,6 @@ html {
   .site-nav--on-ink .site-nav__toggle:focus-visible {
     background-color: rgba(255, 255, 255, 0.12);
     color: #ffffff;
-  }
-}
-
-/* On phones tighten the pill padding so the brand and toggle balance at
-   360–400px viewports. */
-@media (max-width: 480px) {
-  .site-nav {
-    padding-left: 16px;
   }
 }
 
@@ -1313,4 +1284,413 @@ html {
   .keymap-toast {
     transition: none;
   }
+}
+
+/* ===================================================================
+ * Warp-flavored restyle — section eyebrow + feature scroller + video
+ * + testimonials. Monochrome throughout: warp's tinted panels become
+ * chalk (#f4f4f5) grounds with hair (#e4e4e7) rims. Flat, sharp.
+ * =================================================================== */
+
+/* Small tracked uppercase label that opens a section — warp's "WHY WARP"
+   / "OPEN-SOURCE" eyebrows, translated to the mist grey. */
+.section-eyebrow {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #71717a;
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------
+ * Feature scroller — sticky left column (heading + tab-list) tracks a
+ * scrolling right stack. The heading rides with the nav so "The protocol,
+ * in four parts." stays on screen for the whole section.
+ * ------------------------------------------------------------------- */
+.feature-scroller__body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 1024px) {
+  .feature-scroller__body {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: start;
+  }
+}
+
+/* Left column — heading + nav. Sticky on lg+ so both persist while the
+   feature blocks scroll past on the right. */
+.feature-scroller__aside {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+@media (min-width: 1024px) {
+  .feature-scroller__aside {
+    position: sticky;
+    top: clamp(88px, 12vh, 148px);
+  }
+}
+
+.feature-scroller__title {
+  max-width: 16ch;
+}
+
+/* Nav: horizontal jump-row on mobile, vertical list on lg+. */
+.feature-nav {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.feature-nav::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .feature-nav {
+    flex-direction: column;
+    overflow: visible;
+  }
+}
+
+.feature-nav__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #a1a1aa;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    color var(--dur-base) var(--ease-out-quart),
+    background-color var(--dur-base) var(--ease-out-quart);
+}
+
+@media (min-width: 1024px) {
+  .feature-nav__item {
+    width: 100%;
+  }
+}
+
+.feature-nav__item:hover {
+  color: #3f3f46;
+}
+
+.feature-nav__item.is-active {
+  background-color: #18181b;
+  color: #ffffff;
+}
+
+.feature-nav__num {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.feature-track {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3.5rem, 8vw, 7rem);
+}
+
+.feature-block {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2rem);
+  scroll-margin-top: clamp(96px, 14vh, 168px);
+}
+
+/* Grey specimen panel behind the kept photo — warp's screenshot frame,
+   monochrome. Replaces the old white-square-on-photo overlay. */
+.feature-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #f4f4f5;
+  border: 1px solid #e4e4e7;
+}
+
+.feature-block__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  max-width: 52ch;
+}
+
+.feature-block__caption {
+  color: #3f3f46;
+}
+
+/* -------------------------------------------------------------------
+ * Video feature — full-bleed autoplay clip, monochrome darken overlay,
+ * text + on-ink CTA anchored to the lower-left.
+ * ------------------------------------------------------------------- */
+.video-feature {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #000000;
+  min-height: clamp(520px, 80vh, 780px);
+  display: flex;
+  align-items: flex-end;
+}
+
+.video-feature__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Two stacked scrims. The vertical gradient bottom-weights the darken so
+   the lower-left copy has a legible ground; the horizontal one deepens the
+   left edge where the title and lead sit, without flattening the whole
+   frame to black. Copy was hard to read over the bright phone still — this
+   restores contrast while keeping the clip visible. */
+.video-feature__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.35) 35%,
+      rgba(0, 0, 0, 0.88) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.2) 55%,
+      rgba(0, 0, 0, 0) 100%
+    );
+}
+
+.video-feature__inner {
+  width: 100%;
+  padding-block: clamp(48px, 8vw, 120px);
+}
+
+.video-feature__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  max-width: 44ch;
+}
+
+.video-feature__title {
+  color: #ffffff;
+  max-width: 18ch;
+}
+
+.video-feature__body {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* -------------------------------------------------------------------
+ * Testimonials — flat, sharp, hairline-bordered cards on a Chalk band.
+ * The full-bleed Chalk ground (a lightness shift, never a hue) is a quiet
+ * rhythm break from the surrounding Paper sections; the white cards read as
+ * subtly raised panels, edges held by the Hair hairline. Stays flat — no
+ * shadow (No-Shadow Rule).
+ * ------------------------------------------------------------------- */
+.testimonials {
+  background-color: #f4f4f5; /* Chalk */
+}
+
+.testimonials__head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vw, 1rem);
+  max-width: 40ch;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.testimonials__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+@media (min-width: 640px) {
+  .testimonials__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonials__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 2vw, 1.75rem);
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  border: 1px solid #e4e4e7;
+  background-color: #ffffff;
+  height: 100%;
+}
+
+.testimonial-card__quote {
+  flex: 1;
+  color: #18181b;
+}
+
+.testimonial-card__author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testimonial-card__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background-color: #18181b;
+  color: #ffffff;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.testimonial-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.testimonial-card__name {
+  color: #18181b;
+}
+
+.testimonial-card__handle {
+  color: #71717a;
+}
+
+/* ===================================================================
+ * Wallets registry — /wallets. The directory reads as the
+ * "Implementations" registry of a spec, not a table of links. Each
+ * surface (Mobile / Web) is a two-column band: a label rail on the left
+ * (heading + scope + the platform coverage as a mono field) tracks an
+ * entry list on the right. This uses the horizontal space the old single
+ * column left dead, and separates the two surfaces spatially instead of
+ * stacking two identical lists.
+ *
+ * Entries are hairline-separated rows — a wordmark over its destination
+ * host (mono, honest: you see where "Open" goes) and a real Open chip.
+ * On Paper; flat and sharp except the chip, which keeps the documented
+ * lift (DESIGN.md §4).
+ * =================================================================== */
+.wallet-group {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+@media (min-width: 1024px) {
+  .wallet-group {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(3rem, 6vw, 5.5rem);
+    align-items: start;
+  }
+}
+
+/* Label rail — surface heading and a plain-language scope line. */
+.wallet-group__rail {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vw, 1.125rem);
+}
+
+.wallet-group__scope {
+  color: #3f3f46;
+  max-width: 34ch;
+}
+
+/* Entry list — a top hairline opens the register; each row carries its
+   own bottom hairline. Hair (#e4e4e7) keeps the 1px line at the doctrinal
+   hairline weight. */
+.wallet-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #e4e4e7;
+}
+
+.wallet-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding-block: clamp(1.25rem, 2.4vw, 1.75rem);
+  border-bottom: 1px solid #e4e4e7;
+}
+
+/* Name + destination host, stacked. The host is the registry's honest
+   "where does this go" field — a real address, which is exactly what
+   mono is for. */
+.wallet-row__id {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.wallet-row__name {
+  color: #18181b;
+  text-decoration: none;
+  width: fit-content;
+  transition: none;
+}
+
+.wallet-row__name:hover {
+  text-decoration: underline;
+  text-decoration-color: #18181b;
+  text-underline-offset: 4px;
+}
+
+.wallet-row__host {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: #71717a;
+}
+
+/* Open chip — a real button, sized down a touch from the page CTA so a
+   column of them stays quiet. Inherits the .btn-secondary lift. */
+.wallet-open {
+  flex: 0 0 auto;
+  padding: 10px 20px;
+  justify-content: center;
 }

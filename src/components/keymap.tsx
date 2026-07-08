@@ -152,7 +152,7 @@ export default function Keymap() {
               {CHORDS.map((c) => (
                 <tr key={c.keys}>
                   <td className="t-pixel keymap-help__chord">{c.keys}</td>
-                  <td className="t-mono keymap-help__label">{c.label}</td>
+                  <td className="t-label keymap-help__label">{c.label}</td>
                 </tr>
               ))}
             </tbody>

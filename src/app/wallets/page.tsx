@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Reveal from "@/components/reveal";
 import SiteHeader from "@/components/site-header";
 
@@ -9,55 +8,87 @@ export const metadata: Metadata = {
     "A non-exhaustive directory of cashu wallets. Any client that implements the protocol is conformant.",
 };
 
-type Wallet = {
+type Entry = {
   name: string;
-  platforms: string[];
   href: string;
 };
 
-type WalletGroup = {
+type DirectoryGroup = {
   heading: string;
-  subheading: string;
-  wallets: Wallet[];
+  scope: string;
+  entries: Entry[];
 };
 
-// Grouped by surface so visitors land on the right list without scanning
-// per-row chips. Within each group: broadest platform support first, then
-// alphabetical. The per-row platform chips still distinguish iOS vs Android
-// within Mobile for visitors who care.
-const WALLET_GROUPS: WalletGroup[] = [
+// Grouped by surface. Wallets come first (Mobile, then Web), then the
+// developer implementations, then operator tooling. Each non-wallet category
+// gets its own labelled band so nothing is mislabelled as a wallet. Wallets
+// are alphabetical within a group; implementations lead with the reference.
+const DIRECTORY_GROUPS: DirectoryGroup[] = [
   {
     heading: "Mobile",
-    subheading: "Phone wallets. Hold ecash in your pocket.",
-    wallets: [
-      { name: "eNuts",     platforms: ["iOS", "Android"], href: "https://www.enuts.cash" },
-      { name: "Cashu Pro", platforms: ["iOS", "Android"], href: "https://github.com/cashubtc" },
-      { name: "Macadamia", platforms: ["iOS"],            href: "https://macadamia.cash" },
-      { name: "Minibits",  platforms: ["Android"],        href: "https://www.minibits.cash" },
+    scope: "Ecash in your pocket. Wallets for your phone.",
+    entries: [
+      { name: "Cashu.me",  href: "https://wallet.cashu.me" },
+      { name: "eNuts",     href: "https://www.enuts.cash" },
+      { name: "Macadamia", href: "https://macadamia.cash" },
+      { name: "Minibits",  href: "https://www.minibits.cash" },
+      { name: "Numo",      href: "https://numopay.org" },
+      { name: "Sovran",    href: "https://sovran.money/en/" },
     ],
   },
   {
     heading: "Web",
-    subheading: "Browser wallets. No install, runs anywhere.",
-    wallets: [
-      { name: "Athenut",  platforms: ["Web"], href: "https://athenut.com" },
-      { name: "Boardwalk",platforms: ["Web"], href: "https://boardwalkcash.com" },
-      { name: "Cashu.me", platforms: ["Web"], href: "https://wallet.cashu.me" },
-      { name: "Nutstash", platforms: ["Web"], href: "https://nutstash.app" },
+    scope: "Runs in any browser. Nothing to install, portable anywhere.",
+    entries: [
+      { name: "AGI Cash", href: "https://agi.cash/home" },
+      { name: "Athenut",  href: "https://athenut.com" },
+    ],
+  },
+  {
+    heading: "Implementations",
+    scope: "Libraries and SDKs for building on the cashu protocol.",
+    entries: [
+      { name: "Nutshell", href: "https://github.com/cashubtc/nutshell" },
+      { name: "CDK",      href: "https://github.com/cashubtc/cdk" },
+      { name: "Cashu TS", href: "https://github.com/cashubtc/cashu-ts" },
+      { name: "Coco",     href: "https://github.com/cashubtc/coco" },
+    ],
+  },
+  {
+    heading: "Tools",
+    scope: "Not a wallet. Software for running and managing your own mint.",
+    entries: [
+      { name: "Orchard", href: "https://orchard.space" },
     ],
   },
 ];
 
+// The destination, shown under each wordmark as the registry's honest
+// "where does Open go" field. For repos we show the org/repo slug — all four
+// implementations live on github.com, so the bare host would just repeat.
+// Everything else shows its clean host with the www. stripped.
+function targetOf(href: string): string {
+  try {
+    const url = new URL(href);
+    if (url.host === "github.com") {
+      return url.pathname.replace(/^\/|\/$/g, "");
+    }
+    return url.host.replace(/^www\./, "");
+  } catch {
+    return href;
+  }
+}
+
 export default function WalletsPage() {
   return (
-    <main className="bg-black text-white min-h-screen pb-24 lg:pb-32">
-      <SiteHeader onInk />
+    <main className="bg-white text-black min-h-screen pb-24 lg:pb-32">
+      <SiteHeader />
 
-      <div className="page-shell flex flex-col gap-12 lg:gap-16 pt-16 lg:pt-24">
+      <div className="page-shell flex flex-col pt-16 lg:pt-24">
         <Reveal immediate as="header">
           <div id="main-content" className="flex flex-col gap-6 max-w-[60ch]">
             <h1 className="t-display">Wallets.</h1>
-            <p className="t-body-lead text-zinc-100 max-w-[60ch]">
+            <p className="t-body-lead text-zinc-700">
               Any client that implements the cashu protocol is conformant. The
               list below is non-exhaustive, a snapshot of wallets people use
               today, not an endorsement.
@@ -65,81 +96,63 @@ export default function WalletsPage() {
           </div>
         </Reveal>
 
-        {WALLET_GROUPS.map((group, gi) => (
-          <section
-            key={group.heading}
-            aria-labelledby={`wallets-group-${group.heading.toLowerCase()}`}
-            className="flex flex-col gap-6 lg:gap-8"
-          >
-            <Reveal immediate delay={160 + gi * 60}>
-              <div className="flex items-baseline justify-between gap-6 border-b border-zinc-800 pb-4 lg:pb-5">
+        <div className="flex flex-col gap-[clamp(4rem,8vw,6.5rem)] mt-[clamp(3.5rem,7vw,6rem)]">
+          {DIRECTORY_GROUPS.map((group, gi) => (
+            <section
+              key={group.heading}
+              aria-labelledby={`wallets-group-${group.heading.toLowerCase().replace(/\s+/g, "-")}`}
+              className="wallet-group"
+            >
+              <Reveal immediate delay={160 + gi * 60} className="wallet-group__rail">
                 <h2
-                  id={`wallets-group-${group.heading.toLowerCase()}`}
+                  id={`wallets-group-${group.heading.toLowerCase().replace(/\s+/g, "-")}`}
                   className="t-headline"
                 >
                   {group.heading}
                 </h2>
-                <p className="t-label text-zinc-500 max-w-[36ch] text-right hidden sm:block">
-                  {group.subheading}
-                </p>
-              </div>
-            </Reveal>
-            <Reveal immediate delay={220 + gi * 60}>
-              <ul className="divide-y divide-zinc-800">
-                {group.wallets.map((wallet, i) => (
-                  <Reveal
-                    key={wallet.name}
-                    as="li"
-                    immediate
-                    delay={280 + gi * 60 + i * 50}
-                  >
-                    <a
-                      href={wallet.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_auto_auto] items-center gap-4 sm:gap-6 md:gap-8 py-5 sm:py-6 lg:py-7 transition-colors hover:bg-zinc-950 focus-visible:bg-zinc-950 focus-ring--on-ink"
-                    >
-                      <span className="t-title">{wallet.name}</span>
-                      <span className="hidden sm:flex items-center gap-2">
-                        {wallet.platforms.map((p) => (
-                          <span
-                            key={p}
-                            className="t-mono text-zinc-400 border border-zinc-800 px-2 py-1"
-                          >
-                            {p}
-                          </span>
-                        ))}
-                      </span>
-                      <span
-                        aria-hidden
-                        className="t-label text-zinc-500 group-hover:text-white transition-colors"
-                      >
-                        Visit →
-                      </span>
-                    </a>
-                  </Reveal>
-                ))}
-              </ul>
-            </Reveal>
-          </section>
-        ))}
+                <p className="wallet-group__scope t-body">{group.scope}</p>
+              </Reveal>
 
-        <Reveal as="footer">
-          <div className="flex flex-col gap-3 pt-8 border-t border-zinc-900">
-            <p className="t-body text-zinc-400 max-w-[60ch]">
-              Missing a wallet? cashu.space is open source, submit a pull
-              request.
-            </p>
-            <p>
-              <Link
-                href="/"
-                className="t-label text-zinc-300 hover:text-white transition-colors underline underline-offset-4 decoration-zinc-700 hover:decoration-white focus-ring--on-ink"
-              >
-                ← Back to cashu.space
-              </Link>
-            </p>
-          </div>
-        </Reveal>
+              <Reveal immediate delay={220 + gi * 60}>
+                <ul className="wallet-list">
+                  {group.entries.map((entry, i) => (
+                    <Reveal
+                      key={entry.name}
+                      as="li"
+                      immediate
+                      delay={280 + gi * 60 + i * 50}
+                      className="wallet-row"
+                    >
+                      <span className="wallet-row__id">
+                        <a
+                          href={entry.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="wallet-row__name t-title focus-ring"
+                        >
+                          {entry.name}
+                        </a>
+                        <span className="wallet-row__host">
+                          {targetOf(entry.href)}
+                        </span>
+                      </span>
+
+                      <a
+                        href={entry.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Open ${entry.name}`}
+                        className="btn-secondary wallet-open"
+                      >
+                        Open
+                      </a>
+                    </Reveal>
+                  ))}
+                </ul>
+              </Reveal>
+            </section>
+          ))}
+        </div>
       </div>
     </main>
   );

@@ -1,80 +1,18 @@
-import Image from "next/image";
-import Link from "next/link";
-import Reveal from "./reveal";
-
-type FooterLink = { label: string; href: string; external?: boolean };
-
-const COLUMNS: { heading: string; links: FooterLink[] }[] = [
-  {
-    heading: "Protocol",
-    links: [
-      {
-        label: "Specification",
-        href: "https://github.com/cashubtc/nuts",
-        external: true,
-      },
-      {
-        label: "NUTs",
-        href: "https://github.com/cashubtc/nuts#nuts",
-        external: true,
-      },
-    ],
-  },
-  {
-    heading: "Implementations",
-    links: [
-      { label: "Wallets", href: "/wallets" },
-      {
-        label: "Source",
-        href: "https://github.com/cashubtc",
-        external: true,
-      },
-    ],
-  },
-  {
-    heading: "Resources",
-    links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/cashubtc",
-        external: true,
-      },
-      {
-        label: "NUT-00",
-        href: "https://github.com/cashubtc/nuts/blob/main/00.md",
-        external: true,
-      },
-    ],
-  },
-  {
-    heading: "Community",
-    links: [
-      {
-        label: "Nostr",
-        href: "https://njump.me/cashu",
-        external: true,
-      },
-      {
-        label: "Telegram",
-        href: "https://t.me/CashuBTC",
-        external: true,
-      },
-      {
-        label: "OpenCash",
-        href: "https://opencash.dev/",
-        external: true,
-      },
-    ],
-  },
-];
+// Footer — "The Twilight Stack" (DESIGN.md §5): an Ink band closing the
+// page, with a monochrome radial bloom + faint paper grain (both in CSS).
+// A Display wordmark and a "Read the spec" CTA give it a compositional
+// peak; the black section above flows straight in. Flat and sharp — the
+// CTA carries the only lift.
 
 const AI_PROMPT = "Explain the Cashu protocol: what it is, how it works, and why it matters.";
 
-const AI_LINKS: { name: string; href: string; icon: string }[] = [
+const AI_LINKS: { name: string; href: string; icon: string; invert?: boolean }[] = [
   {
     name: "ChatGPT",
     href: `https://chatgpt.com/?q=${encodeURIComponent(AI_PROMPT)}`,
     icon: "/ai/openai.svg",
+    // OpenAI's mark is solid black — invert it to Paper on the Ink footer.
+    invert: true,
   },
   {
     name: "Claude",
@@ -112,65 +50,28 @@ function ExternalLink({
 export default function SiteFooter() {
   return (
     <footer className="footer-specimen relative isolate">
-      {/* Photographic backdrop — grayscale + darken applied in CSS to honour
-          the No-Colour Rule. */}
-      <div className="footer-photo" aria-hidden>
-        <Image
-          src="/keyboard.png"
-          alt=""
-          fill
-          sizes="100vw"
-          priority={false}
-        />
-      </div>
-
       <div className="page-shell relative" style={{ paddingBlock: "clamp(64px, 9vw, 160px)" }}>
         <div className="footer-card">
-          {/* Top: cashu mark + four nav columns */}
-          <div className="footer-card__top">
-            <Reveal>
-              <Link href="/" aria-label="Cashu home" className="footer-mark focus-ring">
-                <Image
-                  src="/cashu-no-bg.png"
-                  alt="Cashu"
-                  width={48}
-                  height={48}
-                />
-              </Link>
-            </Reveal>
-
-            <div className="footer-card__columns">
-              {COLUMNS.map((col, i) => (
-                <Reveal key={col.heading} delay={80 * (i + 1)}>
-                  <div className="flex flex-col gap-4">
-                    <h3 className="t-title text-zinc-500">
-                      {col.heading}
-                    </h3>
-                    <ul className="flex flex-col gap-3">
-                      {col.links.map((link) => (
-                        <li key={link.label}>
-                          {link.external ? (
-                            <ExternalLink
-                              href={link.href}
-                              className="footer-link t-label focus-ring"
-                            >
-                              {link.label}
-                            </ExternalLink>
-                          ) : (
-                            <a
-                              href={link.href}
-                              className="footer-link t-label focus-ring"
-                            >
-                              {link.label}
-                            </a>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </Reveal>
-              ))}
+          {/* Sign-off — the footer's compositional peak: Display wordmark and
+              one quiet line, with the closing CTA baseline-aligned right. */}
+          <div className="footer-signoff">
+            <div>
+              <div className="footer-signoff__mark">Cashu</div>
+              <p className="footer-signoff__line t-body-lead">The open specification.</p>
             </div>
+            <ExternalLink
+              href="https://github.com/cashubtc/nuts"
+              className="btn-primary--on-ink"
+            >
+              Read the spec
+            </ExternalLink>
+          </div>
+
+          {/* RFC metadata strip — spec repo left, descriptor right. Echoes the
+              two-cell mono header device used on the spec code pane. */}
+          <div className="footer-metastrip t-mono">
+            <span>cashubtc/nuts</span>
+            <span className="footer-metastrip__meta">Chaumian ecash for Bitcoin</span>
           </div>
 
           {/* Bottom: socials + legal on left, Ask-AI on right */}
@@ -179,7 +80,7 @@ export default function SiteFooter() {
               <div className="footer-socials">
                 <ExternalLink
                   href="https://x.com/CashuBTC"
-                  className="footer-social focus-ring"
+                  className="footer-social focus-ring--on-ink"
                 >
                   <span className="sr-only">X (Twitter)</span>
                   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -187,8 +88,17 @@ export default function SiteFooter() {
                   </svg>
                 </ExternalLink>
                 <ExternalLink
+                  href="https://primal.net/p/nprofile1qqs0y3tvskgs9gpgxxu5ahgz3fmms3rzmxt504qceqtz4a6pdgfwlkghwl6j8"
+                  className="footer-social focus-ring--on-ink"
+                >
+                  <span className="sr-only">Nostr</span>
+                  <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M210.8 199.4c0 3.1-2.5 5.7-5.7 5.7h-68c-3.1 0-5.7-2.5-5.7-5.7v-15.5c.3-19 2.3-37.2 6.5-45.5 2.5-5 6.7-7.7 11.5-9.1 9.1-2.7 24.9-.9 31.7-1.2 0 0 20.4.8 20.4-10.7s-9.1-8.6-9.1-8.6c-10 .3-17.7-.4-22.6-2.4-8.3-3.3-8.6-9.2-8.6-11.2-.4-23.1-34.5-25.9-64.5-20.1-32.8 6.2.4 53.3.4 116.1v8.4c0 3.1-2.6 5.6-5.7 5.6H57.7c-3.1 0-5.7-2.5-5.7-5.7v-144c0-3.1 2.5-5.7 5.7-5.7h31.7c3.1 0 5.7 2.5 5.7 5.7 0 4.7 5.2 7.2 9 4.5 11.4-8.2 26-12.5 42.4-12.5 36.6 0 64.4 21.4 64.4 68.7v83.2ZM150 99.3c0-6.7-5.4-12.1-12.1-12.1s-12.1 5.4-12.1 12.1 5.4 12.1 12.1 12.1S150 106 150 99.3Z"/>
+                  </svg>
+                </ExternalLink>
+                <ExternalLink
                   href="https://github.com/cashubtc"
-                  className="footer-social focus-ring"
+                  className="footer-social focus-ring--on-ink"
                 >
                   <span className="sr-only">GitHub</span>
                   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -200,13 +110,6 @@ export default function SiteFooter() {
                 <span className="t-label">© 2026</span>
                 <span className="footer-legal__sep" aria-hidden>·</span>
                 <span className="t-label">MIT Licensed</span>
-                <span className="footer-legal__sep" aria-hidden>·</span>
-                <ExternalLink
-                  href="https://github.com/cashubtc/nuts"
-                  className="footer-link t-label focus-ring"
-                >
-                  Read the spec
-                </ExternalLink>
               </div>
             </div>
 
@@ -217,7 +120,7 @@ export default function SiteFooter() {
                   <ExternalLink
                     key={ai.name}
                     href={ai.href}
-                    className="footer-ai__link focus-ring"
+                    className="footer-ai__link focus-ring--on-ink"
                   >
                     <span className="sr-only">{ai.name}</span>
                     {/* Static-asset SVG; rendered as a plain <img> so the
@@ -229,7 +132,11 @@ export default function SiteFooter() {
                       alt=""
                       width={14}
                       height={14}
-                      className="footer-ai__logo"
+                      className={
+                        ai.invert
+                          ? "footer-ai__logo footer-ai__logo--invert"
+                          : "footer-ai__logo"
+                      }
                       aria-hidden
                     />
                   </ExternalLink>

@@ -215,7 +215,12 @@ function Card() {
   return (
     <div className="bg-white text-black w-full divide-y divide-zinc-200">
       <div className="px-5 py-4">
-        <span className="t-label text-zinc-500 uppercase tracking-wider">Implementations</span>
+        <span
+          className="t-label text-zinc-500 uppercase"
+          style={{ letterSpacing: "0.06em" }}
+        >
+          Implementations
+        </span>
       </div>
       {featured.map((repo) => (
         <a
