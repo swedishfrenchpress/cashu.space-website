@@ -1,14 +1,18 @@
-// Footer — light, full-width band unified with the rest of the site. A
-// single hairline top border separates it from the section above; no
-// photographic backdrop, no floating card. Flat and sharp per doctrine.
+// Footer — "The Twilight Stack" (DESIGN.md §5): an Ink band closing the
+// page, with a monochrome radial bloom + faint paper grain (both in CSS).
+// A Display wordmark and a "Read the spec" CTA give it a compositional
+// peak; the black section above flows straight in. Flat and sharp — the
+// CTA carries the only lift.
 
 const AI_PROMPT = "Explain the Cashu protocol: what it is, how it works, and why it matters.";
 
-const AI_LINKS: { name: string; href: string; icon: string }[] = [
+const AI_LINKS: { name: string; href: string; icon: string; invert?: boolean }[] = [
   {
     name: "ChatGPT",
     href: `https://chatgpt.com/?q=${encodeURIComponent(AI_PROMPT)}`,
     icon: "/ai/openai.svg",
+    // OpenAI's mark is solid black — invert it to Paper on the Ink footer.
+    invert: true,
   },
   {
     name: "Claude",
@@ -48,13 +52,35 @@ export default function SiteFooter() {
     <footer className="footer-specimen relative isolate">
       <div className="page-shell relative" style={{ paddingBlock: "clamp(64px, 9vw, 160px)" }}>
         <div className="footer-card">
+          {/* Sign-off — the footer's compositional peak: Display wordmark and
+              one quiet line, with the closing CTA baseline-aligned right. */}
+          <div className="footer-signoff">
+            <div>
+              <div className="footer-signoff__mark">Cashu</div>
+              <p className="footer-signoff__line t-body-lead">The open specification.</p>
+            </div>
+            <ExternalLink
+              href="https://github.com/cashubtc/nuts"
+              className="btn-primary--on-ink"
+            >
+              Read the spec
+            </ExternalLink>
+          </div>
+
+          {/* RFC metadata strip — spec repo left, descriptor right. Echoes the
+              two-cell mono header device used on the spec code pane. */}
+          <div className="footer-metastrip t-mono">
+            <span>cashubtc/nuts</span>
+            <span className="footer-metastrip__meta">Chaumian ecash for Bitcoin</span>
+          </div>
+
           {/* Bottom: socials + legal on left, Ask-AI on right */}
           <div className="footer-card__bottom">
             <div className="footer-card__bottom-left">
               <div className="footer-socials">
                 <ExternalLink
                   href="https://x.com/CashuBTC"
-                  className="footer-social focus-ring"
+                  className="footer-social focus-ring--on-ink"
                 >
                   <span className="sr-only">X (Twitter)</span>
                   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -63,7 +89,7 @@ export default function SiteFooter() {
                 </ExternalLink>
                 <ExternalLink
                   href="https://primal.net/p/nprofile1qqs0y3tvskgs9gpgxxu5ahgz3fmms3rzmxt504qceqtz4a6pdgfwlkghwl6j8"
-                  className="footer-social focus-ring"
+                  className="footer-social focus-ring--on-ink"
                 >
                   <span className="sr-only">Nostr</span>
                   <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
@@ -72,7 +98,7 @@ export default function SiteFooter() {
                 </ExternalLink>
                 <ExternalLink
                   href="https://github.com/cashubtc"
-                  className="footer-social focus-ring"
+                  className="footer-social focus-ring--on-ink"
                 >
                   <span className="sr-only">GitHub</span>
                   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -94,7 +120,7 @@ export default function SiteFooter() {
                   <ExternalLink
                     key={ai.name}
                     href={ai.href}
-                    className="footer-ai__link focus-ring"
+                    className="footer-ai__link focus-ring--on-ink"
                   >
                     <span className="sr-only">{ai.name}</span>
                     {/* Static-asset SVG; rendered as a plain <img> so the
@@ -106,7 +132,11 @@ export default function SiteFooter() {
                       alt=""
                       width={14}
                       height={14}
-                      className="footer-ai__logo"
+                      className={
+                        ai.invert
+                          ? "footer-ai__logo footer-ai__logo--invert"
+                          : "footer-ai__logo"
+                      }
                       aria-hidden
                     />
                   </ExternalLink>

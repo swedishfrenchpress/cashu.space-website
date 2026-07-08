@@ -60,7 +60,7 @@ function StatCard({
       <div className="flex flex-col gap-2">
         <span
           className="font-semibold tracking-tight leading-none"
-          style={{ fontSize: "clamp(2.5rem, 5vw, 4rem)" }}
+          style={{ fontSize: "clamp(3.75rem, 5vw, 5rem)" }}
         >
           {value}
         </span>

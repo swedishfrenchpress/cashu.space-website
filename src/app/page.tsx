@@ -22,19 +22,16 @@ export default function Home() {
           <div className="hero-spec__top">
             <div className="hero-spec__content">
               <Reveal immediate delay={120}>
-                <p className="hero-spec__eyebrow">CASHU</p>
-              </Reveal>
-              <Reveal immediate delay={260}>
                 <h1 className="hero-spec__headline">Open source electronic cash.</h1>
               </Reveal>
-              <Reveal immediate delay={380}>
+              <Reveal immediate delay={240}>
                 <p className="hero-spec__body">
                   Instant, bearer, peer-to-peer. A protocol for digital cash
-                  backed by Lightning, with blind-signed tokens you can hold
+                  backed by bitcoin, with blind-signed tokens you can hold
                   in any wallet.
                 </p>
               </Reveal>
-              <Reveal immediate delay={480}>
+              <Reveal immediate delay={360}>
                 <div className="hero-spec__cta">
                   <Link href="/wallets" className="btn-primary">
                     <span>Get a wallet</span>

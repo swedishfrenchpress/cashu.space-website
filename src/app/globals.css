@@ -506,57 +506,112 @@ html {
 }
 
 /*
- * Footer — light, full-width band unified with the rest of the site.
- * Formerly a Paper card floating on a grayscale photograph; now a plain
- * Paper band separated from the section above by a single 1px Hair
- * hairline. No backdrop, no card chrome — flat and sharp per doctrine.
+ * Footer — "The Twilight Stack" (DESIGN.md §5). The page closes on an Ink
+ * band: a monochrome radial bloom rising from just below the lower edge
+ * (50% 110%, Fog→Ink, every stop inside the grey ramp — the No-Colour Rule
+ * holds) over a faint feTurbulence paper-grain overlay. The black section
+ * above (ReferenceImplementations) flows straight in — the dark-on-dark
+ * seam is the point. Flat and sharp: no container shadow; the closing CTA
+ * carries the only lift on the surface.
  */
 .footer-specimen {
-  background-color: #ffffff;
-  border-top: 1px solid #e4e4e7;
+  position: relative;
+  background-color: #000000;
+  overflow: hidden;
+}
+
+/* Monochrome bloom — anchored 50% 110%, stops verbatim from DESIGN.md §5. */
+.footer-specimen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 110%,
+    #a1a1aa 0%,
+    #71717a 18%,
+    #3f3f46 34%,
+    #18181b 58%,
+    #000000 80%
+  );
+}
+
+/* Paper grain — fractal noise at 0.04, overlay blend. Below conscious
+   perception; its only job is to push the printed-RFC register on dark,
+   where flat black would otherwise read as digital. */
+.footer-specimen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Content rides above both overlays. */
+.footer-specimen .page-shell {
+  position: relative;
+  z-index: 1;
 }
 
 .footer-card {
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: clamp(36px, 5vw, 64px);
 }
 
-.footer-card__top {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: clamp(32px, 5vw, 72px);
-  align-items: start;
+/*
+ * Sign-off — the footer's compositional peak: a Display wordmark + one quiet
+ * line on the left, the closing CTA baseline-aligned on the right. This is
+ * the footer's only Display type; the rest of the surface stays quiet.
+ */
+.footer-signoff {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 48px);
+  flex-wrap: wrap;
 }
 
-.footer-mark {
-  display: inline-flex;
+.footer-signoff__mark {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(3.75rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.footer-signoff__line {
+  margin-top: 14px;
+  color: #a1a1aa;
+}
+
+/*
+ * RFC metadata strip — echoes the spec-pane header device (two-cell mono:
+ * spec path left, descriptor right), framed by a zinc-800 hairline. On the
+ * Ink ground the Hairline Rule translates to #27272a — a literal Hair line
+ * would glare white — matching the border under the code strip elsewhere.
+ */
+.footer-metastrip {
+  display: flex;
   align-items: center;
-  text-decoration: none;
-  color: #18181b;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid #27272a;
+  color: #a1a1aa;
+  flex-wrap: wrap;
 }
 
-.footer-mark img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-}
-
-.footer-card__columns {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(24px, 3vw, 48px);
-}
-
-.footer-link {
-  color: #3f3f46;
-  text-decoration: none;
-  transition: color var(--dur-base) var(--ease-out-quart);
-}
-
-.footer-link:hover,
-.footer-link:focus-visible {
-  color: #000000;
+.footer-metastrip__meta {
+  /* Fog, not Mist — #71717a on #000 is ~4.3:1 and misses AA for 14px text. */
+  color: #a1a1aa;
+  white-space: nowrap;
 }
 
 .footer-card__bottom {
@@ -581,19 +636,32 @@ html {
 }
 
 .footer-social {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  color: #18181b;
+  color: #a1a1aa;
   text-decoration: none;
   transition: color var(--dur-base) var(--ease-out-quart);
 }
 
+/* Expand the tap target to 44x44 for touch without shifting the 18px glyph
+   or the row's visual spacing — the pseudo is transparent and out of flow. */
+.footer-social::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
 .footer-social:hover,
 .footer-social:focus-visible {
-  color: #000000;
+  color: #ffffff;
 }
 
 .footer-social svg {
@@ -605,12 +673,12 @@ html {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #71717a;
+  color: #a1a1aa;
   flex-wrap: wrap;
 }
 
 .footer-legal__sep {
-  color: #a1a1aa;
+  color: #71717a;
   user-select: none;
 }
 
@@ -622,7 +690,7 @@ html {
 }
 
 .footer-ask-label {
-  color: #71717a;
+  color: #a1a1aa;
 }
 
 /*
@@ -640,9 +708,24 @@ html {
 }
 
 .footer-ai__link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+/* Tap target: 44px tall, widened to fill the gap between marks (contiguous,
+   no overlap, no visual shift) — lifts the 14px logos above the 24px AA
+   minimum (WCAG 2.5.8) for touch. Full 44px width would need the logos
+   spread apart, which we avoid to keep the row visually unchanged. */
+.footer-ai__link::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 44px;
+  transform: translate(-50%, -50%);
 }
 
 .footer-ai__logo {
@@ -654,12 +737,21 @@ html {
   flex-shrink: 0;
 }
 
+/* A monochrome mark (e.g. OpenAI's black glyph) would vanish on the Ink
+   ground — force it to Paper. Brand-coloured marks (Claude, Gemini) keep
+   their colour under the sanctioned third-party-logo exception and are not
+   given this class. */
+.footer-ai__logo--invert {
+  filter: brightness(0) invert(1);
+}
+
 .footer-disclaimer {
-  margin-top: clamp(24px, 3vw, 40px);
   width: 100%;
-  max-width: none;
-  color: #71717a;
-  text-wrap: wrap;
+  /* Cap the reading measure — this is a real paragraph, not a one-line legal
+     notice; the site's own 65–75ch rule (PRODUCT.md a11y) applies. */
+  max-width: 72ch;
+  color: #a1a1aa;
+  text-wrap: pretty;
 }
 
 /*
@@ -704,18 +796,12 @@ html {
 }
 
 @media (max-width: 900px) {
-  .footer-card__top {
-    grid-template-columns: 1fr;
-  }
-  .footer-card__columns {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .footer-signoff {
+    align-items: flex-start;
   }
 }
 
 @media (max-width: 560px) {
-  .footer-card__columns {
-    grid-template-columns: 1fr;
-  }
   .footer-card__bottom {
     flex-direction: column;
     align-items: flex-start;
@@ -792,27 +878,12 @@ html {
   gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-/* Protocol wordmark. CASHU sits above the page-peak headline as the
-   name of the protocol — sized between the body text and the Display
-   headline so the hierarchy reads wordmark → page peak → lead. Ink
-   colour and a slightly expanded tracking give it the presence the
-   brand requires while staying clearly subordinate to the H1. */
-.hero-spec__eyebrow {
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.04em;
-  color: #18181b;
-  margin: 0;
-}
-
 /* Page peak. CLAUDE.md is explicit: hero headline = GT-Standard 600,
    ≥3.75rem, line-height 0.95. Held to t-display proportions on a tight
    max-width so the line break lands where the asymmetric grid expects. */
 .hero-spec__headline {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-size: clamp(3.75rem, 7vw, 6.5rem);
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
