@@ -1625,23 +1625,25 @@ html {
   border: 1px solid var(--hair);
 }
 
-/* Orb variant of the media panel — centers the 64px thinking-orb and its
-   mono state caption inside the chalk frame so it reads as a labelled
-   spec-figure. */
+/* Orb variant of the media panel — the panel-scale orb figure fills the
+   chalk frame (OrbFigure measures this box and sizes its canvas to the
+   shorter edge). */
 .feature-media--orb {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
 }
 
-/* Sized to match .feature-nav__num rather than t-mono (0.875rem). */
-.feature-media__state {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  color: var(--faint);
+.orb-figure {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orb-figure__canvas {
+  display: block;
 }
 
 .feature-block__text {

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ThinkingOrb, type OrbState } from "thinking-orbs";
+import { type OrbState } from "thinking-orbs";
+import OrbFigure from "./orb-figure";
 import Reveal from "./reveal";
 
 type TabId = "wallets" | "mints" | "spec" | "tokens";
@@ -151,18 +152,13 @@ export default function TabbedFeature() {
                 className="feature-block"
               >
                 <Reveal variant="fade" slow>
-                  {/* Spec-diagram panel: the chalk frame holds a thinking-orb —
-                      the pillar's state as a dotted instrument reading, with a
-                      mono caption echoing .feature-nav__num so it reads as a
-                      labelled figure. theme=auto tracks the same signals the
-                      site theme does (html data-theme, else the OS scheme).
-                      Swap back to <Image src={tab.image}> when real art is
+                  {/* Spec-diagram panel: the chalk frame holds the pillar's
+                      thinking-orb at panel scale — the dotted instrument
+                      reading nearly fills the frame (see OrbFigure). Swap
+                      back to <Image src={tab.image}> when real art is
                       ready. */}
                   <div className="feature-media feature-media--orb" aria-hidden>
-                    <ThinkingOrb state={tab.state} size={64} theme="auto" />
-                    <span className="feature-media__state">
-                      {String(i + 1).padStart(2, "0")} / {tab.state}
-                    </span>
+                    <OrbFigure state={tab.state} />
                   </div>
                 </Reveal>
                 <div className="feature-block__text">
