@@ -5,11 +5,19 @@ import { useEffect, useRef } from "react";
 /**
  * AsciiField — the hero's terrain band. A canvas grid of Geist Mono glyphs
  * driven by layered sinusoidal noise: three fractal octaves produce a
- * heightfield, and cells near contour lines (height mod spacing) darken,
+ * heightfield, and cells near contour lines (height mod spacing) intensify,
  * so drifting topographic ridgelines emerge from a quiet dotted plain.
- * The ramp runs faint→dark for the white ground: `·` and `/` fill the
- * open field, `,` marks crests, and ₿ (or `B` while Geist Mono lacks
- * U+20BF) caps the contour peaks.
+ * The ramp runs faint→strong against the page ground: `·` and `/` fill
+ * the open field, `,` marks crests, and ₿ caps the contour peaks. Geist
+ * Mono has no U+20BF glyph, so the ₿ is synthesized: the font's own `B`
+ * plus the official symbol's two vertical strokes drawn as rects — the
+ * same letterform on every platform, no system-font fallback. If the
+ * font ever gains a native ₿ (probed at runtime), it takes over.
+ *
+ * Theme: resolves like the site CSS (and thinking-orbs) — an html
+ * data-theme="dark|light" attribute wins, else prefers-color-scheme —
+ * and repaints live when either changes. Light ink on dark paper, dark
+ * ink on light paper; the zinc ramp mirrors.
  *
  * Draws every 2nd rAF (~30fps), DPR capped at 2, pauses offscreen and on
  * hidden tabs, and renders a single static frame under reduced motion.
@@ -24,17 +32,23 @@ const SPEED = 0.9;
 const FRAME_SKIP = 2;
 const MAX_DPR = 2;
 
-/* Brightness thresholds ascend toward darker ink; cells below the first
-   threshold stay empty. The top two levels use the runtime-resolved peak
-   glyph (₿ when the font carries it, else B). */
-const RAMP = [
-  { min: 40, glyph: "·", fill: "#d4d4d8" },
-  { min: 90, glyph: "/", fill: "#a1a1aa" },
-  { min: 140, glyph: ",", fill: "#71717a" },
-  { min: 200, glyph: "", fill: "#52525b" },
-  { min: 232, glyph: "", fill: "#3f3f46" },
-];
+/* Brightness thresholds ascend toward the stronger glyph; cells below the
+   first threshold stay empty. The top two levels use the runtime-resolved
+   peak glyph (₿ when the font carries it, else B). Fills are the zinc ramp,
+   mirrored between schemes. */
+const LEVEL_MIN = [40, 90, 140, 200, 232];
+const LEVEL_GLYPH = ["·", "/", ",", "", ""];
 const PEAK_LEVEL = 3;
+
+/* Synthesized-₿ strokes: two verticals piercing the B, centered ±DX from
+   the glyph center, LEN px beyond its top and bottom edges. */
+const BTC_STROKE_W = 1;
+const BTC_STROKE_LEN = 2;
+const BTC_STROKE_DX = 1.25;
+const FILLS = {
+  light: ["#d4d4d8", "#a1a1aa", "#71717a", "#52525b", "#3f3f46"],
+  dark: ["#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8"],
+};
 
 function noise(x: number, y: number, t: number): number {
   return (
@@ -70,8 +84,8 @@ function brightness(x: number, y: number, t: number): number {
 }
 
 function pickLevel(b: number): number {
-  for (let i = RAMP.length - 1; i >= 0; i--) {
-    if (b >= RAMP[i].min) return i;
+  for (let i = LEVEL_MIN.length - 1; i >= 0; i--) {
+    if (b >= LEVEL_MIN[i]) return i;
   }
   return -1;
 }
@@ -97,10 +111,24 @@ export default function AsciiField({ className }: { className?: string }) {
     let inView = true;
     let fontString = `${FONT_SIZE}px ui-monospace, monospace`;
     let peakGlyph = "B";
+    let synthPeak = true;
+    let bTop = 4.5;
+    let bBot = 4.5;
     const start = performance.now();
 
     const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reduced = mqReduce.matches;
+
+    /* Same resolution order as the CSS tokens and thinking-orbs' auto mode:
+       html data-theme wins, else the OS scheme. */
+    const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
+    const resolveDark = () => {
+      const t = document.documentElement.dataset.theme;
+      if (t === "dark") return true;
+      if (t === "light") return false;
+      return mqDark.matches;
+    };
+    let dark = resolveDark();
 
     const currentT = () =>
       reduced ? 0 : ((performance.now() - start) / 1000) * SPEED;
@@ -117,11 +145,20 @@ export default function AsciiField({ className }: { className?: string }) {
          one substituted from a fallback face almost never does.
          (document.fonts.check false-positives here — next/font emits no
          unicode-range, so it only reports loadedness, not coverage.) */
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       const btc = ctx.measureText("₿").width;
-      peakGlyph =
-        btc > 0 && Math.abs(btc - ctx.measureText("0").width) < 0.5
-          ? "₿"
-          : "B";
+      const native =
+        btc > 0 && Math.abs(btc - ctx.measureText("0").width) < 0.5;
+      peakGlyph = native ? "₿" : "B";
+      synthPeak = !native;
+      if (synthPeak) {
+        /* Stroke anchors from the B's real pixel bounds (relative to the
+           middle baseline the grid draws with). */
+        const m = ctx.measureText("B");
+        bTop = m.actualBoundingBoxAscent;
+        bBot = m.actualBoundingBoxDescent;
+      }
     };
 
     const draw = (t: number) => {
@@ -129,9 +166,10 @@ export default function AsciiField({ className }: { className?: string }) {
       ctx.font = fontString;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      const fills = dark ? FILLS.dark : FILLS.light;
       const cols = Math.ceil(width / CELL_W) + 1;
       const rows = Math.ceil(height / CELL_H) + 1;
-      const buckets: number[][] = RAMP.map(() => []);
+      const buckets: number[][] = fills.map(() => []);
       for (let row = 0; row < rows; row++) {
         const y = (row + 0.5) * TERRAIN_SCALE;
         for (let col = 0; col < cols; col++) {
@@ -140,13 +178,24 @@ export default function AsciiField({ className }: { className?: string }) {
           buckets[level].push(col * CELL_W + CELL_W / 2, row * CELL_H + CELL_H / 2);
         }
       }
-      for (let level = 0; level < RAMP.length; level++) {
+      for (let level = 0; level < fills.length; level++) {
         const pts = buckets[level];
         if (pts.length === 0) continue;
-        ctx.fillStyle = RAMP[level].fill;
-        const glyph = level >= PEAK_LEVEL ? peakGlyph : RAMP[level].glyph;
+        ctx.fillStyle = fills[level];
+        const isPeak = level >= PEAK_LEVEL;
+        const glyph = isPeak ? peakGlyph : LEVEL_GLYPH[level];
         for (let i = 0; i < pts.length; i += 2) {
-          ctx.fillText(glyph, pts[i], pts[i + 1]);
+          const px = pts[i];
+          const py = pts[i + 1];
+          ctx.fillText(glyph, px, py);
+          if (isPeak && synthPeak) {
+            const xl = px - BTC_STROKE_DX - BTC_STROKE_W / 2;
+            const xr = px + BTC_STROKE_DX - BTC_STROKE_W / 2;
+            ctx.fillRect(xl, py - bTop - BTC_STROKE_LEN, BTC_STROKE_W, BTC_STROKE_LEN);
+            ctx.fillRect(xr, py - bTop - BTC_STROKE_LEN, BTC_STROKE_W, BTC_STROKE_LEN);
+            ctx.fillRect(xl, py + bBot, BTC_STROKE_W, BTC_STROKE_LEN);
+            ctx.fillRect(xr, py + bBot, BTC_STROKE_W, BTC_STROKE_LEN);
+          }
         }
       }
     };
@@ -177,6 +226,13 @@ export default function AsciiField({ className }: { className?: string }) {
       }
     };
 
+    /* Theme changed: re-resolve and, when the loop isn't running (paused
+       or reduced motion), repaint the current frame in the new ink. */
+    const onThemeChange = () => {
+      dark = resolveDark();
+      if (!rafId) draw(currentT());
+    };
+
     const applyCanvasSize = () => {
       /* Resizing the bitmap resets every 2D context state; draw() reapplies
          font/align/baseline, the transform is reapplied here. */
@@ -201,6 +257,8 @@ export default function AsciiField({ className }: { className?: string }) {
       sync();
     });
 
+    const mo = new MutationObserver(onThemeChange);
+
     const onVisibility = () => sync();
     const onReduceChange = (e: MediaQueryListEvent) => {
       reduced = e.matches;
@@ -216,8 +274,13 @@ export default function AsciiField({ className }: { className?: string }) {
 
     ro.observe(wrap);
     io.observe(wrap);
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme", "class"],
+    });
     document.addEventListener("visibilitychange", onVisibility);
     mqReduce.addEventListener("change", onReduceChange);
+    mqDark.addEventListener("change", onThemeChange);
 
     /* Re-measure once webfonts settle: the first frames may paint in the
        fallback mono, and the ₿ probe is only meaningful post-load. */
@@ -239,8 +302,10 @@ export default function AsciiField({ className }: { className?: string }) {
       cancelAnimationFrame(resizeRaf);
       ro.disconnect();
       io.disconnect();
+      mo.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
       mqReduce.removeEventListener("change", onReduceChange);
+      mqDark.removeEventListener("change", onThemeChange);
     };
   }, []);
 

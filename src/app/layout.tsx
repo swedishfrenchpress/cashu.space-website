@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 import { GeistPixelSquare } from "geist/font/pixel";
@@ -32,6 +32,14 @@ const gtStandard = localFont({
   variable: "--font-gt",
   display: "swap",
 });
+
+/* Browser chrome follows the site scheme (see the tonal ramp in globals.css). */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cashu-space-website.vercel.app"),
@@ -72,8 +80,21 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${gtStandard.variable} ${GeistMono.variable} ${GeistPixelSquare.variable} h-full antialiased`}
+      /* The theme boot script (and browser extensions) may stamp attributes
+         on <html> before hydration; the mismatch is intentional. */
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        {/* Applies a manually chosen theme before first paint so a saved
+            override can't flash the OS scheme. Parser-blocking on purpose —
+            it must run before anything renders. No saved choice → no
+            attribute → the CSS follows prefers-color-scheme. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}',
+          }}
+        />
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Reveal from "./reveal";
+import ThemeToggle from "./theme-toggle";
 
 type SiteHeaderProps = {
   /** Inverted scheme for on-Ink routes (e.g. /wallets). */
@@ -93,33 +94,36 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
               ))}
             </ul>
 
-            <a
-              href="https://github.com/cashubtc"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${ctaClass} site-nav__cta`}
-            >
-              View on GitHub
-            </a>
-
-            <button
-              type="button"
-              className="site-nav__toggle focus-ring"
-              aria-expanded={isOpen}
-              aria-controls="site-nav-panel"
-              aria-label={isOpen ? "Close menu" : "Open menu"}
-              onClick={() => setIsOpen((o) => !o)}
-            >
-              <span
-                className={`site-nav__toggle-icon${
-                  isOpen ? " is-open" : ""
-                }`}
-                aria-hidden
+            <div className="site-nav__actions">
+              <ThemeToggle />
+              <a
+                href="https://github.com/cashubtc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${ctaClass} site-nav__cta`}
               >
-                <span />
-                <span />
-              </span>
-            </button>
+                View on GitHub
+              </a>
+
+              <button
+                type="button"
+                className="site-nav__toggle focus-ring"
+                aria-expanded={isOpen}
+                aria-controls="site-nav-panel"
+                aria-label={isOpen ? "Close menu" : "Open menu"}
+                onClick={() => setIsOpen((o) => !o)}
+              >
+                <span
+                  className={`site-nav__toggle-icon${
+                    isOpen ? " is-open" : ""
+                  }`}
+                  aria-hidden
+                >
+                  <span />
+                  <span />
+                </span>
+              </button>
+            </div>
           </nav>
         </Reveal>
 

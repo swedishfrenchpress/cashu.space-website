@@ -5,8 +5,10 @@ export function CashuMark({
   className?: string;
   inverted?: boolean;
 }) {
-  const fill = inverted ? "#ffffff" : "#000000";
-  const stroke = inverted ? "#000000" : "#ffffff";
+  /* Default follows the scheme (edge on paper); `inverted` is for always-ink
+     grounds and stays literal. */
+  const fill = inverted ? "#ffffff" : "var(--edge)";
+  const stroke = inverted ? "#000000" : "var(--paper)";
   return (
     <svg
       viewBox="0 0 32 32"

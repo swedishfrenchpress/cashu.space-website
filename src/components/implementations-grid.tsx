@@ -97,7 +97,7 @@ export default function ImplementationsGrid() {
             directory ("what Cashu is made of"). Single 1px Hair line per the
             Hairline Rule (DESIGN.md §4). The doctrine fires exactly once on
             the homepage. */}
-        <hr className="border-0 h-px bg-zinc-200 -mt-4 lg:-mt-6" aria-hidden />
+        <hr className="border-0 h-px bg-hair -mt-4 lg:-mt-6" aria-hidden />
 
         {/* Layout: 1 col on phone, 2 col on tablet (Card 1 spans the left
             column full-height while Cards 2–4 stack down the right), 3 col
@@ -111,7 +111,7 @@ export default function ImplementationsGrid() {
               bento isn't four identical layouts at different sizes. The
               card stays inside the page-shell so the grid reads centered. */}
           <Reveal slow className="md:row-span-3 lg:row-span-2">
-            <div className="relative bg-black text-white min-h-[420px] md:min-h-[520px] lg:min-h-[560px] h-full overflow-hidden">
+            <div className="relative bg-panel text-panel-fg border border-panel-hair min-h-[420px] md:min-h-[520px] lg:min-h-[560px] h-full overflow-hidden">
               {/* md+ watermark — bleeds past the card edges as the original
                   composition intended. Hidden on mobile in favor of the inline
                   figure below, which centers properly in the column. */}
@@ -119,7 +119,7 @@ export default function ImplementationsGrid() {
                 aria-hidden
                 className="hidden md:flex absolute inset-0 pointer-events-none items-center justify-center"
               >
-                <GlobeFigure className="w-[105%] h-[105%] max-w-none text-white" />
+                <GlobeFigure className="w-[105%] h-[105%] max-w-none text-panel-fg" />
               </div>
               <div className="relative z-10 flex flex-col h-full p-8 lg:p-10 md:justify-end gap-6 md:gap-3">
                 {/* Mobile-only inline figure — centers in the space above the
@@ -128,7 +128,7 @@ export default function ImplementationsGrid() {
                   aria-hidden
                   className="md:hidden flex-1 flex items-center justify-center"
                 >
-                  <GlobeFigure className="w-44 h-44 text-white" />
+                  <GlobeFigure className="w-44 h-44 text-panel-fg" />
                 </div>
                 <h3 className="t-title">Open source ecash</h3>
                 <p className="t-body text-zinc-300 max-w-[34ch]">
@@ -140,13 +140,13 @@ export default function ImplementationsGrid() {
 
           {/* Bearer token · wide top right, chalk */}
           <Reveal slow delay={120} className="md:col-start-2 md:row-start-1 lg:col-start-auto lg:row-start-auto lg:col-span-2">
-            <div className="bg-zinc-100 p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
+            <div className="bg-chalk p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
               <div className="flex-1 flex items-center justify-center">
                 <MoneyFigure className="w-36 h-36 lg:w-44 lg:h-44" />
               </div>
               <div className="flex flex-col gap-3 max-w-[52ch]">
                 <h3 className="t-title">Bearer token</h3>
-                <p className="t-body text-zinc-900">
+                <p className="t-body text-ink">
                   Ecash transactions are instant and final, just like physical
                   cash.
                 </p>
@@ -156,13 +156,13 @@ export default function ImplementationsGrid() {
 
           {/* Privacy focused · bottom right left, white with hair */}
           <Reveal slow delay={240} className="md:col-start-2 md:row-start-2">
-            <div className="bg-white border border-zinc-200 p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
+            <div className="bg-card border border-hair p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
               <div className="flex-1 flex items-center justify-center">
                 <LockFigure className="w-32 h-32 lg:w-40 lg:h-40" />
               </div>
               <div className="flex flex-col gap-3">
                 <h3 className="t-title">Privacy focused</h3>
-                <p className="t-body text-zinc-900 max-w-[40ch]">
+                <p className="t-body text-ink max-w-[40ch]">
                   Blind signatures unlink the mint from the holder. Payments
                   are peer-to-peer.
                 </p>
@@ -172,13 +172,13 @@ export default function ImplementationsGrid() {
 
           {/* Ecash for the Web · bottom right right, white with hair */}
           <Reveal slow delay={360} className="md:col-start-2 md:row-start-3 lg:col-start-auto lg:row-start-auto">
-            <div className="bg-white border border-zinc-200 p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
+            <div className="bg-card border border-hair p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
               <div className="flex-1 flex items-center justify-center">
                 <WalletFigure className="w-32 h-32 lg:w-40 lg:h-40" />
               </div>
               <div className="flex flex-col gap-3">
                 <h3 className="t-title">Ecash for the Web</h3>
-                <p className="t-body text-zinc-900 max-w-[40ch]">
+                <p className="t-body text-ink max-w-[40ch]">
                   Tokens fit in HTTP headers, URLs, and JSON. Wire cashu into
                   any web flow.
                 </p>

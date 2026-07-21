@@ -81,14 +81,14 @@ function targetOf(href: string): string {
 
 export default function WalletsPage() {
   return (
-    <main className="bg-white text-black min-h-screen pb-24 lg:pb-32">
+    <main className="bg-paper text-ink min-h-screen pb-24 lg:pb-32">
       <SiteHeader />
 
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
         <Reveal immediate as="header">
           <div id="main-content" className="flex flex-col gap-6 max-w-[60ch]">
             <h1 className="t-display">Wallets.</h1>
-            <p className="t-body-lead text-zinc-700">
+            <p className="t-body-lead text-body">
               Any client that implements the cashu protocol is conformant. The
               list below is non-exhaustive, a snapshot of wallets people use
               today, not an endorsement.

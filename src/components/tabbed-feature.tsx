@@ -154,11 +154,12 @@ export default function TabbedFeature() {
                   {/* Spec-diagram panel: the chalk frame holds a thinking-orb —
                       the pillar's state as a dotted instrument reading, with a
                       mono caption echoing .feature-nav__num so it reads as a
-                      labelled figure. theme is pinned light because the panel
-                      is always chalk regardless of OS scheme. Swap back to
-                      <Image src={tab.image}> when real art is ready. */}
+                      labelled figure. theme=auto tracks the same signals the
+                      site theme does (html data-theme, else the OS scheme).
+                      Swap back to <Image src={tab.image}> when real art is
+                      ready. */}
                   <div className="feature-media feature-media--orb" aria-hidden>
-                    <ThinkingOrb state={tab.state} size={64} theme="light" />
+                    <ThinkingOrb state={tab.state} size={64} theme="auto" />
                     <span className="feature-media__state">
                       {String(i + 1).padStart(2, "0")} / {tab.state}
                     </span>

@@ -11,7 +11,7 @@ import Testimonials from "@/components/testimonials";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 bg-white text-black">
+    <div className="flex flex-col flex-1 bg-paper text-ink">
       <SiteHeader />
 
       {/* Hero — single-column spec opener. Headline, lead, and paired CTAs

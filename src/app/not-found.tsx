@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <main className="flex flex-col flex-1 bg-white text-black">
+    <main className="flex flex-col flex-1 bg-paper text-ink">
       <header className="page-shell pt-6 lg:pt-8 flex items-center">
         <Reveal immediate variant="fade">
           <Link href="/" className="flex items-center gap-2.5 t-title">
@@ -24,13 +24,13 @@ export default function NotFound() {
       >
         <div className="flex flex-col gap-8 lg:gap-10 max-w-[60ch]">
           <Reveal immediate delay={80}>
-            <span className="t-mono text-zinc-500">nut:404</span>
+            <span className="t-mono text-muted">nut:404</span>
           </Reveal>
           <Reveal immediate slow delay={160}>
             <h1 className="t-display">Not specified.</h1>
           </Reveal>
           <Reveal immediate delay={300}>
-            <p className="t-body-lead text-zinc-900 max-w-[52ch]">
+            <p className="t-body-lead text-ink max-w-[52ch]">
               This path does not appear in the protocol. The page may have
               moved, or it may never have existed.
             </p>

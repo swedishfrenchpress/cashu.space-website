@@ -5,7 +5,7 @@ export default function StatsBand() {
         <h2 className="text-center t-headline max-w-[24ch]">
           Real bitcoin, in the spaces bitcoin couldn&rsquo;t reach
         </h2>
-        <p className="text-center text-zinc-500 max-w-[60ch] t-body-lead">
+        <p className="text-center text-muted max-w-[60ch] t-body-lead">
           Pressure-tested by independent mints, wallets, and the developers
           building on the spec.
         </p>
@@ -45,10 +45,10 @@ function StatCard({
   inverted?: boolean;
 }) {
   const surface = inverted
-    ? "bg-black text-white"
-    : "bg-white text-black border border-zinc-200";
-  const captionColor = inverted ? "text-zinc-300" : "text-zinc-600";
-  const labelColor = inverted ? "text-zinc-400" : "text-zinc-500";
+    ? "bg-panel text-panel-fg border border-panel-hair"
+    : "bg-card text-ink border border-hair";
+  const captionColor = inverted ? "text-zinc-300" : "text-body";
+  const labelColor = inverted ? "text-zinc-400" : "text-muted";
 
   return (
     <div

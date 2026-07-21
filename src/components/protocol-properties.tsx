@@ -34,39 +34,39 @@ function MarqueeCard({ card }: { card: Card }) {
   const repeated = card.marquee.repeat(16);
   const Icon = card.icon;
   return (
-    <article className="relative aspect-[3/4] bg-white border border-zinc-200 overflow-hidden">
+    <article className="relative aspect-[3/4] bg-card border border-hair overflow-hidden">
       <span
         aria-hidden
-        className="pointer-events-none absolute top-3 left-10 right-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400"
+        className="pointer-events-none absolute top-3 left-10 right-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-faint"
       >
         {repeated}
       </span>
       <span
         aria-hidden
-        className="pointer-events-none absolute bottom-3 left-10 right-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400"
+        className="pointer-events-none absolute bottom-3 left-10 right-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-faint"
       >
         {repeated}
       </span>
       <span
         aria-hidden
-        className="pointer-events-none absolute left-3 top-10 bottom-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400 [writing-mode:vertical-rl] rotate-180"
+        className="pointer-events-none absolute left-3 top-10 bottom-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-faint [writing-mode:vertical-rl] rotate-180"
       >
         {repeated}
       </span>
       <span
         aria-hidden
-        className="pointer-events-none absolute right-3 top-10 bottom-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-zinc-400 [writing-mode:vertical-rl]"
+        className="pointer-events-none absolute right-3 top-10 bottom-10 overflow-hidden whitespace-nowrap font-mono text-[10px] tracking-[0.15em] uppercase text-faint [writing-mode:vertical-rl]"
       >
         {repeated}
       </span>
 
       <div className="absolute inset-10 lg:inset-12 flex flex-col">
-        <Icon className="h-7 w-7 text-black" />
+        <Icon className="h-7 w-7 text-ink" />
         <div className="mt-auto flex flex-col gap-5">
           <h3 className="t-title">
             {card.titleLead} <em className="italic">{card.titleEm}</em>
           </h3>
-          <p className="t-body text-zinc-600">{card.body}</p>
+          <p className="t-body text-body">{card.body}</p>
         </div>
       </div>
     </article>
