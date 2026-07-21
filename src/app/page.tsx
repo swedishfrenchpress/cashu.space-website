@@ -7,7 +7,6 @@ import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 import TabbedFeature from "@/components/tabbed-feature";
 import TapToPay from "@/components/tap-to-pay";
-import Testimonials from "@/components/testimonials";
 
 export default function Home() {
   return (
@@ -59,7 +58,6 @@ export default function Home() {
         <TabbedFeature />
       </div>
       <TapToPay />
-      <Testimonials />
       <div id="implementations">
         <ImplementationsGrid />
       </div>

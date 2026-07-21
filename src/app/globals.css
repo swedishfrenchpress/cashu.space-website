@@ -1482,9 +1482,9 @@ html {
 }
 
 /* ===================================================================
- * Warp-flavored restyle — section eyebrow + feature scroller + video
- * + testimonials. Monochrome throughout: warp's tinted panels become
- * chalk (var(--chalk)) grounds with hair (var(--hair)) rims. Flat, sharp.
+ * Warp-flavored restyle — section eyebrow + feature scroller + video.
+ * Monochrome throughout: warp's tinted panels become chalk
+ * (var(--chalk)) grounds with hair (var(--hair)) rims. Flat, sharp.
  * =================================================================== */
 
 /* Small tracked uppercase label that opens a section — warp's "WHY WARP"
@@ -1725,93 +1725,6 @@ html {
 
 .video-feature__body {
   color: rgba(255, 255, 255, 0.82);
-}
-
-/* -------------------------------------------------------------------
- * Testimonials — flat, sharp, hairline-bordered cards on a Chalk band.
- * The full-bleed Chalk ground (a lightness shift, never a hue) is a quiet
- * rhythm break from the surrounding Paper sections; the white cards read as
- * subtly raised panels, edges held by the Hair hairline. Stays flat — no
- * shadow (No-Shadow Rule).
- * ------------------------------------------------------------------- */
-.testimonials {
-  background-color: var(--chalk); /* Chalk */
-}
-
-.testimonials__head {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.75rem, 1.5vw, 1rem);
-  max-width: 40ch;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
-}
-
-.testimonials__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(1rem, 2vw, 1.5rem);
-}
-
-@media (min-width: 640px) {
-  .testimonials__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1024px) {
-  .testimonials__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.testimonial-card {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1.25rem, 2vw, 1.75rem);
-  padding: clamp(1.5rem, 2.5vw, 2rem);
-  border: 1px solid var(--hair);
-  background-color: var(--card);
-  height: 100%;
-}
-
-.testimonial-card__quote {
-  flex: 1;
-  color: var(--ink);
-}
-
-.testimonial-card__author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.testimonial-card__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  background-color: var(--ink);
-  color: var(--on-ink);
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.8125rem;
-  letter-spacing: 0.02em;
-}
-
-.testimonial-card__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.testimonial-card__name {
-  color: var(--ink);
-}
-
-.testimonial-card__handle {
-  color: var(--muted);
 }
 
 /* ===================================================================
