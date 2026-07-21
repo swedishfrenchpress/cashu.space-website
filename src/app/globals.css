@@ -809,13 +809,12 @@ html {
 }
 
 /*
- * Hero — "Spec opener". RFC-styled asymmetric layout on Paper:
- * editorial eyebrow, Display headline (GT-Standard per CLAUDE.md),
- * lead paragraph, paired CTAs in the left column; right column reserves
- * room for a pixelated protocol visualization (designed later). A faint
- * vertical column ruler runs behind the content and a single hairline
- * sits at the section base — the page reads like the cover of a
- * published specification, not a marketing splash.
+ * Hero — "Spec opener". Single-column layout on Paper: Display headline
+ * (GT-Standard per CLAUDE.md), lead paragraph, and paired CTAs inside the
+ * page shell, with a full-bleed ASCII terrain band running to the section
+ * base. A single hairline closes the section, cropping the terrain like
+ * an RFC figure rule — the page reads like the cover of a published
+ * specification, not a marketing splash.
  */
 .hero-spec {
   position: relative;
@@ -825,7 +824,9 @@ html {
   overflow: hidden;
   /* Clears the sticky glass bar and lets the headline breathe below it. */
   padding-top: clamp(72px, 9vw, 144px);
-  padding-bottom: clamp(64px, 9vw, 160px);
+  /* The terrain band runs flush to the closing hairline. */
+  padding-bottom: 0;
+  border-bottom: 1px solid #e4e4e7;
 }
 
 .hero-spec__inner {
@@ -834,40 +835,6 @@ html {
   display: flex;
   flex-direction: column;
   gap: clamp(2.5rem, 5vw, 4rem);
-}
-
-/* Two-column lede. The wordmark → headline → lead → CTA stack holds the
-   left; the token specimen figure sits in the right column, centred against
-   the text block. Stacks to a single column on mobile (figure below CTA). */
-.hero-spec__top {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2rem, 4vw, 3rem);
-}
-
-@media (min-width: 1024px) {
-  .hero-spec__top {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    align-items: center;
-    column-gap: clamp(2.5rem, 5vw, 5rem);
-  }
-}
-
-/* Right column — the RFC figure. On mobile it drops below the CTA, capped so
-   the portrait 4:5 specimen never becomes a full-width monolith; on desktop
-   it fills its grid cell. */
-.hero-spec__art {
-  width: 100%;
-  max-width: min(360px, 100%);
-  align-self: flex-start;
-}
-
-@media (min-width: 1024px) {
-  .hero-spec__art {
-    max-width: none;
-    align-self: center;
-  }
 }
 
 .hero-spec__content {
@@ -911,6 +878,39 @@ html {
   flex-wrap: wrap;
   align-items: center;
   gap: clamp(0.75rem, 1.5vw, 1rem);
+}
+
+/*
+ * ASCII terrain band — full-bleed contour field at the hero's base.
+ * Height is a viewport-tuned strip, not a ratio; the top edge dissolves
+ * into the white above via a mask so the terrain reads as emerging from
+ * the page, and the section's bottom hairline crops it like a figure rule.
+ */
+.hero-spec__band {
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+.ascii-field {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: clamp(180px, 26vh, 320px);
+  pointer-events: none;
+  user-select: none;
+  /* The canvas resolves its ctx.font from this computed family. */
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
+}
+
+/* Absolutely positioned so the bitmap size can never feed back into the
+   wrapper's layout size (prevents a ResizeObserver loop). */
+.ascii-field__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /*
@@ -1428,6 +1428,25 @@ html {
   overflow: hidden;
   background-color: #f4f4f5;
   border: 1px solid #e4e4e7;
+}
+
+/* Orb variant of the media panel — centers the 64px thinking-orb and its
+   mono state caption inside the chalk frame so it reads as a labelled
+   spec-figure. */
+.feature-media--orb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* Sized to match .feature-nav__num rather than t-mono (0.875rem). */
+.feature-media__state {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #a1a1aa;
 }
 
 .feature-block__text {

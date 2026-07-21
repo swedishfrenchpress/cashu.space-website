@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { ThinkingOrb, type OrbState } from "thinking-orbs";
 import Reveal from "./reveal";
 
 type TabId = "wallets" | "mints" | "spec" | "tokens";
@@ -15,6 +16,7 @@ type Tab = {
   href: string;
   external?: boolean;
   image: string;
+  state: OrbState;
 };
 
 const TABS: Tab[] = [
@@ -27,6 +29,7 @@ const TABS: Tab[] = [
     cta: "Explore wallets",
     href: "/wallets",
     image: "/canyon.jpg",
+    state: "working",
   },
   {
     id: "mints",
@@ -37,6 +40,7 @@ const TABS: Tab[] = [
     cta: "Explore mints",
     href: "/mints",
     image: "/forest.jpg",
+    state: "searching",
   },
   {
     id: "spec",
@@ -48,6 +52,7 @@ const TABS: Tab[] = [
     href: "https://docs.cashu.space/",
     external: true,
     image: "/peaks.jpg",
+    state: "solving",
   },
   {
     id: "tokens",
@@ -58,6 +63,7 @@ const TABS: Tab[] = [
     cta: "Understand tokens",
     href: "/tokens",
     image: "/flatiron-ascii.jpg",
+    state: "shaping",
   },
 ];
 
@@ -145,10 +151,18 @@ export default function TabbedFeature() {
                 className="feature-block"
               >
                 <Reveal variant="fade" slow>
-                  {/* Placeholder: chalk box (background + hair rim from
-                      .feature-media). Swap back to <Image src={tab.image}> when
-                      real art is ready. */}
-                  <div className="feature-media" aria-hidden />
+                  {/* Spec-diagram panel: the chalk frame holds a thinking-orb —
+                      the pillar's state as a dotted instrument reading, with a
+                      mono caption echoing .feature-nav__num so it reads as a
+                      labelled figure. theme is pinned light because the panel
+                      is always chalk regardless of OS scheme. Swap back to
+                      <Image src={tab.image}> when real art is ready. */}
+                  <div className="feature-media feature-media--orb" aria-hidden>
+                    <ThinkingOrb state={tab.state} size={64} theme="light" />
+                    <span className="feature-media__state">
+                      {String(i + 1).padStart(2, "0")} / {tab.state}
+                    </span>
+                  </div>
                 </Reveal>
                 <div className="feature-block__text">
                   <h3 className="t-headline feature-block__title">
