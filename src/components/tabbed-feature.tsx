@@ -39,7 +39,8 @@ const TABS: Tab[] = [
     caption:
       "Mints bridge Lightning and ecash. Run your own, or trust a community-operated one.",
     cta: "Explore mints",
-    href: "/mints",
+    href: "https://bitcoinmints.com",
+    external: true,
     image: "/forest.jpg",
     state: "searching",
   },
@@ -62,7 +63,8 @@ const TABS: Tab[] = [
     caption:
       "Tokens are bearer strings of bitcoin. Send them in a chat, a QR, an email, a file.",
     cta: "Understand tokens",
-    href: "/tokens",
+    href: "https://cashubtc.github.io/nuts/00/",
+    external: true,
     image: "/flatiron-ascii.jpg",
     state: "shaping",
   },
