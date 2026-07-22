@@ -70,7 +70,7 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
                 priority
                 className="site-nav__logo"
               />
-              <span className="t-title">cashu</span>
+              <span className="site-nav__wordmark">Cashu</span>
             </Link>
 
             <ul className="site-nav__list">

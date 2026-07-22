@@ -868,9 +868,8 @@ html {
 
 .footer-disclaimer {
   width: 100%;
-  /* Cap the reading measure — this is a real paragraph, not a one-line legal
-     notice; the site's own 65–75ch rule (PRODUCT.md a11y) applies. */
-  max-width: 72ch;
+  /* Spans the full footer measure, aligning with the signoff, metastrip, and
+     bottom rows above it so the closing band reads as one flush column. */
   color: #a1a1aa;
   text-wrap: pretty;
 }
@@ -1080,6 +1079,17 @@ html {
   color: var(--edge);
   text-decoration: none;
   padding-right: 4px;
+}
+
+/* Brand wordmark — the same Display face and tight tracking as the footer
+   signoff mark (§5), shrunk to bar scale, so the page opens and closes on
+   one consistent "Cashu" letterform rather than the quieter t-title. */
+.site-nav__wordmark {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 /* Cashew logo — preserve the source aspect (slightly taller than wide) and
