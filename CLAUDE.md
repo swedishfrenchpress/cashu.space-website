@@ -14,7 +14,7 @@ This project has a documented design system. Before generating UI, styling compo
 
 - No chromatic accent. Greys shift by lightness, never by hue.
 - No `box-shadow` on containers. The system is flat.
-- No gradient text, no side-stripe borders, no glassmorphism.
+- No gradient text, no side-stripe borders. Glass (blur + translucency) exists on exactly two sanctioned surfaces — the navbar and the demo-panel mock UI cards (the "depicted-product exception", DESIGN.md §5) — nowhere else.
 - Three typefaces only — GT-Standard (everything readable), Geist Mono (technical), Geist Pixel Square (protocol notation). No third.
 - Hero headline must be Display: GT-Standard 600, ≥3.75rem, line-height 0.95.
 

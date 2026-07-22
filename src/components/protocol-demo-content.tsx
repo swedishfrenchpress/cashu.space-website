@@ -23,7 +23,9 @@ const TOKEN_TAIL = "dWNzYXQ";
 
 /* Faux file pane, same register as the Spec() centerpiece in
    reference-implementations.tsx: filename strip over Geist Mono body, no
-   window chrome, no syntax colour beyond grey/pixel swaps. Always dark. */
+   window chrome, no syntax colour beyond grey/pixel swaps. Theme-flipping:
+   Card pane + Hair strip resolve to the classic dark pane in the dark
+   ramp and a white file pane in light. */
 function CodePane({
   file,
   meta,
@@ -34,14 +36,14 @@ function CodePane({
   children: ReactNode;
 }) {
   return (
-    <div className="w-full max-w-[560px] border border-zinc-800 bg-[#18181b]">
-      <div className="t-mono flex items-center justify-between gap-6 border-b border-zinc-800 bg-[#27272a] px-4 py-2.5">
-        <span className="truncate text-zinc-400">{file}</span>
-        <span className="hidden whitespace-nowrap text-zinc-500 sm:inline">
+    <div className="w-full max-w-[560px] border border-hair bg-card">
+      <div className="t-mono flex items-center justify-between gap-6 bg-hair px-4 py-2.5">
+        <span className="truncate text-body">{file}</span>
+        <span className="hidden whitespace-nowrap text-muted sm:inline">
           {meta}
         </span>
       </div>
-      <pre className="t-mono overflow-x-auto px-5 py-4 text-zinc-100">
+      <pre className="t-mono overflow-x-auto px-5 py-4 text-ink">
         {children}
       </pre>
     </div>
@@ -49,10 +51,10 @@ function CodePane({
 }
 
 /* Grey comment / pixel artefact spans — the pane's whole highlight grammar.
-   Comments sit at zinc-400: they carry real content ("// redeem a token…")
-   and need AA contrast on #18181b, not decoration-grey. */
+   Comments sit at Mist (muted): they carry real content ("// redeem a
+   token…") and need AA contrast on the pane in both schemes. */
 function C({ children }: { children: ReactNode }) {
-  return <span className="text-zinc-400">{children}</span>;
+  return <span className="text-muted">{children}</span>;
 }
 function P({ children }: { children: ReactNode }) {
   return <span className="t-pixel">{children}</span>;
@@ -154,9 +156,11 @@ ${TOKEN_HEAD}…${TOKEN_TAIL}
 
 /* ------------------------------------------------------------------ ui — */
 
-/* Mock product card — theme-flipping (card/hair/ink), flat, sharp,
-   hairline-divided per the implementations-grid card recipes. Depth comes
-   from the ground contrast, never elevation (No-Shadow Rule). */
+/* Mock product card — liquid glass (the depicted-product exception, see
+   .feature-demo__card in globals.css). Rounded, translucent, blurring the
+   drafting grid behind it: it portrays a wallet/mint app, so it speaks
+   product language the site's RFC chrome never does. Row dividers come
+   from the class, not divide-*. */
 function DemoCard({
   className,
   children,
@@ -165,9 +169,7 @@ function DemoCard({
   children: ReactNode;
 }) {
   return (
-    <div
-      className={`w-full max-w-[340px] divide-y divide-hair border border-hair bg-card text-ink ${className ?? ""}`}
-    >
+    <div className={`feature-demo__card max-w-[340px] text-ink ${className ?? ""}`}>
       {children}
     </div>
   );
@@ -231,7 +233,7 @@ function MintsUi() {
             <span className="t-label feature-demo__quote-unpaid text-muted">
               UNPAID
             </span>
-            <span className="t-label feature-demo__quote-paid bg-ink px-2 text-on-ink">
+            <span className="t-label feature-demo__quote-paid rounded-full bg-ink px-2.5 text-on-ink">
               PAID
             </span>
           </span>

@@ -1664,6 +1664,15 @@ html {
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--dur-base) var(--ease-out-quart);
+  /* Shared ground: 44px hairline graph paper in theme tokens — both views
+     flip with the scheme; the artifact on top (glass card vs file pane)
+     carries the register, not the ground. */
+  background-color: var(--band);
+  background-image:
+    linear-gradient(to right, var(--hair) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hair) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center;
 }
 
 .feature-demo__view.is-active {
@@ -1687,10 +1696,10 @@ html {
 
 /* Overflow safety net only — snippets are authored to fit. If a line ever
    scrolls, the bar must not be the loudest element in the frame: thin and
-   dark to match the always-dark pane. */
+   quiet in the pane's own greys. */
 .feature-demo pre {
   scrollbar-width: thin;
-  scrollbar-color: #3f3f46 transparent;
+  scrollbar-color: var(--ghost) transparent;
 }
 
 .feature-demo pre::-webkit-scrollbar {
@@ -1698,39 +1707,67 @@ html {
 }
 
 .feature-demo pre::-webkit-scrollbar-thumb {
-  background-color: #3f3f46;
+  background-color: var(--ghost);
 }
 
 .feature-demo pre::-webkit-scrollbar-track {
   background-color: transparent;
 }
 
-/* UI ground: Band, not Chalk — in the dark ramp Chalk and Card are the
-   same #18181b and the mock card would vanish into its own ground. The
-   hairline graph paper mirrors the API view's grid in the light register,
-   so both views read as "specimen on grid" and the ground never reads as
-   an unfinished placeholder. Future art: render the tab's image behind
-   the card here (grayscale, fill) in place of the grid. */
+/* UI ground: the shared grid plus two soft monochrome blooms so the
+   liquid-glass card has luminance to refract. Grid layers list first
+   (top); blooms sit beneath. Future art: render the tab's image behind
+   the card here (grayscale, fill) in place of the blooms. */
 .feature-demo__view--ui {
-  background-color: var(--band);
   background-image:
     linear-gradient(to right, var(--hair) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--hair) 1px, transparent 1px);
-  background-size: 44px 44px;
-  background-position: center;
+    linear-gradient(to bottom, var(--hair) 1px, transparent 1px),
+    radial-gradient(
+      90% 80% at 18% 0%,
+      color-mix(in srgb, var(--ghost) 55%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      75% 65% at 92% 100%,
+      color-mix(in srgb, var(--ghost) 45%, transparent),
+      transparent 65%
+    );
+  background-size:
+    44px 44px,
+    44px 44px,
+    100% 100%,
+    100% 100%;
+  background-repeat: repeat, repeat, no-repeat, no-repeat;
 }
 
-/* API ground: always-dark drafting grid. Literals by design — like the
-   --panel surfaces this never flips with the theme. Distinct from the
-   footer's Twilight Stack (doctrine-reserved): no bloom, no grain, just
-   flat hairline graph paper. */
-.feature-demo__view--api {
-  background-color: #0a0a0b;
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-  background-size: 44px 44px;
-  background-position: center;
+/* Liquid-glass mock card — the depicted-product exception. The mock UI
+   inside a demo panel portrays a wallet/mint app, not the site, so it may
+   speak product language the RFC chrome never does: 24px radius,
+   translucency over backdrop blur, a specular top edge. Monochrome still
+   holds (the glass tints nothing), and it casts no drop shadow — depth
+   comes from refraction, not elevation. Everything outside these cards
+   stays sharp and flat. */
+.feature-demo__card {
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  background-color: color-mix(in srgb, var(--card) 60%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  /* --panel-fg is light in both schemes: the specular line reads as a
+     white glint on light and dark glass alike. */
+  box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--panel-fg) 40%, transparent);
+  overflow: hidden;
+}
+
+.feature-demo__card > * + * {
+  border-top: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .feature-demo__card {
+    background-color: color-mix(in srgb, var(--card) 94%, transparent);
+  }
 }
 
 /* Square segmented control — the feature-nav register one size down.

@@ -12,7 +12,9 @@
  */
 export default function TokenQr({ className }: { className?: string }) {
   return (
-    <div className={`bg-white p-3 ${className ?? ""}`}>
+    // Radius follows the glass-card idiom (depicted-product exception);
+    // the quiet zone stays literal white and the modules stay square.
+    <div className={`rounded-2xl bg-white p-3 ${className ?? ""}`}>
       <svg
         viewBox="0 0 53 53"
         role="img"

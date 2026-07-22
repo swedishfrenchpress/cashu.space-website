@@ -57,6 +57,7 @@ typography:
 rounded:
   none: "0"
   card: "16px"
+  glass: "24px"
 spacing:
   xs: "8px"
   sm: "16px"
@@ -107,7 +108,7 @@ components:
 
 cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad. Visitors should feel they are looking at *the* document for Cashu, the way bitcoin.org once felt like *the* document for Bitcoin.
 
-The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no glassmorphism, no animated tickers, no testimonial carousels.
+The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no animated tickers, no testimonial carousels, and no glassmorphism outside its two sanctioned surfaces (the navbar and the demo-panel mock UI cards).
 
 Motion is permitted under one condition: it must depict real protocol structure. The hero overlays mint markers and animated dotted lines between them to show Lightning Network bridging — a true property of the protocol — never a decorative flow. See the Honest-Network Rule in §4.
 
@@ -247,10 +248,12 @@ The Twilight Stack is the system's one allowed atmospheric flourish, and is perm
 
 The four-parts section demonstrates the protocol twice over: a mock product-UI card and the code behind it, flipped by a **square segmented control** (never a rounded pill) floating bottom-center inside the media frame. Rules of the pattern:
 
-- **Two grounds, one grid.** Both views sit on 44px hairline graph paper, centered. The UI view draws it in Hair on Band and flips with the theme; the code view draws it always-dark (`1px rgba(255,255,255,0.07)` lines on `#0a0a0b`). Same drafting-grid language, two registers — mock product on light paper, protocol on dark. The grid is deliberately *not* the Twilight Stack: no bloom, no grain. Twilight stays footer-reserved.
-- **The toggle** is the feature-nav register one size down: uppercase GT 500 at `0.75rem`, `letter-spacing: 0.06em`, active segment inverts to Ink/On-Ink. It carries its own Card ground and Hair rim so it reads on every surface it floats over. Flat — the button lift exception does not extend to it.
+- **One grid, both themes.** Both views sit on the same 44px hairline graph paper (Hair lines on Band), centered, and flip with the theme — there is no always-dark surface in the panel. The UI ground adds two soft Ghost blooms so the glass card has luminance to refract. The grid is deliberately *not* the Twilight Stack: no bloom-to-black, no grain. Twilight stays footer-reserved.
+- **The depicted-product exception (liquid glass).** The mock UI card portrays a wallet or mint *app*, not the site — so it alone may speak product language the RFC chrome never does: `rounded.glass` (24px) corners, translucency over `backdrop-filter` blur, a specular top-edge glint, pill-shaped state chips, a rounded QR tile. Constraints that keep it doctrinal: the glass tints nothing (monochrome holds), it casts **no drop shadow** (depth comes from refraction, like the navbar's glass), and nothing outside these mock cards inherits the radius or the blur. Site chrome — including the toggle — stays sharp and flat.
+- **The code pane** is the boxy counterweight: sharp corners, Card ground, Hair tab-strip, Ink text, Mist comments. It flips with the theme (white file pane on light, the classic dark pane on dark) — same register, two keys.
+- **The toggle** is the feature-nav register one size down: uppercase GT 500 at `0.75rem`, `letter-spacing: 0.06em`, active segment inverts to Ink/On-Ink. It carries its own Card ground and Hair rim so it reads on every surface it floats over. Flat and square — neither the button lift nor the glass exception extends to it.
 - **Honest content.** Everything protocol-shaped in a demo panel is real spec data: real NUT examples, a decodable token, request/response bodies verbatim from the NUTs. Mock UI, real protocol.
-- **QR codes never theme-flip.** Modules stay black on a literal-white quiet-zone chip in both schemes — inverted QRs fail scanners, and a scannable code is the point.
+- **QR codes never theme-flip.** Modules stay black on a literal-white quiet-zone tile in both schemes — inverted QRs fail scanners, and a scannable code is the point.
 
 ## 6. Do's and Don'ts
 
