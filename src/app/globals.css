@@ -1659,6 +1659,145 @@ html {
   display: block;
 }
 
+/*
+ * In the press — dark closing band of press cards (see in-the-press.tsx).
+ * A horizontal snap-track shows three cards at lg; the top-right pager
+ * scrolls it. Photos are the site's only rasters, held to the No-Colour
+ * Rule by grayscale(); wordmarks are forced to Paper like the footer marks.
+ * A hairline top rule separates it from the black section it follows.
+ */
+.press {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.press-nav {
+  display: inline-flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.press-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-base) var(--ease-out-quart),
+    opacity var(--dur-base) var(--ease-out-quart);
+}
+
+.press-arrow:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.press-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.press-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+@media (min-width: 1024px) {
+  .press-track {
+    gap: 24px;
+  }
+}
+
+.press-card {
+  flex: 0 0 86%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .press-card {
+    flex-basis: calc((100% - 16px) / 2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .press-card {
+    flex-basis: calc((100% - 48px) / 3);
+  }
+}
+
+.press-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.press-media__img {
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05);
+  transition:
+    transform var(--dur-base) var(--ease-out-quart),
+    filter var(--dur-base) var(--ease-out-quart);
+}
+
+.press-card:hover .press-media__img {
+  transform: scale(1.04);
+  filter: grayscale(1) contrast(1.08) brightness(1.08);
+}
+
+.press-card__title {
+  /* Clamp long headlines so every card's wordmark aligns on one baseline. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.press-logo {
+  margin-top: auto;
+  height: 24px;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  object-position: left center;
+  /* Force any brand colour to Paper on the Ink ground. */
+  filter: brightness(0) invert(1);
+  opacity: 0.82;
+  transition: opacity var(--dur-base) var(--ease-out-quart);
+}
+
+.press-card:hover .press-logo {
+  opacity: 1;
+}
+
+.press-logo--tall {
+  height: 30px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press-track {
+    scroll-behavior: auto;
+  }
+  .press-media__img,
+  .press-card:hover .press-media__img {
+    transition: none;
+    transform: none;
+  }
+}
+
 .feature-block__text {
   display: flex;
   flex-direction: column;

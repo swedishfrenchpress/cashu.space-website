@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AsciiField from "@/components/ascii-field";
 import ImplementationsGrid from "@/components/implementations-grid";
+import InThePress from "@/components/in-the-press";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
@@ -62,6 +63,7 @@ export default function Home() {
         <ImplementationsGrid />
       </div>
       <ReferenceImplementations />
+      <InThePress />
       <SiteFooter />
     </div>
   );
