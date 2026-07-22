@@ -14,7 +14,7 @@ import { useEffect, useRef } from "react";
  * same letterform on every platform, no system-font fallback. If the
  * font ever gains a native ₿ (probed at runtime), it takes over.
  *
- * Theme: resolves like the site CSS (and thinking-orbs) — an html
+ * Theme: resolves like the site CSS — an html
  * data-theme="dark|light" attribute wins, else prefers-color-scheme —
  * and repaints live when either changes. Light ink on dark paper, dark
  * ink on light paper; the zinc ramp mirrors.
@@ -119,8 +119,8 @@ export default function AsciiField({ className }: { className?: string }) {
     const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reduced = mqReduce.matches;
 
-    /* Same resolution order as the CSS tokens and thinking-orbs' auto mode:
-       html data-theme wins, else the OS scheme. */
+    /* Same resolution order as the CSS tokens: html data-theme wins, else
+       the OS scheme. */
     const mqDark = window.matchMedia("(prefers-color-scheme: dark)");
     const resolveDark = () => {
       const t = document.documentElement.dataset.theme;

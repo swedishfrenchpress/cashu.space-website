@@ -5,8 +5,8 @@
  * zinc scale mirrored about its middle (greys shift by lightness, never
  * hue — the No-Colour Rule holds in both schemes). The scheme follows
  * the OS setting via prefers-color-scheme; a `data-theme="dark|light"`
- * attribute on <html> overrides it (the Tailwind/shadcn convention,
- * also watched by thinking-orbs) — useful for testing and any future
+ * attribute on <html> overrides it (the Tailwind/shadcn convention) —
+ * useful for testing and any future
  * manual toggle.
  *
  * Ink-ground surfaces (footer, the black showcase panels, video band)
@@ -226,6 +226,7 @@
   --color-muted: var(--muted);
   --color-body: var(--body);
   --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
   --color-panel: var(--panel);
   --color-panel-hair: var(--panel-hair);
   --color-panel-fg: var(--panel-fg);
@@ -1635,28 +1636,223 @@ html {
   border: 1px solid var(--hair);
 }
 
-/* Orb variant of the media panel — the panel-scale orb figure fills the
-   chalk frame (OrbFigure measures this box and sizes its canvas to the
-   shorter edge). */
-.feature-media--orb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Demo variant of the media panel — griffin-style UI/API switcher (see
+   protocol-demo.tsx). Two stacked views crossfade inside the chalk frame;
+   a square segmented control floats bottom-center. Mobile relaxes the
+   16:10 to a taller frame so the code pane fits without inner scrolling. */
+.feature-demo {
+  aspect-ratio: 4 / 5;
 }
 
-.orb-figure {
+@media (min-width: 640px) {
+  .feature-demo {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+.feature-demo__view {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  /* The searching orb's ₿ painter resolves its ctx.font from this
-     computed family (same pattern as .ascii-field). */
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  /* `safe` so an overflowing child resolves into the padded area instead
+     of cropping symmetrically past both edges (which ate the pane's
+     filename strip and ran code under the toggle). */
+  align-items: safe center;
+  justify-content: safe center;
+  padding: clamp(16px, 4vw, 40px);
+  padding-bottom: 64px; /* clears the floating toggle */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-out-quart);
 }
 
-.orb-figure__canvas {
-  display: block;
+.feature-demo__view.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Pane type scale — one step down from .t-mono (13px) so eight lines of
+   spec clear the 16:10 frame at the lg column width; pixel spans match so
+   mixed lines don't jump size mid-line. Element+class beats the bare .t-*
+   role classes on specificity. */
+.feature-demo pre.t-mono {
+  font-size: 0.8125rem;
+  line-height: 1.4rem;
+}
+
+.feature-demo pre .t-pixel {
+  font-size: 0.8125rem;
+  line-height: 1.4rem;
+}
+
+/* Overflow safety net only — snippets are authored to fit. If a line ever
+   scrolls, the bar must not be the loudest element in the frame: thin and
+   dark to match the always-dark pane. */
+.feature-demo pre {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+.feature-demo pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.feature-demo pre::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+}
+
+.feature-demo pre::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* UI ground: Band, not Chalk — in the dark ramp Chalk and Card are the
+   same #18181b and the mock card would vanish into its own ground. The
+   hairline graph paper mirrors the API view's grid in the light register,
+   so both views read as "specimen on grid" and the ground never reads as
+   an unfinished placeholder. Future art: render the tab's image behind
+   the card here (grayscale, fill) in place of the grid. */
+.feature-demo__view--ui {
+  background-color: var(--band);
+  background-image:
+    linear-gradient(to right, var(--hair) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hair) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center;
+}
+
+/* API ground: always-dark drafting grid. Literals by design — like the
+   --panel surfaces this never flips with the theme. Distinct from the
+   footer's Twilight Stack (doctrine-reserved): no bloom, no grain, just
+   flat hairline graph paper. */
+.feature-demo__view--api {
+  background-color: #0a0a0b;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center;
+}
+
+/* Square segmented control — the feature-nav register one size down.
+   Carries its own opaque Card ground + Hair rim so it reads on all four
+   surface combinations (light/dark theme × UI/API view). Flat: the
+   No-Shadow Rule holds, only .btn-* lift. */
+.feature-demo__toggle {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--card);
+  border: 1px solid var(--hair);
+}
+
+.feature-demo__toggle-btn {
+  border: 0;
+  background: transparent;
+  padding: 7px 16px;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    color var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.feature-demo__toggle-btn:hover {
+  color: var(--ink);
+}
+
+.feature-demo__toggle-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* Offset 0, not .focus-ring's 4px: at 4px the ring would land on the dark
+   grid ground where light-mode --edge (#000) vanishes; at 0 it draws on
+   the control's own Card chip, which always contrasts with --edge. */
+.feature-demo__toggle-btn:focus-visible {
+  outline: 2px solid var(--edge);
+  outline-offset: 0;
+}
+
+/* Mints quote chip — a real NUT-23 lifecycle: UNPAID settles to PAID,
+   once. The animation is paused until the panel's Reveal wrapper marks it
+   in view, then runs a single cycle and holds — a quote never un-pays
+   (Honest-Network Rule). Base state is the settled PAID, so reduced
+   motion (animation: none) shows it statically. The fades are staggered
+   (UNPAID fully out before PAID lands) to avoid a muddy both-half-visible
+   frame mid-swap. */
+.feature-demo__quote {
+  display: inline-grid;
+  justify-items: end;
+}
+
+.feature-demo__quote > span {
+  grid-area: 1 / 1;
+}
+
+.feature-demo__quote-unpaid {
+  opacity: 0;
+  animation: feature-demo-quote-unpaid 6s linear both paused;
+}
+
+.feature-demo__quote-paid {
+  opacity: 1;
+  animation: feature-demo-quote-paid 6s linear both paused;
+}
+
+.reveal.is-revealed .feature-demo__quote-unpaid,
+.reveal.is-revealed .feature-demo__quote-paid {
+  animation-play-state: running;
+}
+
+@keyframes feature-demo-quote-unpaid {
+  0%,
+  62% {
+    opacity: 1;
+  }
+  72%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes feature-demo-quote-paid {
+  0%,
+  70% {
+    opacity: 0;
+  }
+  80%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Touch: the two segments must each clear the 44px minimum target. */
+@media (pointer: coarse) {
+  .feature-demo__toggle-btn {
+    padding: 13px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-demo__view,
+  .feature-demo__toggle-btn {
+    transition: none;
+  }
+
+  .feature-demo__quote-unpaid,
+  .feature-demo__quote-paid {
+    animation: none;
+  }
 }
 
 /*

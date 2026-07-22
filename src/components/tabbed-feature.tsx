@@ -2,14 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { type OrbState } from "thinking-orbs";
-import OrbFigure from "./orb-figure";
+import ProtocolDemo, { type DemoId } from "./protocol-demo";
 import Reveal from "./reveal";
 
-type TabId = "wallets" | "mints" | "spec" | "tokens";
-
 type Tab = {
-  id: TabId;
+  id: DemoId;
   label: string;
   title: string;
   caption: string;
@@ -17,7 +14,6 @@ type Tab = {
   href: string;
   external?: boolean;
   image: string;
-  state: OrbState;
 };
 
 const TABS: Tab[] = [
@@ -30,7 +26,6 @@ const TABS: Tab[] = [
     cta: "Explore wallets",
     href: "/wallets",
     image: "/canyon.jpg",
-    state: "working",
   },
   {
     id: "mints",
@@ -42,7 +37,6 @@ const TABS: Tab[] = [
     href: "https://bitcoinmints.com",
     external: true,
     image: "/forest.jpg",
-    state: "searching",
   },
   {
     id: "spec",
@@ -54,7 +48,6 @@ const TABS: Tab[] = [
     href: "https://docs.cashu.space/",
     external: true,
     image: "/peaks.jpg",
-    state: "solving",
   },
   {
     id: "tokens",
@@ -66,7 +59,6 @@ const TABS: Tab[] = [
     href: "https://cashubtc.github.io/nuts/00/",
     external: true,
     image: "/flatiron-ascii.jpg",
-    state: "shaping",
   },
 ];
 
@@ -154,14 +146,12 @@ export default function TabbedFeature() {
                 className="feature-block"
               >
                 <Reveal variant="fade" slow>
-                  {/* Spec-diagram panel: the chalk frame holds the pillar's
-                      thinking-orb at panel scale — the dotted instrument
-                      reading nearly fills the frame (see OrbFigure). Swap
-                      back to <Image src={tab.image}> when real art is
-                      ready. */}
-                  <div className="feature-media feature-media--orb" aria-hidden>
-                    <OrbFigure state={tab.state} />
-                  </div>
+                  {/* Demo panel: mock product UI ↔ protocol code behind a
+                      UI/API toggle (griffin-style). When real art lands,
+                      tab.image renders behind the UI card — see
+                      .feature-demo__view--ui. Interactive, so no
+                      aria-hidden here. */}
+                  <ProtocolDemo demo={tab.id} label={tab.label} />
                 </Reveal>
                 <div className="feature-block__text">
                   <h3 className="t-headline feature-block__title">

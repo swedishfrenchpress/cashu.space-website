@@ -243,6 +243,15 @@ The page-closing CTA and the site footer share one continuous treatment so the b
 
 The Twilight Stack is the system's one allowed atmospheric flourish, and is permitted only because it (a) stays inside the grey ramp and (b) serves a structural purpose: signalling the end of the page.
 
+### Signature: The Demo Panel (UI/API)
+
+The four-parts section demonstrates the protocol twice over: a mock product-UI card and the code behind it, flipped by a **square segmented control** (never a rounded pill) floating bottom-center inside the media frame. Rules of the pattern:
+
+- **Two grounds, one grid.** Both views sit on 44px hairline graph paper, centered. The UI view draws it in Hair on Band and flips with the theme; the code view draws it always-dark (`1px rgba(255,255,255,0.07)` lines on `#0a0a0b`). Same drafting-grid language, two registers — mock product on light paper, protocol on dark. The grid is deliberately *not* the Twilight Stack: no bloom, no grain. Twilight stays footer-reserved.
+- **The toggle** is the feature-nav register one size down: uppercase GT 500 at `0.75rem`, `letter-spacing: 0.06em`, active segment inverts to Ink/On-Ink. It carries its own Card ground and Hair rim so it reads on every surface it floats over. Flat — the button lift exception does not extend to it.
+- **Honest content.** Everything protocol-shaped in a demo panel is real spec data: real NUT examples, a decodable token, request/response bodies verbatim from the NUTs. Mock UI, real protocol.
+- **QR codes never theme-flip.** Modules stay black on a literal-white quiet-zone chip in both schemes — inverted QRs fail scanners, and a scannable code is the point.
+
 ## 6. Do's and Don'ts
 
 ### Do
