@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { MODE_DRAWS, resolvePreset, type OrbState } from "thinking-orbs";
 
+import { drawBtcGlobe } from "./btc-globe";
+
 /**
  * OrbFigure — a thinking-orb rendered at panel scale. The package's
  * <ThinkingOrb> ships two tuned sizes (64/20) and CSS-scaling its bitmap
@@ -11,6 +13,10 @@ import { MODE_DRAWS, resolvePreset, type OrbState } from "thinking-orbs";
  * with the canvas transform magnifying the 64px coordinate space —
  * plain arcs rasterize at device resolution, so the magnified orb
  * stays crisp at any size.
+ *
+ * The searching state swaps in a local painter (btc-globe.ts) that
+ * rebuilds the same globe from ₿ glyphs; the other states stay on the
+ * package's painters.
  *
  * Fills FILL of the shorter panel edge, re-measured by ResizeObserver.
  * Theme resolves like the rest of the site (html data-theme, else the
@@ -33,7 +39,7 @@ export default function OrbFigure({ state }: { state: OrbState }) {
     if (!ctx) return;
 
     const { mode, speed, opts } = resolvePreset(state, BASE);
-    const paint = MODE_DRAWS[mode];
+    const paint = state === "searching" ? drawBtcGlobe : MODE_DRAWS[mode];
 
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     let size = 0;
@@ -117,6 +123,13 @@ export default function OrbFigure({ state }: { state: OrbState }) {
     };
 
     sync();
+    /* The ₿ painter re-measures once webfonts settle; repaint the
+       static frame if the loop isn't running (reduced motion). */
+    if (state === "searching") {
+      document.fonts.ready.then(() => {
+        if (!disposed && !rafId) draw(currentT());
+      });
+    }
     ro.observe(wrap);
     io.observe(wrap);
     mo.observe(document.documentElement, {

@@ -1640,6 +1640,9 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* The searching orb's ₿ painter resolves its ctx.font from this
+     computed family (same pattern as .ascii-field). */
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
 .orb-figure__canvas {
