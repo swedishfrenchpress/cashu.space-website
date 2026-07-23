@@ -51,6 +51,37 @@
   --page-x: clamp(24px, 6vw, 96px);
 
   /*
+   * Sticky-bar height. The bar occupies flow space, so a viewport-height hero
+   * has to subtract it to land its closing hairline on the fold.
+   *
+   * Measured, not derived — the two breakpoints genuinely differ:
+   *
+   *   below lg  68px nav row (14px padding x2 + the 40px toggle) + 20px from
+   *             the CLOSED .site-nav-panel + 1px hairline = 89px. The panel
+   *             is not actually 0-height when shut: .site-nav-panel__inner
+   *             carries `padding: 4px 0 16px`, and padding is not clipped by
+   *             the `grid-template-rows: 0fr` collapse, so 20px leaks.
+   *   lg and up 14px padding x2 + the ~41.6px .btn-secondary GitHub CTA
+   *             (NOT the 40px .theme-toggle — the padding trim at
+   *             `.site-nav .btn-primary` deliberately spares .btn-secondary)
+   *             + 1px hairline = 70.6px, rounded up to 71.
+   *
+   * Always round UP when re-measuring. Erring short leaves a harmless sliver
+   * of the next section showing; erring long hides the closing hairline under
+   * the fold, which is the entire bug this token exists to fix.
+   */
+  --nav-h: 89px;
+
+  /*
+   * Ceiling on the viewport-filling hero. The hero's fixed parts top out
+   * (headline caps at 6.5rem, terrain band at 320px), so past this height the
+   * surplus above the band stops reading as air and starts reading as a void.
+   * Beyond the cap the hero simply stops chasing the viewport and the next
+   * section peeks in — the pre-viewport-fill behaviour, never worse.
+   */
+  --hero-max: 1200px;
+
+  /*
    * Section cadence — DESIGN.md Principle 4 (Editorial pacing). Sections
    * earn different rhythms by narrative weight, not by reflex. Vertical
    * padding is fluid (clamp) so wide monitors breathe and phones crunch.
@@ -62,6 +93,15 @@
   --section-tight: clamp(40px, 5vw, 96px);
   --section-default: clamp(64px, 9vw, 160px);
   --section-air: clamp(96px, 12vw, 200px);
+}
+
+/* The bar sheds the mobile panel and gains the GitHub CTA at lg, which nets
+   out 18px shorter. Mirrors the `max-width: 1023.98px` boundary the nav's own
+   rules use — keep the two in step. */
+@media (min-width: 1024px) {
+  :root {
+    --nav-h: 71px;
+  }
 }
 
 /* Dark ramp — declared twice because a media query and an attribute
@@ -938,13 +978,34 @@ html {
  * base. A single hairline closes the section, cropping the terrain like
  * an RFC figure rule — the page reads like the cover of a published
  * specification, not a marketing splash.
+ *
+ * The section fills one viewport height (less the sticky bar, capped at
+ * --hero-max) and anchors the band to its base, so that closing hairline
+ * resolves ON the fold rather than floating above it with dead ground
+ * below. Title at the top, horizon at the bottom: a spec cover, not a
+ * stripe adrift mid-page.
  */
 .hero-spec {
   position: relative;
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
   background-color: var(--paper);
   color: var(--ink);
   overflow: hidden;
+  /*
+   * svh, not vh or dvh: vh overflows behind the mobile URL bar, and dvh
+   * reflows every time that bar collapses — which would retrigger the
+   * band's ResizeObserver and redraw the canvas on every scroll. svh holds
+   * still. The vh line below is the fallback for pre-2022 engines and is
+   * overwritten wherever svh parses.
+   *
+   * min-height, not height: on short viewports the hero grows past the fold
+   * and scrolls like any section, instead of crushing the headline into the
+   * terrain.
+   */
+  min-height: min(calc(100vh - var(--nav-h)), var(--hero-max));
+  min-height: min(calc(100svh - var(--nav-h)), var(--hero-max));
   /* Clears the sticky glass bar and lets the headline breathe below it. */
   padding-top: clamp(72px, 9vw, 144px);
   /* The terrain band runs flush to the closing hairline. */
@@ -958,6 +1019,19 @@ html {
   display: flex;
   flex-direction: column;
   gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+/*
+ * The band ships wrapped in a Reveal, so the hero's second flex child is that
+ * wrapper, not .ascii-field itself. An auto top margin drops it to the
+ * section's base: surplus viewport height collects as air ABOVE the terrain,
+ * never inside it, and the band keeps its own height at every screen size.
+ *
+ * Child combinator on purpose — the headline / body / CTA Reveals are nested
+ * inside .hero-spec__inner and must not pick this up.
+ */
+.hero-spec > .reveal {
+  margin-top: auto;
 }
 
 .hero-spec__content {

@@ -198,6 +198,8 @@ This scoping is intentional and doctrinal: the Open Specification north star rej
 
 **The Hairline Rule.** Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.
 
+**The Fold-Line Rule.** The hero fills one viewport height (`min(100svh - var(--nav-h), var(--hero-max))`) and anchors the terrain band to its base, so the closing hairline resolves *on* the fold rather than floating above it with dead ground below. Surplus height collects as air between the CTA row and the band — that gap is load-bearing composition, not a spacing bug, and must not be "corrected" by growing the band or centring the text. Two bounds keep it honest: `--nav-h` is subtracted because the bar is sticky and occupies flow space, and `--hero-max` (1200px) stops the chase on very tall displays, where an uncapped hero would open a void instead of a horizon. Past the cap the next section peeks in, which is the intended degradation.
+
 **The Honest-Network Rule.** Network visualisations and motion are permitted *only when they reflect real protocol structure*. Acceptable: Lightning Network bridges shown as animated dotted lines between mint markers; peer-to-peer token transfer between users. Forbidden: decorative flow, speculative connections, "mints talking to mints" (which Cashu doesn't do), or any animation that exists for aesthetic energy rather than to convey a true property of the protocol. When in doubt, the simpler static version is more honest than the animated one.
 
 ## 5. Components
