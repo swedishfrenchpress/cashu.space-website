@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import TokenQr from "./token-qr";
+import Image from "next/image";
 
 /**
  * Content for the four ProtocolDemo panels: a mock product-UI card and a
@@ -156,129 +156,104 @@ ${TOKEN_HEAD}…${TOKEN_TAIL}
 
 /* ------------------------------------------------------------------ ui — */
 
-/* Mock product card — liquid glass (the depicted-product exception, see
-   .feature-demo__card in globals.css). Rounded, translucent, blurring the
-   drafting grid behind it: it portrays a wallet/mint app, so it speaks
-   product language the site's RFC chrome never does. Row dividers come
-   from the class, not divide-*. */
-function DemoCard({
-  className,
-  children,
+/* Real product screenshot — the depicted-product exception's other half.
+   Both theme variants mount; CSS (the same data-theme/media-query cascade
+   as the navbar's sun/moon swap, see .feature-demo__shot-img) shows only
+   the one matching the active scheme, so the pick never depends on client
+   JS or causes a hydration mismatch. width/height are the crop's real
+   pixel size — object-contain then scales it to fit the frame. */
+function Shot({
+  light,
+  dark,
+  width,
+  height,
+  alt,
 }: {
-  className?: string;
-  children: ReactNode;
+  light: string;
+  dark: string;
+  width: number;
+  height: number;
+  alt: string;
 }) {
   return (
-    <div className={`feature-demo__card max-w-[340px] text-ink ${className ?? ""}`}>
-      {children}
+    <div className="feature-demo__shot">
+      <Image
+        src={light}
+        alt={alt}
+        width={width}
+        height={height}
+        sizes="(max-width: 640px) 90vw, 45vw"
+        className="feature-demo__shot-img feature-demo__shot-img--light"
+      />
+      <Image
+        src={dark}
+        alt={alt}
+        width={width}
+        height={height}
+        sizes="(max-width: 640px) 90vw, 45vw"
+        className="feature-demo__shot-img feature-demo__shot-img--dark"
+      />
     </div>
   );
 }
 
-/* Label / value row. Values are protocol notation → pixel or mono. */
-function DemoRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 px-5 py-3">
-      <span className="t-label text-muted">{label}</span>
-      {children}
-    </div>
-  );
-}
+/* All four screenshots share one crop size: 1024×768, pre-cropped and
+   arranged (light/dark) outside this repo. */
+const SHOT_WIDTH = 1024;
+const SHOT_HEIGHT = 768;
 
+/* Wallets — the wallet's home screen: mint pill, balance, Receive/Send,
+   recent activity. */
 function WalletsUi() {
   return (
-    <DemoCard>
-      <div className="flex items-baseline justify-between gap-4 px-5 py-3">
-        <span className="t-mono text-muted">mint.example.com</span>
-        <span className="t-label uppercase text-muted">Wallet</span>
-      </div>
-      <div className="px-5 py-6">
-        <span className="t-label block text-muted">Balance</span>
-        {/* Stat-scale one-off: protocol notation at display size, per the
-            type-system header's justified-one-off allowance. Inline style
-            because .t-pixel's own font-size beats utility classes. */}
-        <span className="t-pixel mt-3 block" style={{ fontSize: "2rem" }}>
-          2,048 <span style={{ fontSize: "1rem" }}>SAT</span>
-        </span>
-      </div>
-      <DemoRow label="Received">
-        <span className="t-pixel">+512 SAT</span>
-      </DemoRow>
-      <DemoRow label="Sent">
-        <span className="t-pixel text-muted">−128 SAT</span>
-      </DemoRow>
-    </DemoCard>
+    <Shot
+      light="/demo/wallets-light.jpg"
+      dark="/demo/wallets-dark.jpg"
+      width={SHOT_WIDTH}
+      height={SHOT_HEIGHT}
+      alt="A wallet home screen showing a bitcoin balance in ecash, with Receive and Send actions"
+    />
   );
 }
 
+/* Mints — the actual Mints tab of a Cashu wallet app: connected mints,
+   balances, Add Mint / Discover Mints. */
 function MintsUi() {
   return (
-    <DemoCard>
-      <div className="flex items-baseline justify-between gap-4 px-5 py-3">
-        <span className="t-title">Bob&apos;s Cashu mint</span>
-        <span className="t-label uppercase text-muted">Mint</span>
-      </div>
-      <DemoRow label="Version">
-        <span className="t-pixel">Nutshell/0.20.3</span>
-      </DemoRow>
-      <DemoRow label="Supports">
-        <span className="t-mono text-body">NUT-04 · 05 · 07</span>
-      </DemoRow>
-      <DemoRow label="Quote">
-        <span className="flex items-baseline gap-3">
-          <span className="t-pixel">019e6d5a…</span>
-          {/* UNPAID → PAID, a real quote lifecycle (NUT-23). CSS-driven;
-              reduced motion shows the settled PAID state statically. */}
-          <span className="feature-demo__quote" aria-hidden>
-            <span className="t-label feature-demo__quote-unpaid text-muted">
-              UNPAID
-            </span>
-            <span className="t-label feature-demo__quote-paid rounded-full bg-ink px-2.5 text-on-ink">
-              PAID
-            </span>
-          </span>
-          <span className="sr-only">PAID</span>
-        </span>
-      </DemoRow>
-    </DemoCard>
+    <Shot
+      light="/demo/mints-light.jpg"
+      dark="/demo/mints-dark.jpg"
+      width={SHOT_WIDTH}
+      height={SHOT_HEIGHT}
+      alt="The Mints screen of a Cashu wallet, listing connected mints with their balances"
+    />
   );
 }
 
+/* Spec — the wallet's NUT-11 P2PK screen: your key, Show QR, Reveal key. */
 function SpecUi() {
   return (
-    <DemoCard>
-      <div className="flex items-baseline justify-between gap-4 px-5 py-3">
-        <span className="t-title">Locked to a key</span>
-        <span className="t-label uppercase text-muted">NUT-11</span>
-      </div>
-      <DemoRow label="Pubkey">
-        <span className="t-pixel">0249…57a7</span>
-      </DemoRow>
-      <DemoRow label="sigflag">
-        <span className="t-pixel">SIG_INPUTS</span>
-      </DemoRow>
-      <DemoRow label="Unlocks with">
-        <span className="t-label">1 signature</span>
-      </DemoRow>
-    </DemoCard>
+    <Shot
+      light="/demo/spec-light.jpg"
+      dark="/demo/spec-dark.jpg"
+      width={SHOT_WIDTH}
+      height={SHOT_HEIGHT}
+      alt="A wallet screen showing a key locked to the user's ecash, with Show QR and Reveal key actions"
+    />
   );
 }
 
+/* Tokens — the wallet's Pending Ecash sheet: the token as a QR code plus
+   its amount. */
 function TokensUi() {
   return (
-    <DemoCard className="max-w-[240px]">
-      {/* Sized so QR + amount + token string clear the frame's 64px toggle
-          zone — the card must never run under the floating control. */}
-      <div className="flex flex-col items-center gap-3 px-5 py-5">
-        <TokenQr className="w-full max-w-[140px]" />
-        <span className="t-pixel" style={{ fontSize: "1.25rem" }}>
-          1 SAT
-        </span>
-        <span className="t-mono text-muted">
-          {TOKEN_HEAD.slice(0, 10)}…{TOKEN_TAIL}
-        </span>
-      </div>
-    </DemoCard>
+    <Shot
+      light="/demo/tokens-light.jpg"
+      dark="/demo/tokens-dark.jpg"
+      width={SHOT_WIDTH}
+      height={SHOT_HEIGHT}
+      alt="A pending ecash token shown as a QR code with its amount beneath it"
+    />
   );
 }
 

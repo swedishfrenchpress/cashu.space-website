@@ -25,7 +25,7 @@ const TABS: Tab[] = [
       "Independent, open-source, and free. Run a cashu wallet on iOS, Android, or in the browser.",
     cta: "Explore wallets",
     href: "/wallets",
-    image: "/canyon.jpg",
+    image: "/demo/bg-forest.jpg",
   },
   {
     id: "mints",
@@ -36,7 +36,7 @@ const TABS: Tab[] = [
     cta: "Explore mints",
     href: "https://bitcoinmints.com",
     external: true,
-    image: "/forest.jpg",
+    image: "/demo/bg-canyon.jpg",
   },
   {
     id: "spec",
@@ -47,7 +47,7 @@ const TABS: Tab[] = [
     cta: "Read the spec",
     href: "https://docs.cashu.space/",
     external: true,
-    image: "/peaks.jpg",
+    image: "/demo/bg-peaks.jpg",
   },
   {
     id: "tokens",
@@ -58,7 +58,7 @@ const TABS: Tab[] = [
     cta: "Understand tokens",
     href: "https://cashubtc.github.io/nuts/00/",
     external: true,
-    image: "/flatiron-ascii.jpg",
+    image: "/demo/bg-wave.jpg",
   },
 ];
 
@@ -147,11 +147,10 @@ export default function TabbedFeature() {
               >
                 <Reveal variant="fade" slow>
                   {/* Demo panel: mock product UI ↔ protocol code behind a
-                      UI/API toggle (griffin-style). When real art lands,
-                      tab.image renders behind the UI card — see
-                      .feature-demo__view--ui. Interactive, so no
-                      aria-hidden here. */}
-                  <ProtocolDemo demo={tab.id} label={tab.label} />
+                      UI/API toggle (griffin-style). tab.image renders
+                      grayscale behind the UI card — see .feature-demo__photo.
+                      Interactive, so no aria-hidden here. */}
+                  <ProtocolDemo demo={tab.id} label={tab.label} image={tab.image} />
                 </Reveal>
                 <div className="feature-block__text">
                   <h3 className="t-headline feature-block__title">

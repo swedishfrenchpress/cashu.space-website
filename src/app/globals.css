@@ -1714,60 +1714,76 @@ html {
   background-color: transparent;
 }
 
-/* UI ground: the shared grid plus two soft monochrome blooms so the
-   liquid-glass card has luminance to refract. Grid layers list first
-   (top); blooms sit beneath. Future art: render the tab's image behind
-   the card here (grayscale, fill) in place of the blooms. */
+/* UI ground: no grid — the drafting-grid graph paper (.feature-demo__view's
+   own background) is the API pane's register, not the UI pane's. The UI
+   side gets the tab's photo instead (.feature-demo__photo, below); this
+   override just clears the inherited grid so the photo is the only art. */
 .feature-demo__view--ui {
-  background-image:
-    linear-gradient(to right, var(--hair) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--hair) 1px, transparent 1px),
-    radial-gradient(
-      90% 80% at 18% 0%,
-      color-mix(in srgb, var(--ghost) 55%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      75% 65% at 92% 100%,
-      color-mix(in srgb, var(--ghost) 45%, transparent),
-      transparent 65%
-    );
-  background-size:
-    44px 44px,
-    44px 44px,
-    100% 100%,
-    100% 100%;
-  background-repeat: repeat, repeat, no-repeat, no-repeat;
+  background-image: none;
 }
 
-/* Liquid-glass mock card — the depicted-product exception. The mock UI
-   inside a demo panel portrays a wallet/mint app, not the site, so it may
-   speak product language the RFC chrome never does: 24px radius,
-   translucency over backdrop blur, a specular top edge. Monochrome still
-   holds (the glass tints nothing), and it casts no drop shadow — depth
-   comes from refraction, not elevation. Everything outside these cards
-   stays sharp and flat. */
-.feature-demo__card {
+/* The tab's photo (rocks, canyon, peaks, wave) — real art standing in for
+   the old grid+blooms ground, shown at full colour and full opacity (a
+   deliberate exception to the No-Colour Rule — see DESIGN.md — for this
+   depicted-product art only). Sits above .feature-demo__view--ui's own
+   background (band colour only, see above) and below the card/shot
+   (z-index 1, see below). */
+.feature-demo__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Real screenshot — the depicted-product exception, now carried entirely
+   by real art (see Shot in protocol-demo-content.tsx; the coded glass mock
+   it replaced is gone). width+height 100% (not the parent's align-items/
+   justify-content:safe-center default, which only shrink-wraps content)
+   gives it the full padded frame to work with, so the img below can size
+   up to fill it via object-fit rather than rendering at its own small
+   natural/fetched resolution. */
+.feature-demo__shot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  border-radius: 24px;
+  height: 100%;
+}
+
+/* Both theme variants render (see .feature-demo__shot-img--light/--dark
+   below); only one ever has layout. object-fit: contain lets the image
+   grow to fill whichever of width/height binds first, instead of sitting
+   at its native fetched size. No drop shadow, no blur, no rounding — the
+   photo is opaque and runs edge-to-edge inside its own hairline frame. */
+.feature-demo__shot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
-  background-color: color-mix(in srgb, var(--card) 60%, transparent);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  backdrop-filter: blur(24px) saturate(1.4);
-  /* --panel-fg is light in both schemes: the specular line reads as a
-     white glint on light and dark glass alike. */
-  box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--panel-fg) 40%, transparent);
-  overflow: hidden;
 }
 
-.feature-demo__card > * + * {
-  border-top: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
+.feature-demo__shot-img--dark {
+  display: none;
 }
 
-@supports not (backdrop-filter: blur(1px)) {
-  .feature-demo__card {
-    background-color: color-mix(in srgb, var(--card) 94%, transparent);
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .feature-demo__shot-img--light {
+    display: none;
   }
+  :root:not([data-theme="light"]) .feature-demo__shot-img--dark {
+    display: block;
+  }
+}
+
+:root[data-theme="dark"] .feature-demo__shot-img--light {
+  display: none;
+}
+
+:root[data-theme="dark"] .feature-demo__shot-img--dark {
+  display: block;
 }
 
 /* Square segmented control — the feature-nav register one size down.

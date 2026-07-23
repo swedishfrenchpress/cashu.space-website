@@ -16,9 +16,11 @@ export type { DemoId };
 export default function ProtocolDemo({
   demo,
   label,
+  image,
 }: {
   demo: DemoId;
   label: string;
+  image?: string;
 }) {
   // Spec opens on the code side: it self-demonstrates the toggle for the
   // section, and spec-is-the-product means its strongest view IS the code.
@@ -40,6 +42,13 @@ export default function ProtocolDemo({
         aria-hidden={view !== "ui"}
         inert={view !== "ui"}
       >
+        {image ? (
+          <div
+            className="feature-demo__photo"
+            style={{ backgroundImage: `url(${image})` }}
+            aria-hidden
+          />
+        ) : null}
         {entry.ui}
       </div>
       <div
