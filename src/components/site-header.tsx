@@ -23,16 +23,18 @@ const NAV_ITEMS: NavItem[] = [
 
 /**
  * Warp-style top bar. A full-width transparent glass strip pinned to the top
- * of the viewport: logo left, anchor links centered, primary chip right at
+ * of the viewport: logo left, anchor links centered, GitHub chip right at
  * lg+; brand + hamburger toggle below lg, with the panel dropping the four
  * nav items + the GitHub CTA into a glass card beneath the bar. The glass
  * background + backdrop-blur are the navbar's documented exception to the
- * flat doctrine (DESIGN.md §4); the bar and its chip stay square.
+ * flat doctrine (DESIGN.md §4); the bar and its chip stay square. The chip
+ * is secondary by doctrine — GitHub is not one of the two primary jobs
+ * (get a wallet, read the spec; the Two-CTA Rule, DESIGN.md §1).
  */
 export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const ctaClass = onInk ? "btn-primary--on-ink" : "btn-primary";
+  const ctaClass = onInk ? "btn-secondary--on-ink" : "btn-secondary";
 
   // Close the panel on Escape — standard menu accessibility.
   useEffect(() => {

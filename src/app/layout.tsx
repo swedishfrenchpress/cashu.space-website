@@ -43,11 +43,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cashu-space-website.vercel.app"),
-  title: "Cashu",
+  title: "Cashu — Open source electronic cash",
   description:
     "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
   openGraph: {
-    title: "Cashu",
+    title: "Cashu — Open source electronic cash",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
     url: "https://cashu-space-website.vercel.app",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cashu",
+    title: "Cashu — Open source electronic cash",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
     images: ["/og-image.jpg"],

@@ -13,9 +13,10 @@ import Reveal from "./reveal";
  *
  * Three cards show at desktop width; a prev/next pager (top-right, where
  * a "view all" link would sit) scrolls the snap-track to reach the rest.
- * Photos are the site's only raster imagery and are desaturated by CSS to
- * hold the No-Colour Rule; publication wordmarks are forced to Paper via
- * the same brightness(0) invert(1) treatment the footer uses on marks.
+ * Editorial photography reports rather than depicts, so it sits outside
+ * the Depicted-World Exception: photos are desaturated by CSS to hold the
+ * No-Colour Rule, and publication wordmarks are forced to Paper via the
+ * same brightness(0) invert(1) treatment the footer uses on marks.
  */
 
 type Story = {
@@ -111,8 +112,20 @@ export default function InThePress() {
     if (!el) return;
     const card = el.querySelector<HTMLElement>("[data-press-card]");
     const gap = parseFloat(getComputedStyle(el).columnGap) || 24;
-    const delta = card ? card.offsetWidth + gap : el.clientWidth * 0.8;
-    el.scrollBy({ left: dir * delta, behavior: "smooth" });
+    const unit = card ? card.offsetWidth + gap : el.clientWidth * 0.8;
+    // scrollTo an exact card-aligned position rather than scrollBy a delta:
+    // with scroll-snap-type mandatory on the track, a smooth scrollBy gets
+    // resolved back to the nearest snap point (the card it started on) and
+    // the track barely moves. Landing exactly on a snap point keeps the
+    // snap model and the animation in agreement.
+    const idx = Math.round(el.scrollLeft / unit) + dir;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    el.scrollTo({
+      left: Math.max(0, idx * unit),
+      behavior: reduced ? "auto" : "smooth",
+    });
   };
 
   return (

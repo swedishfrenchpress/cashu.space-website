@@ -52,20 +52,26 @@ function MoneyFigure({ className }: { className?: string }) {
   );
 }
 
-function LockFigure({ className }: { className?: string }) {
-  // Shackle arcs in from the left first, then the body, then the keyhole.
-  // The arc draws as a single stroke — that's the satisfying beat.
+function BlindSignatureFigure({ className }: { className?: string }) {
+  // Chaum's carbon-paper envelope — the actual unlinkability mechanism,
+  // not a padlock (padlocks are banned privacy-theater iconography; see
+  // PRODUCT.md anti-references and DESIGN.md §6). The envelope draws
+  // first, then the flap, then the note slipping in half-hidden, and the
+  // mint's signature lands on the outside as the closing beat: signed
+  // without being seen.
   return (
     <svg {...FIGURE_PROPS} className={className}>
+      <rect x="18" y="40" width="84" height="52" className="draw-on" style={drawDelay(0)} pathLength="1" />
+      <path d="M 18 40 L 60 70 L 102 40" className="draw-on" style={drawDelay(240)} pathLength="1" />
+      {/* The note straddles the top edge — mid-insertion, not floating. */}
+      <rect x="46" y="24" width="28" height="16" className="draw-on" style={drawDelay(480)} pathLength="1" />
+      <line x1="51" y1="32" x2="69" y2="32" className="draw-on" style={drawDelay(620)} pathLength="1" />
       <path
-        d="M 38 60 V 46 A 22 22 0 0 1 82 46 V 60"
+        d="M 34 82 C 40 74, 46 90, 52 82 S 64 74, 70 82 S 82 88, 88 80"
         className="draw-on"
-        style={drawDelay(0)}
+        style={drawDelay(760)}
         pathLength="1"
       />
-      <rect x="24" y="60" width="72" height="48" className="draw-on" style={drawDelay(360)} pathLength="1" />
-      <circle cx="60" cy="80" r="4" className="draw-on" style={drawDelay(620)} pathLength="1" />
-      <line x1="60" y1="84" x2="60" y2="94" className="draw-on" style={drawDelay(760)} pathLength="1" />
     </svg>
   );
 }
@@ -158,7 +164,7 @@ export default function ImplementationsGrid() {
           <Reveal slow delay={240} className="md:col-start-2 md:row-start-2">
             <div className="bg-card border border-hair p-6 sm:p-8 lg:p-10 flex flex-col gap-6 min-h-[240px] h-full">
               <div className="flex-1 flex items-center justify-center">
-                <LockFigure className="w-32 h-32 lg:w-40 lg:h-40" />
+                <BlindSignatureFigure className="w-32 h-32 lg:w-40 lg:h-40" />
               </div>
               <div className="flex flex-col gap-3">
                 <h3 className="t-title">Unlinkable payments</h3>

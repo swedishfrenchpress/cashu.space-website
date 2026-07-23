@@ -210,6 +210,18 @@ function Spec() {
 const FEATURED = ["nutshell", "cdk", "coco"] as const;
 const REMAINING = REPOS.length - FEATURED.length;
 
+/* The headline's count is derived from the directory it sits above, so the
+   two can never disagree — nuts (Spec) and awesome-cashu (Resources) are
+   catalogue entries, not implementations. */
+const IMPLEMENTATIONS = REPOS.filter(
+  (r) => r.tag !== "Spec" && r.tag !== "Resources",
+).length;
+const COUNT_WORDS = [
+  "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+] as const;
+const IMPLEMENTATIONS_WORD =
+  COUNT_WORDS[IMPLEMENTATIONS] ?? String(IMPLEMENTATIONS);
+
 function Card() {
   const featured = FEATURED.map((name) => REPOS.find((r) => r.name === name)!);
   return (
@@ -237,15 +249,12 @@ function Card() {
           <span className="t-label text-zinc-500 whitespace-nowrap">{repo.tag}</span>
         </a>
       ))}
+      {/* Non-interactive metadata, not a text-arrow link — the section's
+          single GitHub action is the CTA below the panel. */}
       <div className="px-5 py-4">
-        <a
-          href="https://github.com/cashubtc"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="t-label text-black hover:text-zinc-600 transition-colors focus-ring"
-        >
-          {REMAINING} more on GitHub →
-        </a>
+        <span className="t-label text-zinc-500">
+          + {REMAINING} more in the cashubtc org
+        </span>
       </div>
     </div>
   );
@@ -257,7 +266,9 @@ export default function ReferenceImplementations() {
       <div className="page-shell flex flex-col gap-12 lg:gap-16">
         <div className="flex flex-col gap-6 max-w-[44ch]">
           <Reveal>
-            <h2 className="t-headline">Six implementations, one spec.</h2>
+            <h2 className="t-headline">
+              {IMPLEMENTATIONS_WORD} implementations, one spec.
+            </h2>
           </Reveal>
           <Reveal delay={120}>
             <p className="t-body-lead text-zinc-400">
@@ -292,7 +303,7 @@ export default function ReferenceImplementations() {
               href="https://github.com/cashubtc"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary--on-ink"
+              className="btn-secondary--on-ink"
             >
               View on GitHub
             </a>

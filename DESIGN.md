@@ -42,6 +42,12 @@ typography:
     fontWeight: 500
     lineHeight: 1.4
     letterSpacing: "0"
+  button:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.8125rem"
+    fontWeight: 500
+    lineHeight: 1.2
+    letterSpacing: "0.06em"
   mono:
     fontFamily: "Geist Mono, ui-monospace, SFMono-Regular, monospace"
     fontSize: "0.875rem"
@@ -72,19 +78,19 @@ components:
     backgroundColor: "{colors.ink}"
     textColor: "{colors.paper}"
     rounded: "{rounded.none}"
-    padding: "14px 24px"
-    typography: "{typography.label}"
+    padding: "12px 24px"
+    typography: "{typography.button}"
   button-primary-hover:
     backgroundColor: "{colors.ink-hover}"
     textColor: "{colors.paper}"
   button-secondary:
-    backgroundColor: "{colors.chalk}"
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink-soft}"
     rounded: "{rounded.none}"
-    padding: "10px 20px"
-    typography: "{typography.label}"
+    padding: "12px 24px"
+    typography: "{typography.button}"
   button-secondary-hover:
-    backgroundColor: "{colors.hair}"
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink-soft}"
   nav-link:
     textColor: "{colors.slate}"
@@ -108,18 +114,18 @@ components:
 
 cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad. Visitors should feel they are looking at *the* document for Cashu, the way bitcoin.org once felt like *the* document for Bitcoin.
 
-The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no animated tickers, no testimonial carousels, and no glassmorphism outside its two sanctioned surfaces (the navbar and the demo-panel mock UI cards).
+The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no animated tickers, no testimonial carousels, and no glassmorphism outside its one sanctioned surface (the navbar).
 
 Motion is permitted under one condition: it must depict real protocol structure. The hero overlays mint markers and animated dotted lines between them to show Lightning Network bridging — a true property of the protocol — never a decorative flow. See the Honest-Network Rule in §4.
 
-Color is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.
+Color is intentionally absent from everything the site says in its own voice. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal. The one carve-out is the Depicted-World Exception (§2): artifacts the page *depicts* — real app screenshots, the demo panels' landscape grounds, the tap-to-pay video, third-party marks — keep their source colour, because faking them grey would be its own kind of dishonesty.
 
 **Key Characteristics:**
 
 - Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.
 - Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).
 - Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.
-- Pill buttons, hairline divider, no shadows — depth is conveyed by position and weight, never by elevation.
+- Sharp lifted-slab buttons, hairline divider, no container shadows — depth is conveyed by position and weight; only the button earns a lift.
 - Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast.
 
 **The Two-CTA Rule.** Primary buttons across the site exist to serve two jobs and two only: *get a wallet* and *read the spec*. These are the outcomes PRODUCT.md elevates above mint trust, and the visual hierarchy follows. Every other interactive surface — GitHub, blog, tab switchers, secondary navigation — is a `.btn-secondary` or a `nav-link`. If a third "primary" CTA appears on a single page the page is competing with itself; collapse one before shipping.
@@ -147,7 +153,7 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 **The No-Colour Rule.** The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface "needs" colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch.
 
-**The Hero-Photograph Exception.** The home hero photograph (`/hero-handoff.jpg`) is the single permitted color image on the site — a documentary moment of a Cashu handoff, kept in its source palette so the human gesture carries. Every other photograph still desaturates via `grayscale(1) contrast(1.05)` (see the footer keyboard, phone parallax, and tabbed-feature landscapes). The rule otherwise holds in full: no chromatic accent in type, chrome, backgrounds, borders, icons, or motion.
+**The Depicted-World Exception.** Colour is permitted only inside artifacts the page *depicts*, never in the chrome the site *is*. The sanctioned surfaces, exhaustively: (a) the four-parts demo panels — the landscape photo grounds and the real wallet/mint app screenshots shown over them, including whatever colour the depicted app itself renders; (b) the tap-to-pay video, a documentary capture of real hardware; (c) third-party marks shown at their brand identity — the language logos on the implementations card and the AI-assistant icons in the footer. Everything in the site's own voice — type, backgrounds, borders, buttons, icons, figures, chrome — stays monochrome. Editorial photography *reports* rather than depicts, so it still desaturates via `grayscale(1) contrast(1.05)` and its wordmarks force to Paper (see the press band). A new colour surface that is neither a depicted product artifact nor a third-party mark falls under the No-Colour Rule in full.
 
 **The Two-Black Rule.** Ink (`#000000`) and Ink Soft (`#18181b`) are the only two text colours that may sit on Paper. Slate / Mist / Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.
 
@@ -166,7 +172,8 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 - **Headline** (weight 600, `clamp(2rem, 4vw, 3rem)`, line-height 1.05, letter-spacing −0.015em): Section openings ("What is ecash?", "Wallets", "Mints").
 - **Title** (weight 600, `1.125rem`, line-height 1.3): Subheaders, card titles, anything ranked above body but below a section opening.
 - **Body** (weight 400, `1rem`, line-height 1.5, max line length 65–75ch): All reading copy. Width is enforced; no body paragraph crosses 75ch.
-- **Label** (weight 500, `0.875rem`): Navigation, buttons, captions, the disclaimer.
+- **Label** (weight 500, `0.875rem`): Navigation, captions, the disclaimer.
+- **Button** (weight 500, `0.8125rem`, uppercase, letter-spacing 0.06em, line-height 1.2): Button labels only — one step below Label so the all-caps slab reads as an object, not a line of text. Codified here so the type ramp and the component spec agree on the same number.
 - **Mono** (weight 400, `0.875rem`): Inline code, addresses, transaction ids — anywhere a literal copy-pasteable string appears in copy.
 - **Body Lead** (weight 400, `1.125rem`, line-height 1.55, letter-spacing −0.005em): Section intros and lead paragraphs. One step above body. Use sparingly — usually one lead paragraph per section.
 - **Pixel** (weight 500, `1rem`, letter-spacing 0.04em): Amounts, denominations, mint identifiers, protocol version. A *notation* mark, never a decoration. Never used as a heading, eyebrow, section marker, or link affordance — those are Label sans. If you reach for pixel and there is no machine-data string to set, the answer is Label.
@@ -187,7 +194,7 @@ This scoping is intentional and doctrinal: the Open Specification north star rej
 
 ### Named Rules
 
-**The No-Shadow Rule.** `box-shadow` is forbidden on every container *except* `.btn-primary` and `.btn-secondary`. If a card "needs" elevation, it needs spacing instead. The button exception is non-transferable — no other surface inherits it.
+**The No-Shadow Rule.** `box-shadow` is forbidden on every container *except* the four `.btn-*` button classes (`.btn-primary`, `.btn-secondary`, and their `--on-ink` variants). If a card "needs" elevation, it needs spacing instead. The button exception is non-transferable — no other surface inherits it.
 
 **The Hairline Rule.** Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.
 
@@ -207,7 +214,7 @@ The button is the only surface in the system that breaks the flatness doctrine. 
 - **No icons.** Buttons never carry icons — no SVG glyphs, no `→` arrow, no chevrons, no spinners-as-decoration. The label is the entire button. (A spinner *replacing* the label during an async action is acceptable when the time comes; that's not an icon, it's the label's loading state.)
 - **Primary** (`.btn-primary`): Background Ink Soft (`#18181b`), text Paper (`#ffffff`). Carries a 1px semi-transparent white inside-stroke, a true-black rim shadow (`box-shadow: 0 0 0 1px #000000`), two layered drop shadows (`0 1px 2px rgba(9,9,11,0.08)` and `0 2px 4px rgba(9,9,11,0.16)`), and a white inner top highlight (`inset 0 1px 20px rgba(255,255,255,0.16)`).
 - **Secondary** (`.btn-secondary`): Background Paper (`#ffffff`), text Ink Soft (`#18181b`). Rim is Hair (`box-shadow: 0 0 0 1px #e4e4e7`) so the slab reads against Paper without the white-on-white edge disappearing. Same drop-shadow ramp at half opacity. No inner highlight (invisible on white).
-- **On-ink variant** (`.btn-primary--on-ink`): For CTAs sitting on an Ink section. Paper fill, Slate rim (`box-shadow: 0 0 0 1px #3f3f46`), deeper drop shadows (`0 1px 2px rgba(0,0,0,0.20)` and `0 2px 4px rgba(0,0,0,0.32)`) so the slab reads against black, and a stronger inner top highlight (`rgba(255,255,255,0.50)`) so the lift is unmistakable.
+- **On-ink variants** (`.btn-primary--on-ink`, `.btn-secondary--on-ink`): For CTAs sitting on an Ink section. The primary is a Paper fill with a Slate rim (`box-shadow: 0 0 0 1px #3f3f46`), deeper drop shadows (`0 1px 2px rgba(0,0,0,0.20)` and `0 2px 4px rgba(0,0,0,0.32)`) so the slab reads against black, and a stronger inner top highlight (`rgba(255,255,255,0.50)`) so the lift is unmistakable. The secondary is the quieter counterpart for non-primary actions on Ink, same box, hierarchy by fill.
 - **States:** Hover lifts the slab by `translateY(-1px)` and deepens drop shadow 3; active settles by `translateY(1px)` and reduces the shadows by roughly half. Motion uses the existing `ease-quart-out` curve at `150ms`. Under `prefers-reduced-motion: reduce`, the translate is dropped — only the shadows change.
 - **Focus:** A 2px outline at 4px offset (Ink on light sections, Paper on Ink sections). No glow, no ring colour shift.
 
@@ -246,10 +253,10 @@ The Twilight Stack is the system's one allowed atmospheric flourish, and is perm
 
 ### Signature: The Demo Panel (UI/API)
 
-The four-parts section demonstrates the protocol twice over: a mock product-UI card and the code behind it, flipped by a **square segmented control** (never a rounded pill) floating bottom-center inside the media frame. Rules of the pattern:
+The four-parts section demonstrates the protocol twice over: a real product screenshot and the code behind it, flipped by a **square segmented control** (never a rounded pill) floating bottom-center inside the media frame. Rules of the pattern:
 
-- **One grid, both themes.** Both views sit on the same 44px hairline graph paper (Hair lines on Band), centered, and flip with the theme — there is no always-dark surface in the panel. The UI ground adds two soft Ghost blooms so the glass card has luminance to refract. The grid is deliberately *not* the Twilight Stack: no bloom-to-black, no grain. Twilight stays footer-reserved.
-- **The depicted-product exception (liquid glass).** The mock UI card portrays a wallet or mint *app*, not the site — so it alone may speak product language the RFC chrome never does: `rounded.glass` (24px) corners, translucency over `backdrop-filter` blur, a specular top-edge glint, pill-shaped state chips, a rounded QR tile. Constraints that keep it doctrinal: the glass tints nothing (monochrome holds), it casts **no drop shadow** (depth comes from refraction, like the navbar's glass), and nothing outside these mock cards inherits the radius or the blur. Site chrome — including the toggle — stays sharp and flat.
+- **Two grounds, one frame.** The API view sits on 44px hairline graph paper (Hair lines on Band) that flips with the theme — there is no always-dark surface in the panel. The UI view swaps the graph paper for the tab's full-colour landscape photograph (`.feature-demo__photo`), the Depicted-World Exception's ground. Neither ground is the Twilight Stack: no bloom-to-black, no grain. Twilight stays footer-reserved.
+- **The depicted product is real art.** The UI view shows *real app screenshots* — theme-flipped light/dark captures of actual Cashu wallets and mints — not a coded mock. (The earlier liquid-glass mock card this pattern once specified is retired.) The screenshot is opaque and carries no site-side styling beyond a hairline frame: no drop shadow, no blur, no rounding. Whatever colour the depicted app renders is the app's own voice, sanctioned by the Depicted-World Exception (§2). Nothing outside the demo frame inherits any of it.
 - **The code pane** is the boxy counterweight: sharp corners, Card ground, Hair tab-strip, Ink text, Mist comments. It flips with the theme (white file pane on light, the classic dark pane on dark) — same register, two keys.
 - **The toggle** is the feature-nav register one size down: uppercase GT 500 at `0.75rem`, `letter-spacing: 0.06em`, active segment inverts to Ink/On-Ink. It carries its own Card ground and Hair rim so it reads on every surface it floats over. Flat and square — neither the button lift nor the glass exception extends to it.
 - **Honest content.** Everything protocol-shaped in a demo panel is real spec data: real NUT examples, a decodable token, request/response bodies verbatim from the NUTs. Mock UI, real protocol.
@@ -268,10 +275,10 @@ The four-parts section demonstrates the protocol twice over: a mock product-UI c
 
 ### Don't
 
-- **Don't** introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Never on cashu.space.
+- **Don't** introduce chromatic accent in the site's own voice. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Never on cashu.space. Colour appears only under the Depicted-World Exception (§2): depicted app art, the tap-to-pay video, third-party marks.
 - **Don't** add Web3 / DeFi tropes: pastel gradients, blob shapes, decorative network animations that misrepresent how the protocol works (e.g. mints "talking" to mints, which Cashu doesn't do). Motion is permitted only under the Honest-Network Rule — see §4.
 - **Don't** dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS "YOUR DATA, SECURED™" copy. Privacy is a property of the protocol, stated plainly.
-- **Don't** use `box-shadow` on any container except `.btn-primary` / `.btn-secondary` / `.btn-primary--on-ink`. Buttons are the system's only lifted surface — every other container is flat. No drop shadow, no inner shadow, no coloured glow anywhere else.
+- **Don't** use `box-shadow` on any container except the four `.btn-*` classes (`.btn-primary` / `.btn-secondary` / `.btn-primary--on-ink` / `.btn-secondary--on-ink`). Buttons are the system's only lifted surface — every other container is flat. No drop shadow, no inner shadow, no coloured glow anywhere else.
 - **Don't** use `border-left` / `border-right` >1px as a coloured stripe on cards or callouts. Side-stripes are forbidden in impeccable's universal bans and doubly forbidden here.
 - **Don't** use `background-clip: text` with a gradient (gradient text). One solid colour, emphasis by weight or size.
 - **Don't** introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.

@@ -30,9 +30,9 @@ const TABS: Tab[] = [
   {
     id: "mints",
     label: "Mints",
-    title: "Backed by bitcoin.",
+    title: "Bitcoin in, bitcoin out.",
     caption:
-      "Mints bridge Lightning and ecash. Run your own, or trust a community-operated one.",
+      "Mints bridge Lightning and ecash — run your own, or trust a community-operated one. Ecash is a claim on its mint, not a deposit.",
     cta: "Explore mints",
     href: "https://bitcoinmints.com",
     external: true,

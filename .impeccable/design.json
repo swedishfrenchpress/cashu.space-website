@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-05-23T00:00:00Z",
+  "generatedAt": "2026-07-23T00:00:00Z",
   "title": "Design System: Cashu",
   "extensions": {
     "colorMeta": {
@@ -8,55 +8,136 @@
         "role": "neutral",
         "displayName": "Paper",
         "canonical": "oklch(100% 0 0)",
-        "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7"]
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8",
+          "#e4e4e7"
+        ]
       },
       "ink": {
         "role": "primary",
         "displayName": "Ink",
         "canonical": "oklch(0% 0 0)",
-        "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7"]
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8",
+          "#e4e4e7"
+        ]
       },
       "ink-soft": {
         "role": "neutral",
         "displayName": "Ink Soft",
         "canonical": "oklch(15% 0 0)",
-        "tonalRamp": ["#09090b", "#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8"]
+        "tonalRamp": [
+          "#09090b",
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8"
+        ]
       },
       "ink-hover": {
         "role": "neutral",
         "displayName": "Ink Hover",
         "canonical": "oklch(22% 0 0)",
-        "tonalRamp": ["#09090b", "#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8"]
+        "tonalRamp": [
+          "#09090b",
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8"
+        ]
       },
       "slate": {
         "role": "neutral",
         "displayName": "Slate",
         "canonical": "oklch(36% 0 0)",
-        "tonalRamp": ["#18181b", "#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7"]
+        "tonalRamp": [
+          "#18181b",
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8",
+          "#e4e4e7"
+        ]
       },
       "mist": {
         "role": "neutral",
         "displayName": "Mist",
         "canonical": "oklch(54% 0 0)",
-        "tonalRamp": ["#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5"]
+        "tonalRamp": [
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8",
+          "#e4e4e7",
+          "#f4f4f5"
+        ]
       },
       "fog": {
         "role": "neutral",
         "displayName": "Fog",
         "canonical": "oklch(68% 0 0)",
-        "tonalRamp": ["#27272a", "#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5"]
+        "tonalRamp": [
+          "#27272a",
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8",
+          "#e4e4e7",
+          "#f4f4f5"
+        ]
       },
       "hair": {
         "role": "neutral",
         "displayName": "Hair",
         "canonical": "oklch(91% 0 0)",
-        "tonalRamp": ["#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5", "#fafafa"]
+        "tonalRamp": [
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8",
+          "#e4e4e7",
+          "#f4f4f5",
+          "#fafafa"
+        ]
       },
       "chalk": {
         "role": "neutral",
         "displayName": "Chalk",
         "canonical": "oklch(96% 0 0)",
-        "tonalRamp": ["#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8", "#e4e4e7", "#f4f4f5", "#fafafa"]
+        "tonalRamp": [
+          "#3f3f46",
+          "#52525b",
+          "#71717a",
+          "#a1a1aa",
+          "#d4d4d8",
+          "#e4e4e7",
+          "#f4f4f5",
+          "#fafafa"
+        ]
       }
     },
     "typographyMeta": {
@@ -78,7 +159,7 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Buttons, navigation, captions, the legal disclaimer."
+        "purpose": "Navigation, captions, the legal disclaimer."
       },
       "mono": {
         "displayName": "Mono",
@@ -87,6 +168,10 @@
       "pixel": {
         "displayName": "Pixel Notation",
         "purpose": "Protocol artefacts only: amounts, mint ids, version strings. Geist Pixel Square."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Button labels only. 0.8125rem, weight 500, uppercase, letter-spacing 0.06em — one step below Label so the all-caps slab reads as an object, not a line of text."
       }
     },
     "shadows": [
@@ -139,10 +224,22 @@
       }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
     ]
   },
   "components": [
@@ -158,7 +255,7 @@
       "name": "Secondary Button (Paper Slab)",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Quieter slab. Sharp corners (border-radius 0). Paper fill on Paper sections with a Hair rim and the same lift mechanics as the primary at reduced intensity. No inner highlight (invisible on white). Used for the hero's GitHub / Blog row, tab selectors, and other tertiary actions.",
+      "description": "Quieter slab. Sharp corners (border-radius 0). Paper fill on Paper sections with a Hair rim and the same lift mechanics as the primary at reduced intensity. No inner highlight (invisible on white). Used for the navbar's GitHub chip, the hero's spec link, tab selectors, and other non-primary actions (the Two-CTA Rule).",
       "html": "<a class=\"btn-secondary\" href=\"https://github.com/cashubtc\">GitHub</a>",
       "css": ".btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: #ffffff; color: #18181b; padding: 10px 22px; border: 1px solid rgba(0,0,0,0.04); border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.2; letter-spacing: -0.005em; cursor: pointer; box-shadow: 0 0 0 1px #e4e4e7, 0 1px 2px rgba(9,9,11,0.04), 0 2px 4px rgba(9,9,11,0.08); transition: transform 150ms cubic-bezier(0.25,1,0.5,1), box-shadow 150ms cubic-bezier(0.25,1,0.5,1), background-color 150ms cubic-bezier(0.25,1,0.5,1); } .btn-secondary:hover { background: #fafafa; transform: translateY(-1px); box-shadow: 0 0 0 1px #a1a1aa, 0 2px 4px rgba(9,9,11,0.06), 0 4px 8px rgba(9,9,11,0.10); } .btn-secondary:active { transform: translateY(1px); box-shadow: 0 0 0 1px #d4d4d8, 0 1px 1px rgba(9,9,11,0.04), 0 1px 2px rgba(9,9,11,0.06); } .btn-secondary:focus-visible { outline: 2px solid #000000; outline-offset: 4px; } @media (prefers-reduced-motion: reduce) { .btn-secondary { transition: box-shadow 150ms linear, background-color 150ms linear; } .btn-secondary:hover, .btn-secondary:active { transform: none; } }"
     },
@@ -222,14 +319,14 @@
       "name": "Demo Panel (UI/API Switcher)",
       "kind": "custom",
       "refersTo": "components.demo-panel",
-      "description": "Griffin-style demo panel for the four-parts section: a theme-flipping mock product-UI card on a Hair-on-Band drafting grid crossfades to an always-dark code pane over the same 44px grid in a dark register (1px rgba(255,255,255,0.07) on #0a0a0b), flipped by a square segmented UI/API control floating bottom-center. Neither grid is the Twilight Stack: no bloom, no grain. Demo content is real spec data; QR codes never theme-flip.",
+      "description": "Demo panel for the four-parts section: a UI/API flip where the API view is a theme-flipping code pane on 44px graph paper and the UI view is a real app screenshot over the tab's full-colour landscape ground (Depicted-World Exception; the coded liquid-glass mock is retired). Flipped by a square segmented control. Demo content is real spec data; QR codes never theme-flip.",
       "html": "<div class=\"ds-demo\"><div class=\"ds-demo__view ds-demo__view--api is-active\"><pre class=\"ds-demo__code\">{ \"amount\": 10, \"unit\": \"sat\" }</pre></div><div class=\"ds-demo__toggle\" role=\"group\" aria-label=\"Show as\"><button type=\"button\" aria-pressed=\"false\">UI</button><button type=\"button\" aria-pressed=\"true\">API</button></div></div>",
       "css": ".ds-demo { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border: 1px solid #e4e4e7; } .ds-demo__view { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 40px; padding-bottom: 64px; opacity: 0; transition: opacity 220ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-demo__view.is-active { opacity: 1; } .ds-demo__view--api { background-color: #0a0a0b; background-image: linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px); background-size: 44px 44px; background-position: center; } .ds-demo__code { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 0.875rem; line-height: 1.75; color: #f4f4f5; background: #18181b; border: 1px solid #27272a; padding: 20px; margin: 0; } .ds-demo__toggle { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); display: inline-flex; gap: 3px; padding: 3px; background: #ffffff; border: 1px solid #e4e4e7; } .ds-demo__toggle button { border: 0; background: transparent; padding: 7px 16px; cursor: pointer; color: #71717a; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; } .ds-demo__toggle button[aria-pressed=\"true\"] { background: #18181b; color: #ffffff; }"
     }
   ],
   "narrative": {
     "northStar": "The Open Specification",
-    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered lifted-ink slabs (the only surfaces in the system that carry shadow), generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.",
+    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered lifted-ink slabs (the only surfaces in the system that carry shadow), generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.\n\nColour is absent only from the site's own voice: the Depicted-World Exception sanctions colour inside artifacts the page depicts — real app screenshots and landscape grounds in the demo panels, the tap-to-pay video, and third-party marks.",
     "keyCharacteristics": [
       "Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.",
       "Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).",
@@ -238,16 +335,61 @@
       "Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast."
     ],
     "rules": [
-      { "name": "The No-Colour Rule", "body": "The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface 'needs' colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch.", "section": "colors" },
-      { "name": "The Two-Black Rule", "body": "Ink (#000000) and Ink Soft (#18181b) are the only two text colours that may sit on Paper. Slate, Mist, Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.", "section": "colors" },
-      { "name": "The One Face Rule", "body": "GT-Standard carries everything readable. Geist Mono is technical notation; Geist Pixel Square is protocol notation. Three families, three jobs, no overlap.", "section": "typography" },
-      { "name": "The Big-Or-Quiet Rule", "body": "Type is either Display (≥3.75rem) or quiet (≤1.125rem). The middle ground is avoided. Hierarchy is achieved by jumping scale, not by stair-stepping.", "section": "typography" },
-      { "name": "The No-Shadow Rule", "body": "box-shadow is forbidden on every container except .btn-primary, .btn-secondary, and .btn-primary--on-ink. Buttons are the only invitation-to-press in the system and earn the only lift. If a card 'needs' elevation, it needs spacing instead — the button exception is non-transferable.", "section": "elevation" },
-      { "name": "The Hairline Rule", "body": "Structural separation between sections is achieved with a single 1px line in Hair (#e4e4e7), full content width, never bolder. No double rules, no decorative rules.", "section": "elevation" },
-      { "name": "The Honest-Network Rule", "body": "Network visualisations and motion are permitted only when they reflect real protocol structure — Lightning Network bridges between mints, peer-to-peer token transfer between users. Forbidden: decorative flow, speculative connections, mints 'talking' to mints (which Cashu doesn't do), or any animation that exists for aesthetic energy rather than to convey a true property of the protocol.", "section": "elevation" },
-      { "name": "The Two-CTA Rule", "body": "Primary buttons across the site serve two jobs and two only: get a wallet and read the spec. These are the outcomes PRODUCT.md elevates above mint trust, and the visual hierarchy follows. Every other interactive surface — GitHub, blog, tab switchers, secondary navigation — is .btn-secondary or nav-link. If a third 'primary' CTA appears on a single page, collapse one before shipping.", "section": "overview" },
-      { "name": "The Twilight Stack", "body": "The page-closing CTA and the site footer share one continuous treatment so the bottom of every page reads as a single twilight band. Pattern: an Ink section with a monochrome radial bloom (origin 50% 110%, stepping Fog → Mist → Slate → Ink Soft → Ink, all within the existing grey ramp) and an opacity-0.04 SVG fractal-noise paper-grain overlay in mix-blend overlay. Reserved for closing-CTA + footer surfaces only. Never on Paper, never on cards, never on heroes.", "section": "components" },
-      { "name": "The Demo Panel", "body": "The four-parts section demonstrates the protocol twice over: a mock product-UI card and the code behind it, flipped by a square segmented control (never a rounded pill) floating bottom-center inside the media frame. Both views sit on the same theme-flipping 44px Hair-on-Band graph paper — deliberately not the Twilight Stack: no bloom-to-black, no grain. The mock UI card is the depicted-product exception: it portrays an app, not the site, so it alone renders as liquid glass (24px radius, backdrop blur, specular edge, no drop shadow); the code pane and toggle stay sharp and flat. Everything protocol-shaped in a demo panel is real spec data. QR codes never theme-flip: black modules on a literal-white quiet zone in both schemes.", "section": "components" }
+      {
+        "name": "The No-Colour Rule",
+        "body": "The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface 'needs' colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch. The one carve-out is the Depicted-World Exception.",
+        "section": "colors"
+      },
+      {
+        "name": "The Depicted-World Exception",
+        "body": "Colour is permitted only inside artifacts the page depicts, never in the chrome the site is. Sanctioned, exhaustively: the four-parts demo panels (landscape photo grounds and real wallet/mint app screenshots, including the depicted app's own colour), the tap-to-pay video, and third-party marks at their brand identity (language logos, AI-assistant icons). Editorial photography reports rather than depicts, so it still desaturates and its wordmarks force to Paper. Anything else falls under the No-Colour Rule in full.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Black Rule",
+        "body": "Ink (#000000) and Ink Soft (#18181b) are the only two text colours that may sit on Paper. Slate, Mist, Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Face Rule",
+        "body": "GT-Standard carries everything readable. Geist Mono is technical notation; Geist Pixel Square is protocol notation. Three families, three jobs, no overlap.",
+        "section": "typography"
+      },
+      {
+        "name": "The Big-Or-Quiet Rule",
+        "body": "Type is either Display (≥3.75rem) or quiet (≤1.125rem). The middle ground is avoided. Hierarchy is achieved by jumping scale, not by stair-stepping.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Shadow Rule",
+        "body": "box-shadow is forbidden on every container except the four .btn-* button classes (.btn-primary, .btn-secondary, and their --on-ink variants). Buttons are the only invitation-to-press in the system and earn the only lift. If a card 'needs' elevation, it needs spacing instead — the button exception is non-transferable.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "Structural separation between sections is achieved with a single 1px line in Hair (#e4e4e7), full content width, never bolder. No double rules, no decorative rules.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Honest-Network Rule",
+        "body": "Network visualisations and motion are permitted only when they reflect real protocol structure — Lightning Network bridges between mints, peer-to-peer token transfer between users. Forbidden: decorative flow, speculative connections, mints 'talking' to mints (which Cashu doesn't do), or any animation that exists for aesthetic energy rather than to convey a true property of the protocol.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Two-CTA Rule",
+        "body": "Primary buttons across the site serve two jobs and two only: get a wallet and read the spec. These are the outcomes PRODUCT.md elevates above mint trust, and the visual hierarchy follows. Every other interactive surface — GitHub, blog, tab switchers, secondary navigation — is .btn-secondary or nav-link. If a third 'primary' CTA appears on a single page, collapse one before shipping.",
+        "section": "overview"
+      },
+      {
+        "name": "The Twilight Stack",
+        "body": "The page-closing CTA and the site footer share one continuous treatment so the bottom of every page reads as a single twilight band. Pattern: an Ink section with a monochrome radial bloom (origin 50% 110%, stepping Fog → Mist → Slate → Ink Soft → Ink, all within the existing grey ramp) and an opacity-0.04 SVG fractal-noise paper-grain overlay in mix-blend overlay. Reserved for closing-CTA + footer surfaces only. Never on Paper, never on cards, never on heroes.",
+        "section": "components"
+      },
+      {
+        "name": "The Demo Panel",
+        "body": "The four-parts section demonstrates the protocol twice over: a real product screenshot and the code behind it, flipped by a square segmented control (never a rounded pill) floating bottom-center inside the media frame. The API view sits on theme-flipping 44px Hair-on-Band graph paper; the UI view swaps the grid for the tab's full-colour landscape photograph with a real app screenshot over it (the Depicted-World Exception — the earlier liquid-glass mock card is retired). The screenshot is opaque: hairline frame only, no drop shadow, no blur, no rounding. Neither ground is the Twilight Stack. Everything protocol-shaped is real spec data. QR codes never theme-flip: black modules on a literal-white quiet zone in both schemes.",
+        "section": "components"
+      }
     ],
     "dos": [
       "Do carry the No-Colour Rule. Greys may shift by lightness, never by hue.",
@@ -258,10 +400,10 @@
       "Do treat 1px Hair lines as the only structural divider. Sections separate by space first, hairline second."
     ],
     "donts": [
-      "Don't introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins.",
+      "Don't introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Colour appears only under the Depicted-World Exception: depicted app art, the tap-to-pay video, third-party marks.",
       "Don't add Web3 / DeFi tropes: pastel gradients, blob shapes, playful money-flow illustrations. Cashu is bitcoin-native and deliberately not crypto-coded.",
       "Don't dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS 'YOUR DATA, SECURED™' copy. Privacy is a property of the protocol, stated plainly.",
-      "Don't use box-shadow on any container except .btn-primary / .btn-secondary / .btn-primary--on-ink. Buttons are the system's only lifted surface. Cards, sections, callouts, nav, dividers, and placeholder surfaces all stay flat.",
+      "Don't use box-shadow on any container except the four .btn-* classes (.btn-primary / .btn-secondary / .btn-primary--on-ink / .btn-secondary--on-ink). Buttons are the system's only lifted surface. Cards, sections, callouts, nav, dividers, and placeholder surfaces all stay flat.",
       "Don't use border-left or border-right greater than 1px as a coloured stripe on cards or callouts.",
       "Don't use background-clip: text with a gradient (gradient text). One solid colour, emphasis by weight or size.",
       "Don't introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.",

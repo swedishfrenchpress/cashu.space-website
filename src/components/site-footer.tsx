@@ -59,8 +59,11 @@ export default function SiteFooter() {
               <div className="footer-signoff__mark">Cashu</div>
               <p className="footer-signoff__line t-body-lead">The open specification.</p>
             </div>
+            {/* Same label, same destination as the hero's spec CTA — one
+                canonical URL per label. The NUTs repo stays reachable via
+                the metastrip context and the GitHub social link below. */}
             <ExternalLink
-              href="https://github.com/cashubtc/nuts"
+              href="https://docs.cashu.space/"
               className="btn-primary--on-ink"
             >
               Read the spec

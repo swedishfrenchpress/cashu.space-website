@@ -869,8 +869,10 @@ html {
 
 .footer-disclaimer {
   width: 100%;
-  /* Spans the full footer measure, aligning with the signoff, metastrip, and
-     bottom rows above it so the closing band reads as one flush column. */
+  /* Left edge stays flush with the signoff, metastrip, and bottom rows
+     above; the measure caps at the body maximum (DESIGN.md §3: 65–75ch)
+     so the closing paragraph stays readable at wide viewports. */
+  max-width: 75ch;
   color: #a1a1aa;
   text-wrap: pretty;
 }
@@ -1960,7 +1962,10 @@ html {
   gap: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
+  /* No CSS scroll-behavior here: the pager animates via scrollTo({behavior})
+     in in-the-press.tsx, and a CSS smooth setting makes mandatory snap
+     resolve the animation back to its starting card. Touch swiping snaps
+     natively regardless. */
 }
 
 @media (min-width: 1024px) {
@@ -2043,9 +2048,8 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .press-track {
-    scroll-behavior: auto;
-  }
+  /* The pager's scrollTo already drops to behavior:auto under reduced
+     motion (checked in in-the-press.tsx). */
   .press-media__img,
   .press-card:hover .press-media__img {
     transition: none;
@@ -2168,6 +2172,16 @@ html {
   display: flex;
   flex-direction: column;
   gap: clamp(0.75rem, 1.5vw, 1.125rem);
+  container-type: inline-size;
+}
+
+/* The rail is the grid's narrow 4fr column; the viewport-driven headline
+   ramp overflows it on "Implementations" at lg+ (the rail stops growing
+   with the viewport once the shell maxes out). Same 2rem–3rem ramp
+   endpoints, but scaled to the rail's own width so the longest heading
+   always fits its column. */
+.wallet-group__rail .t-headline {
+  font-size: min(3rem, max(2rem, 12cqw));
 }
 
 .wallet-group__scope {
