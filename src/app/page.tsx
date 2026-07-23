@@ -27,9 +27,9 @@ export default function Home() {
             </Reveal>
             <Reveal immediate delay={240}>
               <p className="hero-spec__body">
-                Instant, bearer, peer-to-peer. A protocol for digital cash
+                Instant, bearer, peer-to-peer. A protocol for ecash
                 backed by bitcoin, with blind-signed tokens you can hold
-                in any wallet.
+                in any Cashu wallet.
               </p>
             </Reveal>
             <Reveal immediate delay={360}>
@@ -43,7 +43,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="btn-secondary"
                 >
-                  <span>View documentation</span>
+                  <span>Read the spec</span>
                 </a>
               </div>
             </Reveal>

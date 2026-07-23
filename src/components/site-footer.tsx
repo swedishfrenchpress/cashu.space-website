@@ -71,7 +71,7 @@ export default function SiteFooter() {
               two-cell mono header device used on the spec code pane. */}
           <div className="footer-metastrip t-mono">
             <span>cashubtc/nuts</span>
-            <span className="footer-metastrip__meta">Chaumian ecash for Bitcoin</span>
+            <span className="footer-metastrip__meta">Chaumian ecash for bitcoin</span>
           </div>
 
           {/* Bottom: socials + legal on left, Ask-AI on right */}

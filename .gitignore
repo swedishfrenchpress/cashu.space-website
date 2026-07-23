@@ -40,3 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /.tmp/
+
+# claude code (personal/session-local, not shared)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# impeccable (local cache only; config + critique history are checked in)
+.impeccable/hook.cache.json

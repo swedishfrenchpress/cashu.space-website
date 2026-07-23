@@ -161,7 +161,7 @@ export default function ImplementationsGrid() {
                 <LockFigure className="w-32 h-32 lg:w-40 lg:h-40" />
               </div>
               <div className="flex flex-col gap-3">
-                <h3 className="t-title">Privacy focused</h3>
+                <h3 className="t-title">Unlinkable payments</h3>
                 <p className="t-body text-ink max-w-[40ch]">
                   Blind signatures unlink the mint from the holder. Payments
                   are peer-to-peer.
@@ -177,9 +177,9 @@ export default function ImplementationsGrid() {
                 <WalletFigure className="w-32 h-32 lg:w-40 lg:h-40" />
               </div>
               <div className="flex flex-col gap-3">
-                <h3 className="t-title">Ecash for the Web</h3>
+                <h3 className="t-title">Ecash for the web</h3>
                 <p className="t-body text-ink max-w-[40ch]">
-                  Tokens fit in HTTP headers, URLs, and JSON. Wire cashu into
+                  Tokens fit in HTTP headers, URLs, and JSON. Wire Cashu into
                   any web flow.
                 </p>
               </div>

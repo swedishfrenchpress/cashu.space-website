@@ -294,7 +294,7 @@ export default function ReferenceImplementations() {
               rel="noopener noreferrer"
               className="btn-primary--on-ink"
             >
-              Browse on GitHub
+              View on GitHub
             </a>
           </div>
         </Reveal>

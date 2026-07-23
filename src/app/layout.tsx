@@ -58,7 +58,7 @@ export const metadata: Metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Two hands exchange US dollar bills against the NYC Flatiron district, flanked by a cashu wallet showing a balance of ₿3,878 on an antifiat mint.",
+        alt: "Two hands exchange US dollar bills against the NYC Flatiron district, flanked by a Cashu wallet showing a balance of ₿3,878 on an antifiat mint.",
       },
     ],
   },

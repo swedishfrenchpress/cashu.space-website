@@ -45,14 +45,13 @@ export default function TapToPay() {
         <div className="video-feature__content">
           <Reveal>
             <h2 className="t-headline video-feature__title">
-              Push bitcoin like a message.
+              Push bitcoin with a tap.
             </h2>
           </Reveal>
           <Reveal delay={80}>
             <p className="t-body-lead video-feature__body">
               Cashu tokens are bearer bitcoin. No accounts, no invoices, no
-              waiting. Tap, and value moves. The protocol makes room for
-              experiences money never allowed before.
+              waiting. Tap, and value moves.
             </p>
           </Reveal>
         </div>

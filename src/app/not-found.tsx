@@ -13,7 +13,7 @@ export default function NotFound() {
         <Reveal immediate variant="fade">
           <Link href="/" className="flex items-center gap-2.5 t-title">
             <CashuMark className="h-7 w-7" />
-            <span>cashu</span>
+            <span>Cashu</span>
           </Link>
         </Reveal>
       </header>

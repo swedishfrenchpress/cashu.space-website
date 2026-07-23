@@ -5,7 +5,7 @@ import SiteHeader from "@/components/site-header";
 export const metadata: Metadata = {
   title: "Wallets · cashu.space",
   description:
-    "A non-exhaustive directory of cashu wallets. Any client that implements the protocol is conformant.",
+    "A non-exhaustive directory of Cashu wallets. Any client that implements the protocol is conformant.",
 };
 
 type Entry = {
@@ -28,7 +28,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Mobile",
     scope: "Ecash in your pocket. Wallets for your phone.",
     entries: [
-      { name: "Cashu.me",  href: "https://wallet.cashu.me" },
+      { name: "Cashu.me",  href: "https://cashu.me" },
       { name: "eNuts",     href: "https://www.enuts.cash" },
       { name: "Macadamia", href: "https://macadamia.cash" },
       { name: "Minibits",  href: "https://www.minibits.cash" },
@@ -46,7 +46,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
   },
   {
     heading: "Implementations",
-    scope: "Libraries and SDKs for building on the cashu protocol.",
+    scope: "Libraries and SDKs for building on the Cashu protocol.",
     entries: [
       { name: "Nutshell", href: "https://github.com/cashubtc/nutshell" },
       { name: "CDK",      href: "https://github.com/cashubtc/cdk" },
@@ -89,7 +89,7 @@ export default function WalletsPage() {
           <div id="main-content" className="flex flex-col gap-6 max-w-[60ch]">
             <h1 className="t-display">Wallets.</h1>
             <p className="t-body-lead text-body">
-              Any client that implements the cashu protocol is conformant. The
+              Any client that implements the Cashu protocol is conformant. The
               list below is non-exhaustive, a snapshot of wallets people use
               today, not an endorsement.
             </p>

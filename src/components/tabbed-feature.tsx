@@ -22,7 +22,7 @@ const TABS: Tab[] = [
     label: "Wallets",
     title: "Hold ecash on your phone.",
     caption:
-      "Independent, open-source, and free. Run a cashu wallet on iOS, Android, or in the browser.",
+      "Independent, open-source, and free. Run a Cashu wallet on iOS, Android, or in the browser.",
     cta: "Explore wallets",
     href: "/wallets",
     image: "/demo/bg-forest.jpg",
