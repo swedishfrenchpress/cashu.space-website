@@ -1738,11 +1738,10 @@ html {
 
 /* Real screenshot — the depicted-product exception, now carried entirely
    by real art (see Shot in protocol-demo-content.tsx; the coded glass mock
-   it replaced is gone). width+height 100% (not the parent's align-items/
-   justify-content:safe-center default, which only shrink-wraps content)
-   gives it the full padded frame to work with, so the img below can size
-   up to fill it via object-fit rather than rendering at its own small
-   natural/fetched resolution. */
+   it replaced is gone). The wrapper stays full-size (not the parent's
+   align-items/justify-content:safe-center default, which only shrink-wraps
+   content) so its own flex centering can position the img — sized to its
+   own aspect ratio below — within the full padded frame. */
 .feature-demo__shot {
   position: relative;
   z-index: 1;
@@ -1754,14 +1753,21 @@ html {
 }
 
 /* Both theme variants render (see .feature-demo__shot-img--light/--dark
-   below); only one ever has layout. object-fit: contain lets the image
-   grow to fill whichever of width/height binds first, instead of sitting
-   at its native fetched size. No drop shadow, no blur, no rounding — the
-   photo is opaque and runs edge-to-edge inside its own hairline frame. */
+   below); only one ever has layout. width/height auto + max-width/max-height
+   100% sizes the element to its own 4:3 crop, capped by whichever of the
+   frame's width/height binds first — the element's box (and its border)
+   then hugs the actual visible photo. (object-fit: contain would scale the
+   painted pixels the same way, but leaves the <img>'s own box at the full
+   100%/100% frame size, so a border on the element traces empty space
+   past the letterboxed photo — visible as a floating rectangle whenever the
+   frame's aspect ratio doesn't match the 4:3 crop, which is every
+   breakpoint.) No drop shadow, no blur, no rounding — the photo is opaque
+   and runs edge-to-edge inside its own hairline frame. */
 .feature-demo__shot-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
   border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
 }
 

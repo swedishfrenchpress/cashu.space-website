@@ -22,11 +22,7 @@ export default function ProtocolDemo({
   label: string;
   image?: string;
 }) {
-  // Spec opens on the code side: it self-demonstrates the toggle for the
-  // section, and spec-is-the-product means its strongest view IS the code.
-  const [view, setView] = useState<"ui" | "api">(
-    demo === "spec" ? "api" : "ui",
-  );
+  const [view, setView] = useState<"ui" | "api">("ui");
   const entry = DEMOS[demo];
 
   return (
