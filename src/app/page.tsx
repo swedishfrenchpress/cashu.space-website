@@ -23,13 +23,12 @@ export default function Home() {
         <div className="hero-spec__inner page-shell">
           <div className="hero-spec__content">
             <Reveal immediate delay={120}>
-              <h1 className="hero-spec__headline">Open source electronic cash.</h1>
+    <h1 className="hero-spec__headline">Open source ecash for bitcoin.</h1>
             </Reveal>
             <Reveal immediate delay={240}>
               <p className="hero-spec__body">
-                Instant, bearer, peer-to-peer. A protocol for ecash
-                backed by bitcoin, with blind-signed tokens you can hold
-                in any Cashu wallet.
+                Instant, bearer, peer-to-peer.<br />
+      Cashu specifies blind-signed tokens for bitcoin-backed ecash.
               </p>
             </Reveal>
             <Reveal immediate delay={360}>

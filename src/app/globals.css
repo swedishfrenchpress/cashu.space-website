@@ -450,14 +450,17 @@ html {
   display: none;
 }
 
-/*
- * Lifted Ink Chip — the only place in the system where elevation is permitted.
- * Doctrine override documented in DESIGN.md §4 (The No-Shadow Rule, scoped).
- */
+/* Flat Cipher Slab — sharp, shadowless buttons. A short encrypt → decrypt
+   pass sweeps the actual label left-to-right on hover/focus; it is visual-only
+   so the accessible label never changes. */
+
 .btn-primary,
 .btn-secondary,
 .btn-primary--on-ink,
 .btn-secondary--on-ink {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   /* No icons inside buttons. The label is the whole button. */
@@ -477,98 +480,78 @@ html {
   white-space: nowrap;
   transform: translateY(0);
   transition:
-    transform 150ms cubic-bezier(0.25, 1, 0.5, 1),
-    box-shadow 150ms cubic-bezier(0.25, 1, 0.5, 1),
-    background-color 150ms cubic-bezier(0.25, 1, 0.5, 1),
-    border-color 150ms cubic-bezier(0.25, 1, 0.5, 1);
+    transform var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-base) var(--ease-out-quart),
+    background-color var(--dur-base) var(--ease-out-quart),
+    border-color var(--dur-base) var(--ease-out-quart);
+}
+
+.button-cipher__label {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--button-cipher-color);
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.button-ciphering {
+  color: transparent !important;
 }
 
 .btn-primary {
   background-color: var(--ink);
   color: var(--on-ink);
-  border-color: rgba(255, 255, 255, 0.22);
-  box-shadow:
-    0 0 0 1px var(--edge),
-    0 1px 2px rgba(9, 9, 11, 0.08),
-    0 2px 4px rgba(9, 9, 11, 0.16),
-    inset 0 1px 20px rgba(255, 255, 255, 0.16);
+  border-color: var(--edge);
 }
 
 .btn-primary:hover {
   background-color: var(--ink-hover);
-  transform: translateY(-1px);
-  box-shadow:
-    0 0 0 1px var(--edge),
-    0 2px 4px rgba(9, 9, 11, 0.10),
-    0 4px 8px rgba(9, 9, 11, 0.20),
-    inset 0 1px 20px rgba(255, 255, 255, 0.18);
+  border-color: var(--ink-hover);
 }
 
 .btn-primary:active {
-  transform: translateY(1px);
-  box-shadow:
-    0 0 0 1px var(--edge),
-    0 1px 1px rgba(9, 9, 11, 0.06),
-    0 1px 2px rgba(9, 9, 11, 0.10),
-    inset 0 1px 20px rgba(255, 255, 255, 0.12);
+  transform: scale(0.985);
 }
 
 .btn-secondary {
   background-color: var(--card);
   color: var(--ink);
-  border-color: rgba(0, 0, 0, 0.04);
-  box-shadow:
-    0 0 0 1px var(--hair),
-    0 1px 2px rgba(9, 9, 11, 0.04),
-    0 2px 4px rgba(9, 9, 11, 0.08);
+  border-color: var(--hair);
 }
 
 .btn-secondary:hover {
   background-color: var(--band);
-  transform: translateY(-1px);
-  box-shadow:
-    0 0 0 1px var(--faint),
-    0 2px 4px rgba(9, 9, 11, 0.06),
-    0 4px 8px rgba(9, 9, 11, 0.10);
+  border-color: var(--muted);
 }
 
 .btn-secondary:active {
-  transform: translateY(1px);
-  box-shadow:
-    0 0 0 1px var(--ghost),
-    0 1px 1px rgba(9, 9, 11, 0.04),
-    0 1px 2px rgba(9, 9, 11, 0.06);
+  transform: scale(0.985);
 }
 
-/* On-ink variant: the chip is white-on-black for closing CTAs sitting on Ink sections. */
+/* On-ink variant: the slab is white-on-black for closing CTAs on Ink. */
 .btn-primary--on-ink {
   background-color: #ffffff;
   color: #18181b;
-  border-color: rgba(0, 0, 0, 0.06);
-  box-shadow:
-    0 0 0 1px #3f3f46,
-    0 1px 2px rgba(0, 0, 0, 0.20),
-    0 2px 4px rgba(0, 0, 0, 0.32),
-    inset 0 1px 20px rgba(255, 255, 255, 0.50);
+  border-color: #e4e4e7;
 }
 
 .btn-primary--on-ink:hover {
-  background-color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow:
-    0 0 0 1px #52525b,
-    0 2px 4px rgba(0, 0, 0, 0.24),
-    0 4px 8px rgba(0, 0, 0, 0.36),
-    inset 0 1px 20px rgba(255, 255, 255, 0.60);
+  background-color: #f4f4f5;
+  border-color: #a1a1aa;
 }
 
 .btn-primary--on-ink:active {
-  transform: translateY(1px);
-  box-shadow:
-    0 0 0 1px #3f3f46,
-    0 1px 1px rgba(0, 0, 0, 0.16),
-    0 1px 2px rgba(0, 0, 0, 0.24),
-    inset 0 1px 20px rgba(255, 255, 255, 0.40);
+  transform: scale(0.985);
 }
 
 .btn-primary:focus-visible,
@@ -584,38 +567,20 @@ html {
   outline-color: #ffffff;
 }
 
-/* Secondary chip on Ink ground — the quiet companion to btn-primary--on-ink.
-   Dark fill with a faint white rim and inner highlight so it lifts off the
-   Ink background without claiming primary status. The doctrine override
-   (allowed shadow) is the same scope as the other chip recipes. */
+/* Secondary slab on Ink ground — the quiet companion to the primary CTA. */
 .btn-secondary--on-ink {
   background-color: #18181b;
   color: #fafafa;
-  border-color: rgba(255, 255, 255, 0.14);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.10),
-    0 1px 2px rgba(0, 0, 0, 0.30),
-    0 2px 4px rgba(0, 0, 0, 0.36),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-color: #3f3f46;
 }
 
 .btn-secondary--on-ink:hover {
   background-color: #27272a;
-  transform: translateY(-1px);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.18),
-    0 2px 4px rgba(0, 0, 0, 0.34),
-    0 4px 8px rgba(0, 0, 0, 0.40),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-color: #71717a;
 }
 
 .btn-secondary--on-ink:active {
-  transform: translateY(1px);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.10),
-    0 1px 1px rgba(0, 0, 0, 0.22),
-    0 1px 2px rgba(0, 0, 0, 0.30),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transform: scale(0.985);
 }
 
 /*
@@ -653,17 +618,20 @@ html {
   .btn-secondary,
   .btn-primary--on-ink,
   .btn-secondary--on-ink {
-    transition: box-shadow 150ms linear, background-color 150ms linear, border-color 150ms linear;
+    transition:
+      background-color var(--dur-fast) linear,
+      border-color var(--dur-fast) linear;
   }
-  .btn-primary:hover,
-  .btn-secondary:hover,
-  .btn-primary--on-ink:hover,
-  .btn-secondary--on-ink:hover,
+
   .btn-primary:active,
   .btn-secondary:active,
   .btn-primary--on-ink:active,
   .btn-secondary--on-ink:active {
     transform: none;
+  }
+
+  .button-cipher__label {
+    display: none;
   }
 }
 
@@ -673,8 +641,8 @@ html {
  * (50% 110%, Fog→Ink, every stop inside the grey ramp — the No-Colour Rule
  * holds) over a faint feTurbulence paper-grain overlay. The black section
  * above (ReferenceImplementations) flows straight in — the dark-on-dark
- * seam is the point. Flat and sharp: no container shadow; the closing CTA
- * carries the only lift on the surface.
+ * seam is the point. Flat and sharp throughout; buttons use fill, border,
+ * and the cipher pass for affordance rather than elevation.
  */
 .footer-specimen {
   position: relative;
@@ -1206,10 +1174,8 @@ html {
   color: var(--edge);
 }
 
-/* CTA in the bar: square, per the Sharp Buttons rule (DESIGN.md §5) — the
-   pill exception is gone with the pill. The lift, shadow, and inner
-   highlight from .btn-primary remain; padding is trimmed so the chip sits
-   comfortably in the bar's height. */
+/* CTA in the bar: square, per the Sharp Buttons rule (DESIGN.md §5).
+   Padding is trimmed so the flat slab sits comfortably in the bar. */
 .site-nav .btn-primary,
 .site-nav .btn-primary--on-ink {
   padding: 10px 22px;
@@ -1870,8 +1836,8 @@ html {
 
 /* Square segmented control — the feature-nav register one size down.
    Carries its own opaque Card ground + Hair rim so it reads on all four
-   surface combinations (light/dark theme × UI/API view). Flat: the
-   No-Shadow Rule holds, only .btn-* lift. */
+   surface combinations (light/dark theme × UI/API view). Flat like every
+   other control in the system. */
 .feature-demo__toggle {
   position: absolute;
   left: 50%;
@@ -2250,8 +2216,7 @@ html {
  *
  * Entries are hairline-separated rows — a wordmark over its destination
  * host (mono, honest: you see where "Open" goes) and a real Open chip.
- * On Paper; flat and sharp except the chip, which keeps the documented
- * lift (DESIGN.md §4).
+ * On Paper; flat and sharp throughout.
  * =================================================================== */
 .wallet-group {
   display: flex;
@@ -2339,7 +2304,7 @@ html {
 }
 
 /* Open chip — a real button, sized down a touch from the page CTA so a
-   column of them stays quiet. Inherits the .btn-secondary lift. */
+   column of them stays quiet. */
 .wallet-open {
   flex: 0 0 auto;
   padding: 10px 20px;

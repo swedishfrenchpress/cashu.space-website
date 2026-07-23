@@ -182,7 +182,7 @@ function Spec() {
          hair of breathing room. The offset lives on the .spec-pane class so
          the magic number doesn't sit inline — see globals.css. */}
       <pre className="spec-pane t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pr-10 overflow-x-auto leading-7">
-        <span className="text-zinc-500">{`// Token v4  ·  CBOR encoding`}</span>{"\n\n"}
+        <span className="text-zinc-500">{`// Cashu Token v4  ·  CBOR encoding`}</span>{"\n\n"}
         {`{\n  "t": [{\n    "i": `}
         <span className="t-pixel">{`h'00…d2'`}</span>
         {`,        `}
@@ -191,9 +191,15 @@ function Spec() {
         <span className="t-pixel">{`64`}</span>
         {`,              `}
         <span className="text-zinc-500">{`// sats`}</span>
-        {`\n      "s": "ecash…"      `}
-        <span className="text-zinc-500">{`// blinded sig`}</span>
-        {`\n    }]\n  }],\n  "m": "https://mint.example.com",\n  "u": "sat"\n}`}
+        {`\n      "s": h'02ab…f1',      `}
+        <span className="text-zinc-500">{`// blinded signature`}</span>
+        {`\n      "d": h'0248…e4'       `}
+        <span className="text-zinc-500">{`// DLEQ proof`}</span>
+        {`\n    }, {\n      "a": `}
+        <span className="t-pixel">{`128`}</span>
+        {`,             `}
+        <span className="text-zinc-500">{`// sats`}</span>
+        {`\n      "s": h'03c9…7e',\n      "d": h'0187…a6'\n    }]\n  }],\n  "m": "https://mint.example.com",\n  "u": "sat",\n  "v": 4\n}`}
       </pre>
     </div>
   );

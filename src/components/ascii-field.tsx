@@ -38,7 +38,9 @@ const MAX_DPR = 2;
    while the strongest level uses the runtime-resolved peak glyph (₿ when
    the font carries it, else B). Fills are the zinc ramp, mirrored between
    schemes. */
-const LEVEL_MIN = [40, 90, 140, 200, 232];
+/* The peak starts close enough to the high-contour band that ₿ appears as a
+   recurring signal across the terrain, not just at a handful of extrema. */
+const LEVEL_MIN = [40, 90, 140, 200, 216];
 const LEVEL_GLYPH = ["·", "/", ",", "", ""];
 const CURRENCY_GLYPHS = ["$", "¥", "€"];
 const CURRENCY_LEVEL = 3;

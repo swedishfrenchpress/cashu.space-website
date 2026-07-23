@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
 import { GeistPixelSquare } from "geist/font/pixel";
 import ConsoleSignature from "@/components/console-signature";
+import ButtonCipher from "@/components/button-cipher";
 import Keymap from "@/components/keymap";
 import "./globals.css";
 
@@ -107,6 +108,7 @@ export default function RootLayout({
           }}
         />
         <ConsoleSignature />
+        <ButtonCipher />
         <Keymap />
         {children}
       </body>

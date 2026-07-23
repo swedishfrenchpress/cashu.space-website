@@ -167,7 +167,7 @@ Color is intentionally absent from everything the site says in its own voice. Th
 - Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.
 - Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).
 - Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.
-- Sharp lifted-slab buttons, hairline divider, no container shadows — depth is conveyed by position and weight; only the button earns a lift.
+- Sharp flat-slab buttons, hairline dividers, and no shadows — hierarchy comes from fill, border, position, and weight.
 - Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast.
 
 **The Two-CTA Rule.** Primary buttons across the site exist to serve two jobs and two only: *get a wallet* and *read the spec*. These are the outcomes PRODUCT.md elevates above mint trust, and the visual hierarchy follows. Every other interactive surface — GitHub, blog, tab switchers, secondary navigation — is a `.btn-secondary` or a `nav-link`. If a third "primary" CTA appears on a single page the page is competing with itself; collapse one before shipping.
@@ -231,15 +231,13 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 ## 4. Elevation
 
-The system is flat with one exception: the button. Every other container — cards, sections, callouts, nav, dividers, placeholder surfaces — sits on Paper without ambient depth. Depth in the layout is conveyed by position (whitespace, grid order), by weight (type doing the lifting), and by a single 1px hairline rule.
+The system is flat without exception. Containers and controls — cards, buttons, sections, callouts, nav, dividers, placeholder surfaces — sit directly on their ground without ambient depth. Hierarchy is conveyed by whitespace, grid position, type weight, fill, border, and a single 1px hairline rule.
 
-The button is the system's only invitation-to-press, and earns the only lift. It carries a darker rim, two layered drop shadows, and an inner top highlight — the *lifted ink chip* — codified in §5.
-
-This scoping is intentional and doctrinal: the Open Specification north star rejects ambient depth on the page, but a CTA that asks for a click is allowed to look like it can be clicked.
+Buttons communicate interaction through contrasting fill, a precise border, quick active compression, and the cipher pass documented in §5. They do not lift off the page.
 
 ### Named Rules
 
-**The No-Shadow Rule.** `box-shadow` is forbidden on every container *except* the four `.btn-*` button classes (`.btn-primary`, `.btn-secondary`, and their `--on-ink` variants). If a card "needs" elevation, it needs spacing instead. The button exception is non-transferable — no other surface inherits it.
+**The No-Shadow Rule.** `box-shadow` is forbidden throughout the site, including buttons. If a surface needs separation, use spacing, fill contrast, or a 1px border.
 
 **The Hairline Rule.** Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.
 
@@ -251,23 +249,24 @@ This scoping is intentional and doctrinal: the Open Specification north star rej
 
 Components are restrained to a small canonical set: two buttons, a nav link, a divider, and a placeholder surface. New components must justify themselves against the No-Colour and No-Shadow rules before being added.
 
-### Buttons — The Lifted Ink Slab
+### Buttons — The Flat Cipher Slab
 
-The button is the only surface in the system that breaks the flatness doctrine. It is a **sharp-cornered slab** that sits *above* the page on a stack of shadows. The rationale: a button is the only element that asks for a press, and the only one that earns visible affordance. Sharpness is doctrinal — there are no rounded buttons anywhere on cashu.space.
+Buttons are **sharp-cornered, shadowless slabs**. Their affordance comes from decisive fill contrast, a 1px border, and one brief mono texture on hover/focus. Sharpness is doctrinal — there are no rounded buttons anywhere on cashu.space.
 
-- **Shape:** Sharp. `border-radius: 0`. Always. No pills, no rounded corners, no soft rectangles. The lift comes from shadow, not from silhouette.
+- **Shape:** Sharp. `border-radius: 0`. Always. No pills, rounded corners, shadows, inner highlights, or glows.
 - **Size parity:** Primary and secondary share the *same* padding (`12px 24px`) and the *same* font size (`0.8125rem`, weight 500). Hierarchy is conveyed by fill (Ink vs Paper), never by box. No "large" modifier; if a CTA needs more presence, the layout around it does the work — whitespace, alignment, isolation.
 - **Copy:** Button labels are **all caps**, set with `text-transform: uppercase` and `letter-spacing: 0.06em`. Sentence-cased button copy is forbidden.
 - **No icons.** Buttons never carry icons — no SVG glyphs, no `→` arrow, no chevrons, no spinners-as-decoration. The label is the entire button. (A spinner *replacing* the label during an async action is acceptable when the time comes; that's not an icon, it's the label's loading state.)
-- **Primary** (`.btn-primary`): Background Ink Soft (`#18181b`), text Paper (`#ffffff`). Carries a 1px semi-transparent white inside-stroke, a true-black rim shadow (`box-shadow: 0 0 0 1px #000000`), two layered drop shadows (`0 1px 2px rgba(9,9,11,0.08)` and `0 2px 4px rgba(9,9,11,0.16)`), and a white inner top highlight (`inset 0 1px 20px rgba(255,255,255,0.16)`).
-- **Secondary** (`.btn-secondary`): Background Paper (`#ffffff`), text Ink Soft (`#18181b`). Rim is Hair (`box-shadow: 0 0 0 1px #e4e4e7`) so the slab reads against Paper without the white-on-white edge disappearing. Same drop-shadow ramp at half opacity. No inner highlight (invisible on white).
-- **On-ink variants** (`.btn-primary--on-ink`, `.btn-secondary--on-ink`): For CTAs sitting on an Ink section. The primary is a Paper fill with a Slate rim (`box-shadow: 0 0 0 1px #3f3f46`), deeper drop shadows (`0 1px 2px rgba(0,0,0,0.20)` and `0 2px 4px rgba(0,0,0,0.32)`) so the slab reads against black, and a stronger inner top highlight (`rgba(255,255,255,0.50)`) so the lift is unmistakable. The secondary is the quieter counterpart for non-primary actions on Ink, same box, hierarchy by fill.
-- **States:** Hover lifts the slab by `translateY(-1px)` and deepens drop shadow 3; active settles by `translateY(1px)` and reduces the shadows by roughly half. Motion uses the existing `ease-quart-out` curve at `150ms`. Under `prefers-reduced-motion: reduce`, the translate is dropped — only the shadows change.
+- **Primary** (`.btn-primary`): Background Ink Soft (`#18181b`), text Paper (`#ffffff`), with a matching Ink border. Hover shifts the fill one neutral step.
+- **Secondary** (`.btn-secondary`): Background Paper (`#ffffff`), text Ink Soft (`#18181b`), with a Hair border. Hover shifts to Band and strengthens the border to Mist.
+- **On-ink variants** (`.btn-primary--on-ink`, `.btn-secondary--on-ink`): The primary uses Paper with a Hair border; the secondary uses Ink Soft with a Slate border. Both remain flat against the dark ground.
+- **Cipher pass:** Hover and keyboard focus run a 460ms left-to-right encrypt → decrypt pass over the visual label. The accessible label stays unchanged; the cipher resolves completely before the interaction settles.
+- **States:** Fill and border transition over `220ms` with `ease-out-quart`. Active compresses to `scale(0.985)` for immediate tactile feedback. Under `prefers-reduced-motion: reduce`, the cipher and scale are removed; only the fill and border change.
 - **Focus:** A 2px outline at 4px offset (Ink on light sections, Paper on Ink sections). No glow, no ring colour shift.
 
-#### What stays flat (no shadow)
+#### What stays flat
 
-The lift exception applies *only* to the three `.btn-*` classes above. Every other surface in the system is flat and sharp: cards, sections, callouts, nav, dividers, placeholder surfaces. A new component is not allowed to inherit the button exception by association.
+Everything. The cipher pass is texture, not elevation; it does not license shadows elsewhere.
 
 ### Navigation
 
@@ -305,7 +304,7 @@ The four-parts section demonstrates the protocol twice over: a real product scre
 - **Two grounds, one frame.** The API view sits on 44px hairline graph paper (Hair lines on Band) that flips with the theme — there is no always-dark surface in the panel. The UI view swaps the graph paper for the tab's fully desaturated landscape photograph (`.feature-demo__photo`), held at 65% opacity so it supports rather than competes with the app screenshot. Neither ground is the Twilight Stack: no bloom-to-black, no grain. Twilight stays footer-reserved.
 - **The depicted product is real art.** The UI view shows *real app screenshots* — theme-flipped light/dark captures of actual Cashu wallets and mints — not a coded mock. (The earlier liquid-glass mock card this pattern once specified is retired.) The screenshot is opaque and carries no site-side styling beyond a hairline frame: no drop shadow, no blur, no rounding. Whatever colour the depicted app renders is the app's own voice, sanctioned by the Depicted-World Exception (§2). Nothing outside the demo frame inherits any of it.
 - **The code pane** is the boxy counterweight: sharp corners, Card ground, Hair tab-strip, Ink text, Mist comments. It flips with the theme (white file pane on light, the classic dark pane on dark) — same register, two keys.
-- **The toggle** is the feature-nav register one size down: uppercase GT 500 at `0.75rem`, `letter-spacing: 0.06em`, active segment inverts to Ink/On-Ink. It carries its own Card ground and Hair rim so it reads on every surface it floats over. Flat and square — neither the button lift nor the glass exception extends to it.
+- **The toggle** is the feature-nav register one size down: uppercase GT 500 at `0.75rem`, `letter-spacing: 0.06em`, active segment inverts to Ink/On-Ink. It carries its own Card ground and Hair rim so it reads on every surface it floats over. Flat and square like the rest of the system.
 - **Honest content.** Everything protocol-shaped in a demo panel is real spec data: real NUT examples, a decodable token, request/response bodies verbatim from the NUTs. Mock UI, real protocol.
 - **QR codes never theme-flip.** Modules stay black on a literal-white quiet-zone tile in both schemes — inverted QRs fail scanners, and a scannable code is the point.
 
@@ -326,7 +325,7 @@ The four-parts section demonstrates the protocol twice over: a real product scre
 - **Don't** introduce chromatic accent in the site's own voice. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Never on cashu.space. Colour appears only under the Depicted-World Exception (§2): depicted app art, the tap-to-pay video, third-party marks.
 - **Don't** add Web3 / DeFi tropes: pastel gradients, blob shapes, decorative network animations that misrepresent how the protocol works (e.g. mints "talking" to mints, which Cashu doesn't do). Motion is permitted only under the Honest-Network Rule — see §4.
 - **Don't** dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS "YOUR DATA, SECURED™" copy. Privacy is a property of the protocol, stated plainly.
-- **Don't** use `box-shadow` on any container except the four `.btn-*` classes (`.btn-primary` / `.btn-secondary` / `.btn-primary--on-ink` / `.btn-secondary--on-ink`). Buttons are the system's only lifted surface — every other container is flat. No drop shadow, no inner shadow, no coloured glow anywhere else.
+- **Don't** use `box-shadow` anywhere. No drop shadow, inner shadow, coloured glow, or button exception.
 - **Don't** use `border-left` / `border-right` >1px as a coloured stripe on cards or callouts. Side-stripes are forbidden in impeccable's universal bans and doubly forbidden here.
 - **Don't** use `background-clip: text` with a gradient (gradient text). One solid colour, emphasis by weight or size.
 - **Don't** introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.
