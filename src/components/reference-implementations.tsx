@@ -264,7 +264,7 @@ export default function ReferenceImplementations() {
   return (
     <section className="bg-black text-white section-y-default">
       <div className="page-shell flex flex-col gap-12 lg:gap-16">
-        <div className="flex flex-col gap-6 max-w-[44ch]">
+        <div className="implementations-intro flex flex-col gap-6">
           <Reveal>
             <h2 className="t-headline">
               {IMPLEMENTATIONS_WORD} implementations, one spec.

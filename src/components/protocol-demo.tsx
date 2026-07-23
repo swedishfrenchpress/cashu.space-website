@@ -41,7 +41,10 @@ export default function ProtocolDemo({
         {image ? (
           <div
             className="feature-demo__photo"
-            style={{ backgroundImage: `url(${image})` }}
+            style={{
+              backgroundImage: `url(${image})`,
+              filter: "grayscale(1)",
+            }}
             aria-hidden
           />
         ) : null}

@@ -146,10 +146,11 @@ export default function TabbedFeature() {
                 className="feature-block"
               >
                 <Reveal variant="fade" slow>
-                  {/* Demo panel: mock product UI ↔ protocol code behind a
+                  {/* Demo panel: real product UI ↔ protocol code behind a
                       UI/API toggle (griffin-style). tab.image renders
-                      grayscale behind the UI card — see .feature-demo__photo.
-                      Interactive, so no aria-hidden here. */}
+                      grayscale behind the UI screenshot — see
+                      .feature-demo__photo. Interactive, so no aria-hidden
+                      here. */}
                   <ProtocolDemo demo={tab.id} label={tab.label} image={tab.image} />
                 </Reveal>
                 <div className="feature-block__text">

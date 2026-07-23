@@ -8,11 +8,12 @@ import { useEffect, useRef } from "react";
  * heightfield, and cells near contour lines (height mod spacing) intensify,
  * so drifting topographic ridgelines emerge from a quiet dotted plain.
  * The ramp runs faint→strong against the page ground: `·` and `/` fill
- * the open field, `,` marks crests, and ₿ caps the contour peaks. Geist
- * Mono has no U+20BF glyph, so the ₿ is synthesized: the font's own `B`
- * plus the official symbol's two vertical strokes drawn as rects — the
- * same letterform on every platform, no system-font fallback. If the
- * font ever gains a native ₿ (probed at runtime), it takes over.
+ * the open field, `,` marks crests, $, ¥, and € mark high contours, and
+ * ₿ caps the strongest peaks. Geist Mono has no U+20BF glyph, so the ₿ is
+ * synthesized: the font's own `B` plus the official symbol's two vertical
+ * strokes drawn as rects — the same letterform on every platform, no
+ * system-font fallback. If the font ever gains a native ₿ (probed at
+ * runtime), it takes over.
  *
  * Theme: resolves like the site CSS — an html
  * data-theme="dark|light" attribute wins, else prefers-color-scheme —
@@ -33,12 +34,15 @@ const FRAME_SKIP = 2;
 const MAX_DPR = 2;
 
 /* Brightness thresholds ascend toward the stronger glyph; cells below the
-   first threshold stay empty. The top two levels use the runtime-resolved
-   peak glyph (₿ when the font carries it, else B). Fills are the zinc ramp,
-   mirrored between schemes. */
+   first threshold stay empty. High contours rotate through fiat symbols,
+   while the strongest level uses the runtime-resolved peak glyph (₿ when
+   the font carries it, else B). Fills are the zinc ramp, mirrored between
+   schemes. */
 const LEVEL_MIN = [40, 90, 140, 200, 232];
 const LEVEL_GLYPH = ["·", "/", ",", "", ""];
-const PEAK_LEVEL = 3;
+const CURRENCY_GLYPHS = ["$", "¥", "€"];
+const CURRENCY_LEVEL = 3;
+const PEAK_LEVEL = 4;
 
 /* Synthesized-₿ strokes: two verticals piercing the B, centered ±DX from
    the glyph center, LEN px beyond its top and bottom edges. */
@@ -88,6 +92,16 @@ function pickLevel(b: number): number {
     if (b >= LEVEL_MIN[i]) return i;
   }
   return -1;
+}
+
+/* Stable spatial hash: a cell always keeps the same currency, so motion
+   comes from the terrain crossing thresholds rather than random shimmer. */
+function pickCurrencyGlyph(px: number, py: number): string {
+  const col = Math.floor(px / CELL_W);
+  const row = Math.floor(py / CELL_H);
+  const hash = Math.imul(col, 31) ^ Math.imul(row, 17);
+  const mixed = Math.imul(hash ^ (hash >>> 13), 1274126177);
+  return CURRENCY_GLYPHS[(mixed >>> 0) % CURRENCY_GLYPHS.length];
 }
 
 export default function AsciiField({ className }: { className?: string }) {
@@ -183,10 +197,14 @@ export default function AsciiField({ className }: { className?: string }) {
         if (pts.length === 0) continue;
         ctx.fillStyle = fills[level];
         const isPeak = level >= PEAK_LEVEL;
-        const glyph = isPeak ? peakGlyph : LEVEL_GLYPH[level];
         for (let i = 0; i < pts.length; i += 2) {
           const px = pts[i];
           const py = pts[i + 1];
+          const glyph = isPeak
+            ? peakGlyph
+            : level === CURRENCY_LEVEL
+              ? pickCurrencyGlyph(px, py)
+              : LEVEL_GLYPH[level];
           ctx.fillText(glyph, px, py);
           if (isPeak && synthPeak) {
             const xl = px - BTC_STROKE_DX - BTC_STROKE_W / 2;
@@ -285,7 +303,7 @@ export default function AsciiField({ className }: { className?: string }) {
     /* Re-measure once webfonts settle: the first frames may paint in the
        fallback mono, and the ₿ probe is only meaningful post-load. */
     try {
-      document.fonts.load(fontString, "·/,B₿0");
+      document.fonts.load(fontString, "·/,$¥€B₿0");
     } catch {
       /* FontFaceSet.load can reject on unparsable specs; the fallback
          font path already covers us. */

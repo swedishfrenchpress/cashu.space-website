@@ -909,10 +909,9 @@ html {
 
 .footer-disclaimer {
   width: 100%;
-  /* Left edge stays flush with the signoff, metastrip, and bottom rows
-     above; the measure caps at the body maximum (DESIGN.md §3: 65–75ch)
-     so the closing paragraph stays readable at wide viewports. */
-  max-width: 75ch;
+  /* Deliberate footer exception to the normal prose measure: this closing
+     statement spans the same grid as every row above it. */
+  max-width: none;
   color: #a1a1aa;
   text-wrap: pretty;
 }
@@ -1053,19 +1052,22 @@ html {
   letter-spacing: -0.02em;
   color: var(--ink);
   margin: 0;
-  max-width: 16ch;
+  width: 100%;
+  max-width: none;
   text-wrap: balance;
 }
 
 .hero-spec__body {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
   font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.5;
   letter-spacing: -0.005em;
   color: var(--body);
   margin: 0;
-  max-width: 44ch;
+  width: 100%;
+  max-width: none;
+  text-wrap: pretty;
 }
 
 /* Row B — CTA row. Primary chip + secondary "View documentation" chip,
@@ -1653,7 +1655,7 @@ html {
   padding: 12px 16px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--faint);
+  color: var(--body);
   cursor: pointer;
   text-align: left;
   white-space: nowrap;
@@ -1798,18 +1800,16 @@ html {
   background-image: none;
 }
 
-/* The tab's photo (rocks, canyon, peaks, wave) — real art standing in for
-   the old grid+blooms ground, shown at full colour and full opacity (a
-   deliberate exception to the No-Colour Rule — see DESIGN.md — for this
-   depicted-product art only). Sits above .feature-demo__view--ui's own
-   background (band colour only, see above) and below the card/shot
-   (z-index 1, see below). */
+/* The tab's photo (rocks, canyon, peaks, wave) — quiet atmosphere behind
+   the product UI. It stays fully desaturated and partially transparent so
+   the depicted app screenshot remains the panel's clear focal point. */
 .feature-demo__photo {
   position: absolute;
   inset: 0;
   z-index: 0;
   background-size: cover;
   background-position: center;
+  opacity: 0.65;
 }
 
 /* Real screenshot — the depicted-product exception, now carried entirely
@@ -1833,7 +1833,7 @@ html {
    100% sizes the element to its own 4:3 crop, capped by whichever of the
    frame's width/height binds first — the element's box (and its border)
    then hugs the actual visible photo. (object-fit: contain would scale the
-   painted pixels the same way, but leaves the <img>'s own box at the full
+   painted pixels the same way, but leaves the image element's box at the full
    100%/100% frame size, so a border on the element traces empty space
    past the letterboxed photo — visible as a floating rectangle whenever the
    frame's aspect ratio doesn't match the 4:3 crop, which is every
@@ -2136,11 +2136,19 @@ html {
   flex-direction: column;
   align-items: flex-start;
   gap: clamp(0.75rem, 1.5vw, 1.25rem);
-  max-width: 52ch;
+  width: 100%;
+  max-width: none;
+}
+
+.feature-block__title {
+  width: 100%;
+  text-wrap: balance;
 }
 
 .feature-block__caption {
+  width: 100%;
   color: var(--body);
+  text-wrap: pretty;
 }
 
 /* -------------------------------------------------------------------
@@ -2200,16 +2208,35 @@ html {
   flex-direction: column;
   align-items: flex-start;
   gap: clamp(1rem, 2vw, 1.5rem);
-  max-width: 44ch;
+  width: 100%;
+  max-width: none;
 }
 
 .video-feature__title {
+  width: 100%;
   color: #ffffff;
-  max-width: 18ch;
+  max-width: none;
+  text-wrap: balance;
 }
 
 .video-feature__body {
+  width: 100%;
+  max-width: 75ch;
   color: rgba(255, 255, 255, 0.82);
+  text-wrap: pretty;
+}
+
+.implementations-intro {
+  width: 100%;
+  max-width: none;
+}
+
+.implementations-intro h2 {
+  text-wrap: balance;
+}
+
+.implementations-intro p {
+  text-wrap: pretty;
 }
 
 /* ===================================================================

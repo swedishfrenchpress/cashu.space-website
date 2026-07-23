@@ -18,6 +18,18 @@ typography:
     fontWeight: 600
     lineHeight: 0.95
     letterSpacing: "-0.02em"
+  heroDisplay:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(3.75rem, 7vw, 6.5rem)"
+    fontWeight: 600
+    lineHeight: 0.95
+    letterSpacing: "-0.02em"
+  footerDisplay:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(3.75rem, 6vw, 5rem)"
+    fontWeight: 600
+    lineHeight: 0.95
+    letterSpacing: "-0.02em"
   headline:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(2rem, 4vw, 3rem)"
@@ -30,21 +42,51 @@ typography:
     fontWeight: 600
     lineHeight: 1.3
     letterSpacing: "-0.01em"
+  brandWordmark:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-0.02em"
   body:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "0"
+  heroLead:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(1.125rem, 1.6vw, 1.5rem)"
+    fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: "-0.005em"
   label:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 500
     lineHeight: 1.4
     letterSpacing: "0"
+  navLink:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 500
+    lineHeight: 1.2
+    letterSpacing: "0"
   button:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.8125rem"
+    fontWeight: 500
+    lineHeight: 1.2
+    letterSpacing: "0.06em"
+  compactButton:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.78125rem"
+    fontWeight: 500
+    lineHeight: 1.2
+    letterSpacing: "0.06em"
+  micro:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.75rem"
     fontWeight: 500
     lineHeight: 1.2
     letterSpacing: "0.06em"
@@ -118,7 +160,7 @@ The system commits to a few sharp moves: massive editorial display type (GT-Stan
 
 Motion is permitted under one condition: it must depict real protocol structure. The hero overlays mint markers and animated dotted lines between them to show Lightning Network bridging — a true property of the protocol — never a decorative flow. See the Honest-Network Rule in §4.
 
-Color is intentionally absent from everything the site says in its own voice. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal. The one carve-out is the Depicted-World Exception (§2): artifacts the page *depicts* — real app screenshots, the demo panels' landscape grounds, the tap-to-pay video, third-party marks — keep their source colour, because faking them grey would be its own kind of dishonesty.
+Color is intentionally absent from everything the site says in its own voice. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal. The one carve-out is the Depicted-World Exception (§2): artifacts the page *depicts* — real app screenshots, the tap-to-pay video, third-party marks — keep their source colour, because faking them grey would be its own kind of dishonesty. The demo panels' landscape grounds are supporting art rather than product evidence, so they desaturate into the site's monochrome register.
 
 **Key Characteristics:**
 
@@ -153,7 +195,7 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 **The No-Colour Rule.** The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface "needs" colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch.
 
-**The Depicted-World Exception.** Colour is permitted only inside artifacts the page *depicts*, never in the chrome the site *is*. The sanctioned surfaces, exhaustively: (a) the four-parts demo panels — the landscape photo grounds and the real wallet/mint app screenshots shown over them, including whatever colour the depicted app itself renders; (b) the tap-to-pay video, a documentary capture of real hardware; (c) third-party marks shown at their brand identity — the language logos on the implementations card and the AI-assistant icons in the footer. Everything in the site's own voice — type, backgrounds, borders, buttons, icons, figures, chrome — stays monochrome. Editorial photography *reports* rather than depicts, so it still desaturates via `grayscale(1) contrast(1.05)` and its wordmarks force to Paper (see the press band). A new colour surface that is neither a depicted product artifact nor a third-party mark falls under the No-Colour Rule in full.
+**The Depicted-World Exception.** Colour is permitted only inside artifacts the page *depicts*, never in the chrome the site *is*. The sanctioned surfaces, exhaustively: (a) the real wallet/mint app screenshots in the four-parts demo panels, including whatever colour the depicted app itself renders; (b) the tap-to-pay video, a documentary capture of real hardware; (c) third-party marks shown at their brand identity — the language logos on the implementations card and the AI-assistant icons in the footer. The demo panels' landscape photo grounds sit outside this exception and desaturate via `grayscale(1)`. Everything in the site's own voice — type, backgrounds, borders, buttons, icons, figures, chrome — stays monochrome. Editorial photography *reports* rather than depicts, so it still desaturates via `grayscale(1) contrast(1.05)` and its wordmarks force to Paper (see the press band). A new colour surface that is neither a depicted product artifact nor a third-party mark falls under the No-Colour Rule in full.
 
 **The Two-Black Rule.** Ink (`#000000`) and Ink Soft (`#18181b`) are the only two text colours that may sit on Paper. Slate / Mist / Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.
 
@@ -169,9 +211,12 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 ### Hierarchy
 
 - **Display** (weight 600, `clamp(3.75rem, 9vw, 9rem)`, line-height 0.95, letter-spacing −0.02em): Short page-peak copy — the closing-CTA slogan, the H1 on dedicated routes (`/wallets`, future `/docs`, `/blog`). Sized to be monumental, which means it only fits copy under ~25 characters. Long descriptive hero prose does not belong at Display; it gets a bespoke scale below Display and above Headline, justified inline. The line break in Display copy is part of the composition, not an accident of viewport.
+- **Homepage Display** (weight 600, `clamp(3.75rem, 7vw, 6.5rem)`, line-height 0.95, letter-spacing −0.02em): The longer homepage statement, scaled below route Display so it can share the full content grid without shouting.
+- **Footer Display** (weight 600, `clamp(3.75rem, 6vw, 5rem)`, line-height 0.95, letter-spacing −0.02em): The compact closing wordmark.
 - **Headline** (weight 600, `clamp(2rem, 4vw, 3rem)`, line-height 1.05, letter-spacing −0.015em): Section openings ("What is ecash?", "Wallets", "Mints").
 - **Title** (weight 600, `1.125rem`, line-height 1.3): Subheaders, card titles, anything ranked above body but below a section opening.
 - **Body** (weight 400, `1rem`, line-height 1.5, max line length 65–75ch): All reading copy. Width is enforced; no body paragraph crosses 75ch.
+- **Hero Lead** (weight 400, `clamp(1.125rem, 1.6vw, 1.5rem)`, line-height 1.5, letter-spacing −0.005em): The homepage hero’s supporting statement. It shares the hero grid width, with `text-wrap: pretty` keeping each rendered line readable.
 - **Label** (weight 500, `0.875rem`): Navigation, captions, the disclaimer.
 - **Button** (weight 500, `0.8125rem`, uppercase, letter-spacing 0.06em, line-height 1.2): Button labels only — one step below Label so the all-caps slab reads as an object, not a line of text. Codified here so the type ramp and the component spec agree on the same number.
 - **Mono** (weight 400, `0.875rem`): Inline code, addresses, transaction ids — anywhere a literal copy-pasteable string appears in copy.
@@ -257,7 +302,7 @@ The Twilight Stack is the system's one allowed atmospheric flourish, and is perm
 
 The four-parts section demonstrates the protocol twice over: a real product screenshot and the code behind it, flipped by a **square segmented control** (never a rounded pill) floating bottom-center inside the media frame. Rules of the pattern:
 
-- **Two grounds, one frame.** The API view sits on 44px hairline graph paper (Hair lines on Band) that flips with the theme — there is no always-dark surface in the panel. The UI view swaps the graph paper for the tab's full-colour landscape photograph (`.feature-demo__photo`), the Depicted-World Exception's ground. Neither ground is the Twilight Stack: no bloom-to-black, no grain. Twilight stays footer-reserved.
+- **Two grounds, one frame.** The API view sits on 44px hairline graph paper (Hair lines on Band) that flips with the theme — there is no always-dark surface in the panel. The UI view swaps the graph paper for the tab's fully desaturated landscape photograph (`.feature-demo__photo`), held at 65% opacity so it supports rather than competes with the app screenshot. Neither ground is the Twilight Stack: no bloom-to-black, no grain. Twilight stays footer-reserved.
 - **The depicted product is real art.** The UI view shows *real app screenshots* — theme-flipped light/dark captures of actual Cashu wallets and mints — not a coded mock. (The earlier liquid-glass mock card this pattern once specified is retired.) The screenshot is opaque and carries no site-side styling beyond a hairline frame: no drop shadow, no blur, no rounding. Whatever colour the depicted app renders is the app's own voice, sanctioned by the Depicted-World Exception (§2). Nothing outside the demo frame inherits any of it.
 - **The code pane** is the boxy counterweight: sharp corners, Card ground, Hair tab-strip, Ink text, Mist comments. It flips with the theme (white file pane on light, the classic dark pane on dark) — same register, two keys.
 - **The toggle** is the feature-nav register one size down: uppercase GT 500 at `0.75rem`, `letter-spacing: 0.06em`, active segment inverts to Ink/On-Ink. It carries its own Card ground and Hair rim so it reads on every surface it floats over. Flat and square — neither the button lift nor the glass exception extends to it.
@@ -271,6 +316,7 @@ The four-parts section demonstrates the protocol twice over: a real product scre
 - **Do** carry the No-Colour Rule. Greys may shift by lightness, never by hue.
 - **Do** set the hero headline in Display (GT-Standard 600, ≥3.75rem, line-height 0.95). The headline earns the page.
 - **Do** keep body copy at 65–75ch max width. Long reads are an editorial feature, not an accident.
+- **Do** let the footer disclaimer span the complete footer grid. It is the deliberate exception to the prose measure, closing the composition on the same edges as the rows above.
 - **Do** use Geist Pixel Square only for protocol notation (amounts, ids, version strings). It is signal, not style.
 - **Do** name implementations by name. Cashu is a directory; wallets and mints appear as plain wordmarks, no logos required at first pass.
 - **Do** treat 1px Hair lines as the only structural divider. Sections separate by space first, hairline second.
