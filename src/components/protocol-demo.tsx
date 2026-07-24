@@ -56,7 +56,7 @@ export default function ProtocolDemo({
           aria-pressed={view === "ui"}
           onClick={() => setView("ui")}
         >
-          UI
+          Figure
         </button>
         <button
           type="button"

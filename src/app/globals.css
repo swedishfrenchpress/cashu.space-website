@@ -1683,9 +1683,17 @@ html {
 /* Demo variant of the media panel — UI/Code switcher (see
    protocol-demo.tsx). Two stacked views crossfade inside the chalk frame;
    a square segmented control floats bottom-center. Mobile relaxes the
-   16:10 to a taller frame so the code pane fits without inner scrolling. */
+   16:10 to a taller frame so the code pane fits without inner scrolling.
+
+   min-height is the floor that keeps the frame tall enough for its fixed-
+   height figure plates plus the floating toggle's reserved lane. Without it,
+   the 16:10 (or 4:5) frame shrinks with column width and, below ~640px of
+   frame width, gets shorter than the tallest plate — so the plate overflows
+   under the toggle. The floor holds ~360px of plate room after the 64px
+   toggle lane and top padding, which clears every current plate. */
 .feature-demo {
   aspect-ratio: 4 / 5;
+  min-height: 440px;
 }
 
 @media (min-width: 640px) {

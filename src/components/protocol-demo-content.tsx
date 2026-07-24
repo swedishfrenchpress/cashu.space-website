@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 
 /**
  * Content for the four ProtocolDemo panels: a mock product-UI card and a
@@ -154,106 +153,273 @@ ${TOKEN_HEAD}…${TOKEN_TAIL}
   );
 }
 
-/* ------------------------------------------------------------------ ui — */
+/* ------------------------------------------------------------- figures — */
 
-/* Real product screenshot — the depicted-product exception's other half.
-   Both theme variants mount; CSS (the same data-theme/media-query cascade
-   as the navbar's sun/moon swap, see .feature-demo__shot-img) shows only
-   the one matching the active scheme, so the pick never depends on client
-   JS or causes a hydration mismatch. width/height are the crop's real
-   pixel size — object-contain then scales it to fit the frame. */
-function Shot({
-  light,
-  dark,
-  width,
-  height,
-  alt,
+/* Purpose-built spec plates that replace the app screenshots — the other
+   half of the FIGURE/CODE toggle, drawn in the site's own monochrome voice
+   rather than depicted app art. Same header-strip register as CodePane so
+   the two toggle views read as siblings: one shows the concept as a plate,
+   the other as bytes. Everything protocol-shaped stays real. */
+function Plate({
+  file,
+  meta,
+  children,
 }: {
-  light: string;
-  dark: string;
-  width: number;
-  height: number;
-  alt: string;
+  file: string;
+  meta: string;
+  children: ReactNode;
 }) {
   return (
-    <div className="feature-demo__shot">
-      <Image
-        src={light}
-        alt={alt}
-        width={width}
-        height={height}
-        sizes="(max-width: 640px) 90vw, 45vw"
-        className="feature-demo__shot-img feature-demo__shot-img--light"
-      />
-      <Image
-        src={dark}
-        alt={alt}
-        width={width}
-        height={height}
-        sizes="(max-width: 640px) 90vw, 45vw"
-        className="feature-demo__shot-img feature-demo__shot-img--dark"
-      />
+    <div className="relative z-[1] w-full max-w-[560px] border border-hair bg-card">
+      <div className="t-mono flex items-center justify-between gap-6 bg-hair px-4 py-2.5">
+        <span className="truncate text-body">{file}</span>
+        <span className="hidden whitespace-nowrap text-muted sm:inline">
+          {meta}
+        </span>
+      </div>
+      <div className="px-6 py-6 sm:px-7 sm:py-7">{children}</div>
     </div>
   );
 }
 
-/* All four screenshots share one crop size: 1024×768, pre-cropped and
-   arranged (light/dark) outside this repo. */
-const SHOT_WIDTH = 1024;
-const SHOT_HEIGHT = 768;
-
-/* Wallets — the wallet's home screen: mint pill, balance, Receive/Send,
-   recent activity. */
-function WalletsUi() {
+/* Shared figure atoms. Eyebrow labels the plate's leading field in the same
+   quiet mono as a spec field name. Arrow is a small flow mark drawn in
+   currentColor so it inherits the surrounding text colour and flips with the
+   theme — no glyph-coverage risk (see the ₿ note in the hero). */
+function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <Shot
-      light="/demo/wallets-light.jpg"
-      dark="/demo/wallets-dark.jpg"
-      width={SHOT_WIDTH}
-      height={SHOT_HEIGHT}
-      alt="A wallet home screen showing a bitcoin balance in ecash, with Receive and Send actions"
-    />
+    <span
+      className="t-mono block text-muted"
+      style={{ fontSize: "0.8125rem", letterSpacing: "0.16em" }}
+    >
+      {children}
+    </span>
   );
 }
 
-/* Mints — the actual Mints tab of a Cashu wallet app: connected mints,
-   balances, Add Mint / Discover Mints. */
+function Arrow() {
+  return (
+    <svg
+      width="22"
+      height="8"
+      viewBox="0 0 22 8"
+      aria-hidden
+      className="shrink-0 text-muted"
+    >
+      <line x1="0" y1="4" x2="21" y2="4" stroke="currentColor" strokeWidth="1" />
+      <path
+        d="M17 1 21 4 17 7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+      />
+    </svg>
+  );
+}
+
+/* Wallets — a balance is not one number but a set of proofs, each in a
+   power-of-two denomination (the mint's keyset). The inked cells are exactly
+   the set bits of the amount: the denomination selection IS the binary
+   representation of the balance. Real protocol behaviour, shown as a plate. */
+const DENOMS = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048];
+const BALANCE = 2101; // = 2048 + 32 + 16 + 4 + 1 — five proofs
+
+function WalletsUi() {
+  const held = DENOMS.filter((d) => (BALANCE & d) === d);
+  return (
+    <Plate file="a wallet holds proofs" meta="testnut mint · sat">
+      {/* Amount stays quiet (Big-Or-Quiet Rule): pixel notation at its
+          documented size, never a Display-scale hero. The denomination
+          ladder below carries the figure. */}
+      <Eyebrow>BALANCE</Eyebrow>
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className="t-pixel text-ink">
+          {BALANCE.toLocaleString("en-US")}
+        </span>
+        <span className="t-mono text-muted">sat</span>
+      </div>
+
+      {/* The ladder is the graphic centerpiece: the mint's power-of-two
+          keyset, inked where the balance holds a proof. The inked/ghost
+          pattern is literally the binary representation of 2,101. */}
+      <div
+        className="mt-6 grid grid-cols-4 gap-1.5 sm:grid-cols-6"
+        aria-hidden
+      >
+        {DENOMS.map((d) => {
+          const on = held.includes(d);
+          return (
+            <span
+              key={d}
+              className={`inline-flex h-11 items-center justify-center border ${
+                on
+                  ? "border-ink bg-ink text-on-ink"
+                  : "border-hair text-ghost"
+              }`}
+            >
+              <span className="t-pixel" style={{ fontSize: "0.8125rem" }}>
+                {d}
+              </span>
+            </span>
+          );
+        })}
+      </div>
+    </Plate>
+  );
+}
+
+/* Mints — a mint converts between Lightning bitcoin and ecash, both ways.
+   Plain-language columns ("you send → you get") carry the "Bitcoin in,
+   bitcoin out" headline; the pixel sat amount marks the ecash side, the word
+   "Lightning" the network side. The protocol verbs (mint/melt), the raw
+   bolt11 string, and the keyset id live on the CODE view, not this face. */
+function Leg({ kind, emphasis }: { kind: "ln" | "ecash"; emphasis?: boolean }) {
+  if (kind === "ln") {
+    return (
+      <span
+        className={`t-mono ${emphasis ? "text-body" : "text-muted"}`}
+        style={{ fontSize: "0.8125rem" }}
+      >
+        Lightning
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-baseline gap-1">
+      <span
+        className={`t-pixel ${emphasis ? "text-ink" : "text-muted"}`}
+        style={{ fontSize: "0.8125rem" }}
+      >
+        10
+      </span>
+      <span className="t-mono text-muted" style={{ fontSize: "0.8125rem" }}>
+        sat ecash
+      </span>
+    </span>
+  );
+}
+
+const EXCHANGE = [
+  { op: "Bitcoin in", from: <Leg kind="ln" />, to: <Leg kind="ecash" emphasis /> },
+  { op: "Bitcoin out", from: <Leg kind="ecash" />, to: <Leg kind="ln" emphasis /> },
+];
+
+/* One column template shared by the header and the rows so "you send" /
+   "you get" sit exactly above their values; the 22px spacer column matches
+   the Arrow's width. */
+const MINT_COLS = "grid grid-cols-[6.75rem_1fr_auto_1fr] items-center gap-3";
+
 function MintsUi() {
   return (
-    <Shot
-      light="/demo/mints-light.jpg"
-      dark="/demo/mints-dark.jpg"
-      width={SHOT_WIDTH}
-      height={SHOT_HEIGHT}
-      alt="The Mints screen of a Cashu wallet, listing connected mints with their balances"
-    />
+    <Plate file="a mint bridges bitcoin" meta="testnut.cashu.space">
+      <div className={`${MINT_COLS} border-b border-hair pb-2`}>
+        <span />
+        <span className="t-mono text-muted" style={{ fontSize: "0.75rem" }}>
+          you send
+        </span>
+        <span className="w-[22px]" />
+        <span
+          className="t-mono text-right text-muted"
+          style={{ fontSize: "0.75rem" }}
+        >
+          you get
+        </span>
+      </div>
+      {EXCHANGE.map((row) => (
+        <div key={row.op} className={`${MINT_COLS} border-b border-hair py-4`}>
+          <span className="t-mono text-body" style={{ fontSize: "0.8125rem" }}>
+            {row.op}
+          </span>
+          <span>{row.from}</span>
+          <Arrow />
+          <span className="text-right">{row.to}</span>
+        </div>
+      ))}
+    </Plate>
   );
 }
 
-/* Spec — the wallet's NUT-11 P2PK screen: your key, Show QR, Reveal key. */
+/* Spec — the NUTs are the protocol's version-controlled registry: numbered
+   documents, each mandatory or optional. This plate is the registry's table
+   of contents; the CODE view opens one NUT (NUT-11) to its bytes. Statuses
+   are accurate — 00/01/02 are mandatory, 11 (P2PK) and 23 (bolt11) optional. */
+/* Four rows, not five: five made the plate tall enough to collide with the
+   floating FIGURE/CODE toggle. NUT-11 stays because the CODE view opens
+   exactly that NUT (nut-11.md, P2PK), tying the two faces together. */
+const NUTS = [
+  { id: "NUT-00", title: "Notation & models", req: true },
+  { id: "NUT-01", title: "Mint public keys", req: true },
+  { id: "NUT-11", title: "Pay-to-Pubkey", req: false },
+  { id: "NUT-23", title: "BOLT11 payments", req: false },
+];
+
 function SpecUi() {
   return (
-    <Shot
-      light="/demo/spec-light.jpg"
-      dark="/demo/spec-dark.jpg"
-      width={SHOT_WIDTH}
-      height={SHOT_HEIGHT}
-      alt="A wallet screen showing a key locked to the user's ecash, with Show QR and Reveal key actions"
-    />
+    <Plate file="cashubtc/nuts" meta="NUT registry">
+      <Eyebrow>NUTS</Eyebrow>
+      <div className="mt-3 border-y border-hair">
+        {NUTS.map((n) => (
+          <div
+            key={n.id}
+            className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-hair py-2.5 last:border-b-0"
+          >
+            <span className="t-pixel text-ink" style={{ fontSize: "0.8125rem" }}>
+              {n.id}
+            </span>
+            <span
+              className="t-mono truncate text-body"
+              style={{ fontSize: "0.8125rem" }}
+            >
+              {n.title}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span
+                className={`inline-block h-2 w-2 ${
+                  n.req ? "bg-ink" : "border border-ghost"
+                }`}
+                aria-hidden
+              />
+              <span
+                className="t-mono text-muted"
+                style={{ fontSize: "0.75rem" }}
+              >
+                {n.req ? "mandatory" : "optional"}
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </Plate>
   );
 }
 
-/* Tokens — the wallet's Pending Ecash sheet: the token as a QR code plus
-   its amount. */
+/* Tokens — a token is just a bearer string: the cashuB prefix is the version,
+   the rest is the CBOR payload (here one 1-sat proof, the same object the
+   CODE view decodes). Whoever holds the string holds the sats, so it rides
+   any channel that carries text. */
 function TokensUi() {
   return (
-    <Shot
-      light="/demo/tokens-light.jpg"
-      dark="/demo/tokens-dark.jpg"
-      width={SHOT_WIDTH}
-      height={SHOT_HEIGHT}
-      alt="A pending ecash token shown as a QR code with its amount beneath it"
-    />
+    <Plate file="a token is a string" meta="V4 · cashuB">
+      <Eyebrow>TOKEN</Eyebrow>
+      <div className="mt-3 border border-hair bg-band px-4 py-3">
+        <span className="break-all">
+          <span className="t-pixel text-ink" style={{ fontSize: "0.8125rem" }}>
+            cashuB
+          </span>
+          <span
+            className="t-mono text-muted"
+            style={{ fontSize: "0.8125rem" }}
+          >
+            {`${TOKEN_HEAD.slice(6)}…${TOKEN_TAIL}`}
+          </span>
+        </span>
+      </div>
+      <div className="mt-6">
+        <span className="t-mono text-body" style={{ fontSize: "0.8125rem" }}>
+          WhatsApp · Signal · QR · Email
+        </span>
+      </div>
+    </Plate>
   );
 }
 
