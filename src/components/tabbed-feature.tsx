@@ -13,7 +13,6 @@ type Tab = {
   cta: string;
   href: string;
   external?: boolean;
-  image: string;
 };
 
 const TABS: Tab[] = [
@@ -25,7 +24,6 @@ const TABS: Tab[] = [
       "Independent, open-source, and free. Run a Cashu wallet on iOS, Android, or in the browser.",
     cta: "Explore wallets",
     href: "/wallets",
-    image: "/demo/bg-forest.jpg",
   },
   {
     id: "mints",
@@ -36,7 +34,6 @@ const TABS: Tab[] = [
     cta: "Explore mints",
     href: "https://bitcoinmints.com",
     external: true,
-    image: "/demo/bg-canyon.jpg",
   },
   {
     id: "spec",
@@ -47,7 +44,6 @@ const TABS: Tab[] = [
     cta: "Read the spec",
     href: "https://docs.cashu.space/",
     external: true,
-    image: "/demo/bg-peaks.jpg",
   },
   {
     id: "tokens",
@@ -58,7 +54,6 @@ const TABS: Tab[] = [
     cta: "Understand tokens",
     href: "https://cashubtc.github.io/nuts/00/",
     external: true,
-    image: "/demo/bg-wave.jpg",
   },
 ];
 
@@ -146,12 +141,10 @@ export default function TabbedFeature() {
                 className="feature-block"
               >
                 <Reveal variant="fade" slow>
-                  {/* Demo panel: real product UI ↔ protocol code behind a
-                      UI/API toggle (griffin-style). tab.image renders
-                      grayscale behind the UI screenshot — see
-                      .feature-demo__photo. Interactive, so no aria-hidden
-                      here. */}
-                  <ProtocolDemo demo={tab.id} label={tab.label} image={tab.image} />
+                  {/* Demo panel: real product UI ↔ protocol code with a quiet
+                      ASCII terrain ground. The product screenshot remains the
+                      only visual focal point. */}
+                  <ProtocolDemo demo={tab.id} label={tab.label} />
                 </Reveal>
                 <div className="feature-block__text">
                   <h3 className="t-headline feature-block__title">

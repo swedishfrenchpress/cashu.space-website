@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import AsciiBackdrop from "./ascii-backdrop";
 import { DEMOS, type DemoId } from "./protocol-demo-content";
 
 export type { DemoId };
@@ -9,18 +10,16 @@ export type { DemoId };
  * ProtocolDemo — griffin.com-style demo panel for the four-parts section.
  * Two stacked views inside the chalk media frame: a mock product-UI card
  * and a code pane on an always-dark drafting grid, flipped by a square
- * UI/API segmented control floating bottom-center. Both views stay mounted
+ * UI/Code segmented control floating bottom-center. Both views stay mounted
  * so the crossfade is a pure opacity swap (no layout shift; the frame's
  * aspect-ratio is fixed). The inactive view is aria-hidden + inert.
  */
 export default function ProtocolDemo({
   demo,
   label,
-  image,
 }: {
   demo: DemoId;
   label: string;
-  image?: string;
 }) {
   const [view, setView] = useState<"ui" | "api">("ui");
   const entry = DEMOS[demo];
@@ -38,16 +37,7 @@ export default function ProtocolDemo({
         aria-hidden={view !== "ui"}
         inert={view !== "ui"}
       >
-        {image ? (
-          <div
-            className="feature-demo__photo"
-            style={{
-              backgroundImage: `url(${image})`,
-              filter: "grayscale(1)",
-            }}
-            aria-hidden
-          />
-        ) : null}
+        <AsciiBackdrop />
         {entry.ui}
       </div>
       <div
@@ -74,7 +64,7 @@ export default function ProtocolDemo({
           aria-pressed={view === "api"}
           onClick={() => setView("api")}
         >
-          API
+          Code
         </button>
       </div>
     </div>
