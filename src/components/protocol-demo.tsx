@@ -37,7 +37,7 @@ export default function ProtocolDemo({
         aria-hidden={view !== "ui"}
         inert={view !== "ui"}
       >
-        <AsciiBackdrop />
+        <AsciiBackdrop variant={demo} />
         {entry.ui}
       </div>
       <div

@@ -22,6 +22,8 @@ import { useEffect, useRef } from "react";
  *
  * Draws every 2nd rAF (~30fps), DPR capped at 2, pauses offscreen and on
  * hidden tabs, and renders a single static frame under reduced motion.
+ * `staticTime` freezes the same renderer at a chosen moment for quieter
+ * supporting surfaces.
  */
 
 const CELL_W = 12;
@@ -106,7 +108,13 @@ function pickCurrencyGlyph(px: number, py: number): string {
   return CURRENCY_GLYPHS[(mixed >>> 0) % CURRENCY_GLYPHS.length];
 }
 
-export default function AsciiField({ className }: { className?: string }) {
+export default function AsciiField({
+  className,
+  staticTime,
+}: {
+  className?: string;
+  staticTime?: number;
+}) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -147,7 +155,8 @@ export default function AsciiField({ className }: { className?: string }) {
     let dark = resolveDark();
 
     const currentT = () =>
-      reduced ? 0 : ((performance.now() - start) / 1000) * SPEED;
+      staticTime ??
+      (reduced ? 0 : ((performance.now() - start) / 1000) * SPEED);
 
     const resolveFont = () => {
       /* ctx.font can't take CSS vars; resolve the real family from the
@@ -237,8 +246,8 @@ export default function AsciiField({ className }: { className?: string }) {
         rafId = 0;
       }
       if (disposed) return;
-      if (reduced) {
-        draw(0);
+      if (staticTime !== undefined || reduced) {
+        draw(currentT());
         return;
       }
       if (inView && document.visibilityState === "visible") {
@@ -327,7 +336,7 @@ export default function AsciiField({ className }: { className?: string }) {
       mqReduce.removeEventListener("change", onReduceChange);
       mqDark.removeEventListener("change", onThemeChange);
     };
-  }, []);
+  }, [staticTime]);
 
   return (
     <div

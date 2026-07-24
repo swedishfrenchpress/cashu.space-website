@@ -1764,24 +1764,30 @@ html {
   background-image: none;
 }
 
-/* Static, deliberately sparse type texture. It is HTML rather than an image
-   or animated canvas, and its mask keeps the screenshot as the focal point. */
+/* A frozen frame from the hero's own terrain renderer. Kept deliberately
+   faint: it should register as shared atmosphere only after the screenshot
+   has already won the hierarchy. */
 .ascii-backdrop {
   position: absolute;
-  inset: -8% -12%;
+  inset: 0;
   z-index: 0;
-  margin: 0;
-  overflow: hidden;
-  color: var(--faint);
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 2.35;
-  letter-spacing: 0.18em;
-  opacity: 0.42;
-  white-space: pre;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, rgba(0, 0, 0, 0.72) 38%, transparent 78%);
-  mask-image: radial-gradient(ellipse at center, #000 0%, rgba(0, 0, 0, 0.72) 38%, transparent 78%);
+  width: 100%;
+  height: 100%;
+  opacity: 0.18;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.42),
+    #000 24%,
+    #000 76%,
+    rgba(0, 0, 0, 0.34)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.42),
+    #000 24%,
+    #000 76%,
+    rgba(0, 0, 0, 0.34)
+  );
 }
 
 /* Real screenshot — the depicted-product exception, now carried entirely
@@ -1803,20 +1809,17 @@ html {
 /* Both theme variants render (see .feature-demo__shot-img--light/--dark
    below); only one ever has layout. width/height auto + max-width/max-height
    100% sizes the element to its own 4:3 crop, capped by whichever of the
-   frame's width/height binds first — the element's box (and its border)
-   then hugs the actual visible photo. (object-fit: contain would scale the
+   frame's width/height binds first — the element's box then hugs the actual
+   visible photo. (object-fit: contain would scale the
    painted pixels the same way, but leaves the image element's box at the full
-   100%/100% frame size, so a border on the element traces empty space
-   past the letterboxed photo — visible as a floating rectangle whenever the
-   frame's aspect ratio doesn't match the 4:3 crop, which is every
-   breakpoint.) No drop shadow, no blur, no rounding — the photo is opaque
-   and runs edge-to-edge inside its own hairline frame. */
+   100%/100% frame size.) A small radius softens the depicted app surface
+   without rounding the surrounding demo frame. */
 .feature-demo__shot-img {
   width: auto;
   height: auto;
   max-width: 100%;
   max-height: 100%;
-  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: 8px;
 }
 
 .feature-demo__shot-img--dark {
