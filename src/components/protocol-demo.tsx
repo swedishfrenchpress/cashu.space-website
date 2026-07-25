@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import AsciiBackdrop from "./ascii-backdrop";
 import { DEMOS, type DemoId } from "./protocol-demo-content";
 
 export type { DemoId };
 
 /**
- * ProtocolDemo — griffin.com-style demo panel for the four-parts section.
- * Two stacked views inside the chalk media frame: a mock product-UI card
- * and a code pane on an always-dark drafting grid, flipped by a square
- * UI/Code segmented control floating bottom-center. Both views stay mounted
- * so the crossfade is a pure opacity swap (no layout shift; the frame's
+ * ProtocolDemo — demo panel for the four-parts section. Two stacked views
+ * inside the media frame, both on the shared theme-flipping drafting sheet:
+ * a captioned figure plate and a code pane, flipped by a square Figure/Code
+ * segmented control floating bottom-center. Both views stay mounted so the
+ * crossfade is a pure opacity swap (no layout shift; the frame's
  * aspect-ratio is fixed). The inactive view is aria-hidden + inert.
  */
 export default function ProtocolDemo({
@@ -37,7 +36,6 @@ export default function ProtocolDemo({
         aria-hidden={view !== "ui"}
         inert={view !== "ui"}
       >
-        <AsciiBackdrop variant={demo} />
         {entry.ui}
       </div>
       <div
@@ -49,7 +47,13 @@ export default function ProtocolDemo({
       >
         {entry.api}
       </div>
-      <div className="feature-demo__toggle" role="group" aria-label="Show as">
+      {/* Panel-specific name — four identical "Show as" groups read as one
+          control that keeps reappearing to AT users. */}
+      <div
+        className="feature-demo__toggle"
+        role="group"
+        aria-label={`Show ${label} as`}
+      >
         <button
           type="button"
           className="feature-demo__toggle-btn"

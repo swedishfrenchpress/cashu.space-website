@@ -30,6 +30,17 @@
   --on-ink: #ffffff;  /* text on inverting chips */
   --edge: #000000;    /* pure-black accents: focus, selection, brand */
 
+  /* Figure-plate optics (§5 Demo Panel). --fig-ground is the drafting
+     sheet the plates and code panes sit on — one full step below Card so
+     the plate reads as an object, not an implication. --fig-lit/--fig-shade
+     are the machined keyline pair: each scheme expresses "lit above,
+     seated below" with the ramp values it has — light darkens the bottom
+     edge (ghost), dark lightens the top edge (ghost). Borders only; the
+     No-Shadow Rule holds. */
+  --fig-ground: #f4f4f5; /* chalk */
+  --fig-lit: #e4e4e7;    /* hair — top edge, same as sides in light */
+  --fig-shade: #d4d4d8;  /* ghost — the darker seat */
+
   /* Always-dark showcase surfaces. --panel-hair is invisible in light
      (border matches the fill) and separates the panel from the near-black
      page in dark. */
@@ -124,6 +135,12 @@
     --on-ink: #0a0a0b;
     --edge: #ffffff;
 
+    /* Figure-plate optics: dark carries the lit rim on top (ghost is the
+       lighter value in this ramp) and seats on hair, mirroring light. */
+    --fig-ground: #101012; /* band */
+    --fig-lit: #3f3f46;    /* ghost — the lit top rim */
+    --fig-shade: #27272a;  /* hair — bottom edge, same as sides in dark */
+
     --panel: #131316;
     --panel-hair: #27272a;
     --panel-fg: #f4f4f5;
@@ -153,6 +170,12 @@
   --ink-hover: #e4e4e7;
   --on-ink: #0a0a0b;
   --edge: #ffffff;
+
+  /* Figure-plate optics: dark carries the lit rim on top (ghost is the
+     lighter value in this ramp) and seats on hair, mirroring light. */
+  --fig-ground: #101012; /* band */
+  --fig-lit: #3f3f46;    /* ghost — the lit top rim */
+  --fig-shade: #27272a;  /* hair — bottom edge, same as sides in dark */
 
   --panel: #131316;
   --panel-hair: #27272a;
@@ -342,22 +365,6 @@ html {
 @media (min-width: 1024px) {
   .spec-pane {
     padding-left: var(--spec-card-offset);
-  }
-}
-
-@keyframes mint-flow {
-  to {
-    stroke-dashoffset: -56;
-  }
-}
-
-.mint-flow {
-  animation: mint-flow var(--mint-flow-duration, 4s) linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mint-flow {
-    animation: none;
   }
 }
 
@@ -799,17 +806,14 @@ html {
   height: 18px;
 }
 
+/* Two quiet fields separated by gap alone — no separator glyphs (the old
+   middot is retired with the rest of them). */
 .footer-legal {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   color: #a1a1aa;
   flex-wrap: wrap;
-}
-
-.footer-legal__sep {
-  color: #71717a;
-  user-select: none;
 }
 
 .footer-card__bottom-right {
@@ -1630,9 +1634,10 @@ html {
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  transition:
-    color var(--dur-base) var(--ease-out-quart),
-    background-color var(--dur-base) var(--ease-out-quart);
+  /* Colour only — the active background snaps. A background transition
+     here left two items reading as active for 220ms during every
+     scroll-spy handoff. */
+  transition: color var(--dur-fast) var(--ease-out-quart);
 }
 
 @media (min-width: 1024px) {
@@ -1716,15 +1721,38 @@ html {
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--dur-base) var(--ease-out-quart);
-  /* Shared ground: 44px hairline graph paper in theme tokens — both views
-     flip with the scheme; the artifact on top (glass card vs file pane)
-     carries the register, not the ground. */
-  background-color: var(--band);
+  /* Drafting sheet — one full value step below the Card plates (§5), so
+     the artifact on top genuinely sits above its ground. Both views share
+     it; both flip with the scheme. */
+  background-color: var(--fig-ground);
+}
+
+/* The 44px hairline graph paper rides its own layer so it can attenuate
+   where the artifact sits: the radial mask thins the grid toward the
+   centre — the ground yielding under the plate. Optics by mask, not blur;
+   the one glass surface remains the navbar. Artifacts stack above via
+   z-index: 1 (.fig, the code pane). */
+.feature-demo__view::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-image:
     linear-gradient(to right, var(--hair) 1px, transparent 1px),
     linear-gradient(to bottom, var(--hair) 1px, transparent 1px);
   background-size: 44px 44px;
   background-position: center;
+  -webkit-mask-image: radial-gradient(
+    120% 90% at 50% 44%,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.52) 46%,
+    #000 80%
+  );
+  mask-image: radial-gradient(
+    120% 90% at 50% 44%,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.52) 46%,
+    #000 80%
+  );
 }
 
 .feature-demo__view.is-active {
@@ -1766,89 +1794,53 @@ html {
   background-color: transparent;
 }
 
-/* UI ground: no graph paper — the drafting grid is reserved for the Code
-   pane. The UI pane carries the quieter ASCII terrain used in the hero. */
-.feature-demo__view--ui {
-  background-image: none;
-}
-
-/* A frozen frame from the hero's own terrain renderer. Kept deliberately
-   faint: it should register as shared atmosphere only after the screenshot
-   has already won the hierarchy. */
-.ascii-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.18;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.42),
-    #000 24%,
-    #000 76%,
-    rgba(0, 0, 0, 0.34)
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.42),
-    #000 24%,
-    #000 76%,
-    rgba(0, 0, 0, 0.34)
-  );
-}
-
-/* Real screenshot — the depicted-product exception, now carried entirely
-   by real art (see Shot in protocol-demo-content.tsx; the coded glass mock
-   it replaced is gone). The wrapper stays full-size (not the parent's
-   align-items/justify-content:safe-center default, which only shrink-wraps
-   content) so its own flex centering can position the img — sized to its
-   own aspect ratio below — within the full padded frame. */
-.feature-demo__shot {
+/* Figure plates — §5 Demo Panel. A published technical plate, not a file
+   pane: Card fill on the drafting sheet, hairline keyline whose top edge
+   is lit and bottom edge seated (--fig-lit/--fig-shade — fill and border
+   only, the No-Shadow Rule holds), captioned below in the site's own
+   voice. The interior speaks machine notation; the caption speaks GT. */
+.fig {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  height: 100%;
+  max-width: 560px;
 }
 
-/* Both theme variants render (see .feature-demo__shot-img--light/--dark
-   below); only one ever has layout. width/height auto + max-width/max-height
-   100% sizes the element to its own 4:3 crop, capped by whichever of the
-   frame's width/height binds first — the element's box then hugs the actual
-   visible photo. (object-fit: contain would scale the
-   painted pixels the same way, but leaves the image element's box at the full
-   100%/100% frame size.) A small radius softens the depicted app surface
-   without rounding the surrounding demo frame. */
-.feature-demo__shot-img {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 8px;
+.fig-plate {
+  border: 1px solid var(--hair);
+  border-top-color: var(--fig-lit);
+  border-bottom-color: var(--fig-shade);
+  background-color: var(--card);
 }
 
-.feature-demo__shot-img--dark {
-  display: none;
+/* RFC-style caption: "Fig. NN" in the micro register, thesis in GT body
+   small. Sits outside the plate on the ground — the figure is the object,
+   the caption is the document's voice describing it. No rule above it:
+   the plate's own bottom keyline already draws the line (Hairline Rule —
+   no double rules). */
+.fig-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 12px;
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .feature-demo__shot-img--light {
-    display: none;
-  }
-  :root:not([data-theme="light"]) .feature-demo__shot-img--dark {
-    display: block;
-  }
+.fig-caption__num {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
-:root[data-theme="dark"] .feature-demo__shot-img--light {
-  display: none;
-}
-
-:root[data-theme="dark"] .feature-demo__shot-img--dark {
-  display: block;
+.fig-caption__text {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--body);
+  text-wrap: pretty;
 }
 
 /* Square segmented control — the feature-nav register one size down.
@@ -1901,59 +1893,6 @@ html {
   outline-offset: 0;
 }
 
-/* Mints quote chip — a real NUT-23 lifecycle: UNPAID settles to PAID,
-   once. The animation is paused until the panel's Reveal wrapper marks it
-   in view, then runs a single cycle and holds — a quote never un-pays
-   (Honest-Network Rule). Base state is the settled PAID, so reduced
-   motion (animation: none) shows it statically. The fades are staggered
-   (UNPAID fully out before PAID lands) to avoid a muddy both-half-visible
-   frame mid-swap. */
-.feature-demo__quote {
-  display: inline-grid;
-  justify-items: end;
-}
-
-.feature-demo__quote > span {
-  grid-area: 1 / 1;
-}
-
-.feature-demo__quote-unpaid {
-  opacity: 0;
-  animation: feature-demo-quote-unpaid 6s linear both paused;
-}
-
-.feature-demo__quote-paid {
-  opacity: 1;
-  animation: feature-demo-quote-paid 6s linear both paused;
-}
-
-.reveal.is-revealed .feature-demo__quote-unpaid,
-.reveal.is-revealed .feature-demo__quote-paid {
-  animation-play-state: running;
-}
-
-@keyframes feature-demo-quote-unpaid {
-  0%,
-  62% {
-    opacity: 1;
-  }
-  72%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes feature-demo-quote-paid {
-  0%,
-  70% {
-    opacity: 0;
-  }
-  80%,
-  100% {
-    opacity: 1;
-  }
-}
-
 /* Touch: the two segments must each clear the 44px minimum target. */
 @media (pointer: coarse) {
   .feature-demo__toggle-btn {
@@ -1965,11 +1904,6 @@ html {
   .feature-demo__view,
   .feature-demo__toggle-btn {
     transition: none;
-  }
-
-  .feature-demo__quote-unpaid,
-  .feature-demo__quote-paid {
-    animation: none;
   }
 }
 

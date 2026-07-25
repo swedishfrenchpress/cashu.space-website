@@ -30,7 +30,7 @@ const TABS: Tab[] = [
     label: "Mints",
     title: "Bitcoin in, bitcoin out.",
     caption:
-      "Mints bridge Lightning and ecash — run your own, or trust a community-operated one. Ecash is a claim on its mint, not a deposit.",
+      "Mints bridge Lightning and ecash. Run your own, or trust a community-operated one. Ecash is a claim on its mint, not a deposit.",
     cta: "Explore mints",
     href: "https://bitcoinmints.com",
     external: true,
@@ -141,8 +141,8 @@ export default function TabbedFeature() {
                 className="feature-block"
               >
                 <Reveal variant="fade" slow>
-                  {/* Demo panel: real product UI ↔ protocol code with a quiet
-                      ASCII terrain ground. The product screenshot remains the
+                  {/* Demo panel: captioned figure plate ↔ protocol code on a
+                      shared drafting-sheet ground. The plate is the panel's
                       only visual focal point. */}
                   <ProtocolDemo demo={tab.id} label={tab.label} />
                 </Reveal>

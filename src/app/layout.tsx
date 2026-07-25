@@ -44,11 +44,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cashu-space-website.vercel.app"),
-  title: "Cashu — Open source electronic cash",
+  title: "Cashu: Open source electronic cash",
   description:
     "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
   openGraph: {
-    title: "Cashu — Open source electronic cash",
+    title: "Cashu: Open source electronic cash",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
     url: "https://cashu-space-website.vercel.app",
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cashu — Open source electronic cash",
+    title: "Cashu: Open source electronic cash",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
     images: ["/og-image.jpg"],
@@ -104,7 +104,7 @@ export default function RootLayout({
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html:
-              "<!--\n  cashu.space — the open specification\n\n  document  landing\n  spec      https://github.com/cashubtc/nuts\n  source    https://github.com/cashubtc\n\n  no company. no token. no treasury.\n-->",
+              "<!--\n  cashu.space: the open specification\n\n  document  landing\n  spec      https://github.com/cashubtc/nuts\n  source    https://github.com/cashubtc\n\n  no company. no token. no treasury.\n-->",
           }}
         />
         <ConsoleSignature />

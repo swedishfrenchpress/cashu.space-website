@@ -73,7 +73,11 @@ export default function Reveal({
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
+          // Also reveal when the element is already above the viewport: a
+          // jump scroll (nav click, anchor load) can leap clean past the
+          // observation band between two observer ticks, in which case
+          // isIntersecting never fires and the element stays blank.
+          if (entry.isIntersecting || entry.boundingClientRect.top < 0) {
             setRevealed(true);
             observer.disconnect();
             break;

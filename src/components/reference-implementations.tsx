@@ -175,14 +175,14 @@ function Spec() {
       <div className="flex items-center justify-between gap-6 bg-[#27272a] border-b border-zinc-800 px-5 py-3 t-mono">
         <span className="text-zinc-400 truncate">cashubtc/nuts/nut-00.md</span>
         <span className="hidden sm:inline text-zinc-500 whitespace-nowrap">
-          v0 · CBOR encoding
+          v0 (CBOR encoding)
         </span>
       </div>
       {/* Left padding on lg+ clears the floating Card's right edge with a
          hair of breathing room. The offset lives on the .spec-pane class so
          the magic number doesn't sit inline — see globals.css. */}
       <pre className="spec-pane t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pr-10 overflow-x-auto leading-7">
-        <span className="text-zinc-500">{`// Cashu Token v4  ·  CBOR encoding`}</span>{"\n\n"}
+        <span className="text-zinc-500">{`// Cashu Token v4, CBOR encoding`}</span>{"\n\n"}
         {`{\n  "t": [{\n    "i": `}
         <span className="t-pixel">{`h'00…d2'`}</span>
         {`,        `}

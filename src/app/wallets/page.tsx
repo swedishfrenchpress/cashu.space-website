@@ -3,7 +3,7 @@ import Reveal from "@/components/reveal";
 import SiteHeader from "@/components/site-header";
 
 export const metadata: Metadata = {
-  title: "Wallets · cashu.space",
+  title: "Cashu Wallets",
   description:
     "A non-exhaustive directory of Cashu wallets. Any client that implements the protocol is conformant.",
 };

@@ -3,7 +3,7 @@ import { CashuMark } from "@/components/cashu-mark";
 import Reveal from "@/components/reveal";
 
 export const metadata = {
-  title: "Not specified · cashu.space",
+  title: "Cashu: Not specified",
 };
 
 export default function NotFound() {

@@ -109,9 +109,9 @@ export default function SiteFooter() {
                   </svg>
                 </ExternalLink>
               </div>
+              {/* Fields separate by layout (gap), not separator glyphs. */}
               <div className="footer-legal">
                 <span className="t-label">© 2026</span>
-                <span className="footer-legal__sep" aria-hidden>·</span>
                 <span className="t-label">MIT Licensed</span>
               </div>
             </div>
