@@ -189,7 +189,12 @@
   --backdrop: rgba(10, 10, 11, 0.85);
 }
 
+/* width: 100% is load-bearing, not redundant. As a flex item the shell would
+   otherwise size to its content, and `margin-inline: auto` would then centre
+   that content instead of the shell — which is exactly how the 404 wordmark
+   ended up floating mid-page while every other page set it hard-left. */
 .page-shell {
+  width: 100%;
   max-width: var(--page-max);
   margin-inline: auto;
   padding-inline: var(--page-x);
@@ -381,10 +386,19 @@ html {
  *
  * The translate is intentionally small. Editorial pacing reads as a
  * settle, not an arrival animation.
+ *
+ * The hidden state is gated on html.js (stamped by the boot script in
+ * layout.tsx): without JavaScript nothing can add `.is-revealed`, and a
+ * spec that only renders with scripting enabled would be a broken promise.
+ * `:where()` keeps the gate at zero extra specificity so the cascade below
+ * is unchanged.
  */
-.reveal {
+:where(html.js) .reveal {
   opacity: 0;
   transform: translateY(8px);
+}
+
+.reveal {
   transition:
     opacity var(--dur-reveal) var(--ease-out-quart),
     transform var(--dur-reveal) var(--ease-out-quart);
@@ -406,22 +420,40 @@ html {
 }
 
 /*
+ * Jump arrivals (anchor nav, keyboard chords, flick-scroll — flagged by the
+ * Reveal tracker). The visitor is already looking at the destination, so the
+ * settle would read as a dead page: no rise, no delay, one brisk fade.
+ */
+.reveal.reveal--instant {
+  transform: none;
+  transition-duration: var(--dur-fast);
+  transition-delay: 0ms;
+}
+
+/*
  * Draw-on — SVG line art animates from invisible to fully drawn. Uses
  * stroke-dasharray + stroke-dashoffset on a per-shape basis with
  * pathLength="1" so authors don't need to compute path length manually.
  * Honest-Network: the line being drawn IS the structure being described.
  */
 .draw-on {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
   transition: stroke-dashoffset 1100ms var(--ease-out-quart);
   transition-delay: var(--draw-delay, 0ms);
 }
 
+/* Undrawn state gated on html.js for the same no-script reason as .reveal. */
+:where(html.js) .draw-on {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
 .draw-on--filled {
-  opacity: 0;
   transition: opacity 480ms var(--ease-out-quart);
   transition-delay: var(--draw-delay, 0ms);
+}
+
+:where(html.js) .draw-on--filled {
+  opacity: 0;
 }
 
 .is-revealed .draw-on,
@@ -511,8 +543,16 @@ html {
   pointer-events: none;
 }
 
+/* The GT label hands off to the mono overlay instantly. Left on the 220ms
+   colour transition it stayed partly visible under the cipher for the first
+   frames — two labels at once, which is exactly what the pass is meant to
+   avoid. Fill and border keep their transitions. */
 .button-ciphering {
   color: transparent !important;
+  transition:
+    transform var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-base) var(--ease-out-quart),
+    border-color var(--dur-base) var(--ease-out-quart);
 }
 
 .btn-primary {
@@ -1178,6 +1218,20 @@ html {
   color: var(--edge);
 }
 
+/* Current route: full Ink, one weight step up. The link the visitor is
+   already on stops reading as an invitation. Weight carries it as well as
+   colour so the state survives at any contrast. */
+.site-nav__link.is-current,
+.site-nav-panel__link.is-current {
+  color: var(--edge);
+  font-weight: 600;
+}
+
+.site-nav--on-ink .site-nav__link.is-current,
+.site-nav-panel--on-ink .site-nav-panel__link.is-current {
+  color: #ffffff;
+}
+
 /* CTA in the bar: square, per the Sharp Buttons rule (DESIGN.md §5).
    Padding is trimmed so the flat slab sits comfortably in the bar. */
 .site-nav .btn-primary,
@@ -1505,6 +1559,14 @@ html {
   background: var(--backdrop);
 }
 
+/* showModal() focuses the dialog itself, and Chrome answers with its default
+   blue ring — the one chromatic thing on the page. Replace it with the
+   system's own ring, drawn just inside the sheet's keyline. */
+.keymap-help:focus-visible {
+  outline: 2px solid var(--edge);
+  outline-offset: -3px;
+}
+
 .keymap-help__sheet {
   padding: 24px 28px;
 }
@@ -1611,10 +1673,84 @@ html {
   display: none;
 }
 
+/*
+ * Scroll affordance for the mobile jump-row. With the scrollbar hidden, the
+ * row ends flush at the viewport edge and "04 Tokens" reads as though it
+ * doesn't exist (at 390px, 138px of the row is off-screen). A mask fades the
+ * overflowing edge so the cut is visible as a cut.
+ *
+ * The fade widths are driven by a scroll timeline, so each edge only fades
+ * while there is actually something past it — and when the row fits (or the
+ * browser has no scroll-driven animations) the timeline is inactive, the
+ * initial 0px holds, and nothing is dimmed.
+ */
+@property --nav-fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --nav-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.feature-nav {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--nav-fade-start),
+    #000 calc(100% - var(--nav-fade-end)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--nav-fade-start),
+    #000 calc(100% - var(--nav-fade-end)),
+    transparent 100%
+  );
+  animation: feature-nav-edges linear both;
+  animation-timeline: scroll(self inline);
+}
+
+/* Fallback for browsers without scroll-driven animations: below 513px the
+   row is always wider than its rail (the four labels measure ~465px against
+   a viewport minus 48px of page padding), so a static end-fade is always
+   telling the truth. Above that width the row may fit, so nothing is faded
+   and those browsers simply keep today's behaviour. Where the timeline does
+   run, its keyframes override this value in both directions. */
+@media (max-width: 512px) {
+  .feature-nav {
+    --nav-fade-end: 36px;
+  }
+}
+
+@keyframes feature-nav-edges {
+  0% {
+    --nav-fade-start: 0px;
+    --nav-fade-end: 36px;
+  }
+  8% {
+    --nav-fade-start: 36px;
+  }
+  92% {
+    --nav-fade-end: 36px;
+  }
+  100% {
+    --nav-fade-start: 36px;
+    --nav-fade-end: 0px;
+  }
+}
+
 @media (min-width: 1024px) {
   .feature-nav {
     flex-direction: column;
     overflow: visible;
+    animation: none;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }
 
@@ -1699,6 +1835,30 @@ html {
 .feature-demo {
   aspect-ratio: 4 / 5;
   min-height: 440px;
+  /* Height of the lane the floating toggle reserves at the frame's base.
+     Coarse pointers grow the segments to the 44px target, so the lane grows
+     with them — otherwise the taller control eats into the plate. */
+  --demo-toggle-lane: 72px;
+}
+
+@media (pointer: coarse) {
+  .feature-demo {
+    --demo-toggle-lane: 80px;
+  }
+}
+
+/* Below the sm breakpoint a ratio-driven frame cannot hold its own content:
+   a caption that wraps to three lines pushes the plate 28px into the toggle
+   (measured at 390px). Here the panel stops being a fixed box and sizes to
+   what it contains — both views share one grid cell, so the crossfade still
+   has no layout shift and the row takes the taller of the two. §5 asks a
+   plate to size to its content; this lets the frame do the same. */
+@media (max-width: 639px) {
+  .feature-demo {
+    aspect-ratio: auto;
+    min-height: 0;
+    display: grid;
+  }
 }
 
 @media (min-width: 640px) {
@@ -1717,7 +1877,7 @@ html {
   align-items: safe center;
   justify-content: safe center;
   padding: clamp(16px, 4vw, 40px);
-  padding-bottom: 64px; /* clears the floating toggle */
+  padding-bottom: var(--demo-toggle-lane, 64px); /* clears the floating toggle */
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--dur-base) var(--ease-out-quart);
@@ -1758,6 +1918,18 @@ html {
 .feature-demo__view.is-active {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* Narrow counterpart to the content-driven frame above: the views leave the
+   absolute stack and share one grid cell, so the taller of the two sets the
+   panel's height and neither can overrun the toggle. Declared after the
+   base rule because it overrides `position`/`inset` at equal specificity. */
+@media (max-width: 639px) {
+  .feature-demo__view {
+    position: relative;
+    inset: auto;
+    grid-area: 1 / 1;
+  }
 }
 
 /* Pane type scale — one step down from .t-mono (13px) so eight lines of
@@ -1891,6 +2063,14 @@ html {
 .feature-demo__toggle-btn:focus-visible {
   outline: 2px solid var(--edge);
   outline-offset: 0;
+}
+
+/* The pressed segment is filled with Ink, so an --edge ring drawn on its
+   edge is invisible in light mode (Ink on Ink). Invert it and pull it
+   inside the fill, where On-Ink always reads. */
+.feature-demo__toggle-btn[aria-pressed="true"]:focus-visible {
+  outline-color: var(--on-ink);
+  outline-offset: -4px;
 }
 
 /* Touch: the two segments must each clear the 44px minimum target. */
@@ -2136,9 +2316,13 @@ html {
   text-wrap: balance;
 }
 
+/* 65ch, not 75ch: `ch` measures the "0" glyph, which in GT-Standard is wider
+   than the average letter — a 75ch cap rendered ~86 real characters per line,
+   past the measure DESIGN.md sets. The cap is stated in the unit CSS has;
+   the number is tuned to the count that actually lands. */
 .video-feature__body {
   width: 100%;
-  max-width: 75ch;
+  max-width: 65ch;
   color: rgba(255, 255, 255, 0.82);
   text-wrap: pretty;
 }
@@ -2152,7 +2336,10 @@ html {
   text-wrap: balance;
 }
 
+/* The headline spans the band; its lead does not. Uncapped, this paragraph
+   ran ~121 characters per line on wide screens. */
 .implementations-intro p {
+  max-width: 65ch;
   text-wrap: pretty;
 }
 
@@ -2247,7 +2434,17 @@ html {
   text-underline-offset: 4px;
 }
 
-.wallet-row__host {
+/* Destination host plus decision facts (platform, source posture) share one
+   mono register on one line, separated by layout gap — data, not badges. */
+.wallet-row__facts {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.5em;
+  row-gap: 2px;
+}
+
+.wallet-row__host,
+.wallet-row__fact {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
   font-size: 0.8125rem;
   line-height: 1.3;

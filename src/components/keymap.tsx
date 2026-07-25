@@ -104,14 +104,23 @@ export default function Keymap() {
         } else if (lower === "w") {
           router.push("/wallets");
         } else if (lower === "s") {
+          // Same destination as every visible "Read the spec" CTA — one
+          // canonical URL per label. The NUTs repo stays reachable from the
+          // footer metastrip and the GitHub links.
           window.open(
-            "https://github.com/cashubtc/nuts",
+            "https://docs.cashu.space/",
             "_blank",
             "noopener,noreferrer",
           );
         } else if (lower === "i") {
+          // Off the homepage the section doesn't exist yet — route to it
+          // rather than swallowing the chord.
           const el = document.getElementById("implementations");
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            router.push("/#implementations");
+          }
         }
         resetChord();
       }
