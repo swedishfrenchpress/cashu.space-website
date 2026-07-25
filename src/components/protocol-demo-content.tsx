@@ -357,7 +357,7 @@ function SpecUi() {
   return (
     <Plate file="cashubtc/nuts" meta="NUT registry">
       <Eyebrow>NUTS</Eyebrow>
-      <div className="mt-3 border-y border-hair">
+      <div className="mt-3 border-t border-hair">
         {NUTS.map((n) => (
           <div
             key={n.id}
