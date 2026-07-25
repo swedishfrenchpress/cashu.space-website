@@ -144,18 +144,21 @@ export default function WalletsPage() {
                         >
                           {entry.name}
                         </a>
-                        {/* Destination + decision facts, one mono register.
-                            Fields separate by layout (gap), never glyphs. */}
-                        <span className="wallet-row__facts">
-                          <span className="wallet-row__host">
-                            {targetOf(entry.href)}
-                          </span>
-                          {entry.facts?.map((fact) => (
-                            <span key={fact} className="wallet-row__fact">
-                              {fact}
-                            </span>
-                          ))}
+                        <span className="wallet-row__host">
+                          {targetOf(entry.href)}
                         </span>
+                      </span>
+
+                      {/* Its own grid column (see .wallet-row in globals.css)
+                          so facts line up down the page regardless of name
+                          or host length — they used to trail a
+                          variable-width host inline and drifted per row. */}
+                      <span className="wallet-row__facts">
+                        {entry.facts?.map((fact) => (
+                          <span key={fact} className="wallet-row__fact">
+                            {fact}
+                          </span>
+                        ))}
                       </span>
 
                       <a

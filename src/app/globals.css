@@ -2453,14 +2453,15 @@ html {
  * Wallets registry — /wallets. The directory reads as the
  * "Implementations" registry of a spec, not a table of links. Each
  * surface (Mobile / Web) is a two-column band: a label rail on the left
- * (heading + scope + the platform coverage as a mono field) tracks an
- * entry list on the right. This uses the horizontal space the old single
- * column left dead, and separates the two surfaces spatially instead of
- * stacking two identical lists.
+ * (heading + scope) tracks an entry list on the right. This uses the
+ * horizontal space the old single column left dead, and separates the
+ * two surfaces spatially instead of stacking two identical lists.
  *
- * Entries are hairline-separated rows — a wordmark over its destination
- * host (mono, honest: you see where "Open" goes) and a real Open chip.
- * On Paper; flat and sharp throughout.
+ * Entries are hairline-separated, one-line rows, grid-aligned into three
+ * tracks: wordmark + destination host (mono, honest: you see where "Open"
+ * goes), decision facts (platform, status), and a real Open chip. Facts
+ * sit in their own track so they align down the page regardless of name
+ * or host length. On Paper; flat and sharp throughout.
  * =================================================================== */
 .wallet-group {
   display: flex;
@@ -2508,11 +2509,16 @@ html {
   border-top: 1px solid var(--hair);
 }
 
+/* Aligned Registry Row: one line per entry. Facts get their own grid
+   track so platform/status text lines up down the whole page regardless
+   of name or host length — it used to trail a variable-width host inline
+   as free-flowing text and drifted to a different x on every row. */
 .wallet-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) minmax(100px, 1fr) auto;
+  column-gap: clamp(1.25rem, 2.5vw, 2rem);
   align-items: center;
-  gap: clamp(1rem, 3vw, 2.5rem);
-  padding-block: clamp(1.25rem, 2.4vw, 1.75rem);
+  padding-block: clamp(1.125rem, 2.2vw, 1.625rem);
   border-bottom: 1px solid var(--hair);
 }
 
@@ -2524,7 +2530,6 @@ html {
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-  flex: 1 1 auto;
 }
 
 .wallet-row__name {
@@ -2540,16 +2545,24 @@ html {
   text-underline-offset: 4px;
 }
 
-/* Destination host plus decision facts (platform, status) share one
-   mono register on one line, separated by layout gap — data, not badges. */
+.wallet-row__host {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+/* Decision facts (platform, status) — their own column, not free text
+   after the host, so they align. Still data, not badges: no fill, no
+   border, spacing does the separating. */
 .wallet-row__facts {
   display: flex;
   flex-wrap: wrap;
-  column-gap: 1.5em;
+  column-gap: 1.25em;
   row-gap: 2px;
+  align-self: center;
 }
 
-.wallet-row__host,
 .wallet-row__fact {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
   font-size: 0.8125rem;
@@ -2560,7 +2573,32 @@ html {
 /* Open chip — a real button, sized down a touch from the page CTA so a
    column of them stays quiet. */
 .wallet-open {
-  flex: 0 0 auto;
   padding: 10px 20px;
   justify-content: center;
+}
+
+/* Below 640px the row's minmax floors (150/220 + 100 + the Open button's
+   intrinsic width) no longer fit inside a phone's page-shell width — the
+   row would force a horizontal scrollbar. Collapse to two tracks: the
+   identity+facts stack in column 1, Open spans both its rows in column 2 —
+   the same two-line shape the row used to have full-time. */
+@media (max-width: 639.98px) {
+  .wallet-row {
+    grid-template-columns: 1fr auto;
+    column-gap: 1rem;
+  }
+
+  .wallet-row__id {
+    grid-column: 1;
+  }
+
+  .wallet-row__facts {
+    grid-column: 1;
+    margin-top: 2px;
+  }
+
+  .wallet-open {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
 }
