@@ -42,8 +42,19 @@ export const viewport: Viewport = {
   ],
 };
 
+/* Absolute base for OG/Twitter asset URLs. The canonical domain wins in
+   production; preview deploys fall back to their own host so their cards
+   don't point at assets the live site may not have yet. */
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_ENV === "production"
+    ? "https://cashu.space"
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "https://cashu.space");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cashu-space-website.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: "Cashu: Open source electronic cash",
   description:
     "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
@@ -51,7 +62,7 @@ export const metadata: Metadata = {
     title: "Cashu: Open source electronic cash",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
-    url: "https://cashu-space-website.vercel.app",
+    url: SITE_URL,
     siteName: "Cashu",
     type: "website",
     images: [
@@ -89,11 +100,13 @@ export default function RootLayout({
         {/* Applies a manually chosen theme before first paint so a saved
             override can't flash the OS scheme. Parser-blocking on purpose —
             it must run before anything renders. No saved choice → no
-            attribute → the CSS follows prefers-color-scheme. */}
+            attribute → the CSS follows prefers-color-scheme. Also stamps
+            html.js, the gate for every scripting-dependent hidden state
+            (.reveal, .draw-on): without it the site renders fully static. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}',
+              'document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}',
           }}
         />
         <a href="#main-content" className="skip-link">

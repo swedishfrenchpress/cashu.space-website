@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Reveal from "./reveal";
 import ThemeToggle from "./theme-toggle";
 
@@ -33,8 +33,16 @@ const NAV_ITEMS: NavItem[] = [
  */
 export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
   const pathname = usePathname();
   const ctaClass = onInk ? "btn-secondary--on-ink" : "btn-secondary";
+
+  /* Route-level only: a link is current when the visitor is on its page.
+     In-page anchors (Protocol, Implementations) are not marked — the page
+     they point into is the one being read either way, and claiming
+     "current" for a section the reader has scrolled past would be a lie. */
+  const isCurrent = (item: NavItem) =>
+    !item.external && !item.href.includes("#") && pathname === item.href;
 
   // Close the panel on Escape — standard menu accessibility.
   useEffect(() => {
@@ -51,6 +59,38 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
     setIsOpen(false);
   }, [pathname]);
 
+  /* --nav-h drives the hero's fold line, and it ships as a hand-measured
+     constant that silently goes stale the moment the bar's type or padding
+     changes. The CSS value still paints the first frame (no flash, and the
+     layout never depends on JS); this only replaces it with what the bar
+     actually measures, and keeps it true through font loading and resize.
+
+     The bar row is measured, not the shell: the mobile panel lives inside
+     the shell and would otherwise fold its open height into the token. Row
+     height + the shell's hairline is the same derivation the CSS comment
+     documents. */
+  useEffect(() => {
+    const row = navRef.current;
+    if (!row || typeof ResizeObserver === "undefined") return;
+
+    const sync = () => {
+      const shell = row.closest(".site-header-shell");
+      const hairline = shell
+        ? parseFloat(getComputedStyle(shell).borderBottomWidth) || 0
+        : 0;
+      const h = Math.ceil(row.getBoundingClientRect().height + hairline);
+      if (h > 0) {
+        document.documentElement.style.setProperty("--nav-h", `${h}px`);
+      }
+    };
+
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(row);
+    document.fonts?.ready.then(sync).catch(() => {});
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <header
       className={`site-header-shell${onInk ? " site-header-shell--on-ink" : ""}`}
@@ -58,6 +98,7 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
       <div className="page-shell">
         <Reveal immediate variant="fade" as="div">
           <nav
+            ref={navRef}
             aria-label="Primary"
             className={`site-nav${onInk ? " site-nav--on-ink" : ""}${
               isOpen ? " is-open" : ""
@@ -88,7 +129,13 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
                       {item.label}
                     </a>
                   ) : (
-                    <Link href={item.href} className="site-nav__link focus-ring">
+                    <Link
+                      href={item.href}
+                      className={`site-nav__link focus-ring${
+                        isCurrent(item) ? " is-current" : ""
+                      }`}
+                      aria-current={isCurrent(item) ? "page" : undefined}
+                    >
                       {item.label}
                     </Link>
                   )}
@@ -158,7 +205,10 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
                   ) : (
                     <Link
                       href={item.href}
-                      className="site-nav-panel__link focus-ring"
+                      className={`site-nav-panel__link focus-ring${
+                        isCurrent(item) ? " is-current" : ""
+                      }`}
+                      aria-current={isCurrent(item) ? "page" : undefined}
                       onClick={() => setIsOpen(false)}
                       tabIndex={isOpen ? 0 : -1}
                     >

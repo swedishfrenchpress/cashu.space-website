@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/reveal";
+import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
 export const metadata: Metadata = {
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
 type Entry = {
   name: string;
   href: string;
+  /* Decision facts, rendered in the host's mono register. Every value must
+     stay verifiable against the project's own site or repo — the registry
+     states facts, it does not endorse. */
+  facts?: string[];
 };
 
 type DirectoryGroup = {
@@ -28,37 +33,40 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Mobile",
     scope: "Ecash in your pocket. Wallets for your phone.",
     entries: [
-      { name: "Cashu.me",  href: "https://cashu.me" },
-      { name: "eNuts",     href: "https://www.enuts.cash" },
-      { name: "Macadamia", href: "https://macadamia.cash" },
-      { name: "Minibits",  href: "https://www.minibits.cash" },
-      { name: "Numo",      href: "https://numopay.org" },
-      { name: "Sovran",    href: "https://sovran.money/en/" },
+      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["PWA", "Open source"] },
+      { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android", "Open source"] },
+      { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS", "Open source"] },
+      { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android", "Open source"] },
+      { name: "Numo",      href: "https://numopay.org",        facts: ["Android", "Point of sale", "Open source"] },
+      { name: "Sovran",    href: "https://sovran.money/en/",   facts: ["iOS and Android", "Beta", "Open source"] },
     ],
   },
   {
     heading: "Web",
     scope: "Runs in any browser. Nothing to install, portable anywhere.",
     entries: [
-      { name: "AGI Cash", href: "https://agi.cash/home" },
-      { name: "Athenut",  href: "https://athenut.com" },
+      { name: "AGI Cash", href: "https://agi.cash/home", facts: ["Beta", "Open source"] },
+      { name: "Athenut",  href: "https://athenut.com",   facts: ["Open source"] },
     ],
   },
   {
-    heading: "Implementations",
+    // "Libraries", not "Implementations": the homepage counts every
+    // implementation in the org (wallets included), so reusing that word for
+    // this narrower set made two adjacent pages disagree on the same term.
+    heading: "Libraries",
     scope: "Libraries and SDKs for building on the Cashu protocol.",
     entries: [
-      { name: "Nutshell", href: "https://github.com/cashubtc/nutshell" },
-      { name: "CDK",      href: "https://github.com/cashubtc/cdk" },
-      { name: "Cashu TS", href: "https://github.com/cashubtc/cashu-ts" },
-      { name: "Coco",     href: "https://github.com/cashubtc/coco" },
+      { name: "Nutshell", href: "https://github.com/cashubtc/nutshell", facts: ["Python", "Reference implementation"] },
+      { name: "CDK",      href: "https://github.com/cashubtc/cdk",      facts: ["Rust"] },
+      { name: "Cashu TS", href: "https://github.com/cashubtc/cashu-ts", facts: ["TypeScript"] },
+      { name: "Coco",     href: "https://github.com/cashubtc/coco",     facts: ["TypeScript"] },
     ],
   },
   {
     heading: "Tools",
     scope: "Not a wallet. Software for running and managing your own mint.",
     entries: [
-      { name: "Orchard", href: "https://orchard.space" },
+      { name: "Orchard", href: "https://orchard.space", facts: ["Self-hosted", "Open source"] },
     ],
   },
 ];
@@ -81,8 +89,10 @@ function targetOf(href: string): string {
 
 export default function WalletsPage() {
   return (
-    <main className="bg-paper text-ink min-h-screen pb-24 lg:pb-32">
+    <div className="flex flex-col bg-paper text-ink min-h-screen">
       <SiteHeader />
+
+      <main className="flex-1 pb-24 lg:pb-32">
 
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
         <Reveal immediate as="header">
@@ -132,8 +142,17 @@ export default function WalletsPage() {
                         >
                           {entry.name}
                         </a>
-                        <span className="wallet-row__host">
-                          {targetOf(entry.href)}
+                        {/* Destination + decision facts, one mono register.
+                            Fields separate by layout (gap), never glyphs. */}
+                        <span className="wallet-row__facts">
+                          <span className="wallet-row__host">
+                            {targetOf(entry.href)}
+                          </span>
+                          {entry.facts?.map((fact) => (
+                            <span key={fact} className="wallet-row__fact">
+                              {fact}
+                            </span>
+                          ))}
                         </span>
                       </span>
 
@@ -154,6 +173,12 @@ export default function WalletsPage() {
           ))}
         </div>
       </div>
-    </main>
+      </main>
+
+      {/* The twilight stack closes every page (DESIGN.md §5) — the wallet
+          chooser leaves past the disclaimer and the spec CTA, not into a
+          dead end after the last directory row. */}
+      <SiteFooter />
+    </div>
   );
 }

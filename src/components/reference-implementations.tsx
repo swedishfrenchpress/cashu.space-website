@@ -17,6 +17,7 @@ const REPOS: Repo[] = [
   { name: "cdk",           url: "https://github.com/cashubtc/cdk",           tag: "Dev kit",         lang: "Rust"       },
   { name: "eNuts",         url: "https://github.com/cashubtc/eNuts",         tag: "Mobile wallet",   lang: "TypeScript" },
   { name: "cashu.me",      url: "https://github.com/cashubtc/cashu.me",      tag: "Web wallet",      lang: "TypeScript" },
+  { name: "cashu-ts",      url: "https://github.com/cashubtc/cashu-ts",      tag: "Wallet library",  lang: "TypeScript" },
   { name: "awesome-cashu", url: "https://github.com/cashubtc/awesome-cashu", tag: "Resources",       lang: "—"          },
   { name: "coco",          url: "https://github.com/cashubtc/coco",          tag: "Wallet toolkit",  lang: "TypeScript" },
 ];

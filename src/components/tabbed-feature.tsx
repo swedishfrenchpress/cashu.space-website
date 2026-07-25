@@ -66,15 +66,32 @@ const TABS: Tab[] = [
  * block into view. Below lg the nav collapses to a horizontal jump row and
  * the blocks stack in document order — no observer needed for correctness.
  */
+/* While a click-driven scroll is in flight the scroll-spy must stay quiet:
+   every block it crosses would otherwise re-render the nav mid-animation,
+   and a re-render during a smooth scroll is what left the occasional click
+   apparently doing nothing. Long enough to cover a full-page smooth scroll,
+   short enough that a visitor who grabs the wheel gets the spy straight back. */
+const SPY_MUTE_MS = 900;
+
 export default function TabbedFeature() {
   const [active, setActive] = useState(0);
   const blockRefs = useRef<(HTMLElement | null)[]>([]);
+  const spyMuted = useRef(false);
+  const unmuteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (unmuteTimer.current) clearTimeout(unmuteTimer.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     // A zero-height band across the viewport middle: whichever block spans
     // the centerline is the active one. No throttling / scroll math needed.
     const observer = new IntersectionObserver(
       (entries) => {
+        if (spyMuted.current) return;
         for (const entry of entries) {
           if (entry.isIntersecting) {
             const idx = Number(
@@ -94,10 +111,17 @@ export default function TabbedFeature() {
   }, []);
 
   const scrollToBlock = (i: number) => {
-    blockRefs.current[i]?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
+    const el = blockRefs.current[i];
+    if (!el) return;
+    // The pressed tab is the destination — say so immediately rather than
+    // waiting for the spy to catch up at the end of the scroll.
+    spyMuted.current = true;
+    if (unmuteTimer.current) clearTimeout(unmuteTimer.current);
+    unmuteTimer.current = setTimeout(() => {
+      spyMuted.current = false;
+    }, SPY_MUTE_MS);
+    setActive(i);
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   return (

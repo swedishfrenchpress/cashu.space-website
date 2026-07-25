@@ -58,10 +58,12 @@ export default function Home() {
         <TabbedFeature />
       </div>
       <TapToPay />
+      <ImplementationsGrid />
+      {/* The nav's "Implementations" label must land on the registry that
+          names them, not on the properties bento two sections above it. */}
       <div id="implementations">
-        <ImplementationsGrid />
+        <ReferenceImplementations />
       </div>
-      <ReferenceImplementations />
       <InThePress />
       <SiteFooter />
     </div>
