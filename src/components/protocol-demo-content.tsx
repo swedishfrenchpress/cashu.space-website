@@ -166,16 +166,20 @@ function Plate({
   children,
 }: {
   file: string;
-  meta: string;
+  /* Optional: a plate whose caption needs no qualifier leaves the right half
+     of the strip empty rather than reaching for something to put there. */
+  meta?: string;
   children: ReactNode;
 }) {
   return (
     <div className="relative z-[1] w-full max-w-[560px] border border-hair bg-card">
       <div className="t-mono flex items-center justify-between gap-6 bg-hair px-4 py-2.5">
         <span className="truncate text-body">{file}</span>
-        <span className="hidden whitespace-nowrap text-muted sm:inline">
-          {meta}
-        </span>
+        {meta ? (
+          <span className="hidden whitespace-nowrap text-muted sm:inline">
+            {meta}
+          </span>
+        ) : null}
       </div>
       <div className="px-6 py-6 sm:px-7 sm:py-7">{children}</div>
     </div>
@@ -183,7 +187,7 @@ function Plate({
 }
 
 /* Shared figure atoms. Eyebrow labels the plate's leading field in the same
-   quiet mono as a spec field name. Arrow is a small flow mark drawn in
+   quiet mono as a spec field name. Head is a small flow mark drawn in
    currentColor so it inherits the surrounding text colour and flips with the
    theme — no glyph-coverage risk (see the ₿ note in the hero). */
 function Eyebrow({ children }: { children: ReactNode }) {
@@ -197,19 +201,22 @@ function Eyebrow({ children }: { children: ReactNode }) {
   );
 }
 
-function Arrow() {
+/* Head is the arrowhead alone — the shaft is a DOM hairline that flexes to
+   fill the row, so a crossing can span any plate width without a viewBox
+   scaling the head out of proportion. Same 4×6 geometry and 1px stroke the
+   old full Arrow carried. */
+function Head({ dir }: { dir: "right" | "left" }) {
   return (
     <svg
-      width="22"
+      width="5"
       height="8"
-      viewBox="0 0 22 8"
+      viewBox="0 0 5 8"
+      fill="none"
       aria-hidden
-      className="shrink-0 text-muted"
+      className="shrink-0"
     >
-      <line x1="0" y1="4" x2="21" y2="4" stroke="currentColor" strokeWidth="1" />
       <path
-        d="M17 1 21 4 17 7"
-        fill="none"
+        d={dir === "right" ? "M1 1 4 4 1 7" : "M4 1 1 4 4 7"}
         stroke="currentColor"
         strokeWidth="1"
       />
@@ -227,7 +234,7 @@ const BALANCE = 2101; // = 2048 + 32 + 16 + 4 + 1 — five proofs
 function WalletsUi() {
   const held = DENOMS.filter((d) => (BALANCE & d) === d);
   return (
-    <Plate file="a wallet holds proofs" meta="testnut mint · sat">
+    <Plate file="a wallet holds proofs">
       {/* Amount stays quiet (Big-Or-Quiet Rule): pixel notation at its
           documented size, never a Display-scale hero. The denomination
           ladder below carries the figure. */}
@@ -268,73 +275,103 @@ function WalletsUi() {
   );
 }
 
-/* Mints — a mint converts between Lightning bitcoin and ecash, both ways.
-   Plain-language columns ("you send → you get") carry the "Bitcoin in,
-   bitcoin out" headline; the pixel sat amount marks the ecash side, the word
-   "Lightning" the network side. The protocol verbs (mint/melt), the raw
-   bolt11 string, and the keyset id live on the CODE view, not this face. */
-function Leg({ kind, emphasis }: { kind: "ln" | "ecash"; emphasis?: boolean }) {
-  if (kind === "ln") {
-    return (
-      <span
-        className={`t-mono ${emphasis ? "text-body" : "text-muted"}`}
-        style={{ fontSize: "0.8125rem" }}
-      >
-        Lightning
-      </span>
-    );
-  }
+/* Mints — a mint is a reserve, and this plate is its balance sheet: the
+   bitcoin it holds on the left, the ecash it has issued on the right. The two
+   sides carry the same figure because that equality IS the point — ecash is a
+   claim on the mint, which is the one thing the section's caption asserts and
+   the old "you send → you get" table never drew.
+
+   The earlier face kept the protocol verbs on the CODE view and spoke only
+   plain language. That inverted here: mint/melt now ride the arrows, because
+   an arrow that shows its own direction explains the verb for free, and
+   without them the plate restated the headline instead of teaching anything.
+   The header strip and the closing line stay plain English.
+
+   Zoom levels differ across the toggle by design: this face is mint-wide
+   state, the CODE view is one 10-sat mint quote against it. Not a mismatch —
+   don't "fix" one to match the other. */
+const RESERVE = 100_000;
+
+/* A crossing: hairline shaft either side of the verb, arrowhead at the far
+   end. Grid, not flex: 1fr_auto_1fr centres the verb on the container no
+   matter what sits in the side cells. A flex row with a spacer opposite the
+   head either de-centres the verb or leaves the two shafts ending 4px apart,
+   since only one end carries arrowhead ink. */
+function Crossing({ verb, dir }: { verb: string; dir: "right" | "left" }) {
+  const shaft = <span className="h-px flex-1 bg-current" />;
   return (
-    <span className="inline-flex items-baseline gap-1">
-      <span
-        className={`t-pixel ${emphasis ? "text-ink" : "text-muted"}`}
-        style={{ fontSize: "0.8125rem" }}
-      >
-        10
+    <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+      <span className="flex items-center">
+        {dir === "left" && <Head dir="left" />}
+        {shaft}
       </span>
-      <span className="t-mono text-muted" style={{ fontSize: "0.8125rem" }}>
-        sat ecash
+      <span className="t-pixel px-2 text-body" style={{ fontSize: "0.8125rem" }}>
+        {verb}
       </span>
-    </span>
+      <span className="flex items-center">
+        {shaft}
+        {dir === "right" && <Head dir="right" />}
+      </span>
+    </div>
   );
 }
 
-const EXCHANGE = [
-  { op: "Bitcoin in", from: <Leg kind="ln" />, to: <Leg kind="ecash" emphasis /> },
-  { op: "Bitcoin out", from: <Leg kind="ecash" />, to: <Leg kind="ln" emphasis /> },
-];
-
-/* One column template shared by the header and the rows so "you send" /
-   "you get" sit exactly above their values; the 22px spacer column matches
-   the Arrow's width. */
-const MINT_COLS = "grid grid-cols-[6.75rem_1fr_auto_1fr] items-center gap-3";
-
 function MintsUi() {
   return (
-    <Plate file="a mint bridges bitcoin" meta="testnut.cashu.space">
-      <div className={`${MINT_COLS} border-b border-hair pb-2`}>
-        <span />
-        <span className="t-mono text-muted" style={{ fontSize: "0.75rem" }}>
-          you send
-        </span>
-        <span className="w-[22px]" />
-        <span
-          className="t-mono text-right text-muted"
-          style={{ fontSize: "0.75rem" }}
-        >
-          you get
+    <Plate file="a mint is a reserve">
+      <div className="grid grid-cols-2 gap-x-8">
+        <div>
+          <Eyebrow>HOLDS</Eyebrow>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="t-pixel text-ink">
+              {RESERVE.toLocaleString("en-US")}
+            </span>
+            <span className="t-mono text-muted">sat</span>
+          </div>
+          {/* Short forms below sm: at 375px each column is ~140px, and the
+              full phrases wrap to two lines on both sides at once — enough to
+              push the plate under the floating toggle. */}
+          <p className="t-mono mt-1 text-muted" style={{ fontSize: "0.75rem" }}>
+            <span className="sm:hidden">in Lightning</span>
+            <span className="hidden sm:inline">bitcoin, in Lightning</span>
+          </p>
+        </div>
+
+        <div className="text-right">
+          <Eyebrow>ISSUED</Eyebrow>
+          <div className="mt-2 flex items-baseline justify-end gap-2">
+            <span className="t-pixel text-ink">
+              {RESERVE.toLocaleString("en-US")}
+            </span>
+            <span className="t-mono text-muted">sat</span>
+          </div>
+          <p className="t-mono mt-1 text-muted" style={{ fontSize: "0.75rem" }}>
+            <span className="sm:hidden">as ecash</span>
+            <span className="hidden sm:inline">ecash, in circulation</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Static, not animated. globals.css carries a sanctioned .mint-flow
+          marching-ants utility for exactly this bridge, but the Honest-Network
+          Rule's own tiebreaker prefers the static version, an infinite loop
+          implies flow that isn't happening, and one moving plate out of four
+          breaks the set.
+
+          Held to a centred band rather than the full body width: at full width
+          the shafts read as two rules spanning the plate rather than as flows
+          between the two columns above them. */}
+      <div className="mx-auto mt-6 w-[70%] space-y-4 text-muted">
+        <Crossing verb="mint" dir="right" />
+        <Crossing verb="melt" dir="left" />
+      </div>
+
+      {/* No rule above this line — the space carries the separation. */}
+      <div className="mt-10">
+        <span className="t-mono text-body" style={{ fontSize: "0.8125rem" }}>
+          the mint holds the bitcoin, you hold the claim
         </span>
       </div>
-      {EXCHANGE.map((row) => (
-        <div key={row.op} className={`${MINT_COLS} border-b border-hair py-4`}>
-          <span className="t-mono text-body" style={{ fontSize: "0.8125rem" }}>
-            {row.op}
-          </span>
-          <span>{row.from}</span>
-          <Arrow />
-          <span className="text-right">{row.to}</span>
-        </div>
-      ))}
     </Plate>
   );
 }
@@ -355,7 +392,7 @@ const NUTS = [
 
 function SpecUi() {
   return (
-    <Plate file="cashubtc/nuts" meta="NUT registry">
+    <Plate file="cashubtc/nuts">
       <Eyebrow>NUTS</Eyebrow>
       <div className="mt-3 border-t border-hair">
         {NUTS.map((n) => (
@@ -399,7 +436,7 @@ function SpecUi() {
    any channel that carries text. */
 function TokensUi() {
   return (
-    <Plate file="a token is a string" meta="V4 · cashuB">
+    <Plate file="a token is a string">
       <Eyebrow>TOKEN</Eyebrow>
       <div className="mt-3 border border-hair bg-band px-4 py-3">
         <span className="break-all">
