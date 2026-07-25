@@ -174,7 +174,14 @@
         "purpose": "Button labels only. 0.8125rem, weight 500, uppercase, letter-spacing 0.06em — one step below Label so the all-caps slab reads as an object, not a line of text."
       }
     },
-    "shadows": [],
+    "shadows": [
+      {
+        "name": "nav-shadow",
+        "value": "0 4px 10px rgba(0, 0, 0, 0.05)",
+        "darkValue": "0 4px 10px rgba(0, 0, 0, 0.55)",
+        "usage": "The site's one sanctioned box-shadow: the navbar's condensed (scrolled) box only. Added 2026-07-25 on the user's direction as part of the Onyx-pattern bar. No other surface inherits this licence."
+      }
+    ],
     "motion": [
       {
         "name": "ease-quart-out",
@@ -245,7 +252,7 @@
       "name": "Nav Link",
       "kind": "nav",
       "refersTo": "nav-link",
-      "description": "Top-bar navigation links. Slate at rest, Ink on hover. No underline, no active background.",
+      "description": "Top-bar navigation links. Slate at rest, Ink on hover. No underline, no active background. The bar itself follows the Onyx pattern: transparent at rest (inset 10px), condensing on scroll into a floating glass box (12px radius, hairline rim, --nav-shadow, 300ms ease-in-out).",
       "html": "<a class=\"ds-nav-link\" href=\"#wallets\">Wallets</a>",
       "css": ".ds-nav-link { color: #3f3f46; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.4; text-decoration: none; transition: color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-nav-link:hover { color: #000000; } .ds-nav-link:focus-visible { outline: 2px solid #000000; outline-offset: 4px; border-radius: 2px; }"
     },
@@ -336,7 +343,7 @@
       },
       {
         "name": "The No-Shadow Rule",
-        "body": "box-shadow is forbidden throughout the site, including buttons. Separation comes from spacing, fill contrast, or a 1px border.",
+        "body": "box-shadow is forbidden throughout the site, including buttons. Separation comes from spacing, fill contrast, or a 1px border. One sanctioned exception (2026-07-25, user-directed): the navbar's condensed box carries --nav-shadow as part of the Onyx-pattern scroll behaviour; no other surface inherits it.",
         "section": "elevation"
       },
       {
@@ -377,7 +384,7 @@
       "Don't introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Colour appears only under the Depicted-World Exception: depicted app art, the tap-to-pay video, third-party marks.",
       "Don't add Web3 / DeFi tropes: pastel gradients, blob shapes, playful money-flow illustrations. Cashu is bitcoin-native and deliberately not crypto-coded.",
       "Don't dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS 'YOUR DATA, SECURED™' copy. Privacy is a property of the protocol, stated plainly.",
-      "Don't use box-shadow anywhere. No drop shadow, inner shadow, coloured glow, or button exception.",
+      "Don't use box-shadow anywhere except the navbar's condensed box (--nav-shadow, user-directed 2026-07-25). No drop shadow, inner shadow, coloured glow, or button exception elsewhere.",
       "Don't use border-left or border-right greater than 1px as a coloured stripe on cards or callouts.",
       "Don't use background-clip: text with a gradient (gradient text). One solid colour, emphasis by weight or size.",
       "Don't introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.",

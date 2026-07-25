@@ -305,8 +305,10 @@ function WalletsUi() {
 
       {/* Bottom register: the proofs' shared keyset, the same
           00ffd48b8f5ecf80 the Tokens plate serializes. Fields separate by
-          layout, not by separator glyphs. */}
-      <div className="mt-5 flex items-baseline justify-between gap-4 border-t border-hair pt-3">
+          layout, not by separator glyphs. flex-wrap: the keyset id is one
+          unbreakable token; on plates narrower than the pair it drops to
+          its own line instead of clipping at the plate edge. */}
+      <div className="mt-5 flex flex-wrap items-baseline justify-between gap-4 border-t border-hair pt-3">
         <span className="t-mono text-muted" style={{ fontSize: "0.75rem" }}>
           {HELD.length} proofs
         </span>

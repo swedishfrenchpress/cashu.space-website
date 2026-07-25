@@ -130,17 +130,16 @@ export default function Reveal({
     const node = ref.current;
     if (!node) return;
 
+    /* No observer, or reduced motion: reveal at once. rAF rather than a
+       bare call (lint: no setState in the effect body) — it still runs
+       before the next paint, so no flash of the hidden state is possible. */
     if (
       typeof window === "undefined" ||
-      typeof IntersectionObserver === "undefined"
+      typeof IntersectionObserver === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      setRevealed(true);
-      return;
-    }
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setRevealed(true);
-      return;
+      const id = window.requestAnimationFrame(() => setRevealed(true));
+      return () => window.cancelAnimationFrame(id);
     }
 
     let firstPass = true;

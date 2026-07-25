@@ -14,7 +14,9 @@ type Entry = {
   href: string;
   /* Decision facts, rendered in the host's mono register. Every value must
      stay verifiable against the project's own site or repo — the registry
-     states facts, it does not endorse. */
+     states facts, it does not endorse. Facts that hold for the whole
+     directory ("Open source" — everything here is) say nothing and stay
+     out. */
   facts?: string[];
 };
 
@@ -33,20 +35,20 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Mobile",
     scope: "Ecash in your pocket. Wallets for your phone.",
     entries: [
-      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["PWA", "Open source"] },
-      { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android", "Open source"] },
-      { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS", "Open source"] },
-      { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android", "Open source"] },
-      { name: "Numo",      href: "https://numopay.org",        facts: ["Android", "Point of sale", "Open source"] },
-      { name: "Sovran",    href: "https://sovran.money/en/",   facts: ["iOS and Android", "Beta", "Open source"] },
+      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["PWA"] },
+      { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android"] },
+      { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS"] },
+      { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android"] },
+      { name: "Numo",      href: "https://numopay.org",        facts: ["Android", "Point of sale"] },
+      { name: "Sovran",    href: "https://sovran.money/en/",   facts: ["iOS and Android", "Beta"] },
     ],
   },
   {
     heading: "Web",
     scope: "Runs in any browser. Nothing to install, portable anywhere.",
     entries: [
-      { name: "AGI Cash", href: "https://agi.cash/home", facts: ["Beta", "Open source"] },
-      { name: "Athenut",  href: "https://athenut.com",   facts: ["Open source"] },
+      { name: "AGI Cash", href: "https://agi.cash/home", facts: ["Beta"] },
+      { name: "Athenut",  href: "https://athenut.com" },
     ],
   },
   {
@@ -66,7 +68,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Tools",
     scope: "Not a wallet. Software for running and managing your own mint.",
     entries: [
-      { name: "Orchard", href: "https://orchard.space", facts: ["Self-hosted", "Open source"] },
+      { name: "Orchard", href: "https://orchard.space", facts: ["Self-hosted"] },
     ],
   },
 ];

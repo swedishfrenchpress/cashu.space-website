@@ -13,8 +13,8 @@ This project has a documented design system. Before generating UI, styling compo
 **Hard rules (see DESIGN.md for the full set):**
 
 - No chromatic accent in the site's own voice. Greys shift by lightness, never by hue. Colour exists only under the Depicted-World Exception (DESIGN.md §2): depicted app art in the demo panels, the tap-to-pay video, third-party marks.
-- No `box-shadow` on containers. The system is flat; only the `.btn-*` slabs lift.
-- No gradient text, no side-stripe borders. Glass (blur + translucency) exists on exactly one sanctioned surface — the navbar — nowhere else.
+- No `box-shadow` anywhere — buttons included; they are flat cipher slabs — except the navbar's condensed (scrolled) box, which carries `--nav-shadow` as part of the Onyx-pattern bar (user-directed 2026-07-25; DESIGN.md §4–5). No other surface inherits that licence.
+- No gradient text, no side-stripe borders. Glass (blur + translucency) exists on exactly one sanctioned surface — the navbar's condensed box — nowhere else.
 - Three typefaces only — GT-Standard (everything readable), Geist Mono (technical), Geist Pixel Square (protocol notation). No third.
 - Hero headline must be Display: GT-Standard 600, ≥3.75rem, line-height 0.95.
 

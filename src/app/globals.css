@@ -65,23 +65,36 @@
    * Sticky-bar height. The bar occupies flow space, so a viewport-height hero
    * has to subtract it to land its closing hairline on the fold.
    *
-   * Measured, not derived — the two breakpoints genuinely differ:
+   * Derivation (kept true at runtime by the ResizeObserver sync in
+   * site-header.tsx): --nav-inset (10px) + the frame's 2px of borders + the
+   * nav row. The closed mobile panel contributes 0 — its inner padding only
+   * exists in the open state, so nothing leaks into the flow height.
    *
-   *   below lg  68px nav row (14px padding x2 + the 40px toggle) + 20px from
-   *             the CLOSED .site-nav-panel + 1px hairline = 89px. The panel
-   *             is not actually 0-height when shut: .site-nav-panel__inner
-   *             carries `padding: 4px 0 16px`, and padding is not clipped by
-   *             the `grid-template-rows: 0fr` collapse, so 20px leaks.
-   *   lg and up 14px padding x2 + the ~41.6px .btn-secondary GitHub CTA
-   *             (NOT the 40px .theme-toggle — the padding trim at
-   *             `.site-nav .btn-primary` deliberately spares .btn-secondary)
-   *             + 1px hairline = 70.6px, rounded up to 71.
+   *   below lg  10 + 2 + 68px row (14px padding x2 + the 40px toggle) = 80.
+   *   lg and up 10 + 2 + ~69.6px row (14px padding x2 + the ~41.6px
+   *             .btn-secondary GitHub CTA — NOT the 40px .theme-toggle; the
+   *             padding trim at `.site-nav .btn-primary` deliberately spares
+   *             .btn-secondary) = 81.6, rounded up to 82.
    *
    * Always round UP when re-measuring. Erring short leaves a harmless sliver
    * of the next section showing; erring long hides the closing hairline under
    * the fold, which is the entire bug this token exists to fix.
    */
-  --nav-h: 89px;
+  --nav-h: 80px;
+
+  /*
+   * Onyx-pattern bar geometry. The bar rests --nav-inset below the viewport
+   * edge at all times; once the page scrolls it condenses into a floating
+   * box (see .site-nav-frame): --nav-gutter insets the box from the viewport
+   * on narrow screens, --nav-condensed-max tightens it on wide ones (~12%
+   * under --page-max, the ratio lifted from the reference), and --nav-shadow
+   * is the box's one sanctioned lift — the sole box-shadow on the site
+   * (DESIGN.md §4).
+   */
+  --nav-inset: 10px;
+  --nav-condensed-max: 1128px;
+  --nav-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  --dur-nav: 300ms;
 
   /*
    * Ceiling on the viewport-filling hero. The hero's fixed parts top out
@@ -106,12 +119,12 @@
   --section-air: clamp(96px, 12vw, 200px);
 }
 
-/* The bar sheds the mobile panel and gains the GitHub CTA at lg, which nets
-   out 18px shorter. Mirrors the `max-width: 1023.98px` boundary the nav's own
-   rules use — keep the two in step. */
+/* The bar swaps the 40px toggle for the ~41.6px GitHub CTA at lg. Mirrors
+   the `max-width: 1023.98px` boundary the nav's own rules use — keep the
+   two in step. */
 @media (min-width: 1024px) {
   :root {
-    --nav-h: 71px;
+    --nav-h: 82px;
   }
 }
 
@@ -151,6 +164,9 @@
     --wash: rgba(255, 255, 255, 0.08);
     --wash-strong: rgba(255, 255, 255, 0.12);
     --backdrop: rgba(10, 10, 11, 0.85);
+    /* Deeper than light's 0.05 — a lift this subtle needs more weight to
+       register against the near-black page at all. */
+    --nav-shadow: 0 4px 10px rgba(0, 0, 0, 0.55);
   }
 }
 
@@ -187,6 +203,9 @@
   --wash: rgba(255, 255, 255, 0.08);
   --wash-strong: rgba(255, 255, 255, 0.12);
   --backdrop: rgba(10, 10, 11, 0.85);
+  /* Deeper than light's 0.05 — a lift this subtle needs more weight to
+     register against the near-black page at all. */
+  --nav-shadow: 0 4px 10px rgba(0, 0, 0, 0.55);
 }
 
 /* width: 100% is load-bearing, not redundant. As a flex item the shell would
@@ -203,6 +222,15 @@
 .section-y-tight { padding-block: var(--section-tight); }
 .section-y-default { padding-block: var(--section-default); }
 .section-y-air { padding-block: var(--section-air); }
+
+/* Anchor destinations (nav links, g-chords) land below the sticky bar.
+   Without this, arrivals at narrow widths tucked the section's first line
+   under the glass wherever the section's own top padding ran shorter than
+   the bar. */
+#why-cashu,
+#implementations {
+  scroll-margin-top: var(--nav-h);
+}
 
 /*
  * Type system — DESIGN.md §3. Single source of truth for hierarchy.
@@ -1125,33 +1153,89 @@ html {
 }
 
 /*
- * Warp-style top bar.
+ * Onyx-pattern top bar (behaviour lifted from onyx.security, 2026-07-25,
+ * on the user's direction; materials stay the site's own).
  *
- * A full-width transparent glass strip pinned to the very top of the
- * viewport — no floating gutters, no pill. The translucent ground +
- * backdrop-blur live on the shell so the glass spans edge to edge; the
- * inner row stays constrained to the page-shell. Glass + blur are the
- * navbar's documented exception to the flat/sharp doctrine (DESIGN.md §4);
- * the bar itself is square and carries only a hairline bottom rule, no
- * drop shadow. The bar is sticky so page content slides under the glass as
- * the user scrolls — the one context where glassmorphism reads as glass.
+ * Two states, one sticky shell:
+ *
+ *   rest       The bar sits --nav-inset below the viewport edge, fully
+ *              transparent — no ground, no rule. The row aligns to the
+ *              page-shell gutters like every section beneath it.
+ *   condensed  Past a small scroll threshold (or with the mobile panel
+ *              open) the inner frame becomes a floating box: glass ground
+ *              + blur, 12px radius, hairline rim, the site's one sanctioned
+ *              box-shadow (--nav-shadow), dropped 4px and tightened to
+ *              --nav-condensed-max width with 24px inner padding. All of it
+ *              transitions over --dur-nav ease-in-out, the reference's own
+ *              timing.
+ *
+ * The shell stays sticky (not fixed) so it keeps occupying flow space and
+ * the hero's fold-line math is untouched; its flow height never changes
+ * because the condensed drop is a transform. The shell itself is
+ * hit-transparent so the gutters beside the condensed box don't swallow
+ * clicks. Glass + blur + radius + shadow are the navbar's documented
+ * exception to the flat/sharp doctrine (DESIGN.md §4–5); everything inside
+ * the box stays square.
  */
 .site-header-shell {
   position: sticky;
   top: 0;
   z-index: 50;
+  padding: var(--nav-inset) var(--nav-gutter, 0px) 0;
+  pointer-events: none;
+  transition: padding var(--dur-nav) ease-in-out;
+}
 
+.site-header-shell.is-condensed {
+  --nav-gutter: 10px;
+}
+
+.site-nav-frame {
+  pointer-events: auto;
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-x);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  /* Clips the open panel's full-bleed link washes to the rounded box. */
+  overflow: clip;
+  transition:
+    max-width var(--dur-nav) ease-in-out,
+    padding var(--dur-nav) ease-in-out,
+    transform var(--dur-nav) ease-in-out,
+    background-color var(--dur-nav) ease-in-out,
+    border-color var(--dur-nav) ease-in-out,
+    box-shadow var(--dur-nav) ease-in-out;
+}
+
+.site-header-shell.is-condensed .site-nav-frame {
+  max-width: var(--nav-condensed-max);
+  padding-inline: 24px;
+  transform: translateY(4px);
   background-color: var(--glass);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--glass-hair);
+  border-color: var(--glass-hair);
+  box-shadow: var(--nav-shadow);
 }
 
 /* Browsers without backdrop-filter (older Firefox) — opt into a denser
-   ground so the bar still reads as a surface over scrolling content. */
+   ground so the box still reads as a surface over scrolling content. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-header-shell {
+  .site-header-shell.is-condensed .site-nav-frame {
     background-color: var(--glass-solid);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header-shell,
+  .site-nav-frame {
+    transition: none;
+  }
+  .site-header-shell.is-condensed .site-nav-frame {
+    transform: none;
   }
 }
 
@@ -1240,15 +1324,15 @@ html {
   font-size: 0.78125rem;
 }
 
-/* Ink-route variant: the dark glass ground lives on the shell so it spans
-   the full bar width; the nav row itself only recolours its text. */
-.site-header-shell--on-ink {
+/* Ink-route variant: the condensed box takes a dark glass ground; the nav
+   row itself only recolours its text. */
+.site-header-shell--on-ink.is-condensed .site-nav-frame {
   background-color: rgba(9, 9, 11, 0.55);
-  border-bottom-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-header-shell--on-ink {
+  .site-header-shell--on-ink.is-condensed .site-nav-frame {
     background-color: rgba(9, 9, 11, 0.94);
   }
 }
@@ -1413,12 +1497,20 @@ html {
   pointer-events: auto;
 }
 
+/* Padding exists only in the open state: closed, the 0fr collapse would
+   not clip it, and the leaked 20px used to inflate the bar's flow height
+   (and therefore --nav-h) below lg. */
 .site-nav-panel__inner {
   overflow: hidden;
-  padding: 4px 0 16px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  transition: padding var(--dur-base) var(--ease-out-quart);
+}
+
+.site-nav-panel.is-open .site-nav-panel__inner {
+  padding: 4px 0 16px;
 }
 
 .site-nav-panel__list {
@@ -1920,6 +2012,15 @@ html {
   pointer-events: auto;
 }
 
+/* The artifacts are flex items, and a flex item's automatic minimum size is
+   its min-content — for the code pane that is its longest unwrappable mono
+   line (~452px), which refused to shrink, pushed the pane past the frame,
+   and disabled the pre's own overflow-x safety net. min-width: 0 hands the
+   overflow decision back to the pre, where the thin-scrollbar net lives. */
+.feature-demo__view > * {
+  min-width: 0;
+}
+
 /* Narrow counterpart to the content-driven frame above: the views leave the
    absolute stack and share one grid cell, so the taller of the two sets the
    panel's height and neither can overrun the toggle. Declared after the
@@ -1929,6 +2030,11 @@ html {
     position: relative;
     inset: auto;
     grid-area: 1 / 1;
+    /* Same automatic-minimum-size trap one level up: as a grid item the
+       view's min-content (driven by the code pane's longest line) forced
+       the shared 1/1 track wider than the frame, clipping both views on
+       phones. Zeroed, the track sizes to the frame and content shrinks. */
+    min-width: 0;
   }
 }
 
@@ -2434,7 +2540,7 @@ html {
   text-underline-offset: 4px;
 }
 
-/* Destination host plus decision facts (platform, source posture) share one
+/* Destination host plus decision facts (platform, status) share one
    mono register on one line, separated by layout gap — data, not badges. */
 .wallet-row__facts {
   display: flex;

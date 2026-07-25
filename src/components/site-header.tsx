@@ -21,18 +21,27 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Implementations", href: "/#implementations" },
 ];
 
+/*
+ * Condense hysteresis. The box appears once the page has clearly scrolled
+ * and only lets go near the very top, so the 300ms transition can't be made
+ * to flicker by hovering the threshold.
+ */
+const CONDENSE_ON_Y = 24;
+const CONDENSE_OFF_Y = 8;
+
 /**
- * Warp-style top bar. A full-width transparent glass strip pinned to the top
- * of the viewport: logo left, anchor links centered, GitHub chip right at
- * lg+; brand + hamburger toggle below lg, with the panel dropping the four
- * nav items + the GitHub CTA into a glass card beneath the bar. The glass
- * background + backdrop-blur are the navbar's documented exception to the
- * flat doctrine (DESIGN.md §4); the bar and its chip stay square. The chip
- * is secondary by doctrine — GitHub is not one of the two primary jobs
+ * Onyx-pattern top bar (DESIGN.md §5 Navigation): at rest a transparent
+ * strip inset 10px from the viewport edge — logo left, anchor links
+ * centered, GitHub chip right at lg+; brand + hamburger below lg. On
+ * scroll (or with the panel open) the frame condenses into a floating
+ * glass box — the navbar's documented exception to the flat doctrine
+ * (DESIGN.md §4); everything inside the box stays square. The chip is
+ * secondary by doctrine — GitHub is not one of the two primary jobs
  * (get a wallet, read the spec; the Two-CTA Rule, DESIGN.md §1).
  */
 export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [condensed, setCondensed] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
   const pathname = usePathname();
   const ctaClass = onInk ? "btn-secondary--on-ink" : "btn-secondary";
@@ -55,9 +64,37 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
   }, [isOpen]);
 
   // Auto-close on route change so the menu doesn't linger after navigation.
-  useEffect(() => {
+  // State is adjusted during render (the endorsed derived-state pattern)
+  // rather than in an effect, so the closed frame is what actually paints.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (lastPathname !== pathname) {
+    setLastPathname(pathname);
     setIsOpen(false);
-  }, [pathname]);
+  }
+
+  /* Scroll-condense driver, rAF-throttled. Runs once on mount too: an
+     anchor arrival (/#implementations) starts mid-page and must land with
+     the box already formed, not watch it assemble. */
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setCondensed((prev) =>
+        prev ? window.scrollY > CONDENSE_OFF_Y : window.scrollY > CONDENSE_ON_Y,
+      );
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    /* rAF, not a direct call: runs pre-paint, so an anchor arrival still
+       lands with the box formed, without setState in the effect body. */
+    raf = requestAnimationFrame(update);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   /* --nav-h drives the hero's fold line, and it ships as a hand-measured
      constant that silently goes stale the moment the bar's type or padding
@@ -65,20 +102,28 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
      layout never depends on JS); this only replaces it with what the bar
      actually measures, and keeps it true through font loading and resize.
 
-     The bar row is measured, not the shell: the mobile panel lives inside
-     the shell and would otherwise fold its open height into the token. Row
-     height + the shell's hairline is the same derivation the CSS comment
-     documents. */
+     The bar row is measured, not the shell or frame: the mobile panel lives
+     inside the frame and would otherwise fold its open height into the
+     token. Row height + the shell's top inset + the frame's borders is the
+     same derivation the CSS token comment documents. */
   useEffect(() => {
     const row = navRef.current;
     if (!row || typeof ResizeObserver === "undefined") return;
 
     const sync = () => {
       const shell = row.closest(".site-header-shell");
-      const hairline = shell
-        ? parseFloat(getComputedStyle(shell).borderBottomWidth) || 0
+      const frame = row.closest(".site-nav-frame");
+      const inset = shell
+        ? parseFloat(getComputedStyle(shell).paddingTop) || 0
         : 0;
-      const h = Math.ceil(row.getBoundingClientRect().height + hairline);
+      const frameStyle = frame ? getComputedStyle(frame) : null;
+      const borders = frameStyle
+        ? (parseFloat(frameStyle.borderTopWidth) || 0) +
+          (parseFloat(frameStyle.borderBottomWidth) || 0)
+        : 0;
+      const h = Math.ceil(
+        row.getBoundingClientRect().height + inset + borders,
+      );
       if (h > 0) {
         document.documentElement.style.setProperty("--nav-h", `${h}px`);
       }
@@ -93,9 +138,15 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
 
   return (
     <header
-      className={`site-header-shell${onInk ? " site-header-shell--on-ink" : ""}`}
+      className={`site-header-shell${onInk ? " site-header-shell--on-ink" : ""}${
+        condensed || isOpen ? " is-condensed" : ""
+      }`}
     >
-      <div className="page-shell">
+      {/* The frame is the condensing box; the open panel must sit inside it
+          so the glass ground wraps the dropped links too. isOpen forces the
+          condensed state for the same reason: an open menu over an
+          un-scrolled page still needs a ground to read against. */}
+      <div className="site-nav-frame">
         <Reveal immediate variant="fade" as="div">
           <nav
             ref={navRef}

@@ -104,6 +104,7 @@ typography:
     letterSpacing: "0.04em"
 rounded:
   none: "0"
+  nav: "12px"
   card: "16px"
   glass: "24px"
 spacing:
@@ -237,7 +238,7 @@ Buttons communicate interaction through contrasting fill, a precise border, quic
 
 ### Named Rules
 
-**The No-Shadow Rule.** `box-shadow` is forbidden throughout the site, including buttons. If a surface needs separation, use spacing, fill contrast, or a 1px border.
+**The No-Shadow Rule.** `box-shadow` is forbidden throughout the site, including buttons. If a surface needs separation, use spacing, fill contrast, or a 1px border. One sanctioned exception, added 2026-07-25 on the user's direction: the navbar's condensed box carries `--nav-shadow` (`0 4px 10px` near-transparent black) as part of the Onyx-pattern scroll behaviour — see §5 Navigation. No other surface inherits this licence.
 
 **The Hairline Rule.** Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.
 
@@ -270,9 +271,12 @@ Everything. The cipher pass is texture, not elevation; it does not license shado
 
 ### Navigation
 
-- **Style:** Top bar, full-width, padding matches page-x (`24px` mobile / `48px` sm / `80px` lg).
-- **Links** (`nav-link`): Label-weight, colour Slate (`#3f3f46`). Hover transitions colour to Ink. No underline, no active background.
-- **Mobile:** Links collapse below the `md` breakpoint; the brand wordmark and the two buttons remain.
+The bar follows the Onyx pattern (behaviour lifted from onyx.security on the user's direction, 2026-07-25; materials stay the site's own). Two states, one sticky shell:
+
+- **Rest (page top):** fully transparent — no ground, no blur, no rule. The bar sits 10px (`--nav-inset`) below the viewport edge; the row aligns to the page-shell gutters like every section beneath it.
+- **Condensed (scrolled, or mobile panel open):** the inner frame becomes a floating box — glass ground + 20px blur, `rounded.nav` (12px) corners, `--glass-hair` rim, the site's one sanctioned `box-shadow` (`--nav-shadow`), dropped a further 4px and tightened to 1128px max-width with 24px inner padding. The transition runs 300ms ease-in-out; `prefers-reduced-motion` drops the translate and transitions. The box (glass, radius, shadow) is the navbar's exclusive licence; everything inside it stays square and flat.
+- **Links** (`nav-link`): Label-weight, colour Slate (`#3f3f46`). Hover transitions colour to Ink. No underline, no active background. Current route sets full Ink and one weight step up.
+- **Mobile:** Links collapse below `lg` into the hamburger panel, which opens inside the condensed box; the brand and theme toggle remain in the row.
 
 ### Divider
 
