@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { GeistMono } from "geist/font/mono";
-import { GeistPixelSquare } from "geist/font/pixel";
 import ConsoleSignature from "@/components/console-signature";
 import ButtonCipher from "@/components/button-cipher";
 import Keymap from "@/components/keymap";
@@ -25,14 +24,32 @@ const gtStandard = localFont({
       weight: "600",
       style: "normal",
     },
-    {
-      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Semibold-Oblique-Trial.woff2",
-      weight: "600",
-      style: "italic",
-    },
   ],
   variable: "--font-gt",
   display: "swap",
+});
+
+/* Declared here rather than imported from `geist/font/pixel`, which is not
+   a per-face module: it calls localFont() at module scope for all five
+   pixel faces (Square, Circle, Grid, Line, Triangle), so importing one
+   registers and preloads every one. Circle, Grid, Line, and Triangle —
+   faces nothing on this site ever sets — were costing 101KB of woff2 on
+   every page load. DESIGN.md's three-typeface rule was holding in the
+   stylesheet and leaking on the wire.
+
+   preload: false demotes rather than defers. The keymap overlay renders
+   `.t-pixel` chords into the DOM at load, so the face still resolves on
+   first paint; what changes is that it stops occupying a preload slot
+   ahead of the three GT-Standard faces the hero is actually waiting on.
+   Updating `geist` means re-copying the woff2 into public/fonts/. */
+const geistPixelSquare = localFont({
+  src: "../../public/fonts/geist-pixel/GeistPixel-Square.woff2",
+  weight: "500",
+  variable: "--font-geist-pixel-square",
+  display: "swap",
+  preload: false,
+  adjustFontFallback: false,
+  fallback: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
 });
 
 /* Browser chrome follows the site scheme (see the tonal ramp in globals.css). */
@@ -85,7 +102,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${gtStandard.variable} ${GeistMono.variable} ${GeistPixelSquare.variable} h-full antialiased`}
+      className={`${gtStandard.variable} ${GeistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
       /* The theme boot script (and browser extensions) may stamp attributes
          on <html> before hydration; the mismatch is intentional. */
       suppressHydrationWarning
