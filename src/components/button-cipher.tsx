@@ -52,7 +52,7 @@ export default function ButtonCipher() {
     const cleanup = new Map<HTMLElement, () => void>();
 
     const enhance = (button: HTMLElement) => {
-      if (cleanup.has(button) || button.classList.contains("btn-with-count")) return;
+      if (cleanup.has(button)) return;
       const source = button.textContent?.replace(/\s+/g, " ").trim();
       if (!source) return;
 
@@ -88,17 +88,22 @@ export default function ButtonCipher() {
         state.frame = requestAnimationFrame(paint);
       };
 
+      /* Pointer only. The pass used to fire on focusin as well, which meant
+         every CTA a keyboard visitor tabbed onto went `color: transparent`
+         and painted random hex for 460ms — the label was unreadable at
+         exactly the moment they were reading it to decide. A mouse user can
+         move the pointer away; a tabbing user has no equivalent escape, so
+         the cost was paid entirely by the people with the fewest options.
+         The focus ring still marks the target, the accessible name never
+         changed, and the pass survives intact where it was always aimed:
+         the hover. */
       button.addEventListener("pointerenter", start);
-      button.addEventListener("focusin", start);
       button.addEventListener("pointerleave", finish);
-      button.addEventListener("focusout", finish);
       cleanup.set(button, () => {
         finish();
         label.remove();
         button.removeEventListener("pointerenter", start);
-        button.removeEventListener("focusin", start);
         button.removeEventListener("pointerleave", finish);
-        button.removeEventListener("focusout", finish);
       });
     };
 

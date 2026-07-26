@@ -36,10 +36,14 @@ function CodePane({
   children: ReactNode;
 }) {
   return (
-    <div className="relative z-[1] w-full max-w-[560px] border border-hair bg-card">
+    <div className="relative z-[1] w-full max-w-[560px] border border-fig-edge bg-card">
+      {/* Ink over Body, not Body over Mist. The strip's ground is --hair, so
+          the meta cell's old --muted measured 3.81:1 on it — under AA for
+          14px. Both cells step one tone up: the file path stays the louder
+          of the two and the pair clears AA in both schemes. */}
       <div className="t-mono flex items-center justify-between gap-6 bg-hair px-4 py-2.5">
-        <span className="truncate text-body">{file}</span>
-        <span className="hidden whitespace-nowrap text-muted sm:inline">
+        <span className="truncate text-ink">{file}</span>
+        <span className="hidden whitespace-nowrap text-body sm:inline">
           {meta}
         </span>
       </div>

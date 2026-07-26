@@ -172,10 +172,19 @@ function Spec() {
     <div className="bg-[#18181b] w-full">
       {/* Header strip — slim, two-cell: file path left, spec metadata right.
          Earns the strip space by carrying information instead of leaving the
-         right half blank like a browser tab. */}
+         right half blank like a browser tab.
+
+         This pane is always dark — it does not flip with the scheme — so its
+         greys are literals and have to clear AA on their own. zinc-500
+         (#71717a) measured 3.08:1 on the strip and 3.63:1 on the pane body,
+         both under 4.5 for 14px. globals.css already carries the finding, in
+         the footer metastrip comment: "Fog, not Mist — #71717a on #000 is
+         ~4.3:1 and misses AA for 14px text." The rule was written and never
+         applied here. Each tone steps up one: zinc-300 path, zinc-400 meta
+         and comments, zinc-100 body — four ranks, all legible. */}
       <div className="flex items-center justify-between gap-6 bg-[#27272a] border-b border-zinc-800 px-5 py-3 t-mono">
-        <span className="text-zinc-400 truncate">cashubtc/nuts/nut-00.md</span>
-        <span className="hidden sm:inline text-zinc-500 whitespace-nowrap">
+        <span className="text-zinc-300 truncate">cashubtc/nuts/nut-00.md</span>
+        <span className="hidden sm:inline text-zinc-400 whitespace-nowrap">
           v0 (CBOR encoding)
         </span>
       </div>
@@ -183,23 +192,23 @@ function Spec() {
          hair of breathing room. The offset lives on the .spec-pane class so
          the magic number doesn't sit inline — see globals.css. */}
       <pre className="spec-pane t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pr-10 overflow-x-auto leading-7">
-        <span className="text-zinc-500">{`// Cashu Token v4, CBOR encoding`}</span>{"\n\n"}
+        <span className="text-zinc-400">{`// Cashu Token v4, CBOR encoding`}</span>{"\n\n"}
         {`{\n  "t": [{\n    "i": `}
         <span className="t-pixel">{`h'00…d2'`}</span>
         {`,        `}
-        <span className="text-zinc-500">{`// mint id`}</span>
+        <span className="text-zinc-400">{`// mint id`}</span>
         {`\n    "p": [{\n      "a": `}
         <span className="t-pixel">{`64`}</span>
         {`,              `}
-        <span className="text-zinc-500">{`// sats`}</span>
+        <span className="text-zinc-400">{`// sats`}</span>
         {`\n      "s": h'02ab…f1',      `}
-        <span className="text-zinc-500">{`// blinded signature`}</span>
+        <span className="text-zinc-400">{`// blinded signature`}</span>
         {`\n      "d": h'0248…e4'       `}
-        <span className="text-zinc-500">{`// DLEQ proof`}</span>
+        <span className="text-zinc-400">{`// DLEQ proof`}</span>
         {`\n    }, {\n      "a": `}
         <span className="t-pixel">{`128`}</span>
         {`,             `}
-        <span className="text-zinc-500">{`// sats`}</span>
+        <span className="text-zinc-400">{`// sats`}</span>
         {`\n      "s": h'03c9…7e',\n      "d": h'0187…a6'\n    }]\n  }],\n  "m": "https://mint.example.com",\n  "u": "sat",\n  "v": 4\n}`}
       </pre>
     </div>
@@ -284,10 +293,13 @@ export default function ReferenceImplementations() {
             </h2>
           </Reveal>
           <Reveal delay={120}>
-            {/* ch overestimates the measure for proportional type — the "0"
-                glyph is wider than GT-Standard's average — so 65ch was
-                rendering ~87 characters, past DESIGN.md's 65–75 rule. */}
-            <p className="t-body-lead text-zinc-400 max-w-[54ch]">
+            {/* The measure is capped by .implementations-intro p in
+                globals.css (--measure-lead), not here. A max-w-[54ch] utility
+                sat on this element and never took effect: that rule is
+                unlayered and Tailwind utilities live in @layer utilities, so
+                the layer loses no matter the specificity. The cap reads as
+                authored and rendered at 89 characters. */}
+            <p className="t-body-lead text-zinc-400">
               Active across Python, Rust, and TypeScript. The cashubtc
               organization hosts the spec, the SDKs, and the reference
               wallets.
