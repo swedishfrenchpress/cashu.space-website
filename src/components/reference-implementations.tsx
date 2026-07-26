@@ -215,7 +215,6 @@ function Spec() {
    the middle. No stars: the visitor isn't choosing between nutshell and cdk
    by GitHub vanity counts. */
 const FEATURED = ["nutshell", "cdk", "coco"] as const;
-const REMAINING = REPOS.length - FEATURED.length;
 
 /* The headline's count is derived from the directory it sits above, so the
    two can never disagree — nuts (Spec) and awesome-cashu (Resources) are
@@ -223,6 +222,13 @@ const REMAINING = REPOS.length - FEATURED.length;
 const IMPLEMENTATIONS = REPOS.filter(
   (r) => r.tag !== "Spec" && r.tag !== "Resources",
 ).length;
+
+/* Must subtract from IMPLEMENTATIONS, not REPOS.length. Counting the two
+   catalogue entries here made the card read 3 listed + 5 more = 8 under a
+   headline that says Six: the one section whose whole argument is that we
+   count honestly, failing its own arithmetic. Both numbers now share a
+   denominator, which is what makes them unable to disagree. */
+const REMAINING = IMPLEMENTATIONS - FEATURED.length;
 const COUNT_WORDS = [
   "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
 ] as const;
@@ -260,7 +266,7 @@ function Card() {
           single GitHub action is the CTA below the panel. */}
       <div className="px-5 py-4">
         <span className="t-label text-zinc-500">
-          + {REMAINING} more in the cashubtc org
+          + {REMAINING} more implementations in the cashubtc org
         </span>
       </div>
     </div>
@@ -278,7 +284,10 @@ export default function ReferenceImplementations() {
             </h2>
           </Reveal>
           <Reveal delay={120}>
-            <p className="t-body-lead text-zinc-400">
+            {/* ch overestimates the measure for proportional type — the "0"
+                glyph is wider than GT-Standard's average — so 65ch was
+                rendering ~87 characters, past DESIGN.md's 65–75 rule. */}
+            <p className="t-body-lead text-zinc-400 max-w-[54ch]">
               Active across Python, Rust, and TypeScript. The cashubtc
               organization hosts the spec, the SDKs, and the reference
               wallets.

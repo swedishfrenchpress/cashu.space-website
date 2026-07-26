@@ -89,6 +89,19 @@ function isJumpArrival() {
  */
 const MAX_DELAY_MS = 360;
 
+/*
+ * Defer a reveal by a timeout, never by requestAnimationFrame. A tab opened
+ * in the background — cmd-click, "open in new tab", a restored session —
+ * pauses rAF indefinitely, so an rAF-scheduled reveal never runs and the
+ * page sits fully transparent until the tab is focused. Timeouts are
+ * clamped in background tabs but they still fire, so the entrance completes
+ * whether or not anyone is watching yet. One frame of delay is all this
+ * needs; it exists to keep setState out of the effect body.
+ */
+function scheduleReveal(run: () => void) {
+  return window.setTimeout(run, 0);
+}
+
 /**
  * Reveal — the unified entrance wrapper. Above-the-fold elements pass
  * `immediate` so they animate on mount (post-paint); below-the-fold use the
@@ -123,23 +136,22 @@ export default function Reveal({
     ensureTracker();
 
     if (immediate) {
-      const id = window.requestAnimationFrame(() => setRevealed(true));
-      return () => window.cancelAnimationFrame(id);
+      const id = scheduleReveal(() => setRevealed(true));
+      return () => window.clearTimeout(id);
     }
 
     const node = ref.current;
     if (!node) return;
 
-    /* No observer, or reduced motion: reveal at once. rAF rather than a
-       bare call (lint: no setState in the effect body) — it still runs
-       before the next paint, so no flash of the hidden state is possible. */
+    /* No observer, or reduced motion: reveal at once. Deferred by a timeout
+       rather than called bare (lint: no setState in the effect body). */
     if (
       typeof window === "undefined" ||
       typeof IntersectionObserver === "undefined" ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      const id = window.requestAnimationFrame(() => setRevealed(true));
-      return () => window.cancelAnimationFrame(id);
+      const id = scheduleReveal(() => setRevealed(true));
+      return () => window.clearTimeout(id);
     }
 
     let firstPass = true;

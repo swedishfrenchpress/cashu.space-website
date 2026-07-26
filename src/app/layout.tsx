@@ -102,11 +102,28 @@ export default function RootLayout({
             it must run before anything renders. No saved choice → no
             attribute → the CSS follows prefers-color-scheme. Also stamps
             html.js, the gate for every scripting-dependent hidden state
-            (.reveal, .draw-on): without it the site renders fully static. */}
+            (.reveal, .draw-on): without it the site renders fully static.
+
+            The same script arms a failsafe. html.js is stamped here, but
+            only React can add `.is-revealed`, so between this line and
+            hydration every .reveal is transparent. Scripting-off was always
+            handled; scripting-*slow* and scripting-*broken* were not, and
+            those fail worse — they never resolve.
+
+            The test is the outcome, not a proxy: after 1.5s, has *any*
+            .reveal actually revealed? Every page opens with `immediate`
+            reveals, so on a healthy page at least one has. Asking React to
+            report its own readiness instead would miss the case that
+            actually bites — a backgrounded tab, where hydration completes
+            but requestAnimationFrame is paused, so the flag says ready
+            while every element is still transparent. If nothing has
+            revealed, drop html.js and the page becomes the static document
+            it already knows how to be. This lives inline, not in a chunk,
+            so a chunk that never arrives cannot take the failsafe with it. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}',
+              'document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}setTimeout(function(){if(!document.querySelector(".reveal.is-revealed"))document.documentElement.classList.remove("js")},1500)',
           }}
         />
         <a href="#main-content" className="skip-link">

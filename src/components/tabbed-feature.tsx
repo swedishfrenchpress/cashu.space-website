@@ -164,12 +164,10 @@ export default function TabbedFeature() {
                 data-index={i}
                 className="feature-block"
               >
-                <Reveal variant="fade" slow>
-                  {/* Demo panel: captioned figure plate ↔ protocol code on a
-                      shared drafting-sheet ground. The plate is the panel's
-                      only visual focal point. */}
-                  <ProtocolDemo demo={tab.id} label={tab.label} />
-                </Reveal>
+                {/* Claim, then evidence, then action. A spec captions a
+                    figure because the prose already introduced it; leading
+                    with the plate made the reader hold `keyset 00ffd48b…`
+                    in working memory until the thesis arrived below it. */}
                 <div className="feature-block__text">
                   <h3 className="t-headline feature-block__title">
                     {tab.title}
@@ -177,6 +175,14 @@ export default function TabbedFeature() {
                   <p className="t-body-lead feature-block__caption">
                     {tab.caption}
                   </p>
+                </div>
+                <Reveal variant="fade" slow>
+                  {/* Demo panel: captioned figure plate ↔ protocol code on a
+                      shared drafting-sheet ground. The plate is the panel's
+                      only visual focal point. */}
+                  <ProtocolDemo demo={tab.id} label={tab.label} />
+                </Reveal>
+                <div className="feature-block__action">
                   {tab.external ? (
                     <a
                       href={tab.href}

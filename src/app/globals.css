@@ -420,6 +420,11 @@ html {
  * spec that only renders with scripting enabled would be a broken promise.
  * `:where()` keeps the gate at zero extra specificity so the cascade below
  * is unchanged.
+ *
+ * The same boot script strips html.js if hydration has not signalled within
+ * 1.5s, so a slow or failed chunk resolves to the static document instead of
+ * an indefinitely blank one. Every rule here is therefore a *decoration* on
+ * content that is already legible — never the thing that makes it legible.
  */
 :where(html.js) .reveal {
   opacity: 0;
@@ -431,7 +436,24 @@ html {
     opacity var(--dur-reveal) var(--ease-out-quart),
     transform var(--dur-reveal) var(--ease-out-quart);
   transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* Compositor hint only while it can still pay for itself. Left on every
+   .reveal it would hold a layer per element for the life of the page. */
+:where(html.js) .reveal:not(.is-revealed) {
   will-change: opacity, transform;
+}
+
+/*
+ * No html.js means either scripting is off or the failsafe fired. Either
+ * way nothing will ever add .is-revealed, so there is no entrance to play
+ * and the transition would only delay legibility — worse, a backgrounded
+ * tab freezes transitions mid-flight, so an *animated* recovery can leave
+ * the page transparent indefinitely. The recovery must be a cut, not a fade.
+ * Specificity (0,1,1) intentionally beats .reveal--slow / .reveal--instant.
+ */
+html:not(.js) .reveal {
+  transition: none;
 }
 
 .reveal.is-revealed {
@@ -557,7 +579,16 @@ html {
   position: absolute;
   inset: 0;
   z-index: 2;
-  display: flex;
+  /* Only present while it has something to paint. This element is absolutely
+     positioned over the real label, so as a permanent fixture it is an
+     invisible plate sitting on every button on the site — and anything that
+     gives it a ground turns it into a visible one. Contrast extensions do
+     exactly that: Dark Reader assigns backgrounds by computed value and
+     blanks every button label, which an explicit `transparent` does not
+     prevent. Existing only during the pass removes the hazard rather than
+     negotiating with it. */
+  display: none;
+  background-color: transparent;
   align-items: center;
   justify-content: center;
   color: var(--button-cipher-color);
@@ -575,6 +606,10 @@ html {
    colour transition it stayed partly visible under the cipher for the first
    frames — two labels at once, which is exactly what the pass is meant to
    avoid. Fill and border keep their transitions. */
+.button-ciphering .button-cipher__label {
+  display: flex;
+}
+
 .button-ciphering {
   color: transparent !important;
   transition:
@@ -598,15 +633,21 @@ html {
   transform: scale(0.985);
 }
 
+/* The rim is the whole affordance. Flat + shadowless means nothing else
+   says "control", and at --hair the boundary measured 1.27:1 against paper
+   — under WCAG 2.2 SC 1.4.11's 3:1 for a control's identifying boundary,
+   so READ THE SPEC read as a line of text with a ghost around it. --muted
+   is 4.8:1 and still a hairline: the doctrine was never the problem, the
+   tone step was. Hover now goes to full Ink so the state change survives. */
 .btn-secondary {
   background-color: var(--card);
   color: var(--ink);
-  border-color: var(--hair);
+  border-color: var(--muted);
 }
 
 .btn-secondary:hover {
   background-color: var(--band);
-  border-color: var(--muted);
+  border-color: var(--ink);
 }
 
 .btn-secondary:active {
@@ -642,16 +683,18 @@ html {
   outline-color: #ffffff;
 }
 
-/* Secondary slab on Ink ground — the quiet companion to the primary CTA. */
+/* Secondary slab on Ink ground — the quiet companion to the primary CTA.
+   Same 1.4.11 correction as .btn-secondary: the old #3f3f46 rim measured
+   2.01:1 against black. #71717a clears 3:1 and stays inside the grey ramp. */
 .btn-secondary--on-ink {
   background-color: #18181b;
   color: #fafafa;
-  border-color: #3f3f46;
+  border-color: #71717a;
 }
 
 .btn-secondary--on-ink:hover {
   background-color: #27272a;
-  border-color: #71717a;
+  border-color: #a1a1aa;
 }
 
 .btn-secondary--on-ink:active {
@@ -2343,6 +2386,15 @@ html {
   max-width: none;
 }
 
+/* The block's CTA sits below the figure it acts on, so it is its own row
+   rather than the tail of the text stack. Flex keeps the slab at content
+   width — a bare anchor would stretch to the column under .feature-block's
+   default align-items: stretch. */
+.feature-block__action {
+  display: flex;
+  align-items: flex-start;
+}
+
 .feature-block__title {
   width: 100%;
   text-wrap: balance;
@@ -2426,9 +2478,12 @@ html {
    than the average letter — a 75ch cap rendered ~86 real characters per line,
    past the measure DESIGN.md sets. The cap is stated in the unit CSS has;
    the number is tuned to the count that actually lands. */
+/* 54ch, not 65ch: the ch unit measures the "0" glyph, which is wider than
+   GT-Standard's average character, so a nominal 65ch was setting ~86 real
+   characters — past the 65–75 measure DESIGN.md §6 commits to. */
 .video-feature__body {
   width: 100%;
-  max-width: 65ch;
+  max-width: 54ch;
   color: rgba(255, 255, 255, 0.82);
   text-wrap: pretty;
 }
@@ -2503,10 +2558,29 @@ html {
 /* Entry list — a top hairline opens the register; each row carries its
    own bottom hairline. Hair (var(--hair)) keeps the 1px line at the doctrinal
    hairline weight. */
+/*
+ * Registry rules use --rule, not --hair. In dark, --hair (#27272a) sits at
+ * 1.33:1 on --paper and the registry stops reading as a table at all — and
+ * here the rules are not decoration, they are the row structure carrying
+ * name / facts / action across three columns. --ghost restores the grouping
+ * without touching the global hairline token every other section is tuned
+ * against. Light is unchanged: --hair is already legible on paper.
+ */
 .wallet-list {
+  --rule: var(--hair);
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--hair);
+  border-top: 1px solid var(--rule);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .wallet-list {
+    --rule: var(--ghost);
+  }
+}
+
+:root[data-theme="dark"] .wallet-list {
+  --rule: var(--ghost);
 }
 
 /* Aligned Registry Row: one line per entry. Facts get their own grid
@@ -2519,7 +2593,7 @@ html {
   column-gap: clamp(1.25rem, 2.5vw, 2rem);
   align-items: center;
   padding-block: clamp(1.125rem, 2.2vw, 1.625rem);
-  border-bottom: 1px solid var(--hair);
+  border-bottom: 1px solid var(--rule, var(--hair));
 }
 
 /* Name + destination host, stacked. The host is the registry's honest
@@ -2532,17 +2606,11 @@ html {
   min-width: 0;
 }
 
+/* A label, not a control. The hover underline left with the link this used
+   to be — underlining text that cannot be clicked is a lie about it. */
 .wallet-row__name {
   color: var(--ink);
-  text-decoration: none;
   width: fit-content;
-  transition: none;
-}
-
-.wallet-row__name:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--ink);
-  text-underline-offset: 4px;
 }
 
 .wallet-row__host {

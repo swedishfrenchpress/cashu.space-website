@@ -135,15 +135,15 @@ export default function WalletsPage() {
                       delay={280 + gi * 60 + i * 50}
                       className="wallet-row"
                     >
+                      {/* Plain text, not a second link. The wordmark and the
+                          OPEN slab pointed at the same href, so the registry
+                          spent 26 tab stops on 13 destinations and announced
+                          every entry twice to a screen reader. OPEN is the
+                          row's single control; the name is its label. */}
                       <span className="wallet-row__id">
-                        <a
-                          href={entry.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="wallet-row__name t-title focus-ring"
-                        >
+                        <span className="wallet-row__name t-title">
                           {entry.name}
-                        </a>
+                        </span>
                         <span className="wallet-row__host">
                           {targetOf(entry.href)}
                         </span>
@@ -165,7 +165,7 @@ export default function WalletsPage() {
                         href={entry.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`Open ${entry.name}`}
+                        aria-label={`Open ${entry.name} (opens in a new tab)`}
                         className="btn-secondary wallet-open"
                       >
                         Open
