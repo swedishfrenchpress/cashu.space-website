@@ -32,14 +32,22 @@
 
   /* Figure-plate optics (§5 Demo Panel). --fig-ground is the drafting
      sheet the plates and code panes sit on — one full step below Card so
-     the plate reads as an object, not an implication. --fig-lit/--fig-shade
-     are the machined keyline pair: each scheme expresses "lit above,
-     seated below" with the ramp values it has — light darkens the bottom
-     edge (ghost), dark lightens the top edge (ghost). Borders only; the
-     No-Shadow Rule holds. */
+     the plate reads as an object, not an implication. --fig-edge/--fig-lit/
+     --fig-shade are the machined keyline set: each scheme expresses "lit
+     above, seated below" with the ramp values it has — light darkens the
+     bottom edge, dark lightens the top edge. Borders only; the No-Shadow
+     Rule holds.
+
+     The whole set sits one tone off --hair on purpose. The graph paper the
+     plate lands on is drawn in --hair, so a --hair keyline made the plate
+     the same value as its own ground: the object was outlined in the grid
+     it was supposed to sit above. Stepping the set one tone (light: ghost
+     sides and lit rim, faint seat; dark: faint rim, ghost sides and seat)
+     keeps the polarity identical and separates the plate from the sheet. */
   --fig-ground: #f4f4f5; /* chalk */
-  --fig-lit: #e4e4e7;    /* hair — top edge, same as sides in light */
-  --fig-shade: #d4d4d8;  /* ghost — the darker seat */
+  --fig-edge: #d4d4d8;   /* ghost — the sides */
+  --fig-lit: #d4d4d8;    /* ghost — top edge, same as sides in light */
+  --fig-shade: #a1a1aa;  /* faint — the darker seat */
 
   /* Always-dark showcase surfaces. --panel-hair is invisible in light
      (border matches the fill) and separates the panel from the near-black
@@ -117,6 +125,22 @@
   --section-tight: clamp(40px, 5vw, 96px);
   --section-default: clamp(64px, 9vw, 160px);
   --section-air: clamp(96px, 12vw, 200px);
+
+  /*
+   * Lead-paragraph measure — DESIGN.md §6, "65–75ch max width".
+   *
+   * `ch` measures the "0" glyph, which in GT-Standard is markedly wider than
+   * the family's average character, so a nominal 65ch renders ~89 real
+   * characters and a nominal 54ch still renders 82 on text made of short
+   * words. Two paragraphs were capped in `ch` and both were over: the
+   * implementations lead at 89, the Tokens pillar at 82.
+   *
+   * This is the measure stated in the unit CSS has, tuned to the count that
+   * actually lands. Verified in-browser across both lead paragraphs at
+   * 1440px: 66 and 73 characters, inside the rule at both ends. Change this
+   * by measuring rendered characters, never by converting the rule's number.
+   */
+  --measure-lead: 48ch;
 }
 
 /* The bar swaps the 40px toggle for the ~41.6px GitHub CTA at lg. Mirrors
@@ -148,11 +172,14 @@
     --on-ink: #0a0a0b;
     --edge: #ffffff;
 
-    /* Figure-plate optics: dark carries the lit rim on top (ghost is the
-       lighter value in this ramp) and seats on hair, mirroring light. */
+    /* Figure-plate optics: dark carries the lit rim on top (faint is the
+       lighter value in this ramp) and seats on ghost, mirroring light. Both
+       sit one tone off --hair so the plate never shares a value with the
+       graph paper under it — see the light block for the reasoning. */
     --fig-ground: #101012; /* band */
-    --fig-lit: #3f3f46;    /* ghost — the lit top rim */
-    --fig-shade: #27272a;  /* hair — bottom edge, same as sides in dark */
+    --fig-edge: #3f3f46;   /* ghost — the sides */
+    --fig-lit: #71717a;    /* faint — the lit top rim */
+    --fig-shade: #3f3f46;  /* ghost — bottom edge, same as sides in dark */
 
     --panel: #131316;
     --panel-hair: #27272a;
@@ -187,11 +214,14 @@
   --on-ink: #0a0a0b;
   --edge: #ffffff;
 
-  /* Figure-plate optics: dark carries the lit rim on top (ghost is the
-     lighter value in this ramp) and seats on hair, mirroring light. */
+  /* Figure-plate optics: dark carries the lit rim on top (faint is the
+     lighter value in this ramp) and seats on ghost, mirroring light. Both
+     sit one tone off --hair so the plate never shares a value with the
+     graph paper under it — see the light block for the reasoning. */
   --fig-ground: #101012; /* band */
-  --fig-lit: #3f3f46;    /* ghost — the lit top rim */
-  --fig-shade: #27272a;  /* hair — bottom edge, same as sides in dark */
+  --fig-edge: #3f3f46;   /* ghost — the sides */
+  --fig-lit: #71717a;    /* faint — the lit top rim */
+  --fig-shade: #3f3f46;  /* ghost — bottom edge, same as sides in dark */
 
   --panel: #131316;
   --panel-hair: #27272a;
@@ -317,6 +347,7 @@
   --color-band: var(--band);
   --color-chalk: var(--chalk);
   --color-hair: var(--hair);
+  --color-fig-edge: var(--fig-edge);
   --color-ghost: var(--ghost);
   --color-faint: var(--faint);
   --color-muted: var(--muted);
@@ -701,36 +732,6 @@ html:not(.js) .reveal {
   transform: scale(0.985);
 }
 
-/*
- * .btn-with-count — chip modifier that splits the chip into label + data cells
- * separated by a 1px hairline. The right-side cell carries mono numerics with
- * cap-tracking and uppercase reset, because the count is data, not a label.
- * Compose on any base chip. Default divider tone matches the Paper rim;
- * .btn-primary (Ink ground) overrides to a 22% white hair so the rule reads
- * against the dark fill.
- */
-.btn-with-count {
-  padding-right: 0;
-}
-
-.btn-with-count__meta {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 16px;
-  padding: 12px 24px;
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  border-left: 1px solid var(--hair);
-}
-
-.btn-primary.btn-with-count .btn-with-count__meta {
-  /* Divider on the inverting chip — same polarity as its text. */
-  border-left-color: color-mix(in srgb, var(--on-ink) 22%, transparent);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .btn-primary,
   .btn-secondary,
@@ -995,7 +996,17 @@ html:not(.js) .reveal {
   /* Deliberate footer exception to the normal prose measure: this closing
      statement spans the same grid as every row above it. */
   max-width: none;
-  color: #a1a1aa;
+  /* Hair, not Fog. The disclaimer is the only text that sits inside the
+     Twilight bloom's bright zone, and Fog (#a1a1aa) is *the bloom's own
+     first stop* — text colour and ground peak were the same value, so the
+     closing sentence dissolved into the light it was printed on. Measured
+     against the rendered gradient: Fog bottoms out at 2.63:1 on a phone
+     (six wrapped lines, the last one sitting on the anchor) and 4.36:1 on
+     a wide screen. Hair holds 5.32:1 at the same worst point, stays inside
+     the grey ramp, and still reads a full step quieter than the Paper
+     wordmark above it. Any future value here must be checked against the
+     bloom, not against #000 — the section's background-color lies. */
+  color: #e4e4e7;
   text-wrap: pretty;
 }
 
@@ -1220,6 +1231,15 @@ html:not(.js) .reveal {
  * exception to the flat/sharp doctrine (DESIGN.md §4–5); everything inside
  * the box stays square.
  */
+/* The padding transition here (and max-width/padding on .site-nav-frame
+   below) animates layout, which a linter will flag and which is accepted.
+   The gutter *is* the condense on narrow screens — it's how the box pulls in
+   from the viewport edges — and there is no compositor-only spelling of it:
+   scaleX distorts the row's contents, and clip-path would mean rebuilding
+   the bar's geometry. Kept deliberately: one property, one element, 300ms,
+   on a state flip that hysteresis (CONDENSE_ON_Y / CONDENSE_OFF_Y in
+   site-header.tsx) already prevents from firing repeatedly. Don't animate
+   layout anywhere else on the strength of this. */
 .site-header-shell {
   position: sticky;
   top: 0;
@@ -1354,43 +1374,11 @@ html:not(.js) .reveal {
   font-weight: 600;
 }
 
-.site-nav--on-ink .site-nav__link.is-current,
-.site-nav-panel--on-ink .site-nav-panel__link.is-current {
-  color: #ffffff;
-}
-
 /* CTA in the bar: square, per the Sharp Buttons rule (DESIGN.md §5).
    Padding is trimmed so the flat slab sits comfortably in the bar. */
-.site-nav .btn-primary,
-.site-nav .btn-primary--on-ink {
+.site-nav .btn-primary {
   padding: 10px 22px;
   font-size: 0.78125rem;
-}
-
-/* Ink-route variant: the condensed box takes a dark glass ground; the nav
-   row itself only recolours its text. */
-.site-header-shell--on-ink.is-condensed .site-nav-frame {
-  background-color: rgba(9, 9, 11, 0.55);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-header-shell--on-ink.is-condensed .site-nav-frame {
-    background-color: rgba(9, 9, 11, 0.94);
-  }
-}
-
-.site-nav--on-ink .site-nav__brand {
-  color: #ffffff;
-}
-
-.site-nav--on-ink .site-nav__link {
-  color: #d4d4d8;
-}
-
-.site-nav--on-ink .site-nav__link:hover,
-.site-nav--on-ink .site-nav__link:focus-visible {
-  color: #ffffff;
 }
 
 /* Right-side cluster: theme toggle + CTA on desktop; theme toggle +
@@ -1455,16 +1443,6 @@ html:not(.js) .reveal {
 
 :root[data-theme="dark"] .theme-toggle__moon {
   display: none;
-}
-
-.site-nav--on-ink .theme-toggle {
-  color: #d4d4d8;
-}
-
-.site-nav--on-ink .theme-toggle:hover,
-.site-nav--on-ink .theme-toggle:focus-visible {
-  background-color: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
 }
 
 /* Toggle button is hidden on desktop; nav list + CTA carry the bar. */
@@ -1542,14 +1520,19 @@ html:not(.js) .reveal {
 
 /* Padding exists only in the open state: closed, the 0fr collapse would
    not clip it, and the leaked 20px used to inflate the bar's flow height
-   (and therefore --nav-h) below lg. */
+   (and therefore --nav-h) below lg.
+   It is not transitioned. The grid-template-rows 0fr→1fr animation already
+   carries the height reveal, and this element is clipped for the whole of
+   it, so 20px of padding appearing on the first frame inside a box that is
+   still growing is invisible — while animating `padding` costs a layout
+   pass per frame on every open and close. Snap the padding, animate the
+   row. */
 .site-nav-panel__inner {
   overflow: hidden;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  transition: padding var(--dur-base) var(--ease-out-quart);
 }
 
 .site-nav-panel.is-open .site-nav-panel__inner {
@@ -1583,16 +1566,6 @@ html:not(.js) .reveal {
 .site-nav-panel__link:focus-visible {
   background-color: var(--wash);
   color: var(--edge);
-}
-
-.site-nav-panel--on-ink .site-nav-panel__link {
-  color: #f4f4f5;
-}
-
-.site-nav-panel--on-ink .site-nav-panel__link:hover,
-.site-nav-panel--on-ink .site-nav-panel__link:focus-visible {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
 }
 
 /* CTA inside the panel: square per doctrine, stretched to the sheet width
@@ -1638,14 +1611,6 @@ html:not(.js) .reveal {
   .site-nav__toggle:hover,
   .site-nav__toggle:focus-visible {
     background-color: var(--wash-strong);
-  }
-  .site-nav--on-ink .site-nav__toggle {
-    color: #f4f4f5;
-  }
-  .site-nav--on-ink .site-nav__toggle:hover,
-  .site-nav--on-ink .site-nav__toggle:focus-visible {
-    background-color: rgba(255, 255, 255, 0.12);
-    color: #ffffff;
   }
 }
 
@@ -1738,23 +1703,15 @@ html:not(.js) .reveal {
 }
 
 /* ===================================================================
- * Warp-flavored restyle — section eyebrow + feature scroller + video.
- * Monochrome throughout: warp's tinted panels become chalk
- * (var(--chalk)) grounds with hair (var(--hair)) rims. Flat, sharp.
+ * Warp-flavored restyle — feature scroller + video. Monochrome
+ * throughout: warp's tinted panels become chalk (var(--chalk)) grounds
+ * with hair (var(--hair)) rims. Flat, sharp.
+ *
+ * The .section-eyebrow rule that opened this block is gone: nothing used
+ * it, and DESIGN.md §6 rules section eyebrows out by name ("sections
+ * separate by space and headline, not by labelled introductions"). It was
+ * a live stylesheet entry for a component the doctrine forbids.
  * =================================================================== */
-
-/* Small tracked uppercase label that opens a section — warp's "WHY WARP"
-   / "OPEN-SOURCE" eyebrows, translated to the mist grey. */
-.section-eyebrow {
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 0;
-}
 
 /* -------------------------------------------------------------------
  * Feature scroller — sticky left column (heading + tab-list) tracks a
@@ -2128,7 +2085,7 @@ html:not(.js) .reveal {
 }
 
 .fig-plate {
-  border: 1px solid var(--hair);
+  border: 1px solid var(--fig-edge);
   border-top-color: var(--fig-lit);
   border-bottom-color: var(--fig-shade);
   background-color: var(--card);
@@ -2165,9 +2122,11 @@ html:not(.js) .reveal {
 }
 
 /* Square segmented control — the feature-nav register one size down.
-   Carries its own opaque Card ground + Hair rim so it reads on all four
+   Carries its own opaque Card ground + keyline so it reads on all four
    surface combinations (light/dark theme × UI/Code view). Flat like every
-   other control in the system. */
+   other control in the system. The rim takes --fig-edge, not --hair, for
+   the same reason the plate does: it floats over graph paper drawn in
+   --hair, and a control outlined in its own ground is not outlined. */
 .feature-demo__toggle {
   position: absolute;
   left: 50%;
@@ -2178,7 +2137,7 @@ html:not(.js) .reveal {
   gap: 3px;
   padding: 3px;
   background: var(--card);
-  border: 1px solid var(--hair);
+  border: 1px solid var(--fig-edge);
 }
 
 .feature-demo__toggle-btn {
@@ -2253,6 +2212,12 @@ html:not(.js) .reveal {
   flex-shrink: 0;
 }
 
+/* The Legible-Rim Rule (DESIGN.md §5) applies here too: on a flat, shadowless
+   system the 1px rim is the whole control. The old rgba(255,255,255,0.25)
+   composites to #404040 on the Ink ground — 2.03:1, under WCAG 2.2 SC 1.4.11's
+   3:1 for a control's identifying boundary, the same failure .btn-secondary
+   was corrected for. Mist (#71717a) is 4.30:1 and hovers to Fog, which is
+   exactly what .btn-secondary--on-ink does. Same rule, same two tones. */
 .press-arrow {
   display: inline-flex;
   align-items: center;
@@ -2260,7 +2225,7 @@ html:not(.js) .reveal {
   width: 44px;
   height: 44px;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid #71717a;
   background: transparent;
   cursor: pointer;
   transition:
@@ -2269,7 +2234,7 @@ html:not(.js) .reveal {
 }
 
 .press-arrow:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.7);
+  border-color: #a1a1aa;
 }
 
 .press-arrow:disabled {
@@ -2400,8 +2365,12 @@ html:not(.js) .reveal {
   text-wrap: balance;
 }
 
+/* The pillar title spans the column; its lead does not. Uncapped it inherited
+   .feature-block__text's `max-width: none` and ran to the full 8fr track —
+   82 characters on the Tokens pillar, past the measure. */
 .feature-block__caption {
   width: 100%;
+  max-width: var(--measure-lead);
   color: var(--body);
   text-wrap: pretty;
 }
@@ -2498,9 +2467,14 @@ html:not(.js) .reveal {
 }
 
 /* The headline spans the band; its lead does not. Uncapped, this paragraph
-   ran ~121 characters per line on wide screens. */
+   ran ~121 characters per line on wide screens.
+   The cap lives here and only here. A `max-w-[54ch]` utility was also set on
+   the element in JSX and never applied: this rule is unlayered, Tailwind's
+   utilities sit in @layer utilities, and an unlayered declaration outranks
+   every layer regardless of specificity. The authored fix was a no-op and
+   the paragraph kept rendering at 89 characters. One cap, one place. */
 .implementations-intro p {
-  max-width: 65ch;
+  max-width: var(--measure-lead);
   text-wrap: pretty;
 }
 

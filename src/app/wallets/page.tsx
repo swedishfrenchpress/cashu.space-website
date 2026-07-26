@@ -3,10 +3,27 @@ import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
+/* openGraph is set explicitly, not inherited. Next merges the root layout's
+   block into every route, so without this the share card for /wallets
+   carried the homepage's title and pointed its url at https://cashu.space —
+   a link to the directory previewing as the landing page. */
+const TITLE = "Cashu Wallets";
+const DESCRIPTION =
+  "A non-exhaustive directory of Cashu wallets. Any client that implements the protocol is conformant.";
+
 export const metadata: Metadata = {
-  title: "Cashu Wallets",
-  description:
-    "A non-exhaustive directory of Cashu wallets. Any client that implements the protocol is conformant.",
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/wallets" },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: "/wallets",
+  },
+  twitter: {
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 type Entry = {

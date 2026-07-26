@@ -7,11 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import Reveal from "./reveal";
 import ThemeToggle from "./theme-toggle";
 
-type SiteHeaderProps = {
-  /** Inverted scheme for on-Ink routes (e.g. /wallets). */
-  onInk?: boolean;
-};
-
 type NavItem = { label: string; href: string; external?: boolean };
 
 const NAV_ITEMS: NavItem[] = [
@@ -38,13 +33,21 @@ const CONDENSE_OFF_Y = 8;
  * (DESIGN.md §4); everything inside the box stays square. The chip is
  * secondary by doctrine — GitHub is not one of the two primary jobs
  * (get a wallet, read the spec; the Two-CTA Rule, DESIGN.md §1).
+ *
+ * There is one scheme. An `onInk` prop once branched the bar to an
+ * inverted variant for dark-ground routes, carrying its own shell, nav,
+ * and panel modifiers plus a parallel set of CSS rules — but no route
+ * ever passed it, and both routes that exist open on Paper. The dead
+ * branch had already drifted (its glass hardcoded rgba(9,9,11,…) where
+ * every live token uses rgba(10,10,11,…)), which is the usual fate of
+ * code nothing renders. If an Ink-ground route arrives, rebuild the
+ * variant against the tokens rather than reviving this.
  */
-export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
+export default function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [condensed, setCondensed] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
   const pathname = usePathname();
-  const ctaClass = onInk ? "btn-secondary--on-ink" : "btn-secondary";
 
   /* Route-level only: a link is current when the visitor is on its page.
      In-page anchors (Protocol, Implementations) are not marked — the page
@@ -138,9 +141,7 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
 
   return (
     <header
-      className={`site-header-shell${onInk ? " site-header-shell--on-ink" : ""}${
-        condensed || isOpen ? " is-condensed" : ""
-      }`}
+      className={`site-header-shell${condensed || isOpen ? " is-condensed" : ""}`}
     >
       {/* The frame is the condensing box; the open panel must sit inside it
           so the glass ground wraps the dropped links too. isOpen forces the
@@ -151,9 +152,7 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
           <nav
             ref={navRef}
             aria-label="Primary"
-            className={`site-nav${onInk ? " site-nav--on-ink" : ""}${
-              isOpen ? " is-open" : ""
-            }`}
+            className={`site-nav${isOpen ? " is-open" : ""}`}
           >
             <Link href="/" className="site-nav__brand focus-ring">
               <Image
@@ -200,7 +199,7 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
                 href="https://github.com/cashubtc"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`${ctaClass} site-nav__cta`}
+                className="btn-secondary site-nav__cta"
               >
                 View on GitHub
               </a>
@@ -233,9 +232,7 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
             hidden visually & from AT when closed. */}
         <div
           id="site-nav-panel"
-          className={`site-nav-panel${onInk ? " site-nav-panel--on-ink" : ""}${
-            isOpen ? " is-open" : ""
-          }`}
+          className={`site-nav-panel${isOpen ? " is-open" : ""}`}
           aria-hidden={!isOpen}
         >
           <div className="site-nav-panel__inner">
@@ -273,7 +270,7 @@ export default function SiteHeader({ onInk = false }: SiteHeaderProps) {
               href="https://github.com/cashubtc"
               target="_blank"
               rel="noopener noreferrer"
-              className={`${ctaClass} site-nav-panel__cta`}
+              className="btn-secondary site-nav-panel__cta"
               tabIndex={isOpen ? 0 : -1}
               onClick={() => setIsOpen(false)}
             >

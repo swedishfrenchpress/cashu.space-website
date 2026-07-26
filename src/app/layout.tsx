@@ -5,6 +5,7 @@ import { GeistPixelSquare } from "geist/font/pixel";
 import ConsoleSignature from "@/components/console-signature";
 import ButtonCipher from "@/components/button-cipher";
 import Keymap from "@/components/keymap";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
 const gtStandard = localFont({
@@ -42,22 +43,15 @@ export const viewport: Viewport = {
   ],
 };
 
-/* Absolute base for OG/Twitter asset URLs. The canonical domain wins in
-   production; preview deploys fall back to their own host so their cards
-   don't point at assets the live site may not have yet. */
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_ENV === "production"
-    ? "https://cashu.space"
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "https://cashu.space");
-
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Cashu: Open source electronic cash",
   description:
     "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
+  /* Routes override this with their own path. Preview deploys resolve it
+     against their own host via metadataBase, so a preview never claims to
+     be the canonical document. */
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Cashu: Open source electronic cash",
     description:

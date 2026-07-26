@@ -128,13 +128,19 @@ export default function SiteFooter() {
                     <span className="sr-only">{ai.name}</span>
                     {/* Static-asset SVG; rendered as a plain <img> so the
                         Next.js image optimizer (which blocks SVG by
-                        default) stays out of the path. */}
+                        default) stays out of the path. Lazy like the press
+                        wordmarks: these are 14px decorative marks at the
+                        very bottom of the page, and gemini.svg is a Figma
+                        export with a base64 raster inside it, so the three
+                        of them cost ~55KB that no arriving visitor needs. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={ai.icon}
                       alt=""
                       width={14}
                       height={14}
+                      loading="lazy"
+                      decoding="async"
                       className={
                         ai.invert
                           ? "footer-ai__logo footer-ai__logo--invert"
