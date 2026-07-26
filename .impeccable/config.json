@@ -6,8 +6,44 @@
       {
         "rule": "design-system-radius",
         "value": "24px",
-        "reason": "User requested liquid-glass 24px radius for demo-panel mock UI cards (depicted-product exception, documented in DESIGN.md)",
-        "createdAt": "2026-07-22T12:49:05.357Z"
+        "createdAt": "2026-07-22T12:49:05.357Z",
+        "reason": "User requested liquid-glass 24px radius for demo-panel mock UI cards (depicted-product exception, documented in DESIGN.md)"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-07-26T20:08:40.488Z",
+        "reason": "Onyx bar: the gutter/max-width animation IS the condense; scaleX distorts the row and clip-path means rebuilding the bar. User-directed pattern, documented at the rule."
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-07-26T20:08:48.815Z",
+        "reason": "The 44px drafting sheet under the RFC figure plates, sanctioned by name in DESIGN.md 5. Falls inside the rule's own carve-out for blueprint/measurement surfaces."
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/components/in-the-press.tsx"
+        ],
+        "createdAt": "2026-07-26T20:09:14.727Z",
+        "reason": "Deliberate plain <img> with a JSX-expression src the static scan can't resolve; verified rendering at runtime and recorded in .impeccable/critique/ignore.md"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/components/site-footer.tsx"
+        ],
+        "createdAt": "2026-07-26T20:09:14.769Z",
+        "reason": "Deliberate plain <img> with a JSX-expression src the static scan can't resolve; verified rendering at runtime and recorded in .impeccable/critique/ignore.md"
       }
     ]
   }

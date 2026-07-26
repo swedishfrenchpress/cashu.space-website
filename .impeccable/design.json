@@ -1,14 +1,17 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-23T19:37:51Z",
+  "generatedAt": "2026-07-26T19:53:45Z",
   "title": "Design System: Cashu",
   "extensions": {
     "colorMeta": {
       "paper": {
         "role": "neutral",
         "displayName": "Paper",
-        "canonical": "oklch(100% 0 0)",
+        "canonical": "#ffffff",
         "tonalRamp": [
+          "#0a0a0b",
+          "#101012",
+          "#131316",
           "#18181b",
           "#27272a",
           "#3f3f46",
@@ -16,14 +19,20 @@
           "#71717a",
           "#a1a1aa",
           "#d4d4d8",
-          "#e4e4e7"
+          "#e4e4e7",
+          "#f4f4f5",
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "ink": {
         "role": "primary",
         "displayName": "Ink",
-        "canonical": "oklch(0% 0 0)",
+        "canonical": "#000000",
         "tonalRamp": [
+          "#0a0a0b",
+          "#101012",
+          "#131316",
           "#18181b",
           "#27272a",
           "#3f3f46",
@@ -31,44 +40,62 @@
           "#71717a",
           "#a1a1aa",
           "#d4d4d8",
-          "#e4e4e7"
+          "#e4e4e7",
+          "#f4f4f5",
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "ink-soft": {
         "role": "neutral",
         "displayName": "Ink Soft",
-        "canonical": "oklch(15% 0 0)",
+        "canonical": "#18181b",
         "tonalRamp": [
-          "#09090b",
+          "#0a0a0b",
+          "#101012",
+          "#131316",
           "#18181b",
           "#27272a",
           "#3f3f46",
           "#52525b",
           "#71717a",
           "#a1a1aa",
-          "#d4d4d8"
+          "#d4d4d8",
+          "#e4e4e7",
+          "#f4f4f5",
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "ink-hover": {
         "role": "neutral",
         "displayName": "Ink Hover",
-        "canonical": "oklch(22% 0 0)",
+        "canonical": "#27272a",
         "tonalRamp": [
-          "#09090b",
+          "#0a0a0b",
+          "#101012",
+          "#131316",
           "#18181b",
           "#27272a",
           "#3f3f46",
           "#52525b",
           "#71717a",
           "#a1a1aa",
-          "#d4d4d8"
+          "#d4d4d8",
+          "#e4e4e7",
+          "#f4f4f5",
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "slate": {
         "role": "neutral",
         "displayName": "Slate",
-        "canonical": "oklch(36% 0 0)",
+        "canonical": "#3f3f46",
         "tonalRamp": [
+          "#0a0a0b",
+          "#101012",
+          "#131316",
           "#18181b",
           "#27272a",
           "#3f3f46",
@@ -76,14 +103,21 @@
           "#71717a",
           "#a1a1aa",
           "#d4d4d8",
-          "#e4e4e7"
+          "#e4e4e7",
+          "#f4f4f5",
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "mist": {
         "role": "neutral",
         "displayName": "Mist",
-        "canonical": "oklch(54% 0 0)",
+        "canonical": "#71717a",
         "tonalRamp": [
+          "#0a0a0b",
+          "#101012",
+          "#131316",
+          "#18181b",
           "#27272a",
           "#3f3f46",
           "#52525b",
@@ -91,14 +125,20 @@
           "#a1a1aa",
           "#d4d4d8",
           "#e4e4e7",
-          "#f4f4f5"
+          "#f4f4f5",
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "fog": {
         "role": "neutral",
         "displayName": "Fog",
-        "canonical": "oklch(68% 0 0)",
+        "canonical": "#a1a1aa",
         "tonalRamp": [
+          "#0a0a0b",
+          "#101012",
+          "#131316",
+          "#18181b",
           "#27272a",
           "#3f3f46",
           "#52525b",
@@ -106,14 +146,21 @@
           "#a1a1aa",
           "#d4d4d8",
           "#e4e4e7",
-          "#f4f4f5"
+          "#f4f4f5",
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "hair": {
         "role": "neutral",
         "displayName": "Hair",
-        "canonical": "oklch(91% 0 0)",
+        "canonical": "#e4e4e7",
         "tonalRamp": [
+          "#0a0a0b",
+          "#101012",
+          "#131316",
+          "#18181b",
+          "#27272a",
           "#3f3f46",
           "#52525b",
           "#71717a",
@@ -121,14 +168,20 @@
           "#d4d4d8",
           "#e4e4e7",
           "#f4f4f5",
-          "#fafafa"
+          "#fafafa",
+          "#ffffff"
         ]
       },
       "chalk": {
         "role": "neutral",
         "displayName": "Chalk",
-        "canonical": "oklch(96% 0 0)",
+        "canonical": "#f4f4f5",
         "tonalRamp": [
+          "#0a0a0b",
+          "#101012",
+          "#131316",
+          "#18181b",
+          "#27272a",
           "#3f3f46",
           "#52525b",
           "#71717a",
@@ -136,72 +189,130 @@
           "#d4d4d8",
           "#e4e4e7",
           "#f4f4f5",
-          "#fafafa"
+          "#fafafa",
+          "#ffffff"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Hero headline only. Set tight, weight 600, sized to fill the viewport."
+        "purpose": "Short page-peak copy under ~25 characters: the closing-CTA slogan and the H1 on dedicated routes. The line break is part of the composition, not an accident of viewport."
+      },
+      "heroDisplay": {
+        "displayName": "Homepage Display",
+        "purpose": "The longer homepage statement, scaled below route Display so it can share the full content grid without shouting."
+      },
+      "footerDisplay": {
+        "displayName": "Footer Display",
+        "purpose": "The compact closing wordmark. The footer's only Display type; the rest of that surface stays quiet."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Section openings. The second-tier voice on a page."
+        "purpose": "Section openings."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Subheaders and card titles. Ranks above body, below section openings."
+        "purpose": "Subheaders and card titles: the quiet side of Big-Or-Quiet."
+      },
+      "brandWordmark": {
+        "displayName": "Brand Wordmark",
+        "purpose": "The navbar 'Cashu' letterform. Same face and tracking as the footer signoff mark, shrunk to bar scale, so the page opens and closes on one letterform."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Reading copy. Capped at 65 to 75ch line length."
+        "purpose": "All reading copy, capped at the 65-75 character measure."
+      },
+      "heroLead": {
+        "displayName": "Hero Lead",
+        "purpose": "The homepage hero's supporting statement. Shares the hero grid width with text-wrap: pretty."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Navigation, captions, the legal disclaimer."
+        "purpose": "Navigation, captions, and the footer legal fields."
       },
-      "mono": {
-        "displayName": "Mono",
-        "purpose": "Inline code, addresses, transaction ids. Geist Mono."
-      },
-      "pixel": {
-        "displayName": "Pixel Notation",
-        "purpose": "Protocol artefacts only: amounts, mint ids, version strings. Geist Pixel Square."
+      "navLink": {
+        "displayName": "Nav Link",
+        "purpose": "Bar links only. The current route steps to full Ink and one weight up, so colour is never the only signal."
       },
       "button": {
         "displayName": "Button",
-        "purpose": "Button labels only. 0.8125rem, weight 500, uppercase, letter-spacing 0.06em — one step below Label so the all-caps slab reads as an object, not a line of text."
+        "purpose": "Button labels only, uppercase. One step below Label so the all-caps slab reads as an object, not a line of text."
+      },
+      "compactButton": {
+        "displayName": "Compact Button",
+        "purpose": "The bar's own CTA and the mobile panel CTA, trimmed to sit comfortably in the row."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "The 'Fig. NN' caption register and the Figure/Code segmented-control labels."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Code, addresses, and transaction ids: anywhere a literal copy-pasteable string appears in copy."
+      },
+      "pixel": {
+        "displayName": "Pixel",
+        "purpose": "Protocol notation only: amounts, denominations, mint identifiers, version strings. Never a heading, eyebrow, section marker, or link affordance."
       }
     },
     "shadows": [
       {
         "name": "nav-shadow",
         "value": "0 4px 10px rgba(0, 0, 0, 0.05)",
-        "darkValue": "0 4px 10px rgba(0, 0, 0, 0.55)",
-        "usage": "The site's one sanctioned box-shadow: the navbar's condensed (scrolled) box only. Added 2026-07-25 on the user's direction as part of the Onyx-pattern bar. No other surface inherits this licence."
+        "purpose": "The single sanctioned box-shadow on the site (user-directed 2026-07-25): the navbar's condensed Onyx box. Deepens to rgba(0,0,0,0.55) in dark, where a lift this subtle needs more weight to register against the near-black page. No other surface inherits this licence."
       }
     ],
     "motion": [
       {
-        "name": "ease-quart-out",
+        "name": "ease-out-quart",
         "value": "cubic-bezier(0.25, 1, 0.5, 1)",
-        "purpose": "Default easing for state transitions (hover, focus). Exponential ease-out."
+        "purpose": "The system default. Every state transition, entrance, and draw-on uses it unless noted."
       },
       {
-        "name": "duration-fast",
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Held for longer editorial settles."
+      },
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Held for the sharpest deceleration. Used sparingly."
+      },
+      {
+        "name": "dur-fast",
         "value": "150ms",
-        "purpose": "Button and link state transitions."
+        "purpose": "Feedback: hover colour, focus, skip-link, and jump-arrival reveals."
       },
       {
-        "name": "duration-base",
+        "name": "dur-base",
         "value": "220ms",
-        "purpose": "Button fill/border changes and other base state transitions."
+        "purpose": "Button fill and border, mobile panel open, demo-view crossfade."
       },
       {
-        "name": "button-cipher-pass",
-        "value": "460ms left-to-right encrypt/decrypt pass",
-        "purpose": "Visual-only label cipher on button hover and keyboard focus; the accessible label remains unchanged."
+        "name": "dur-reveal",
+        "value": "620ms",
+        "purpose": "The standard entrance settle: opacity plus an 8px rise."
+      },
+      {
+        "name": "dur-reveal-slow",
+        "value": "880ms",
+        "purpose": "The slow entrance for large media and figure panels."
+      },
+      {
+        "name": "dur-nav",
+        "value": "300ms",
+        "purpose": "The Onyx condense, ease-in-out rather than quart: the reference's own timing."
+      },
+      {
+        "name": "cipher-pass",
+        "value": "460ms",
+        "purpose": "The button label's encrypt-to-decrypt sweep. Pointer only, never focus. Removed entirely under prefers-reduced-motion."
+      },
+      {
+        "name": "draw-on",
+        "value": "1100ms",
+        "purpose": "SVG line art tracing itself via stroke-dashoffset, staggered per shape. Honest-Network: the line being drawn is the structure being described."
       }
     ],
     "breakpoints": [
@@ -218,7 +329,7 @@
         "value": "1024px"
       },
       {
-        "name": "xl",
+        "name": "page-max",
         "value": "1280px"
       }
     ]
@@ -228,107 +339,112 @@
       "name": "Primary Button (Flat Cipher Slab)",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The principal CTA. A shadowless Ink slab on Paper with sharp corners, a precise border, and a brief left-to-right encrypt/decrypt pass over its visual label on hover/focus. Active feedback is a restrained scale compression.",
-      "html": "<a class=\"btn-primary\" href=\"/docs\"><span>Read the spec</span></a>",
-      "css": ".btn-primary { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; background: #18181b; color: #ffffff; padding: 12px 24px; border: 1px solid #000000; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: transform 150ms cubic-bezier(0.25,1,0.5,1), background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .btn-primary:hover { background: #27272a; border-color: #27272a; } .btn-primary:active { transform: scale(0.985); } .btn-primary:focus-visible { outline: 2px solid #000000; outline-offset: 4px; }"
+      "description": "One of only two jobs a primary may serve: get a wallet, read the spec. Sharp, shadowless, all-caps.",
+      "html": "<a class='ds-btn-primary' href='#'>Get a wallet</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; border: 1px solid var(--edge); border-radius: 0; padding: 12px 24px; background-color: var(--ink); color: var(--on-ink); font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; white-space: nowrap; cursor: pointer; transition: transform 150ms cubic-bezier(0.25,1,0.5,1), background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .ds-btn-primary:hover { background-color: var(--ink-hover); border-color: var(--ink-hover); } .ds-btn-primary:active { transform: scale(0.985); } .ds-btn-primary:focus-visible { outline: 2px solid var(--edge); outline-offset: 4px; }"
     },
     {
-      "name": "Secondary Button (Paper Slab)",
+      "name": "Secondary Button (Legible Rim)",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Quieter shadowless slab. Paper fill with a Mist border; hover shifts to Band and strengthens the border to Ink. The rim is the control's only affordance on a flat system, so it stays at or above the 3:1 boundary contrast WCAG 2.2 SC 1.4.11 asks for — Hair is too faint to carry it. It shares the primary button's brief label cipher pass and active compression.",
-      "html": "<a class=\"btn-secondary\" href=\"https://github.com/cashubtc\">GitHub</a>",
-      "css": ".btn-secondary { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; background: #ffffff; color: #18181b; padding: 12px 24px; border: 1px solid #71717a; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: transform 150ms cubic-bezier(0.25,1,0.5,1), background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .btn-secondary:hover { background: #fafafa; border-color: #18181b; } .btn-secondary:active { transform: scale(0.985); } .btn-secondary:focus-visible { outline: 2px solid #000000; outline-offset: 4px; }"
+      "description": "The quiet companion, at identical padding and size. Its 1px Mist rim is the entire affordance on a flat system, so the rim is never dropped to Hair.",
+      "html": "<a class='ds-btn-secondary' href='#'>Read the spec</a>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; border: 1px solid var(--muted); border-radius: 0; padding: 12px 24px; background-color: var(--card); color: var(--ink); font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; white-space: nowrap; cursor: pointer; transition: transform 150ms cubic-bezier(0.25,1,0.5,1), background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .ds-btn-secondary:hover { background-color: var(--band); border-color: var(--ink); } .ds-btn-secondary:active { transform: scale(0.985); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--edge); outline-offset: 4px; }"
     },
     {
-      "name": "Primary Button — On Ink (Paper Slab on Black)",
+      "name": "Secondary Button — On Ink",
       "kind": "button",
-      "refersTo": "button-primary-on-ink",
-      "description": "The closing-CTA variant. A flat Paper slab with a Hair border on Ink, using the same label cipher pass and active compression as the light-surface buttons.",
-      "html": "<a class=\"btn-primary--on-ink btn-primary--lg\" href=\"/wallets\">Get a wallet</a>",
-      "css": ".btn-primary--on-ink { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; background: #ffffff; color: #18181b; padding: 12px 24px; border: 1px solid #e4e4e7; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: transform 150ms cubic-bezier(0.25,1,0.5,1), background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .btn-primary--on-ink:hover { background: #f4f4f5; border-color: #a1a1aa; } .btn-primary--on-ink:active { transform: scale(0.985); } .btn-primary--on-ink:focus-visible { outline: 2px solid #ffffff; outline-offset: 4px; }"
+      "refersTo": "button-secondary-on-ink",
+      "description": "The secondary against a dark ground. Mist rim at rest, Fog on hover: the two tones every outlined control on Ink now inherits, the press pager included.",
+      "html": "<a class='ds-btn-secondary-on-ink' href='#'>View on GitHub</a>",
+      "css": ".ds-btn-secondary-on-ink { display: inline-flex; align-items: center; border: 1px solid #71717a; border-radius: 0; padding: 12px 24px; background-color: #18181b; color: #fafafa; font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; white-space: nowrap; cursor: pointer; transition: transform 150ms cubic-bezier(0.25,1,0.5,1), background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .ds-btn-secondary-on-ink:hover { background-color: #27272a; border-color: #a1a1aa; } .ds-btn-secondary-on-ink:active { transform: scale(0.985); } .ds-btn-secondary-on-ink:focus-visible { outline: 2px solid #ffffff; outline-offset: 4px; }"
     },
     {
       "name": "Nav Link",
       "kind": "nav",
       "refersTo": "nav-link",
-      "description": "Top-bar navigation links. Slate at rest, Ink on hover. No underline, no active background. The bar itself follows the Onyx pattern: transparent at rest (inset 10px), condensing on scroll into a floating glass box (12px radius, hairline rim, --nav-shadow, 300ms ease-in-out).",
-      "html": "<a class=\"ds-nav-link\" href=\"#wallets\">Wallets</a>",
-      "css": ".ds-nav-link { color: #3f3f46; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.4; text-decoration: none; transition: color 150ms cubic-bezier(0.25, 1, 0.5, 1); } .ds-nav-link:hover { color: #000000; } .ds-nav-link:focus-visible { outline: 2px solid #000000; outline-offset: 4px; border-radius: 2px; }"
+      "description": "Slate at rest, Ink on hover. No underline, no active background. The current route steps to full Ink and one weight up so the state survives at any contrast.",
+      "html": "<nav class='ds-nav'><a class='ds-nav-link' href='#'>Wallets</a><a class='ds-nav-link ds-nav-link--current' href='#' aria-current='page'>Protocol</a><a class='ds-nav-link' href='#'>Spec</a></nav>",
+      "css": ".ds-nav { display: inline-flex; align-items: center; gap: 32px; } .ds-nav-link { font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 0.9375rem; font-weight: 500; line-height: 1.2; color: var(--body); text-decoration: none; transition: color 220ms cubic-bezier(0.25,1,0.5,1); } .ds-nav-link:hover, .ds-nav-link:focus-visible { color: var(--edge); } .ds-nav-link--current { color: var(--edge); font-weight: 600; } .ds-nav-link:focus-visible { outline: 2px solid var(--edge); outline-offset: 4px; }"
     },
     {
-      "name": "Hero Display Headline",
-      "kind": "custom",
-      "refersTo": "typography.display",
-      "description": "The signature hero treatment. GT-Standard at clamp(3.75rem, 9vw, 9rem), weight 600, line-height 0.95, letter-spacing −0.02em. Wraps deliberately.",
-      "html": "<h1 class=\"ds-hero-display\">Bearer ecash<br>for bitcoin</h1>",
-      "css": ".ds-hero-display { color: #000000; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: clamp(3.75rem, 9vw, 9rem); font-weight: 600; line-height: 0.95; letter-spacing: -0.02em; margin: 0; }"
-    },
-    {
-      "name": "Pixel Notation",
-      "kind": "custom",
-      "refersTo": "typography.pixel",
-      "description": "Inline protocol artefact set in Geist Pixel Square. Use for amounts, mint ids, version strings inside human prose.",
-      "html": "<p class=\"ds-body\">Your balance is <span class=\"ds-pixel\">21,000 sats</span> across two mints.</p>",
-      "css": ".ds-body { color: #000000; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.5; margin: 0; max-width: 65ch; } .ds-pixel { font-family: 'GeistPixelSquare', 'Geist Mono', monospace; font-size: 1rem; font-weight: 500; line-height: 1; letter-spacing: 0.04em; }"
+      "name": "Onyx Bar — Condensed Box",
+      "kind": "nav",
+      "refersTo": "components.onyx-bar",
+      "description": "The scrolled state of the sticky bar, and the system's only glass, radius, and shadow surface. Transparent at rest; past a small scroll threshold the inner frame becomes a floating box. Everything inside it stays square and flat.",
+      "html": "<div class='ds-onyx'><div class='ds-onyx-row'><span class='ds-onyx-brand'>Cashu</span><span class='ds-onyx-links'><a class='ds-nav-link' href='#'>Wallets</a><a class='ds-nav-link' href='#'>Spec</a></span></div></div>",
+      "css": ".ds-onyx { max-width: 1128px; margin-inline: auto; padding-inline: 24px; border: 1px solid var(--glass-hair); border-radius: 12px; background-color: var(--glass); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); box-shadow: var(--nav-shadow); transition: max-width 300ms ease-in-out, padding 300ms ease-in-out, transform 300ms ease-in-out, background-color 300ms ease-in-out, border-color 300ms ease-in-out, box-shadow 300ms ease-in-out; } .ds-onyx-row { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: 14px 0; } .ds-onyx-brand { font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 1.25rem; font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; color: var(--edge); } .ds-onyx-links { display: inline-flex; gap: 32px; } @media (prefers-reduced-motion: reduce) { .ds-onyx { transition: none; } }"
     },
     {
       "name": "Hairline Divider",
       "kind": "custom",
       "refersTo": "divider",
-      "description": "The system's only structural separator. A single 1px line in Hair, full content width.",
-      "html": "<hr class=\"ds-divider\" />",
-      "css": ".ds-divider { border: none; height: 1px; background: #e4e4e7; margin: 0; }"
+      "description": "A single 1px line in Hair at full content width. The only structural divider in the system: no double rules, no decorative rules, no vertical dividers.",
+      "html": "<hr class='ds-divider' aria-hidden='true'>",
+      "css": ".ds-divider { border: 0; height: 1px; background-color: var(--hair); margin: 0; }"
     },
     {
-      "name": "Placeholder Surface",
+      "name": "Pixel Notation",
+      "kind": "custom",
+      "refersTo": "typography.pixel",
+      "description": "The system's one typographic flourish, and it earns its place semantically: pixel type marks machine data inside human prose.",
+      "html": "<p class='ds-prose'>A single proof carries <span class='ds-pixel'>2048</span> sat, signed by keyset <span class='ds-pixel'>00ffd48b8f5ecf80</span>.</p>",
+      "css": ".ds-prose { font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 1rem; font-weight: 400; line-height: 1.5; color: var(--body); margin: 0; } .ds-pixel { font-family: var(--font-pixel), var(--font-mono), monospace; font-size: 1rem; font-weight: 500; line-height: 1; letter-spacing: 0.04em; color: var(--ink); }"
+    },
+    {
+      "name": "Figure Plate (Demo Panel)",
       "kind": "card",
-      "refersTo": "placeholder-surface",
-      "description": "Temporary surface awaiting a real asset (hero image, mint screenshot). Chalk background, Fog caption, 16px radius. Replace before shipping; never final.",
-      "html": "<div class=\"ds-placeholder\" role=\"img\" aria-label=\"Hero image placeholder\">hero image placeholder</div>",
-      "css": ".ds-placeholder { display: flex; align-items: center; justify-content: center; aspect-ratio: 16 / 9; width: 100%; background: #f4f4f5; color: #a1a1aa; border-radius: 16px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; }"
+      "refersTo": "components.demo-panel",
+      "description": "A published technical plate on the drafting sheet, captioned RFC-style below. The keyline set steps one tone off Hair so the plate never shares a value with the graph paper it sits on. Borders only: the No-Shadow Rule holds.",
+      "html": "<div class='ds-fig-ground'><div class='ds-fig'><div class='ds-fig-plate'><div class='ds-fig-field'>Balance</div><div class='ds-fig-amount'>2,101<span class='ds-fig-unit'>sat</span></div></div><div class='ds-fig-caption'><span class='ds-fig-num'>Fig. 01</span><span class='ds-fig-text'>A balance is a set of proofs. The inked denominations are 2,101 in binary.</span></div></div></div>",
+      "css": ".ds-fig-ground { position: relative; padding: 40px; background-color: var(--fig-ground); background-image: linear-gradient(to right, var(--hair) 1px, transparent 1px), linear-gradient(to bottom, var(--hair) 1px, transparent 1px); background-size: 44px 44px; background-position: center; } .ds-fig { position: relative; max-width: 560px; } .ds-fig-plate { border: 1px solid var(--fig-edge); border-top-color: var(--fig-lit); border-bottom-color: var(--fig-shade); background-color: var(--card); padding: 24px; } .ds-fig-field { font-family: var(--font-mono), ui-monospace, monospace; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); } .ds-fig-amount { font-family: var(--font-pixel), var(--font-mono), monospace; font-size: 1.5rem; font-weight: 500; line-height: 1; letter-spacing: 0.04em; color: var(--ink); margin-top: 6px; } .ds-fig-unit { font-family: var(--font-mono), ui-monospace, monospace; font-size: 0.75rem; color: var(--muted); margin-left: 2px; } .ds-fig-caption { display: flex; align-items: baseline; gap: 10px; margin-top: 12px; font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; } .ds-fig-num { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); white-space: nowrap; } .ds-fig-text { font-size: 0.875rem; line-height: 1.45; color: var(--body); }"
     },
     {
-      "name": "Twilight Stack (Closing CTA)",
+      "name": "Registry Row",
+      "kind": "custom",
+      "refersTo": "components.registry-row",
+      "description": "One line per directory entry on /wallets, hairline-separated across three tracks: wordmark plus destination host, decision facts in their own column so they align down the page, and a single Open control. The name is a label, not a second link — the row spends one tab stop, not two.",
+      "html": "<ul class='ds-registry'><li class='ds-registry-row'><span class='ds-registry-id'><span class='ds-registry-name'>Minibits</span><span class='ds-registry-host'>minibits.cash</span></span><span class='ds-registry-facts'><span>iOS and Android</span></span><a class='ds-registry-open' href='#'>Open</a></li></ul>",
+      "css": ".ds-registry { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--hair); } .ds-registry-row { display: grid; grid-template-columns: minmax(150px, 220px) minmax(100px, 1fr) auto; column-gap: 2rem; align-items: center; padding-block: 1.625rem; border-bottom: 1px solid var(--hair); } .ds-registry-id { display: flex; flex-direction: column; gap: 4px; min-width: 0; } .ds-registry-name { font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 1.125rem; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; color: var(--ink); } .ds-registry-host, .ds-registry-facts { font-family: var(--font-mono), ui-monospace, monospace; font-size: 0.8125rem; line-height: 1.3; color: var(--muted); } .ds-registry-facts { display: flex; flex-wrap: wrap; column-gap: 1.25em; row-gap: 2px; } .ds-registry-open { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--muted); border-radius: 0; padding: 10px 20px; background-color: var(--card); color: var(--ink); font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .ds-registry-open:hover { background-color: var(--band); border-color: var(--ink); } .ds-registry-open:focus-visible { outline: 2px solid var(--edge); outline-offset: 4px; }"
+    },
+    {
+      "name": "Twilight Stack (Closing Band)",
       "kind": "custom",
       "refersTo": "components.twilight-stack",
-      "description": "The page-closing CTA pattern. Ink section with a monochrome radial bloom anchored just below the lower edge and a fractal-noise paper-grain overlay. Carries the .btn-primary--on-ink slab as its single CTA. Reserved for closing-CTA and footer surfaces — not a card, not a hero, never on Paper.",
-      "html": "<section class=\"ds-twilight\"><div class=\"ds-twilight__bloom\" aria-hidden=\"true\"></div><div class=\"ds-twilight__grain\" aria-hidden=\"true\"></div><div class=\"ds-twilight__content\"><h2 class=\"ds-twilight__title\">Cashu, in your pocket.</h2><a class=\"ds-twilight__cta\" href=\"/wallets\">Get a wallet</a></div></section>",
-      "css": ".ds-twilight { position: relative; isolation: isolate; overflow: hidden; padding: 80px 32px; background: #000000; color: #ffffff; } .ds-twilight__bloom { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(100% 60% at 50% 110%, #a1a1aa 0%, #71717a 18%, #3f3f46 34%, #18181b 58%, #000000 80%); } .ds-twilight__grain { position: absolute; inset: 0; pointer-events: none; opacity: 0.04; mix-blend-mode: overlay; background-image: url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>\"); } .ds-twilight__content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 40px; } .ds-twilight__title { font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 600; line-height: 0.95; letter-spacing: -0.02em; text-align: center; max-width: 18ch; margin: 0; } .ds-twilight__cta { display: inline-flex; align-items: center; background: #ffffff; color: #18181b; padding: 12px 24px; border: 1px solid #e4e4e7; border-radius: 0; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: transform 150ms cubic-bezier(0.25,1,0.5,1), background-color 220ms cubic-bezier(0.25,1,0.5,1), border-color 220ms cubic-bezier(0.25,1,0.5,1); } .ds-twilight__cta:hover { background: #f4f4f5; border-color: #a1a1aa; } .ds-twilight__cta:active { transform: scale(0.985); }"
-    },
-    {
-      "name": "Demo Panel (Figure/Code Switcher)",
-      "kind": "custom",
-      "refersTo": "components.demo-panel",
-      "description": "Demo panel for the four-parts section: a Figure/Code flip where both views share a theme-flipping drafting sheet (fig-ground under 44px graph paper, radially attenuated under the artifact). The Figure view is a captioned spec plate — Card fill, lit-top/seated-bottom keyline, 'Fig. NN' + GT thesis caption below; the Code view is a theme-flipping file pane. Flipped by a square segmented control with a panel-specific accessible name. Demo content is real spec data.",
-      "html": "<div class=\"ds-demo\"><div class=\"ds-demo__view is-active\"><figure class=\"ds-fig\"><div class=\"ds-fig__plate\"><span class=\"ds-fig__field\">BALANCE</span><span class=\"ds-fig__amount\">2,101 <span class=\"ds-fig__unit\">sat</span></span></div><figcaption class=\"ds-fig__caption\"><span class=\"ds-fig__num\">Fig. 01</span><span class=\"ds-fig__text\">A balance is a set of proofs.</span></figcaption></figure></div><div class=\"ds-demo__toggle\" role=\"group\" aria-label=\"Show Wallets as\"><button type=\"button\" aria-pressed=\"true\">Figure</button><button type=\"button\" aria-pressed=\"false\">Code</button></div></div>",
-      "css": ".ds-demo { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border: 1px solid #e4e4e7; } .ds-demo__view { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 40px 40px 64px; opacity: 0; transition: opacity 220ms cubic-bezier(0.25, 1, 0.5, 1); background-color: #f4f4f5; } .ds-demo__view.is-active { opacity: 1; } .ds-demo__view::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, #e4e4e7 1px, transparent 1px), linear-gradient(to bottom, #e4e4e7 1px, transparent 1px); background-size: 44px 44px; background-position: center; -webkit-mask-image: radial-gradient(120% 90% at 50% 44%, rgba(0,0,0,0.3), rgba(0,0,0,0.52) 46%, #000 80%); mask-image: radial-gradient(120% 90% at 50% 44%, rgba(0,0,0,0.3), rgba(0,0,0,0.52) 46%, #000 80%); } .ds-fig { position: relative; z-index: 1; width: 100%; max-width: 560px; } .ds-fig__plate { border: 1px solid #e4e4e7; border-bottom-color: #d4d4d8; background: #ffffff; padding: 28px; } .ds-fig__field { display: block; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 0.75rem; letter-spacing: 0.06em; color: #71717a; } .ds-fig__amount { font-family: 'GeistPixelSquare', 'Geist Mono', monospace; font-size: 1.5rem; color: #18181b; } .ds-fig__unit { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 0.8125rem; color: #71717a; } .ds-fig__caption { display: flex; align-items: baseline; gap: 10px; margin-top: 12px; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; } .ds-fig__num { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #18181b; } .ds-fig__text { font-size: 0.875rem; color: #3f3f46; } .ds-demo__toggle { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); display: inline-flex; gap: 3px; padding: 3px; background: #ffffff; border: 1px solid #e4e4e7; } .ds-demo__toggle button { border: 0; background: transparent; padding: 7px 16px; cursor: pointer; color: #71717a; font-family: 'GT-Standard', ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; } .ds-demo__toggle button[aria-pressed='true'] { background: #18181b; color: #ffffff; }"
+      "description": "The system's one atmospheric flourish, reserved for the closing CTA and footer. An Ink band under a monochrome bloom anchored below the lower edge, plus a fractal-noise paper grain. Text in the lower third is contrast-checked against the bloom, never against the section's declared black — which is why the disclaimer is Hair, not Fog.",
+      "html": "<footer class='ds-twilight'><div class='ds-twilight-inner'><div class='ds-twilight-mark'>Cashu</div><p class='ds-twilight-line'>The open specification.</p><p class='ds-twilight-disclaimer'>Mints are operated by independent parties; balances held with a mint are a claim on that mint, not a deposit. Read the spec before trusting anyone, including us.</p></div></footer>",
+      "css": ".ds-twilight { position: relative; isolation: isolate; overflow: hidden; background-color: #000000; padding: 96px 40px; } .ds-twilight::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(120% 90% at 50% 110%, #a1a1aa 0%, #71717a 18%, #3f3f46 34%, #18181b 58%, #000000 80%); } .ds-twilight::after { content: ''; position: absolute; inset: 0; z-index: 0; opacity: 0.04; mix-blend-mode: overlay; pointer-events: none; background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\"); } .ds-twilight-inner { position: relative; z-index: 1; } .ds-twilight-mark { font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 5rem; font-weight: 600; line-height: 0.95; letter-spacing: -0.02em; color: #ffffff; } .ds-twilight-line { margin: 14px 0 0; font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 1.125rem; line-height: 1.55; color: #a1a1aa; } .ds-twilight-disclaimer { margin: 48px 0 0; max-width: none; font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; color: #e4e4e7; text-wrap: pretty; }"
     }
   ],
   "narrative": {
     "northStar": "The Open Specification",
-    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, sharp-cornered shadowless button slabs, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts when the spec calls for a notation different from prose.\n\nColor is intentionally absent. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal.\n\nColour is absent only from the site's own voice: the Depicted-World Exception sanctions colour inside artifacts the page depicts — the tap-to-pay video and third-party marks. Everything else, the demo figures included, stays in the site's monochrome register.",
+    "overview": "cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad. Visitors should feel they are looking at *the* document for Cashu, the way bitcoin.org once felt like *the* document for Bitcoin.\n\nThe system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no animated tickers, no testimonial carousels, and no glassmorphism outside its one sanctioned surface (the navbar).\n\nMotion is permitted under one condition: it must depict real protocol structure. The hero overlays mint markers and animated dotted lines between them to show Lightning Network bridging — a true property of the protocol — never a decorative flow. See the Honest-Network Rule in §4.\n\nColor is intentionally absent from everything the site says in its own voice. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal. The one carve-out is the Depicted-World Exception (§2): artifacts the page *depicts* — the tap-to-pay video, third-party marks — keep their source colour, because faking them grey would be its own kind of dishonesty.",
     "keyCharacteristics": [
       "Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.",
       "Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).",
       "Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.",
-      "Flat, sharp surfaces throughout. Buttons use fill, border, active compression, and a brief label cipher pass rather than shadow or lift.",
+      "Sharp flat-slab buttons, hairline dividers, and no shadows — hierarchy comes from fill, border, position, and weight.",
       "Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast."
     ],
     "rules": [
       {
+        "name": "The Two-CTA Rule",
+        "body": "Primary buttons across the site exist to serve two jobs and two only: *get a wallet* and *read the spec*. These are the outcomes PRODUCT.md elevates above mint trust, and the visual hierarchy follows. Every other interactive surface — GitHub, blog, tab switchers, secondary navigation — is a `.btn-secondary` or a `nav-link`. If a third \"primary\" CTA appears on a single page the page is competing with itself; collapse one before shipping.",
+        "section": "overview"
+      },
+      {
         "name": "The No-Colour Rule",
-        "body": "The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface 'needs' colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch. The one carve-out is the Depicted-World Exception.",
+        "body": "The system uses no chromatic accent. Greys may shift by lightness but never by hue. If a future surface \"needs\" colour, the design is wrong — work the hierarchy with type and space before reaching for a swatch.",
         "section": "colors"
       },
       {
         "name": "The Depicted-World Exception",
-        "body": "Colour is permitted only inside artifacts the page depicts, never in the chrome the site is. Sanctioned, exhaustively: the tap-to-pay video, and third-party marks at their brand identity (language logos, AI-assistant icons). (The four-parts demo panels once sat here as real app screenshots; they are now spec figures drawn in the site's own voice and fall under the No-Colour Rule in full.) Editorial photography reports rather than depicts, so it desaturates and its wordmarks force to Paper. Anything else falls under the No-Colour Rule in full.",
+        "body": "Colour is permitted only inside artifacts the page *depicts*, never in the chrome the site *is*. The sanctioned surfaces, exhaustively: (a) the tap-to-pay video, a documentary capture of real hardware; (b) third-party marks shown at their brand identity — the language logos on the implementations card and the AI-assistant icons in the footer. (The four-parts demo panels once sat here as real app screenshots; they are now spec figures drawn in the site's own voice — see §5 — and fall under the No-Colour Rule in full.) Everything in the site's own voice — type, backgrounds, borders, buttons, icons, figures, chrome — stays monochrome. Editorial photography *reports* rather than depicts, so it still desaturates via `grayscale(1) contrast(1.05)` and its wordmarks force to Paper (see the press band). A new colour surface that is neither a depicted product artifact nor a third-party mark falls under the No-Colour Rule in full.",
         "section": "colors"
       },
       {
         "name": "The Two-Black Rule",
-        "body": "Ink (#000000) and Ink Soft (#18181b) are the only two text colours that may sit on Paper. Slate, Mist, Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.",
+        "body": "Ink (`#000000`) and Ink Soft (`#18181b`) are the only two text colours that may sit on Paper. Slate / Mist / Fog exist for legal disclaimers, nav, and labels only — never for primary reading copy.",
         "section": "colors"
       },
       {
@@ -338,37 +454,32 @@
       },
       {
         "name": "The Big-Or-Quiet Rule",
-        "body": "Type is either Display (≥3.75rem) or quiet (≤1.125rem). The middle ground is avoided. Hierarchy is achieved by jumping scale, not by stair-stepping.",
+        "body": "Type is either Display (≥3.75rem) or quiet (≤1.125rem). The middle ground — `text-2xl` / `text-3xl` body — is avoided. Hierarchy is achieved by jumping scale, not by stair-stepping.",
         "section": "typography"
       },
       {
         "name": "The No-Shadow Rule",
-        "body": "box-shadow is forbidden throughout the site, including buttons. Separation comes from spacing, fill contrast, or a 1px border. One sanctioned exception (2026-07-25, user-directed): the navbar's condensed box carries --nav-shadow as part of the Onyx-pattern scroll behaviour; no other surface inherits it.",
+        "body": "`box-shadow` is forbidden throughout the site, including buttons. If a surface needs separation, use spacing, fill contrast, or a 1px border. One sanctioned exception, added 2026-07-25 on the user's direction: the navbar's condensed box carries `--nav-shadow` (`0 4px 10px` near-transparent black) as part of the Onyx-pattern scroll behaviour — see §5 Navigation. No other surface inherits this licence.",
         "section": "elevation"
       },
       {
         "name": "The Hairline Rule",
-        "body": "Structural separation between sections is achieved with a single 1px line in Hair (#e4e4e7), full content width, never bolder. No double rules, no decorative rules.",
+        "body": "Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Fold-Line Rule",
+        "body": "The hero fills one viewport height (`min(100svh - var(--nav-h), var(--hero-max))`) and anchors the terrain band to its base, so the closing hairline resolves *on* the fold rather than floating above it with dead ground below. Surplus height collects as air between the CTA row and the band — that gap is load-bearing composition, not a spacing bug, and must not be \"corrected\" by growing the band or centring the text. Two bounds keep it honest: `--nav-h` is subtracted because the bar is sticky and occupies flow space, and `--hero-max` (1200px) stops the chase on very tall displays, where an uncapped hero would open a void instead of a horizon. Past the cap the next section peeks in, which is the intended degradation.",
         "section": "elevation"
       },
       {
         "name": "The Honest-Network Rule",
-        "body": "Network visualisations and motion are permitted only when they reflect real protocol structure — Lightning Network bridges between mints, peer-to-peer token transfer between users. Forbidden: decorative flow, speculative connections, mints 'talking' to mints (which Cashu doesn't do), or any animation that exists for aesthetic energy rather than to convey a true property of the protocol.",
+        "body": "Network visualisations and motion are permitted *only when they reflect real protocol structure*. Acceptable: Lightning Network bridges shown as animated dotted lines between mint markers; peer-to-peer token transfer between users. Forbidden: decorative flow, speculative connections, \"mints talking to mints\" (which Cashu doesn't do), or any animation that exists for aesthetic energy rather than to convey a true property of the protocol. When in doubt, the simpler static version is more honest than the animated one.",
         "section": "elevation"
       },
       {
-        "name": "The Two-CTA Rule",
-        "body": "Primary buttons across the site serve two jobs and two only: get a wallet and read the spec. These are the outcomes PRODUCT.md elevates above mint trust, and the visual hierarchy follows. Every other interactive surface — GitHub, blog, tab switchers, secondary navigation — is .btn-secondary or nav-link. If a third 'primary' CTA appears on a single page, collapse one before shipping.",
-        "section": "overview"
-      },
-      {
-        "name": "The Twilight Stack",
-        "body": "The page-closing CTA and the site footer share one continuous treatment so the bottom of every page reads as a single twilight band. Pattern: an Ink section with a monochrome radial bloom (origin 50% 110%, stepping Fog → Mist → Slate → Ink Soft → Ink, all within the existing grey ramp) and an opacity-0.04 SVG fractal-noise paper-grain overlay in mix-blend overlay. Reserved for closing-CTA + footer surfaces only. Never on Paper, never on cards, never on heroes.",
-        "section": "components"
-      },
-      {
-        "name": "The Demo Panel",
-        "body": "The four-parts section demonstrates the protocol twice over: a captioned spec figure and the code behind it, flipped by a square segmented control (never a rounded pill) floating bottom-center inside the media frame. Both views share one theme-flipping drafting sheet — fig-ground (Chalk in light, Band in dark) under 44px hairline graph paper that rides its own layer and attenuates radially toward the centre, yielding under the artifact; depth is value, keyline, and mask, never blur, translucency, or shadow. The Figure view is a published plate: Card fill, a keyline with lit top edge and seated bottom edge (fig-lit/fig-shade), and an RFC-style caption below the plate — 'Fig. NN' in the micro register plus a GT-Standard thesis sentence. Plate interiors speak machine notation: mono field names at micro tracking, pixel amounts at 1.5rem as the one scale jump; plates size to their content. The Code view is the file-shaped counterweight with the Hair filename strip — figures are captioned, files are stripped. Neither ground is the Twilight Stack. Everything protocol-shaped is real spec data.",
+        "name": "The Legible-Rim Rule",
+        "body": "On a flat, shadowless system the 1px rim *is* the control — nothing else marks a secondary button as pressable. It therefore carries a real boundary, not a decorative one: Mist at rest, never Hair. Hair (`#e4e4e7`) measures 1.27:1 against Paper and Slate (`#3f3f46`) measures 2.01:1 against Ink, both under WCAG 2.2 SC 1.4.11's 3:1 for a control's identifying boundary; at those values \"READ THE SPEC\" read as a line of text with a ghost around it. Restraint is a tonal choice about *which* grey, never a licence to drop below the threshold that makes the control a control. The rule is about rims, not about buttons, and binds every outlined control on the site. The press pager was the case that proved it: an `rgba(255,255,255,0.25)` rim composites to `#404040` on Ink — 2.03:1, the identical failure, on a control that isn't a `.btn-*`. It now carries Mist at rest and Fog on hover, the same two tones as `.btn-secondary--on-ink`. Any new outlined control inherits this before it inherits anything else.",
         "section": "components"
       }
     ],
@@ -376,18 +487,20 @@
       "Do carry the No-Colour Rule. Greys may shift by lightness, never by hue.",
       "Do set the hero headline in Display (GT-Standard 600, ≥3.75rem, line-height 0.95). The headline earns the page.",
       "Do keep body copy at 65–75ch max width. Long reads are an editorial feature, not an accident.",
+      "Do let the footer disclaimer span the complete footer grid. It is the deliberate exception to the prose measure, closing the composition on the same edges as the rows above.",
       "Do use Geist Pixel Square only for protocol notation (amounts, ids, version strings). It is signal, not style.",
       "Do name implementations by name. Cashu is a directory; wallets and mints appear as plain wordmarks, no logos required at first pass.",
       "Do treat 1px Hair lines as the only structural divider. Sections separate by space first, hairline second."
     ],
     "donts": [
-      "Don't introduce chromatic accent. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Colour appears only under the Depicted-World Exception: depicted app art, the tap-to-pay video, third-party marks.",
-      "Don't add Web3 / DeFi tropes: pastel gradients, blob shapes, playful money-flow illustrations. Cashu is bitcoin-native and deliberately not crypto-coded.",
-      "Don't dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS 'YOUR DATA, SECURED™' copy. Privacy is a property of the protocol, stated plainly.",
-      "Don't use box-shadow anywhere except the navbar's condensed box (--nav-shadow, user-directed 2026-07-25). No drop shadow, inner shadow, coloured glow, or button exception elsewhere.",
-      "Don't use border-left or border-right greater than 1px as a coloured stripe on cards or callouts.",
-      "Don't use background-clip: text with a gradient (gradient text). One solid colour, emphasis by weight or size.",
+      "Don't introduce chromatic accent in the site's own voice. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Never on cashu.space. Colour appears only under the Depicted-World Exception (§2): the tap-to-pay video and third-party marks.",
+      "Don't add Web3 / DeFi tropes: pastel gradients, blob shapes, decorative network animations that misrepresent how the protocol works (e.g. mints \"talking\" to mints, which Cashu doesn't do). Motion is permitted only under the Honest-Network Rule — see §4.",
+      "Don't dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS \"YOUR DATA, SECURED™\" copy. Privacy is a property of the protocol, stated plainly.",
+      "Don't use `box-shadow` anywhere. No drop shadow, inner shadow, coloured glow, or button exception.",
+      "Don't use `border-left` / `border-right` >1px as a coloured stripe on cards or callouts. Side-stripes are forbidden in impeccable's universal bans and doubly forbidden here.",
+      "Don't use `background-clip: text` with a gradient (gradient text). One solid colour, emphasis by weight or size.",
       "Don't introduce a third typeface. Three families exist (GT-Standard, Geist Mono, Geist Pixel Square) and each has one job.",
+      "Don't use Geist Pixel Square as a section eyebrow, RFC-style metadata label, or link affordance. The pixel face marks protocol artefacts inside prose; everywhere else it reads as decoration. Section eyebrows in general are out — sections separate by space and headline, not by labelled introductions.",
       "Don't centre body copy. Long-form reading sets flush left, ragged right.",
       "Don't use stock photography of smiling teams, abstract blockchain visuals, or any hero treatment that could appear unchanged on a fintech site.",
       "Don't ship Chalk placeholder surfaces in final layouts. They are scaffolding only."
