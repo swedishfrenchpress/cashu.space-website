@@ -1,13 +1,16 @@
 /**
  * The field's choreography.
  *
- * A ~92-second loop that spends most of its time as open terrain and briefly
- * resolves into the vault door and the blind-signature round trip. It is
- * deliberately slow: a typical visit sees at most one transition, and the
- * shapes are meant to be noticed by someone who stops and looks, not to
- * perform at the reader. Anything faster turns the background into a slideshow
- * competing with the headline, which is the failure mode PRODUCT.md's
- * "the hero earns its size; nothing competes with it" is guarding against.
+ * A ~76-second loop. The vault begins condensing at 10s and stands complete
+ * by 16s, so the door lands within a first read of the headline — the
+ * original 26s opening hold meant most visits saw only terrain, and the
+ * user called it (2026-08-14). After that first beat the loop breathes:
+ * the door dissolves, the terrain runs open, and the blind-signature round
+ * trip arrives for the visitor who stays. It is still not a slideshow:
+ * every morph keeps its six eased seconds, and open terrain separates every
+ * scene. Anything busier turns the background into a performance competing
+ * with the headline, which is the failure mode PRODUCT.md's "the hero earns
+ * its size; nothing competes with it" is guarding against.
  */
 
 export type Scene = "terrain" | "vault" | "bdhke";
@@ -34,7 +37,7 @@ type Step =
 /* Read top to bottom as the loop. A `morph` step crossfades from whatever
    scene preceded it into the named one. */
 const STEPS: Step[] = [
-  { hold: "terrain", seconds: 26 },
+  { hold: "terrain", seconds: 10 },
   { morph: "vault", seconds: 6 },
   { hold: "vault", seconds: 14 },
   { morph: "terrain", seconds: 6 },

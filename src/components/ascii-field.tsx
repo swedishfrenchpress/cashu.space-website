@@ -87,20 +87,41 @@ const BTC_STROKE_DX = 1.25;
  */
 const MASK_DEAD_TOP = 0.09;
 
-/* Where a scene sits in the field, as a fraction of the box. Pushed right and
-   low on wide screens so the mask's left dimmer doesn't eat half the figure,
-   and recentred once the copy spans the full measure. */
+/* The scene stage (retuned 2026-08-14, user-approved option A — see the
+   Fold-Line entry, DESIGN.md §4). Scenes sit bottom-centre, on the horizon:
+   the copy is centred, the mask quiets an ellipse around it, and the field
+   runs full-strength along the base — the one place a figure can be both
+   monumental and legible. The old 0.65/0.62 stage was tuned against the
+   left-aligned copy and its one-sided mask; under the symmetric quiet zone
+   it landed the figures at 0.09-0.22 effective strength.
+
+   The vault crests the fold — its lower arc is meant to crop. The round
+   trip's anchor is derived per-frame in draw() so its return path clears
+   the closing hairline at any hero height. Below NARROW_BREAKPOINT the
+   round trip stands down entirely (see draw()); the vault still plays. */
 const NARROW_BREAKPOINT = 768;
-const SCENE_CX_WIDE = 0.65;
-const SCENE_CY_WIDE = 0.62;
-const SCENE_CX_NARROW = 0.5;
-const SCENE_CY_NARROW = 0.64;
+const SCENE_CX = 0.5;
+const VAULT_CY = 0.91;
+/* Floor for the round trip's anchor on very short heroes. */
+const BDHKE_CY_MIN = 0.62;
+/* Grid units clawed back from EXTENT_Y when anchoring the round trip:
+   EXTENT_Y pads the figure 24 units past its deepest stroke, and riding
+   that full pad left the ring cores in the ellipse's ramp (~0.84) instead
+   of its full zone. Sinking all but 2 pad units puts the cores at full
+   strength and the return path ~10px above the closing hairline. */
+const BDHKE_SINK = 22;
 
 /* Scene sizing. The wallet pins the vault at 314 units across; a hero wants it
    monumental, so both scenes scale to the box within sane bounds. */
-const VAULT_MIN_D = 380;
+/* 440, up from 380: the floor only binds on phones (and very short desktop
+   windows), where the ring band at the old floor thinned to a single cell
+   and the door went wispy. At 440 the door over-fills a 390px viewport by
+   ~25px a side — a deliberate crop; the door is bigger than the phone. */
+const VAULT_MIN_D = 440;
 const VAULT_MAX_D = 700;
-const VAULT_VMIN_FRACTION = 0.74;
+/* 0.80, up from 0.74 with the move to the horizon stage: a cresting door
+   reads smaller than a floating one, so it earns a little more diameter. */
+const VAULT_VMIN_FRACTION = 0.8;
 const BDHKE_W_FRACTION = 0.64;
 const BDHKE_H_FRACTION = 0.68;
 const SCENE_SCALE_MIN = 0.7;
@@ -272,8 +293,17 @@ export default function AsciiField({
           ? compositionAt(wall)
           : { scene: "terrain" as const, mix: 0, sceneTime: 0 };
       const narrow = width < NARROW_BREAKPOINT;
-      const cx = width * (narrow ? SCENE_CX_NARROW : SCENE_CX_WIDE);
-      const cy = height * (narrow ? SCENE_CY_NARROW : SCENE_CY_WIDE);
+      /* The round trip is ~800 grid units wide and its scale floor keeps its
+         strokes above one cell, so below NARROW_BREAKPOINT it cannot fit the
+         box: both rings crop at the edges and the two-party picture stops
+         reading as two parties. Narrow holds open terrain through that slot
+         instead — the vault, which does fit, still plays. Recorded in the
+         Honest-Network entry, DESIGN.md §4. */
+      const active =
+        narrow && comp.scene === "bdhke"
+          ? { scene: "terrain" as const, mix: 0, sceneTime: 0 }
+          : comp;
+      const cx = width * SCENE_CX;
       const vaultScale =
         clamp(
           Math.min(width, height) * VAULT_VMIN_FRACTION,
@@ -289,9 +319,20 @@ export default function AsciiField({
         SCENE_SCALE_MIN,
         SCENE_SCALE_MAX,
       );
+      /* The vault's anchor is proportional — the crest composition scales
+         with the box, and its lower arc cropping at the fold is the point.
+         The round trip's is derived from its own extent so the return path
+         clears the closing hairline at any hero height. */
+      const cy =
+        active.scene === "vault"
+          ? height * VAULT_CY
+          : Math.max(
+              height * BDHKE_CY_MIN,
+              height - (EXTENT_Y - BDHKE_SINK) * bdhkeScale,
+            );
       const trip =
-        comp.scene === "bdhke"
-          ? roundTrip(comp.sceneTime / ROUND_TRIP_SECONDS)
+        active.scene === "bdhke"
+          ? roundTrip(active.sceneTime / ROUND_TRIP_SECONDS)
           : null;
 
       /* Pointer lens. Advanced once per frame, before any sampling. */
@@ -348,8 +389,8 @@ export default function AsciiField({
              Weighted by coverage so the shape has full internal contrast
              where it exists and the terrain is untouched where it doesn't. */
           let b = terrainB;
-          if (comp.mix > 0) {
-            const isVault = comp.scene === "vault";
+          if (active.mix > 0) {
+            const isVault = active.scene === "vault";
             const scale = isVault ? vaultScale : bdhkeScale;
             const cover = isVault
               ? vaultCoverage(sx, sy, cx, cy, scale)
@@ -358,7 +399,7 @@ export default function AsciiField({
               const shapeB = isVault
                 ? vaultBrightness(sx, sy, cx, cy, terrainB, scale, true)
                 : bdhkeBrightness(sx, sy, cx, cy, terrainB, scale, trip!, t);
-              b = terrainB + (shapeB - terrainB) * comp.mix * cover;
+              b = terrainB + (shapeB - terrainB) * active.mix * cover;
             }
           }
 
