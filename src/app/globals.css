@@ -874,7 +874,9 @@ html:not(.js) .reveal {
 .footer-metastrip {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /* Single cell since the repo slug came out, so this is flex-start by
+     intent rather than by `space-between` happening to collapse to it. */
+  justify-content: flex-start;
   gap: 16px;
   padding-top: 18px;
   border-top: 1px solid #27272a;
@@ -1460,12 +1462,40 @@ html:not(.js) .reveal {
   }
 }
 
+/*
+ * THE CONDENSED SHRINK (user-directed 2026-08-14). Condensing used to change
+ * only the box — width, gutter, glass, drop — while the row inside kept its
+ * full rest height, so the bar moved without ever getting smaller. Now the
+ * row itself contracts: padding 14→8, logo 28→24, wordmark 1.25→1.0625rem,
+ * and the two controls 40→34. Measured end to end the bar goes 80px → 62px.
+ *
+ * Height, not width. --nav-condensed-max stays where it is: that ratio is
+ * lifted from the layout reference, and pulling the box narrower as well
+ * starts crowding four nav items that already sit at their comfortable
+ * spacing on a laptop.
+ *
+ * This extends the animated-layout exception documented above rather than
+ * quietly widening it. Same terms as the original: one element tree, one
+ * state flip, 300ms, guarded by the CONDENSE_ON_Y / CONDENSE_OFF_Y
+ * hysteresis so it cannot be strobed by hovering the threshold. The row's
+ * contents are all small and text-light, so there is no long reflow chain
+ * behind them. It still does not license animating layout elsewhere.
+ *
+ * --nav-h does NOT follow the shrink — see the rest-height guard and settle
+ * delay in site-header.tsx. It names the bar's height over the top of the
+ * page, and the top of the page is where the bar is not condensed.
+ */
 .site-nav {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: clamp(16px, 3vw, 32px);
   padding: 14px 0;
+  transition: padding var(--dur-nav) ease-in-out;
+}
+
+.site-header-shell.is-condensed .site-nav {
+  padding: 8px 0;
 }
 
 .site-nav__brand {
@@ -1486,6 +1516,14 @@ html:not(.js) .reveal {
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
+  transition: font-size var(--dur-nav) ease-in-out;
+}
+
+/* 1.125rem, not the 1.0625rem this wanted by eye: that step already exists
+   on the ramp (it is the floor of the Title clamp), and a one-off size for a
+   scroll state is not worth a new entry in the scale. */
+.site-header-shell.is-condensed .site-nav__wordmark {
+  font-size: 1.125rem;
 }
 
 /* Cashew logo — preserve the source aspect (slightly taller than wide) and
@@ -1495,6 +1533,11 @@ html:not(.js) .reveal {
   width: auto;
   height: 28px;
   image-rendering: pixelated;
+  transition: height var(--dur-nav) ease-in-out;
+}
+
+.site-header-shell.is-condensed .site-nav__logo {
+  height: 24px;
 }
 
 .site-nav__list {
@@ -1549,6 +1592,117 @@ html:not(.js) .reveal {
 }
 
 /*
+ * GitHub CTA — labelled slab at rest, bare mark once condensed
+ * (user-directed 2026-08-14).
+ *
+ * The base button rule states "No icons inside buttons. The label is the
+ * whole button." That rule is about buttons wearing a decorative glyph
+ * *beside* their label, which is the thing that makes a control look like
+ * stock UI-kit furniture. It is not violated here, because the two states
+ * are never both present: at rest this is a pure label, and condensed it is
+ * a pure icon. There is no label-plus-ornament state to prohibit.
+ *
+ * Condensed it also stops being a button at all. The rim comes off with the
+ * label, and what is left is the theme toggle's treatment exactly — 34px
+ * square, no ground, no border, Body ink, Wash on hover — because in the
+ * shrunken bar it is the same class of thing the toggle is: a bare mark in a
+ * cluster of bare marks. A rim around one of them and not the other would
+ * claim a hierarchy that stops being true the moment the label is gone.
+ * (User-directed; the first pass kept the slab and it read as a stray box.)
+ *
+ * The label collapses by width rather than `display: none` so the button
+ * narrows over the same 300ms as the box it sits in — a hard swap mid-morph
+ * reads as a glitch, and `display` cannot be transitioned. Collapsed it is
+ * `max-width: 0` + `overflow: hidden` on the parent, which leaves the text in
+ * the accessibility tree; that is fine and in fact wanted, because the
+ * unconditional aria-label on the anchor is what actually names the control
+ * in both states.
+ */
+.site-nav__cta {
+  /* No gap, ever. Exactly one child has width in either state, but flex gap
+     applies between items regardless of their size — an 8px gap here would
+     sit permanently beside the zero-width icon and push the resting label
+     off its old position. The cross-fade needs no separation because the two
+     children are never both legible. */
+  gap: 0;
+  transition:
+    padding var(--dur-nav) ease-in-out,
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart);
+}
+
+.site-nav__cta-icon {
+  /* 18px, the theme toggle's glyph size — the two sit side by side once
+     condensed and must read as one pair, not two sizes. */
+  width: 18px;
+  height: 18px;
+  flex: none;
+  /* Collapsed at rest, so the resting slab is exactly the label it always
+     was — no reserved gutter, no shifted text. */
+  max-width: 0;
+  opacity: 0;
+  transition:
+    max-width var(--dur-nav) ease-in-out,
+    opacity calc(var(--dur-nav) / 2) ease-in-out;
+}
+
+.site-nav__cta-label {
+  /* Comfortably past the rendered label (~130px at 13px uppercase with
+     0.06em tracking) so nothing clips, but not so far past it that the
+     collapse spends its first frames animating empty space. */
+  max-width: 12em;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width var(--dur-nav) ease-in-out,
+    opacity calc(var(--dur-nav) / 2) ease-in-out;
+}
+
+/* 18px mark + 7px padding each side + the 1px transparent rim the base
+   button always carries = a 34px square, identical to the condensed toggle.
+   Sized by padding rather than an explicit width because the resting width
+   is `auto`, and auto→34px is not an animatable pair — the button has to
+   narrow by shedding padding and label, not by jumping to a number. */
+.site-header-shell.is-condensed .site-nav__cta {
+  padding: 7px;
+  justify-content: center;
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--body);
+}
+
+/* Beats `.btn-secondary:hover` (2 classes) at 4. Wash + Edge is the theme
+   toggle's hover verbatim. */
+.site-header-shell.is-condensed .site-nav__cta:hover {
+  background-color: var(--wash);
+  border-color: transparent;
+  color: var(--edge);
+}
+
+.site-header-shell.is-condensed .site-nav__cta-icon {
+  max-width: 18px;
+  opacity: 1;
+}
+
+.site-header-shell.is-condensed .site-nav__cta-label {
+  max-width: 0;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav,
+  .site-nav__logo,
+  .site-nav__wordmark,
+  .theme-toggle,
+  .site-nav__cta,
+  .site-nav__cta-icon,
+  .site-nav__cta-label {
+    transition: none;
+  }
+}
+
+/*
  * Theme toggle — quiet icon button in the bar. Which icon renders is pure
  * CSS from the same cascade that flips the tokens (media query + data-theme
  * override), so server markup never depends on client theme state: sun in
@@ -1568,7 +1722,18 @@ html:not(.js) .reveal {
   cursor: pointer;
   transition:
     background-color var(--dur-fast) var(--ease-out-quart),
-    color var(--dur-fast) var(--ease-out-quart);
+    color var(--dur-fast) var(--ease-out-quart),
+    width var(--dur-nav) ease-in-out,
+    height var(--dur-nav) ease-in-out;
+}
+
+/* The toggle is the tallest thing in the row (the brand is 28px, the CTA
+   ~40px), so the row's height is its height — the condensed padding alone
+   would not shrink the bar without this coming down too. 34px keeps the
+   pointer target at the 24px AA minimum with room to spare. */
+.site-header-shell.is-condensed .theme-toggle {
+  width: 34px;
+  height: 34px;
 }
 
 .theme-toggle:hover,

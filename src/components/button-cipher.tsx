@@ -69,7 +69,15 @@ export default function ButtonCipher() {
         button.classList.remove("button-ciphering");
       };
 
+      /* Opt-out, checked per pass rather than at enhance time so a button
+         can move in and out of eligibility while mounted. The pass works by
+         going `color: transparent` and painting scrambled hex over the
+         label, which is fine for a word and destructive for anything else:
+         a control whose visible content is an icon inheriting currentColor
+         would simply vanish for 460ms and paint garbage where it was. The
+         nav's GitHub CTA becomes exactly that once the bar condenses. */
       const start = () => {
+        if (button.dataset.cipher === "off") return;
         finish();
         button.style.setProperty(
           "--button-cipher-color",

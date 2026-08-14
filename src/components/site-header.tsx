@@ -24,6 +24,11 @@ const NAV_ITEMS: NavItem[] = [
 const CONDENSE_ON_Y = 24;
 const CONDENSE_OFF_Y = 8;
 
+/* Longer than --dur-nav (300ms) so a --nav-h measurement can never land on a
+   frame of the condense/expand transition. Keep the two in step if either
+   moves. */
+const SETTLE_MS = 360;
+
 /**
  * Onyx-pattern top bar (DESIGN.md §5 Navigation): at rest a transparent
  * strip inset 10px from the viewport edge — logo left, anchor links
@@ -108,12 +113,35 @@ export default function SiteHeader() {
      The bar row is measured, not the shell or frame: the mobile panel lives
      inside the frame and would otherwise fold its open height into the
      token. Row height + the shell's top inset + the frame's borders is the
-     same derivation the CSS token comment documents. */
+     same derivation the CSS token comment documents.
+
+     Rest height only — the guard below is load-bearing. Since the condensed
+     bar shrinks its own row, an ungated observer would refire on every frame
+     of the 300ms condense and walk --nav-h down with it; the hero's
+     `min-height: calc(100vh - var(--nav-h))` would then grow underneath the
+     reader as they scrolled away from it, which is a layout shift caused by
+     scrolling. --nav-h means "how tall is the bar over the top of the page",
+     and the top of the page is exactly where the bar is not condensed.
+
+     Arriving mid-page (/#implementations) starts condensed, so there is no
+     rest height to measure and the CSS constant stands until the visitor
+     reaches the top. That is the right failure: the constant is accurate for
+     the shipped bar, and the two things --nav-h feeds — the hero fold and
+     anchor scroll-margin — are both fine with a value that errs tall.
+
+     Observer-driven syncs are also settle-delayed past --dur-nav. The
+     condensed class drops at the *start* of the expand transition, so a
+     plain guard would still let the 300ms of intermediate heights through
+     while the class already reads "at rest" — measuring the bar mid-grow and
+     walking --nav-h up frame by frame, right where the hero is on screen.
+     Waiting for the box to stop moving is the whole fix; the mount call
+     stays synchronous so the correct value lands on the first frame. */
   useEffect(() => {
     const row = navRef.current;
     if (!row || typeof ResizeObserver === "undefined") return;
 
     const sync = () => {
+      if (row.closest(".site-header-shell.is-condensed")) return;
       const shell = row.closest(".site-header-shell");
       const frame = row.closest(".site-nav-frame");
       const inset = shell
@@ -132,11 +160,20 @@ export default function SiteHeader() {
       }
     };
 
+    let settle = 0;
+    const syncWhenSettled = () => {
+      clearTimeout(settle);
+      settle = window.setTimeout(sync, SETTLE_MS);
+    };
+
     sync();
-    const observer = new ResizeObserver(sync);
+    const observer = new ResizeObserver(syncWhenSettled);
     observer.observe(row);
-    document.fonts?.ready.then(sync).catch(() => {});
-    return () => observer.disconnect();
+    document.fonts?.ready.then(syncWhenSettled).catch(() => {});
+    return () => {
+      observer.disconnect();
+      clearTimeout(settle);
+    };
   }, []);
 
   return (
@@ -195,13 +232,39 @@ export default function SiteHeader() {
 
             <div className="site-nav__actions">
               <ThemeToggle />
+              {/* Two states, one control. At rest it is a labelled slab; once
+                  the bar condenses the label collapses to nothing and the
+                  mark takes over, so the shrunken box spends its width on
+                  navigation instead of a sentence. Both children ship in the
+                  markup and swap in CSS — nothing here depends on the
+                  condense state, so the server frame and the first client
+                  frame agree.
+
+                  aria-label is unconditional and matches the visible label
+                  exactly, which is what keeps the accessible name stable
+                  across the swap: in the collapsed state the only child left
+                  is an aria-hidden glyph, and without it the link would
+                  announce as "link, https://github.com/cashubtc". */}
               <a
                 href="https://github.com/cashubtc"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-secondary site-nav__cta"
+                aria-label="View on GitHub"
+                /* Suppress the hover cipher while this is a bare mark — the
+                   pass blanks currentColor, which would erase the icon
+                   rather than scramble a label. See button-cipher.tsx. */
+                data-cipher={condensed || isOpen ? "off" : undefined}
               >
-                View on GitHub
+                <svg
+                  className="site-nav__cta-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.77.12 3.06.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.14c0 .31.21.68.79.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z" />
+                </svg>
+                <span className="site-nav__cta-label">View on GitHub</span>
               </a>
 
               <button

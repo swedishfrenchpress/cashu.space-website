@@ -82,10 +82,13 @@ export default function SiteFooter() {
             </ExternalLink>
           </div>
 
-          {/* RFC metadata strip — spec repo left, descriptor right. Echoes the
-              two-cell mono header device used on the spec code pane. */}
+          {/* RFC metadata strip. Was a two-cell device (spec repo left,
+              descriptor right) echoing the spec code pane's mono header; the
+              cashubtc/nuts cell was dropped 2026-08-14 on the user's
+              direction, so what remains is a ruled descriptor line. It sits
+              left with the rest of the page rather than stranded right where
+              its missing counterweight used to hold it. */}
           <div className="footer-metastrip t-mono">
-            <span>cashubtc/nuts</span>
             <span className="footer-metastrip__meta">Chaumian ecash for bitcoin</span>
           </div>
 
