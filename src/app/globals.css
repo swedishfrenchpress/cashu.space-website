@@ -1150,12 +1150,30 @@ html:not(.js) .reveal {
   gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-/* Page peak. CLAUDE.md is explicit: hero headline = GT-Standard 600,
-   ≥3.75rem, line-height 0.95. Held to t-display proportions on a tight
-   max-width so the line break lands where the asymmetric grid expects. */
+/*
+ * Page peak. CLAUDE.md is explicit: hero headline = GT-Standard 600,
+ * ≥3.75rem, line-height 0.95.
+ *
+ * It now runs at the full t-display scale, which is the role this element
+ * was always supposed to have: the ramp comment at the top of this file
+ * lists t-display's job as "Page peaks: hero, page-closing CTA, route H1s",
+ * and DESIGN.md §1 states the hero runs 6rem-9rem.
+ *
+ * The bespoke clamp(3.75rem, 7vw, 6.5rem) that used to live here honoured
+ * neither. It pinned at 6.5rem -- the very bottom of the documented range --
+ * on any viewport past ~1486px, and fell to 5.6rem at 1280px, under the
+ * stated floor. The measurable cost: the /wallets route H1 rendered 29%
+ * larger than the homepage hero at 1440px and 38% larger at 1920px, so a
+ * secondary page out-shouted the page peak. The hero read flat because it
+ * had quietly opted out of the system's strongest move.
+ *
+ * Nothing new was introduced to fix it. This is t-display's own scale, and
+ * the deck and body around it were deliberately left alone so the headline
+ * reads as the peak rather than everything getting louder together.
+ */
 .hero-spec__headline {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(3.75rem, 7vw, 6.5rem);
+  font-size: clamp(3.75rem, 9vw, 9rem);
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;

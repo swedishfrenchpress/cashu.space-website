@@ -20,7 +20,7 @@ typography:
     letterSpacing: "-0.02em"
   heroDisplay:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(3.75rem, 7vw, 6.5rem)"
+    fontSize: "clamp(3.75rem, 9vw, 9rem)"
     fontWeight: 600
     lineHeight: 0.95
     letterSpacing: "-0.02em"
@@ -172,7 +172,7 @@ Color is intentionally absent from everything the site says in its own voice. Th
 **Key Characteristics:**
 
 - Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.
-- Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).
+- Display type does the heaviest lifting: the hero runs the full `t-display` scale, `clamp(3.75rem, 9vw, 9rem)`, set tight (line-height 0.95, letter-spacing −0.02em). It reaches 9rem past 1600px and holds there. Until 2026-08-14 the hero carried a bespoke `clamp(3.75rem, 7vw, 6.5rem)` that pinned at the bottom of this range and let the `/wallets` route H1 render 29% larger than the homepage peak; the bespoke step is gone.
 - Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.
 - Sharp flat-slab buttons, hairline dividers, and no shadows — hierarchy comes from fill, border, position, and weight.
 - Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast.
@@ -217,8 +217,8 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 ### Hierarchy
 
-- **Display** (weight 600, `clamp(3.75rem, 9vw, 9rem)`, line-height 0.95, letter-spacing −0.02em): Short page-peak copy — the closing-CTA slogan, the H1 on dedicated routes (`/wallets`, future `/docs`, `/blog`). Sized to be monumental, which means it only fits copy under ~25 characters. Long descriptive hero prose does not belong at Display; it gets a bespoke scale below Display and above Headline, justified inline. The line break in Display copy is part of the composition, not an accident of viewport.
-- **Homepage Display** (weight 600, `clamp(3.75rem, 7vw, 6.5rem)`, line-height 0.95, letter-spacing −0.02em): The longer homepage statement, scaled below route Display so it can share the full content grid without shouting.
+- **Display** (weight 600, `clamp(3.75rem, 9vw, 9rem)`, line-height 0.95, letter-spacing −0.02em): Short page-peak copy — the closing-CTA slogan, the H1 on dedicated routes (`/wallets`, future `/docs`, `/blog`). Sized to be monumental. The line break in Display copy is part of the composition, not an accident of viewport. The homepage hero runs at this scale too — see below.
+- **Homepage Display** — *retired 2026-08-14, on the user's direction.* This was a bespoke `clamp(3.75rem, 7vw, 6.5rem)` step for the homepage H1, on the reasoning that longer descriptive hero prose should sit below route Display "so it can share the full content grid without shouting." The reasoning was deliberate and it was wrong in practice: the step pinned at 6.5rem past ~1486px and fell to 5.6rem at 1280px, so the homepage hero — the page peak — rendered **29% smaller than the `/wallets` route H1 at 1440px and 38% smaller at 1920px**. A secondary route out-shouted the front door, and the hero read flat for exactly that reason. The hero now uses Display unmodified. Measured across 360–2560px: no horizontal overflow, and the section still resolves on the fold at every size (2 lines to 1440px, 3 lines past 1600px, 4 on phones, unchanged from before). Do not reintroduce a homepage-only display step; if the hero copy grows too long for Display, shorten the copy.
 - **Footer Display** (weight 600, `clamp(3.75rem, 6vw, 5rem)`, line-height 0.95, letter-spacing −0.02em): The compact closing wordmark.
 - **Headline** (weight 600, `clamp(2rem, 4vw, 3rem)`, line-height 1.05, letter-spacing −0.015em): Section openings ("What is ecash?", "Wallets", "Mints").
 - **Title** (weight 600, `1.125rem`, line-height 1.3): Subheaders, card titles, anything ranked above body but below a section opening.
