@@ -60,6 +60,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "-0.005em"
+  heroDeck:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(1.5rem, 2.4vw, 2.25rem)"
+    fontWeight: 500
+    lineHeight: 1.15
+    letterSpacing: "-0.015em"
   label:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.875rem"

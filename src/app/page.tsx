@@ -38,11 +38,19 @@ export default function Home() {
             <Reveal immediate delay={120}>
     <h1 className="hero-spec__headline">Open source ecash for bitcoin.</h1>
             </Reveal>
+            {/* Deck then body, grouped so they share a tight gap and read as
+                one unit under the headline. The deck carries the claim; the
+                body carries the mechanism that makes the claim true. The old
+                single paragraph put the three properties in a subordinate
+                line above a sentence that restated the headline. */}
             <Reveal immediate delay={240}>
-              <p className="hero-spec__body">
-                Instant, bearer, peer-to-peer.<br />
-      Cashu specifies blind-signed tokens for bitcoin-backed ecash.
-              </p>
+              <div className="hero-spec__lead">
+                <p className="hero-spec__deck">Instant, bearer, peer-to-peer.</p>
+                <p className="hero-spec__body">
+                  Every Cashu token is blind-signed, so the mint cannot link
+                  the one you spend to the one it signed.
+                </p>
+              </div>
             </Reveal>
             <Reveal immediate delay={360}>
               <div className="hero-spec__cta">

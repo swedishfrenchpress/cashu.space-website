@@ -1166,6 +1166,42 @@ html:not(.js) .reveal {
   text-wrap: balance;
 }
 
+/*
+ * Deck and body are one unit: a tight internal gap against the much larger
+ * gap .hero-spec__content puts between the headline, the lead, and the CTA
+ * row. Tight group, generous separation.
+ */
+.hero-spec__lead {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 1.1vw, 0.875rem);
+}
+
+/*
+ * Deck — the standfirst. Not an eyebrow: it sits below the headline and above
+ * the body, and it carries the page's claim rather than labelling it.
+ *
+ * The three properties used to be the first line of the body paragraph, set
+ * at body size and weight above a longer sentence, so the punchiest text in
+ * the hero was reading from the second chair. Promoting it needs its own
+ * role because the gap it has to cover is large: the headline is 100px/600
+ * and the body is 23px/400.
+ *
+ * Separated from the body on three axes at once — size, weight, and tone —
+ * so the two roles stay distinguishable at 390px, where the size step
+ * compresses from 1.48x to 1.33x and size alone would stop carrying it.
+ */
+.hero-spec__deck {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin: 0;
+  text-wrap: balance;
+}
+
 .hero-spec__body {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.125rem, 1.6vw, 1.5rem);
@@ -1174,8 +1210,14 @@ html:not(.js) .reveal {
   letter-spacing: -0.005em;
   color: var(--body);
   margin: 0;
-  width: 100%;
-  max-width: none;
+  /*
+   * A real cap, not `none`. The old copy only stayed in measure because a
+   * <br /> forced its break; a flowing sentence in a flex-start column grows
+   * to its natural width, which at 23px runs past the 75ch reading ceiling.
+   * `ch` is the "0" advance and GT-Standard's zero is wide, so 46ch lands
+   * around 65-70 characters of mixed-case prose.
+   */
+  max-width: 46ch;
   text-wrap: pretty;
 }
 
