@@ -2778,7 +2778,11 @@ html:not(.js) .reveal {
   border: 1px solid var(--hair);
   border-radius: 0;
   padding: 2px 7px;
-  font-size: 0.6875rem;
+  /* The `micro` step (0.75rem / 500 / 0.06em uppercase) — the ramp already
+     owns exactly this register, so the tag uses it rather than the 0.6875rem
+     I first reached for by eye. A new step for a one-off tag would have been
+     an unjustified addition to the scale. */
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
