@@ -61,7 +61,9 @@ import {
  * Draws every 2nd rAF (~30fps), DPR capped at 2, pauses offscreen and on
  * hidden tabs, and renders a single static frame under reduced motion.
  * `staticTime` freezes the renderer at a chosen moment of pure terrain — no
- * morph, no lens — for quieter supporting surfaces.
+ * morph, no lens — for quieter supporting surfaces. `renderFullField`
+ * disables the hero mask's top-row optimization when a supporting surface
+ * uses its own mask.
  */
 
 const FONT_SIZE = 12;
@@ -111,15 +113,36 @@ function clamp(v: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, v));
 }
 
+function smoothstep(v: number): number {
+  const u = clamp(v, 0, 1);
+  return u * u * (3 - 2 * u);
+}
+
 export default function AsciiField({
   className,
   staticTime,
+  renderFullField = false,
+  staticTransitionMs = 0,
 }: {
   className?: string;
   staticTime?: number;
+  renderFullField?: boolean;
+  staticTransitionMs?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const latestStaticTimeRef = useRef(staticTime);
+  const updateStaticTimeRef = useRef<(next: number | undefined) => void>(
+    () => {},
+  );
+  const staticMode = staticTime !== undefined;
+
+  /* Keep the setup effect stable while allowing its transition controller to
+     receive a new target sample. This runs before both setup and dispatch on
+     every commit, including a live↔static mode change. */
+  useEffect(() => {
+    latestStaticTimeRef.current = staticTime;
+  }, [staticTime]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -143,6 +166,31 @@ export default function AsciiField({
     let bTop = 4.5;
     let bBot = 4.5;
     const start = performance.now();
+
+    /* Supporting fields can move between two frozen terrain samples. The
+       value is interpolated rather than the bitmaps crossfaded, so every
+       glyph naturally promotes, demotes, or disappears as a contour passes
+       through its cell. Interrupting a transition starts from its current
+       sampled time instead of snapping to either endpoint. */
+    const initialStaticTime = latestStaticTimeRef.current ?? 0;
+    let staticFrom = initialStaticTime;
+    let staticTo = initialStaticTime;
+    let staticStartedAt = start;
+    let staticTransitioning = false;
+
+    const staticTimeAt = (now: number) => {
+      if (!staticTransitioning) return staticTo;
+      const progress =
+        staticTransitionMs > 0
+          ? (now - staticStartedAt) / staticTransitionMs
+          : 1;
+      if (progress >= 1) {
+        staticTransitioning = false;
+        staticFrom = staticTo;
+        return staticTo;
+      }
+      return staticFrom + (staticTo - staticFrom) * smoothstep(progress);
+    };
 
     const field = createTerrainField(OPEN_FIELD_GAIN);
     const pointer = new WarpPointer();
@@ -170,7 +218,8 @@ export default function AsciiField({
     const currentWall = () =>
       reduced ? 0 : (performance.now() - start) / 1000;
     /** Field time — the noise's clock. */
-    const currentT = () => staticTime ?? currentWall() * SPEED;
+    const currentT = () =>
+      staticMode ? staticTimeAt(performance.now()) : currentWall() * SPEED;
 
     const resolveFont = () => {
       /* ctx.font can't take CSS vars; resolve the real family from the
@@ -209,7 +258,9 @@ export default function AsciiField({
       const cols = Math.ceil(width / CELL_W) + 1;
       const rows = Math.ceil(height / CELL_H) + 1;
       /* Rows the mask erases outright are never computed. */
-      const firstRow = Math.floor((height * MASK_DEAD_TOP) / CELL_H);
+      const firstRow = renderFullField
+        ? 0
+        : Math.floor((height * MASK_DEAD_TOP) / CELL_H);
 
       field.resize(cols, rows);
       field.update(t);
@@ -217,7 +268,7 @@ export default function AsciiField({
       /* Scene composition. `staticTime` is documented as a quiet frame, so it
          short-circuits to pure terrain rather than freezing mid-morph. */
       const comp =
-        staticTime === undefined && !reduced
+        !staticMode && !reduced
           ? compositionAt(wall)
           : { scene: "terrain" as const, mix: 0, sceneTime: 0 };
       const narrow = width < NARROW_BREAKPOINT;
@@ -245,7 +296,7 @@ export default function AsciiField({
 
       /* Pointer lens. Advanced once per frame, before any sampling. */
       pointer.advance(wall);
-      const k = reduced || staticTime !== undefined ? 0 : pointer.currentK(wall);
+      const k = reduced || staticMode ? 0 : pointer.currentK(wall);
       const lensR = k > 0 ? bloomedRadius(k) : 0;
       const lensX = pointer.x;
       const lensY = pointer.y;
@@ -346,6 +397,20 @@ export default function AsciiField({
     const paintCurrent = () => draw(currentT(), currentWall());
 
     const tick = (now: number) => {
+      if (staticMode) {
+        draw(staticTimeAt(now), currentWall());
+        if (
+          staticTransitioning &&
+          inView &&
+          document.visibilityState === "visible"
+        ) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          rafId = 0;
+        }
+        return;
+      }
+
       frameCount++;
       if (frameCount % FRAME_SKIP === 0) {
         const wall = (now - start) / 1000;
@@ -363,13 +428,44 @@ export default function AsciiField({
         rafId = 0;
       }
       if (disposed) return;
-      if (staticTime !== undefined || reduced) {
+      if (reduced) {
+        staticTransitioning = false;
+        staticFrom = staticTo;
         paintCurrent();
+        return;
+      }
+      if (staticMode) {
+        if (
+          staticTransitioning &&
+          inView &&
+          document.visibilityState === "visible"
+        ) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          paintCurrent();
+        }
         return;
       }
       if (inView && document.visibilityState === "visible") {
         rafId = requestAnimationFrame(tick);
       }
+    };
+
+    updateStaticTimeRef.current = (next) => {
+      if (!staticMode || next === undefined) return;
+      const now = performance.now();
+      const current = staticTimeAt(now);
+      if (next === staticTo && !staticTransitioning) return;
+
+      staticFrom = current;
+      staticTo = next;
+      staticStartedAt = now;
+      staticTransitioning =
+        !reduced &&
+        staticTransitionMs > 0 &&
+        Math.abs(staticTo - staticFrom) > Number.EPSILON;
+      if (!staticTransitioning) staticFrom = staticTo;
+      sync();
     };
 
     /* Theme changed: re-resolve and, when the loop isn't running (paused
@@ -417,7 +513,11 @@ export default function AsciiField({
     const onVisibility = () => sync();
     const onReduceChange = (e: MediaQueryListEvent) => {
       reduced = e.matches;
-      if (reduced) pointer.reset();
+      if (reduced) {
+        pointer.reset();
+        staticTransitioning = false;
+        staticFrom = staticTo;
+      }
       sync();
     };
 
@@ -439,7 +539,7 @@ export default function AsciiField({
     let pointerInside = false;
 
     const onPointerMove = (e: PointerEvent) => {
-      if (reduced || staticTime !== undefined) return;
+      if (reduced || staticMode) return;
       if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
       if (!mqFine.matches) return;
       const now = (performance.now() - start) / 1000;
@@ -512,6 +612,7 @@ export default function AsciiField({
 
     return () => {
       disposed = true;
+      updateStaticTimeRef.current = () => {};
       cancelAnimationFrame(rafId);
       cancelAnimationFrame(resizeRaf);
       cancelAnimationFrame(rectRaf);
@@ -526,6 +627,10 @@ export default function AsciiField({
       window.removeEventListener("blur", onPointerLeaveWindow);
       window.removeEventListener("scroll", onScroll);
     };
+  }, [renderFullField, staticMode, staticTransitionMs]);
+
+  useEffect(() => {
+    updateStaticTimeRef.current(staticTime);
   }, [staticTime]);
 
   return (

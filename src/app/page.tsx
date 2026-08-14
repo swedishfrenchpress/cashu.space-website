@@ -14,14 +14,17 @@ export default function Home() {
     <div className="flex flex-col flex-1 bg-paper text-ink">
       <SiteHeader />
 
-      {/* Hero — single-column spec opener. A live ASCII field fills the whole
-          section as its ground, morphing slowly between the terrain, the
-          vault door, and the blind-signature round trip; the headline, lead,
-          and paired CTAs sit left-aligned on top of it inside the page shell.
-          The field's mask keeps it near-empty behind the copy and densest
-          toward the bottom-right, so "title at the top, horizon at the
-          bottom" survives the field going full-bleed. The staged reveal runs
-          headline → body → CTA, with the field fading in last. */}
+      {/* Hero — single-column spec opener, centred on purpose (the site's one
+          departure from left-aligned editorial; see the Centred-Hero
+          Exception, DESIGN.md §4). A live ASCII field fills the whole section
+          as its ground, morphing slowly between the terrain, the vault door,
+          and the blind-signature round trip; the headline, lead, and paired
+          CTAs sit centred on top of it, the headline escaping the page shell.
+          The field's symmetric mask holds it near-empty behind the copy
+          column and lets it run full-strength out to both edges, so "title
+          at the top, horizon at the bottom" survives the field going
+          full-bleed. The staged reveal runs headline, then body, then CTA,
+          with the field fading in last. */}
       <section id="main-content" className="hero-spec">
         <Reveal
           immediate
@@ -36,7 +39,9 @@ export default function Home() {
         <div className="hero-spec__inner page-shell">
           <div className="hero-spec__content">
             <Reveal immediate delay={120}>
-    <h1 className="hero-spec__headline">Open source ecash for bitcoin.</h1>
+              <h1 className="hero-spec__headline">
+                Open source ecash for bitcoin.
+              </h1>
             </Reveal>
             {/* Deck then body, grouped so they share a tight gap and read as
                 one unit under the headline. The deck carries the claim; the

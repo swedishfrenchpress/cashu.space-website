@@ -25,7 +25,7 @@ const TOKEN_TAIL = "dWNzYXQ";
    window chrome, no syntax colour beyond grey/pixel swaps. Theme-flipping:
    Card pane + Hair strip resolve to the classic dark pane in the dark
    ramp and a white file pane in light. z-1 lifts it above the view's
-   masked drafting-grid layer. */
+   masked ASCII-field layer. */
 function CodePane({
   file,
   meta,
@@ -161,7 +161,7 @@ ${TOKEN_HEAD}…${TOKEN_TAIL}
 /* ------------------------------------------------------------- figures — */
 
 /* Published technical plates — the FIGURE half of the toggle. Each is a
-   real <figure>: a machined Card plate on the shared drafting sheet,
+   real <figure>: a machined Card plate on the shared ASCII sheet,
    captioned below in the site's own voice the way a spec captions its
    diagrams. Deliberately NOT the CodePane's file-strip chrome: a figure is
    not a file, and the two views should read as two registers of one

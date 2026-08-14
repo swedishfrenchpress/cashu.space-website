@@ -38,12 +38,11 @@
      bottom edge, dark lightens the top edge. Borders only; the No-Shadow
      Rule holds.
 
-     The whole set sits one tone off --hair on purpose. The graph paper the
-     plate lands on is drawn in --hair, so a --hair keyline made the plate
-     the same value as its own ground: the object was outlined in the grid
-     it was supposed to sit above. Stepping the set one tone (light: ghost
-     sides and lit rim, faint seat; dark: faint rim, ghost sides and seat)
-     keeps the polarity identical and separates the plate from the sheet. */
+     The whole set sits one tone off the sheet on purpose. The ASCII field
+     spans several greys, so a Hair keyline disappeared wherever its value
+     met the ground. Stepping the set one tone (light: ghost sides and lit
+     rim, faint seat; dark: faint rim, ghost sides and seat) keeps the
+     polarity identical and separates the plate from the glyph field. */
   --fig-ground: #f4f4f5; /* chalk */
   --fig-edge: #d4d4d8;   /* ghost — the sides */
   --fig-lit: #d4d4d8;    /* ghost — top edge, same as sides in light */
@@ -173,9 +172,8 @@
     --edge: #ffffff;
 
     /* Figure-plate optics: dark carries the lit rim on top (faint is the
-       lighter value in this ramp) and seats on ghost, mirroring light. Both
-       sit one tone off --hair so the plate never shares a value with the
-       graph paper under it — see the light block for the reasoning. */
+       lighter value in this ramp) and seats on ghost, mirroring light. The
+       set stays one tone off the ASCII sheet — see the light block. */
     --fig-ground: #101012; /* band */
     --fig-edge: #3f3f46;   /* ghost — the sides */
     --fig-lit: #71717a;    /* faint — the lit top rim */
@@ -215,9 +213,8 @@
   --edge: #ffffff;
 
   /* Figure-plate optics: dark carries the lit rim on top (faint is the
-     lighter value in this ramp) and seats on ghost, mirroring light. Both
-     sit one tone off --hair so the plate never shares a value with the
-     graph paper under it — see the light block for the reasoning. */
+     lighter value in this ramp) and seats on ghost, mirroring light. The
+     set stays one tone off the ASCII sheet — see the light block. */
   --fig-ground: #101012; /* band */
   --fig-edge: #3f3f46;   /* ghost — the sides */
   --fig-lit: #71717a;    /* faint — the lit top rim */
@@ -1094,17 +1091,17 @@ html:not(.js) .reveal {
 
 /*
  * Hero — "Spec opener". Single-column layout on Paper: Display headline
- * (GT-Standard per CLAUDE.md), lead paragraph, and paired CTAs inside the
- * page shell, with a full-bleed ASCII terrain band running to the section
- * base. A single hairline closes the section, cropping the terrain like
- * an RFC figure rule — the page reads like the cover of a published
- * specification, not a marketing splash.
+ * (GT-Standard per CLAUDE.md), lead paragraph, and paired CTAs, centred on
+ * purpose (the Centred-Hero Exception, DESIGN.md §4), over a full-bleed
+ * ASCII field whose mask keeps the copy column quiet. A single hairline
+ * closes the section, cropping the field like an RFC figure rule — the
+ * page reads like the cover of a published specification, not a marketing
+ * splash.
  *
  * The section fills one viewport height (less the sticky bar, capped at
- * --hero-max) and anchors the band to its base, so that closing hairline
- * resolves ON the fold rather than floating above it with dead ground
- * below. Title at the top, horizon at the bottom: a spec cover, not a
- * stripe adrift mid-page.
+ * --hero-max), so that closing hairline resolves ON the fold rather than
+ * floating above it with dead ground below. Title at the top, horizon at
+ * the bottom: a spec cover, not a stripe adrift mid-page.
  */
 .hero-spec {
   position: relative;
@@ -1137,9 +1134,6 @@ html:not(.js) .reveal {
 .hero-spec__inner {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2.5rem, 5vw, 4rem);
 }
 
 .hero-spec__content {
@@ -2103,9 +2097,13 @@ html:not(.js) .reveal {
 }
 
 /* Demo variant of the media panel — UI/Code switcher (see
-   protocol-demo.tsx). Two stacked views crossfade inside the chalk frame;
-   a square segmented control floats bottom-center. Mobile relaxes the
-   16:10 to a taller frame so the code pane fits without inner scrolling.
+   protocol-demo.tsx). Two stacked views crossfade over a shared ASCII
+   contour sheet; a square segmented control floats bottom-center. The
+   Figure and Code views select nearby frozen field frames. The canvas
+   interpolates its terrain time for one brief recalculation, then goes idle,
+   so the ground changes without adding another ambient animation loop.
+   Mobile relaxes the 16:10 to a taller frame so the code pane fits without
+   inner scrolling.
 
    min-height is the floor that keeps the frame tall enough for its fixed-
    height figure plates plus the floating toggle's reserved lane. Without it,
@@ -2116,6 +2114,8 @@ html:not(.js) .reveal {
 .feature-demo {
   aspect-ratio: 4 / 5;
   min-height: 440px;
+  isolation: isolate;
+  background-color: var(--fig-ground);
   /* Height of the lane the floating toggle reserves at the frame's base.
      Coarse pointers grow the segments to the 44px target, so the lane grows
      with them — otherwise the taller control eats into the plate. */
@@ -2151,6 +2151,7 @@ html:not(.js) .reveal {
 .feature-demo__view {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: flex;
   /* `safe` so an overflowing child resolves into the padded area instead
      of cropping symmetrically past both edges (which ate the pane's
@@ -2162,38 +2163,45 @@ html:not(.js) .reveal {
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--dur-base) var(--ease-out-quart);
-  /* Drafting sheet — one full value step below the Card plates (§5), so
-     the artifact on top genuinely sits above its ground. Both views share
-     it; both flip with the scheme. */
-  background-color: var(--fig-ground);
+  background-color: transparent;
 }
 
-/* The 44px hairline graph paper rides its own layer so it can attenuate
-   where the artifact sits: the radial mask thins the grid toward the
-   centre — the ground yielding under the plate. Optics by mask, not blur;
-   the one glass surface remains the navbar. Artifacts stack above via
-   z-index: 1 (.fig, the code pane). */
-.feature-demo__view::before {
-  content: "";
+/* Static samples of the homepage's real ASCII contour field replace the
+   generic graph paper. On a Figure/Code change the canvas interpolates the
+   field's terrain time: contours migrate cell by cell, so glyphs promote,
+   demote, and disappear into the new sample instead of crossfading as a
+   bitmap. The material changes with the artifact, but it never loops or
+   competes with the page's one live field.
+
+   The field is masked down under the central artifact, then allowed to gain
+   density at the panel edges. That keeps the plate/code pane legible while
+   still making the surface unmistakably typographic. */
+.feature-demo__ascii {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(to right, var(--hair) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--hair) 1px, transparent 1px);
-  background-size: 44px 44px;
-  background-position: center;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.feature-demo__ascii-field {
+  position: absolute;
+  inset: 0;
+  opacity: 0.46;
   -webkit-mask-image: radial-gradient(
-    120% 90% at 50% 44%,
-    rgba(0, 0, 0, 0.3),
-    rgba(0, 0, 0, 0.52) 46%,
-    #000 80%
+    88% 82% at 50% 44%,
+    rgb(0 0 0 / 0.08) 0,
+    rgb(0 0 0 / 0.18) 42%,
+    #000 100%
   );
   mask-image: radial-gradient(
-    120% 90% at 50% 44%,
-    rgba(0, 0, 0, 0.3),
-    rgba(0, 0, 0, 0.52) 46%,
-    #000 80%
+    88% 82% at 50% 44%,
+    rgb(0 0 0 / 0.08) 0,
+    rgb(0 0 0 / 0.18) 42%,
+    #000 100%
   );
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
 }
 
 .feature-demo__view.is-active {
@@ -2262,7 +2270,7 @@ html:not(.js) .reveal {
 }
 
 /* Figure plates — §5 Demo Panel. A published technical plate, not a file
-   pane: Card fill on the drafting sheet, hairline keyline whose top edge
+   pane: Card fill on the ASCII sheet, hairline keyline whose top edge
    is lit and bottom edge seated (--fig-lit/--fig-shade — fill and border
    only, the No-Shadow Rule holds), captioned below in the site's own
    voice. The interior speaks machine notation; the caption speaks GT. */
@@ -2308,9 +2316,8 @@ html:not(.js) .reveal {
 /* Square segmented control — the feature-nav register one size down.
    Carries its own opaque Card ground + keyline so it reads on all four
    surface combinations (light/dark theme × UI/Code view). Flat like every
-   other control in the system. The rim takes --fig-edge, not --hair, for
-   the same reason the plate does: it floats over graph paper drawn in
-   --hair, and a control outlined in its own ground is not outlined. */
+   other control in the system. The rim takes --fig-edge, not --hair, so it
+   stays distinct from the multi-tone ASCII field. */
 .feature-demo__toggle {
   position: absolute;
   left: 50%;
@@ -2349,8 +2356,8 @@ html:not(.js) .reveal {
   color: var(--on-ink);
 }
 
-/* Offset 0, not .focus-ring's 4px: at 4px the ring would land on the dark
-   grid ground where light-mode --edge (#000) vanishes; at 0 it draws on
+/* Offset 0, not .focus-ring's 4px: at 4px the ring could land on a dark
+   ASCII glyph where light-mode --edge (#000) vanishes; at 0 it draws on
    the control's own Card chip, which always contrasts with --edge. */
 .feature-demo__toggle-btn:focus-visible {
   outline: 2px solid var(--edge);
