@@ -200,8 +200,8 @@
         "purpose": "Short page-peak copy under ~25 characters: the closing-CTA slogan and the H1 on dedicated routes. The line break is part of the composition, not an accident of viewport."
       },
       "heroDisplay": {
-        "displayName": "Homepage Display",
-        "purpose": "The longer homepage statement, scaled below route Display so it can share the full content grid without shouting."
+        "displayName": "Homepage Display (retired)",
+        "purpose": "Retired 2026-08-14. Was a bespoke clamp(3.75rem, 7vw, 6.5rem) step for the homepage H1; it pinned at the bottom of the documented hero range and let the /wallets route H1 render 29-38% larger than the page peak. The hero now uses Display unmodified. Do not reintroduce a homepage-only display step."
       },
       "footerDisplay": {
         "displayName": "Footer Display",
@@ -254,6 +254,10 @@
       "pixel": {
         "displayName": "Pixel",
         "purpose": "Protocol notation only: amounts, denominations, mint identifiers, version strings. Never a heading, eyebrow, section marker, or link affordance."
+      },
+      "heroDeck": {
+        "displayName": "Hero Deck",
+        "purpose": "The standfirst under the hero headline: the page's claim in one line, sitting between Display and heroLead. Separated from the body on size, weight and tone at once so the two roles stay distinct at phone widths."
       }
     },
     "shadows": [
