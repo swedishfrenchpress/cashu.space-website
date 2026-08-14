@@ -33,9 +33,25 @@ export default function Home() {
           <AsciiField />
         </Reveal>
 
+        {/* Full-bleed title band. Sits outside the page shell so it spans the
+            viewport, and carries the three properties the deck used to hold —
+            on wide screens it replaces the deck rather than repeating it, and
+            below 768px it swaps back (only one of the pair is ever in the DOM
+            flow, so a screen reader never hears both).
+
+            The caps are applied in CSS, not typed into the content, so the
+            accessible name stays "Instant, Bearer, Peer-to-peer" rather than
+            three shouted words a screen reader may spell out. */}
+        <Reveal immediate delay={120} className="hero-band">
+          <p className="hero-band__line">
+            Instant <span className="hero-band__mark">₿</span> Bearer{" "}
+            <span className="hero-band__mark">₿</span> Peer-to-peer
+          </p>
+        </Reveal>
+
         <div className="hero-spec__inner page-shell">
           <div className="hero-spec__content">
-            <Reveal immediate delay={120}>
+            <Reveal immediate delay={220}>
     <h1 className="hero-spec__headline">Open source ecash for bitcoin.</h1>
             </Reveal>
             {/* Deck then body, grouped so they share a tight gap and read as
@@ -43,7 +59,7 @@ export default function Home() {
                 body carries the mechanism that makes the claim true. The old
                 single paragraph put the three properties in a subordinate
                 line above a sentence that restated the headline. */}
-            <Reveal immediate delay={240}>
+            <Reveal immediate delay={300}>
               <div className="hero-spec__lead">
                 <p className="hero-spec__deck">Instant, bearer, peer-to-peer.</p>
                 <p className="hero-spec__body">
