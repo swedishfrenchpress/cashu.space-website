@@ -57,7 +57,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
       { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS"] },
       { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android"] },
       { name: "Numo",      href: "https://numopay.org",        facts: ["Android", "Point of sale"] },
-      { name: "Sovran",    href: "https://sovran.money/en/",   facts: ["iOS and Android", "Beta"] },
+      { name: "Sovran",    href: "https://sovran.money/en/",   facts: ["iOS", "Beta"] },
     ],
   },
   {

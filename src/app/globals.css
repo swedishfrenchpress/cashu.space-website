@@ -418,18 +418,46 @@ html {
 /*
  * Spec pane left padding clears the floating Implementations Card on lg+.
  * The offset is the Card's effective right edge (340px width, sitting at
- * left: 0 in the absolute parent) plus a breathing-room hair (≈40px). Lives
- * as a token so we can tune it in one place instead of inline magic numbers
- * scattered across the component.
+ * left: 0 in the absolute parent) minus wherever the centred pane starts,
+ * plus a breathing-room hair. Lives as a token so we can tune it in one place
+ * instead of inline magic numbers scattered across the component.
+ *
+ * Both this and the pane's max width were retuned together (2026-08-14): the
+ * pane was 768px carrying a 437px longest line, so ~90px of its content box
+ * was dead air on the right. At 704px the pane starts 34px further right,
+ * which cuts the Card overlap to ~138px, so the offset comes down with it and
+ * the code keeps the same ~37px clearance from the Card's edge. Change one
+ * and you must recheck the other.
  */
 :root {
-  --spec-card-offset: 200px;
+  --spec-card-offset: 176px;
 }
 
 @media (min-width: 1024px) {
   .spec-pane {
     padding-left: var(--spec-card-offset);
   }
+}
+
+/*
+ * Comment column for the spec pane. Holds the code half of a commented line so
+ * the `//` column starts at a fixed x.
+ *
+ * Space padding cannot do this job here. The pixel face (Geist Pixel Square,
+ * 16px) advances 9.12px where Geist Mono advances 8.4px — measured, not
+ * assumed — so a line carrying a mint id or a sat amount runs about 1.09x
+ * wide and drifts more than a character out of column. Sizing in `ch` resolves
+ * against the pre's own mono face, so the column is stable whatever notation
+ * the value is set in.
+ *
+ * 32ch fits the widest code half (the keyset-id line, ~30.6ch once the pixel
+ * run is accounted for) with a little headroom. Grow it if a longer value
+ * lands here; `white-space: pre` means an overflowing line pushes its comment
+ * right rather than wrapping, which is visible immediately.
+ */
+.spec-code {
+  display: inline-block;
+  width: 32ch;
 }
 
 @keyframes fadeIn {
@@ -1114,19 +1142,6 @@ html:not(.js) .reveal {
   gap: clamp(2.5rem, 5vw, 4rem);
 }
 
-/*
- * The band ships wrapped in a Reveal, so the hero's second flex child is that
- * wrapper, not .ascii-field itself. An auto top margin drops it to the
- * section's base: surplus viewport height collects as air ABOVE the terrain,
- * never inside it, and the band keeps its own height at every screen size.
- *
- * Child combinator on purpose — the headline / body / CTA Reveals are nested
- * inside .hero-spec__inner and must not pick this up.
- */
-.hero-spec > .reveal {
-  margin-top: auto;
-}
-
 .hero-spec__content {
   display: flex;
   flex-direction: column;
@@ -1174,26 +1189,103 @@ html:not(.js) .reveal {
 }
 
 /*
- * ASCII terrain band — full-bleed contour field at the hero's base.
- * Height is a viewport-tuned strip, not a ratio; the top edge dissolves
- * into the white above via a mask so the terrain reads as emerging from
- * the page, and the section's bottom hairline crops it like a figure rule.
+ * ASCII field — the hero's ground. A live contour field that fills the whole
+ * section, morphing slowly between terrain, the vault door, and the
+ * blind-signature round trip (see src/lib/ascii/).
+ *
+ * The Reveal wrapper carries the positioning, not .ascii-field itself: while
+ * unrevealed, .reveal holds `will-change: transform`, which establishes a
+ * containing block: an absolutely positioned child inside it would resolve
+ * inset:0 against a zero-height box and paint nothing until the reveal
+ * landed. Positioning the wrapper instead resolves against .hero-spec, which
+ * is already `position: relative; isolation: isolate`.
+ *
+ * z-index 0 keeps it under .hero-spec__inner's z-index 1 without leaving the
+ * hero's stacking context.
  */
-.hero-spec__band {
-  margin-top: clamp(3rem, 6vw, 5rem);
+.hero-spec__field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
 .ascii-field {
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: clamp(180px, 26vh, 320px);
+  height: 100%;
   pointer-events: none;
   user-select: none;
   /* The canvas resolves its ctx.font from this computed family. */
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
+  /*
+   * Readability mask, two gradients intersected.
+   *
+   * Vertical: fully transparent behind the sticky bar, still faint through the
+   * headline's band, full only past the CTA row — the copy always reads
+   * against near-open paper. The flat transparent run to 9% is load-bearing
+   * twice over: it stops the field competing with the navbar, and the renderer
+   * skips those rows outright (MASK_DEAD_TOP in ascii-field.tsx — keep the two
+   * numbers in sync or the field visibly clips).
+   *
+   * Horizontal: the copy is left-aligned, so the left column is held down and
+   * the field runs densest toward the bottom-right. Between them they keep the
+   * Fold-Line Rule's composition — title at the top, horizon at the bottom —
+   * now as a density gradient rather than as the band's height.
+   *
+   * mask-composite: intersect is the standard keyword; -webkit-mask-composite
+   * spells the same operation `source-in`. Both are listed because Safari
+   * honours the prefixed mask-image property and needs the prefixed keyword to
+   * match it.
+   */
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 9%,
+      rgb(0 0 0 / 0.32) 36%,
+      #000 70%
+    ),
+    linear-gradient(to right, rgb(0 0 0 / 0.26) 0, rgb(0 0 0 / 0.26) 30%, #000 68%);
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 9%,
+      rgb(0 0 0 / 0.32) 36%,
+      #000 70%
+    ),
+    linear-gradient(to right, rgb(0 0 0 / 0.26) 0, rgb(0 0 0 / 0.26) 30%, #000 68%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/*
+ * Below the lg breakpoint the copy spans the full measure, so a left-edge
+ * dimmer would carve a hole out of nothing. Flatten the horizontal pass to a
+ * uniform hold-down and let the vertical fade do the work alone.
+ */
+@media (max-width: 767px) {
+  .ascii-field {
+    -webkit-mask-image:
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 9%,
+        rgb(0 0 0 / 0.26) 40%,
+        #000 78%
+      ),
+      linear-gradient(to right, rgb(0 0 0 / 0.45) 0, rgb(0 0 0 / 0.45) 100%);
+    mask-image:
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 9%,
+        rgb(0 0 0 / 0.26) 40%,
+        #000 78%
+      ),
+      linear-gradient(to right, rgb(0 0 0 / 0.45) 0, rgb(0 0 0 / 0.45) 100%);
+  }
 }
 
 /* Absolutely positioned so the bitmap size can never feed back into the

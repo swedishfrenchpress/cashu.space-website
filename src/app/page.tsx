@@ -14,12 +14,25 @@ export default function Home() {
     <div className="flex flex-col flex-1 bg-paper text-ink">
       <SiteHeader />
 
-      {/* Hero — single-column spec opener. Headline, lead, and paired CTAs
-          sit left-aligned inside the page shell; below them a full-bleed
-          ASCII terrain band (a live contour field drawn in Geist Mono
-          glyphs) runs to the hero's base, cropped by the section's closing
-          hairline. The staged reveal runs headline → body → CTA → band. */}
+      {/* Hero — single-column spec opener. A live ASCII field fills the whole
+          section as its ground, morphing slowly between the terrain, the
+          vault door, and the blind-signature round trip; the headline, lead,
+          and paired CTAs sit left-aligned on top of it inside the page shell.
+          The field's mask keeps it near-empty behind the copy and densest
+          toward the bottom-right, so "title at the top, horizon at the
+          bottom" survives the field going full-bleed. The staged reveal runs
+          headline → body → CTA, with the field fading in last. */}
       <section id="main-content" className="hero-spec">
+        <Reveal
+          immediate
+          variant="fade"
+          slow
+          delay={480}
+          className="hero-spec__field"
+        >
+          <AsciiField />
+        </Reveal>
+
         <div className="hero-spec__inner page-shell">
           <div className="hero-spec__content">
             <Reveal immediate delay={120}>
@@ -48,10 +61,6 @@ export default function Home() {
             </Reveal>
           </div>
         </div>
-
-        <Reveal immediate variant="fade" slow delay={480}>
-          <AsciiField className="hero-spec__band" />
-        </Reveal>
       </section>
 
       <div id="why-cashu">

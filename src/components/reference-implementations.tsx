@@ -191,25 +191,48 @@ function Spec() {
       {/* Left padding on lg+ clears the floating Card's right edge with a
          hair of breathing room. The offset lives on the .spec-pane class so
          the magic number doesn't sit inline — see globals.css. */}
+      {/* The commented lines split into a fixed-width code half plus the
+          comment, rather than padding the gap with spaces. Space padding
+          cannot align this pane: the pixel face renders at 16px and advances
+          9.12px against Geist Mono's 8.4px, so any line carrying a mint id or
+          an amount runs ~1.09x wide and its comment lands a character or more
+          off the column. `.spec-code` is sized in `ch`, which resolves against
+          the pre's own mono face, so the column holds whatever the value.
+
+          The values themselves are as long as the pane can carry: the keyset
+          id is shown whole (it really is 16 hex characters), and the 33-byte
+          signature and DLEQ proof keep an elision because they genuinely
+          don't fit — but a wider one, since the pane had ~125px going spare. */}
       <pre className="spec-pane t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pr-10 overflow-x-auto leading-7">
         <span className="text-zinc-400">{`// Cashu Token v4, CBOR encoding`}</span>{"\n\n"}
-        {`{\n  "t": [{\n    "i": `}
-        <span className="t-pixel">{`h'00…d2'`}</span>
-        {`,        `}
-        <span className="text-zinc-400">{`// mint id`}</span>
-        {`\n    "p": [{\n      "a": `}
-        <span className="t-pixel">{`64`}</span>
-        {`,              `}
+        {`{\n  "t": [{\n`}
+        <span className="spec-code">
+          {`    "i": `}
+          <span className="t-pixel">{`h'00ad268c4d1f5826'`}</span>
+          {`,`}
+        </span>
+        <span className="text-zinc-400">{`// keyset id`}</span>
+        {`\n    "p": [{\n`}
+        <span className="spec-code">
+          {`      "a": `}
+          <span className="t-pixel">{`64`}</span>
+          {`,`}
+        </span>
         <span className="text-zinc-400">{`// sats`}</span>
-        {`\n      "s": h'02ab…f1',      `}
+        {`\n`}
+        <span className="spec-code">{`      "s": h'02ab34c1…9c7cf1',`}</span>
         <span className="text-zinc-400">{`// blinded signature`}</span>
-        {`\n      "d": h'0248…e4'       `}
+        {`\n`}
+        <span className="spec-code">{`      "d": h'0248e1b9…5b73e4'`}</span>
         <span className="text-zinc-400">{`// DLEQ proof`}</span>
-        {`\n    }, {\n      "a": `}
-        <span className="t-pixel">{`128`}</span>
-        {`,             `}
+        {`\n    }, {\n`}
+        <span className="spec-code">
+          {`      "a": `}
+          <span className="t-pixel">{`128`}</span>
+          {`,`}
+        </span>
         <span className="text-zinc-400">{`// sats`}</span>
-        {`\n      "s": h'03c9…7e',\n      "d": h'0187…a6'\n    }]\n  }],\n  "m": "https://mint.example.com",\n  "u": "sat",\n  "v": 4\n}`}
+        {`\n      "s": h'03c9f0a7…41ae7e',\n      "d": h'0187bd42…62d4a6'\n    }]\n  }],\n  "m": "https://mint.example.com",\n  "u": "sat",\n  "v": 4\n}`}
       </pre>
     </div>
   );
@@ -275,7 +298,7 @@ function Card() {
           single GitHub action is the CTA below the panel. */}
       <div className="px-5 py-4">
         <span className="t-label text-zinc-500">
-          + {REMAINING} more implementations in the cashubtc org
+          + {REMAINING} more in the cashubtc org
         </span>
       </div>
     </div>
@@ -319,7 +342,7 @@ export default function ReferenceImplementations() {
             <div className="mb-6 lg:mb-0 lg:absolute lg:left-0 lg:top-16 lg:w-[340px] lg:z-10">
               <Card />
             </div>
-            <div className="lg:mx-auto lg:max-w-3xl lg:px-0">
+            <div className="lg:mx-auto lg:max-w-[704px] lg:px-0">
               <Spec />
             </div>
           </div>

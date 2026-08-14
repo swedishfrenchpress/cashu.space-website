@@ -1,111 +1,114 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import {
+  bdhkeBrightness,
+  bdhkeCoverage,
+  EXTENT_X,
+  EXTENT_Y,
+  roundTrip,
+} from "@/lib/ascii/bdhke";
+import {
+  CELL_H,
+  CELL_W,
+  CURRENCY_LEVEL,
+  FILLS,
+  LEVEL_GLYPH,
+  PEAK_LEVEL,
+  TERRAIN_SCALE,
+  brightness,
+  OPEN_FIELD_GAIN,
+  createTerrainField,
+  displayLevel,
+  pickCurrencyGlyph,
+} from "@/lib/ascii/terrain";
+import { compositionAt } from "@/lib/ascii/timeline";
+import {
+  EXTENT_RADIUS,
+  vaultBrightness,
+  vaultCoverage,
+} from "@/lib/ascii/vault";
+import {
+  WarpPointer,
+  bloomedRadius,
+  displacement,
+  swirlAngle,
+} from "@/lib/ascii/warp";
 
 /**
- * AsciiField — the hero's terrain band. A canvas grid of Geist Mono glyphs
- * driven by layered sinusoidal noise: three fractal octaves produce a
- * heightfield, and cells near contour lines (height mod spacing) intensify,
- * so drifting topographic ridgelines emerge from a quiet dotted plain.
- * The ramp runs faint→strong against the page ground: `·` and `/` fill
- * the open field, `,` marks crests, $, ¥, and € mark high contours, and
- * ₿ caps the strongest peaks. Geist Mono has no U+20BF glyph, so the ₿ is
+ * AsciiField — the hero's ground. A canvas grid of Geist Mono glyphs filling
+ * the whole section, drawn from the terrain heightfield in `@/lib/ascii` and
+ * morphing slowly between three scenes (see `timeline.ts`).
+ *
+ * The ramp runs faint→strong against the page ground: `·` and `/` fill the
+ * open field, `,` marks crests, $, ¥, and € mark high contours, and ₿ caps
+ * the strongest peaks. Geist Mono has no U+20BF glyph, so the ₿ is
  * synthesized: the font's own `B` plus the official symbol's two vertical
  * strokes drawn as rects — the same letterform on every platform, no
  * system-font fallback. If the font ever gains a native ₿ (probed at
  * runtime), it takes over.
  *
- * Theme: resolves like the site CSS — an html
- * data-theme="dark|light" attribute wins, else prefers-color-scheme —
- * and repaints live when either changes. Light ink on dark paper, dark
- * ink on light paper; the zinc ramp mirrors.
+ * Two clocks. `t` is field time (wall-clock × SPEED) and drives the noise;
+ * `wall` is plain elapsed seconds and drives the scene timeline and the
+ * pointer lens envelopes, which are specified in real seconds and must not
+ * inherit the field's speed scaling.
+ *
+ * Theme: resolves like the site CSS — an html data-theme="dark|light"
+ * attribute wins, else prefers-color-scheme — and repaints live when either
+ * changes. Light ink on dark paper, dark ink on light paper; the zinc ramp
+ * mirrors.
  *
  * Draws every 2nd rAF (~30fps), DPR capped at 2, pauses offscreen and on
  * hidden tabs, and renders a single static frame under reduced motion.
- * `staticTime` freezes the same renderer at a chosen moment for quieter
- * supporting surfaces.
+ * `staticTime` freezes the renderer at a chosen moment of pure terrain — no
+ * morph, no lens — for quieter supporting surfaces.
  */
 
-const CELL_W = 12;
-const CELL_H = 14;
 const FONT_SIZE = 12;
-const TERRAIN_SCALE = 0.13;
-const CONTOUR_SPACING = 0.08;
 const SPEED = 0.9;
 const FRAME_SKIP = 2;
 const MAX_DPR = 2;
-
-/* Brightness thresholds ascend toward the stronger glyph; cells below the
-   first threshold stay empty. High contours rotate through fiat symbols,
-   while the strongest level uses the runtime-resolved peak glyph (₿ when
-   the font carries it, else B). Fills are the zinc ramp, mirrored between
-   schemes. */
-/* The peak starts close enough to the high-contour band that ₿ appears as a
-   recurring signal across the terrain, not just at a handful of extrema. */
-const LEVEL_MIN = [40, 90, 140, 200, 216];
-const LEVEL_GLYPH = ["·", "/", ",", "", ""];
-const CURRENCY_GLYPHS = ["$", "¥", "€"];
-const CURRENCY_LEVEL = 3;
-const PEAK_LEVEL = 4;
 
 /* Synthesized-₿ strokes: two verticals piercing the B, centered ±DX from
    the glyph center, LEN px beyond its top and bottom edges. */
 const BTC_STROKE_W = 1;
 const BTC_STROKE_LEN = 2;
 const BTC_STROKE_DX = 1.25;
-const FILLS = {
-  light: ["#d4d4d8", "#a1a1aa", "#71717a", "#52525b", "#3f3f46"],
-  dark: ["#3f3f46", "#52525b", "#71717a", "#a1a1aa", "#d4d4d8"],
-};
 
-function noise(x: number, y: number, t: number): number {
-  return (
-    Math.sin(0.8 * x + 0.3 * t) * Math.cos(0.6 * y + 0.2 * t) * 0.5 +
-    0.25 * Math.sin(1.6 * x + 1.2 * y + 0.15 * t) +
-    Math.sin(0.3 * x - 0.4 * t) * Math.cos(0.4 * y + 0.25 * t) * 0.6 +
-    0.3 * Math.sin(0.5 * (x + y) + 0.35 * t) +
-    Math.sin(2.5 * x + 0.1 * t) * Math.cos(2.8 * y - 0.12 * t) * 0.15
-  );
-}
+/**
+ * Fraction of the height the readability mask holds fully transparent.
+ *
+ * Must track the second stop of `.ascii-field`'s vertical mask gradient in
+ * globals.css: those rows are painted into a mask that erases them, so
+ * computing them is pure waste. Keep the two in sync — if the CSS stop moves
+ * down and this doesn't, the field visibly clips.
+ */
+const MASK_DEAD_TOP = 0.09;
 
-function fractal(x: number, y: number, t: number): number {
-  return (
-    noise(x, y, t) +
-    0.4 * noise(2.2 * x, 2.2 * y, 0.7 * t) +
-    0.15 * noise(4.5 * x, 4.5 * y, 0.4 * t)
-  );
-}
+/* Where a scene sits in the field, as a fraction of the box. Pushed right and
+   low on wide screens so the mask's left dimmer doesn't eat half the figure,
+   and recentred once the copy spans the full measure. */
+const NARROW_BREAKPOINT = 768;
+const SCENE_CX_WIDE = 0.65;
+const SCENE_CY_WIDE = 0.62;
+const SCENE_CX_NARROW = 0.5;
+const SCENE_CY_NARROW = 0.64;
 
-function brightness(x: number, y: number, t: number): number {
-  const r = Math.min(1, Math.max(0, (fractal(x, y, t) + 1.8) / 3.6));
-  const s = (r % CONTOUR_SPACING) / CONTOUR_SPACING;
-  const onContour = s < 0.12 || s > 0.88;
-  let b = onContour ? Math.round(200 * r + 55) : Math.round(140 * r);
-  if (onContour) {
-    /* Steeper terrain sharpens its contour line. */
-    const gx = noise(x + 0.01, y, t) - noise(x - 0.01, y, t);
-    const gy = noise(x, y + 0.01, t) - noise(x, y - 0.01, t);
-    const d = 12 * Math.hypot(gx, gy);
-    if (d > 0.5) b = Math.min(255, b + Math.round(40 * d));
-  }
-  return b;
-}
+/* Scene sizing. The wallet pins the vault at 314 units across; a hero wants it
+   monumental, so both scenes scale to the box within sane bounds. */
+const VAULT_MIN_D = 380;
+const VAULT_MAX_D = 700;
+const VAULT_VMIN_FRACTION = 0.74;
+const BDHKE_W_FRACTION = 0.64;
+const BDHKE_H_FRACTION = 0.68;
+const SCENE_SCALE_MIN = 0.7;
+const SCENE_SCALE_MAX = 2.4;
 
-function pickLevel(b: number): number {
-  for (let i = LEVEL_MIN.length - 1; i >= 0; i--) {
-    if (b >= LEVEL_MIN[i]) return i;
-  }
-  return -1;
-}
+/** Seconds for one blind-signature round trip. */
+const ROUND_TRIP_SECONDS = 11;
 
-/* Stable spatial hash: a cell always keeps the same currency, so motion
-   comes from the terrain crossing thresholds rather than random shimmer. */
-function pickCurrencyGlyph(px: number, py: number): string {
-  const col = Math.floor(px / CELL_W);
-  const row = Math.floor(py / CELL_H);
-  const hash = Math.imul(col, 31) ^ Math.imul(row, 17);
-  const mixed = Math.imul(hash ^ (hash >>> 13), 1274126177);
-  return CURRENCY_GLYPHS[(mixed >>> 0) % CURRENCY_GLYPHS.length];
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.min(hi, Math.max(lo, v));
 }
 
 export default function AsciiField({
@@ -125,11 +128,12 @@ export default function AsciiField({
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    const dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
+    let dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
     let width = 0;
     let height = 0;
     let rafId = 0;
     let resizeRaf = 0;
+    let rectRaf = 0;
     let frameCount = 0;
     let disposed = false;
     let inView = true;
@@ -140,8 +144,16 @@ export default function AsciiField({
     let bBot = 4.5;
     const start = performance.now();
 
+    const field = createTerrainField(OPEN_FIELD_GAIN);
+    const pointer = new WarpPointer();
+    /* Cached so a pointermove never forces layout. Refreshed on resize and on
+       scroll (the hero moves under the viewport as the page scrolls); at most
+       one frame stale, which a hover lens cannot perceive. */
+    let rect = wrap.getBoundingClientRect();
+
     const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reduced = mqReduce.matches;
+    const mqFine = window.matchMedia("(hover: hover) and (pointer: fine)");
 
     /* Same resolution order as the CSS tokens: html data-theme wins, else
        the OS scheme. */
@@ -154,9 +166,11 @@ export default function AsciiField({
     };
     let dark = resolveDark();
 
-    const currentT = () =>
-      staticTime ??
-      (reduced ? 0 : ((performance.now() - start) / 1000) * SPEED);
+    /** Elapsed wall-clock seconds — the timeline's and the lens's clock. */
+    const currentWall = () =>
+      reduced ? 0 : (performance.now() - start) / 1000;
+    /** Field time — the noise's clock. */
+    const currentT = () => staticTime ?? currentWall() * SPEED;
 
     const resolveFont = () => {
       /* ctx.font can't take CSS vars; resolve the real family from the
@@ -186,7 +200,7 @@ export default function AsciiField({
       }
     };
 
-    const draw = (t: number) => {
+    const draw = (t: number, wall: number) => {
       ctx.clearRect(0, 0, width, height);
       ctx.font = fontString;
       ctx.textAlign = "center";
@@ -194,15 +208,115 @@ export default function AsciiField({
       const fills = dark ? FILLS.dark : FILLS.light;
       const cols = Math.ceil(width / CELL_W) + 1;
       const rows = Math.ceil(height / CELL_H) + 1;
+      /* Rows the mask erases outright are never computed. */
+      const firstRow = Math.floor((height * MASK_DEAD_TOP) / CELL_H);
+
+      field.resize(cols, rows);
+      field.update(t);
+
+      /* Scene composition. `staticTime` is documented as a quiet frame, so it
+         short-circuits to pure terrain rather than freezing mid-morph. */
+      const comp =
+        staticTime === undefined && !reduced
+          ? compositionAt(wall)
+          : { scene: "terrain" as const, mix: 0, sceneTime: 0 };
+      const narrow = width < NARROW_BREAKPOINT;
+      const cx = width * (narrow ? SCENE_CX_NARROW : SCENE_CX_WIDE);
+      const cy = height * (narrow ? SCENE_CY_NARROW : SCENE_CY_WIDE);
+      const vaultScale =
+        clamp(
+          Math.min(width, height) * VAULT_VMIN_FRACTION,
+          VAULT_MIN_D,
+          VAULT_MAX_D,
+        ) /
+        (2 * EXTENT_RADIUS);
+      const bdhkeScale = clamp(
+        Math.min(
+          (width * BDHKE_W_FRACTION) / (2 * EXTENT_X),
+          (height * BDHKE_H_FRACTION) / (2 * EXTENT_Y),
+        ),
+        SCENE_SCALE_MIN,
+        SCENE_SCALE_MAX,
+      );
+      const trip =
+        comp.scene === "bdhke"
+          ? roundTrip(comp.sceneTime / ROUND_TRIP_SECONDS)
+          : null;
+
+      /* Pointer lens. Advanced once per frame, before any sampling. */
+      pointer.advance(wall);
+      const k = reduced || staticTime !== undefined ? 0 : pointer.currentK(wall);
+      const lensR = k > 0 ? bloomedRadius(k) : 0;
+      const lensX = pointer.x;
+      const lensY = pointer.y;
+
       const buckets: number[][] = fills.map(() => []);
-      for (let row = 0; row < rows; row++) {
-        const y = (row + 0.5) * TERRAIN_SCALE;
+      for (let row = firstRow; row < rows; row++) {
+        const py = row * CELL_H + CELL_H / 2;
         for (let col = 0; col < cols; col++) {
-          const level = pickLevel(brightness((col + 0.5) * TERRAIN_SCALE, y, t));
+          const px = col * CELL_W + CELL_W / 2;
+
+          /* Sample position in pixels. Unwarped it is the cell centre; inside
+             the lens it is pulled toward the pointer, so the terrain visibly
+             flees it and the contour lines bend around the rim. */
+          let sx = px;
+          let sy = py;
+          let warped = false;
+          if (lensR > 0) {
+            const ddx = px - lensX;
+            const ddy = py - lensY;
+            const d = Math.hypot(ddx, ddy);
+            if (d > 0 && d < lensR) {
+              const f = displacement(d, k);
+              if (f > 0) {
+                const theta = swirlAngle(f);
+                const cos = Math.cos(theta);
+                const sin = Math.sin(theta);
+                const inv = f / d;
+                sx = px - (ddx * cos - ddy * sin) * inv;
+                sy = py - (ddx * sin + ddy * cos) * inv;
+                warped = true;
+              }
+            }
+          }
+          /* Warped cells leave the separable grid, so they pay the exact
+             per-cell field. At a 220px lens that is a few hundred cells —
+             nothing against the thousands the fast path covers. */
+          const terrainB = warped
+            ? brightness(
+                (sx / CELL_W) * TERRAIN_SCALE,
+                (sy / CELL_H) * TERRAIN_SCALE,
+                t,
+                OPEN_FIELD_GAIN,
+              )
+            : field.brightnessAt(col, row);
+
+          /* The morph is a brightness lerp, then a threshold — never a glyph
+             crossfade. Dots condense first and ₿ lands last, so the landscape
+             deforms into the shape instead of dissolving into it.
+             Weighted by coverage so the shape has full internal contrast
+             where it exists and the terrain is untouched where it doesn't. */
+          let b = terrainB;
+          if (comp.mix > 0) {
+            const isVault = comp.scene === "vault";
+            const scale = isVault ? vaultScale : bdhkeScale;
+            const cover = isVault
+              ? vaultCoverage(sx, sy, cx, cy, scale)
+              : bdhkeCoverage(sx, sy, cx, cy, scale);
+            if (cover > 0) {
+              const shapeB = isVault
+                ? vaultBrightness(sx, sy, cx, cy, terrainB, scale, true)
+                : bdhkeBrightness(sx, sy, cx, cy, terrainB, scale, trip!, t);
+              b = terrainB + (shapeB - terrainB) * comp.mix * cover;
+            }
+          }
+
+          const level = displayLevel(b);
           if (level < 0) continue;
-          buckets[level].push(col * CELL_W + CELL_W / 2, row * CELL_H + CELL_H / 2);
+          buckets[level].push(px, py);
         }
       }
+
       for (let level = 0; level < fills.length; level++) {
         const pts = buckets[level];
         if (pts.length === 0) continue;
@@ -229,10 +343,13 @@ export default function AsciiField({
       }
     };
 
+    const paintCurrent = () => draw(currentT(), currentWall());
+
     const tick = (now: number) => {
       frameCount++;
       if (frameCount % FRAME_SKIP === 0) {
-        draw(((now - start) / 1000) * SPEED);
+        const wall = (now - start) / 1000;
+        draw(wall * SPEED, wall);
       }
       rafId = requestAnimationFrame(tick);
     };
@@ -247,7 +364,7 @@ export default function AsciiField({
       }
       if (disposed) return;
       if (staticTime !== undefined || reduced) {
-        draw(currentT());
+        paintCurrent();
         return;
       }
       if (inView && document.visibilityState === "visible") {
@@ -259,7 +376,7 @@ export default function AsciiField({
        or reduced motion), repaint the current frame in the new ink. */
     const onThemeChange = () => {
       dark = resolveDark();
-      if (!rafId) draw(currentT());
+      if (!rafId) paintCurrent();
     };
 
     const applyCanvasSize = () => {
@@ -273,31 +390,95 @@ export default function AsciiField({
     const ro = new ResizeObserver((entries) => {
       cancelAnimationFrame(resizeRaf);
       resizeRaf = requestAnimationFrame(() => {
-        const rect = entries[entries.length - 1].contentRect;
-        width = rect.width;
-        height = rect.height;
+        const contentRect = entries[entries.length - 1].contentRect;
+        width = contentRect.width;
+        height = contentRect.height;
+        /* Re-resolved here, not captured once at setup: dragging the window
+           to a different-DPI monitor fires a resize but not a reload. */
+        dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
+        rect = wrap.getBoundingClientRect();
         applyCanvasSize();
-        draw(currentT());
+        paintCurrent();
       });
     });
 
-    const io = new IntersectionObserver((entries) => {
-      inView = entries[entries.length - 1].isIntersecting;
-      sync();
-    });
+    /* rootMargin pre-warms the field a little before it scrolls back in, so
+       returning to the top of the page never catches a blank frame. */
+    const io = new IntersectionObserver(
+      (entries) => {
+        inView = entries[entries.length - 1].isIntersecting;
+        sync();
+      },
+      { rootMargin: "20% 0px" },
+    );
 
     const mo = new MutationObserver(onThemeChange);
 
     const onVisibility = () => sync();
     const onReduceChange = (e: MediaQueryListEvent) => {
       reduced = e.matches;
+      if (reduced) pointer.reset();
       sync();
     };
 
+    /*
+     * Pointer lens.
+     *
+     * The field is `pointer-events: none` and stays that way — it lies under
+     * the headline and both CTAs, and must never intercept a click. So the
+     * lens listens on the window and hit-tests the cached rect itself. That
+     * also keeps the component free of any assumption about what wraps it.
+     *
+     * Mouse and pen only: on touch there is no hover, and a tap has to reach
+     * the buttons.
+     */
+    /* Tracked separately from `pointer.active`, which stays true through the
+       release settle. Keying re-entry off `active` would call move() instead of
+       engage() on a pointer that came back mid-decay, so the lens would follow
+       the cursor while still fading to nothing. */
+    let pointerInside = false;
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (reduced || staticTime !== undefined) return;
+      if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+      if (!mqFine.matches) return;
+      const now = (performance.now() - start) / 1000;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+        if (pointerInside) {
+          pointerInside = false;
+          pointer.release(now);
+        }
+        return;
+      }
+      if (pointerInside) {
+        pointer.move(x, y);
+      } else {
+        pointerInside = true;
+        /* engage() ramps from the current envelope, so coming back during the
+           settle resumes rather than snapping shut and reopening. */
+        pointer.engage(x, y, now);
+      }
+    };
+
+    const onPointerLeaveWindow = () => {
+      pointerInside = false;
+      pointer.release((performance.now() - start) / 1000);
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(rectRaf);
+      rectRaf = requestAnimationFrame(() => {
+        rect = wrap.getBoundingClientRect();
+      });
+    };
+
     resolveFont();
-    const rect = wrap.getBoundingClientRect();
-    width = rect.width;
-    height = rect.height;
+    const initial = wrap.getBoundingClientRect();
+    width = initial.width;
+    height = initial.height;
+    rect = initial;
     applyCanvasSize();
     sync();
 
@@ -310,6 +491,10 @@ export default function AsciiField({
     document.addEventListener("visibilitychange", onVisibility);
     mqReduce.addEventListener("change", onReduceChange);
     mqDark.addEventListener("change", onThemeChange);
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("pointerleave", onPointerLeaveWindow);
+    window.addEventListener("blur", onPointerLeaveWindow);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     /* Re-measure once webfonts settle: the first frames may paint in the
        fallback mono, and the ₿ probe is only meaningful post-load. */
@@ -322,19 +507,24 @@ export default function AsciiField({
     document.fonts.ready.then(() => {
       if (disposed) return;
       resolveFont();
-      if (!rafId) draw(currentT());
+      if (!rafId) paintCurrent();
     });
 
     return () => {
       disposed = true;
       cancelAnimationFrame(rafId);
       cancelAnimationFrame(resizeRaf);
+      cancelAnimationFrame(rectRaf);
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
       mqReduce.removeEventListener("change", onReduceChange);
       mqDark.removeEventListener("change", onThemeChange);
+      window.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerleave", onPointerLeaveWindow);
+      window.removeEventListener("blur", onPointerLeaveWindow);
+      window.removeEventListener("scroll", onScroll);
     };
   }, [staticTime]);
 

@@ -17,5 +17,6 @@ This project has a documented design system. Before generating UI, styling compo
 - No gradient text, no side-stripe borders. Glass (blur + translucency) exists on exactly one sanctioned surface — the navbar's condensed box — nowhere else.
 - Three typefaces only — GT-Standard (everything readable), Geist Mono (technical), Geist Pixel Square (protocol notation). No third.
 - Hero headline must be Display: GT-Standard 600, ≥3.75rem, line-height 0.95.
+- The hero ASCII field (`src/lib/ascii/`) is full-bleed and morphs on a 92s loop: terrain → vault door → blind-signature round trip → terrain, with a pointer lens. Two DESIGN.md §4 rules were amended for it on 2026-08-14 (Fold-Line, Honest-Network) — read those entries before changing the hero's geometry, mask, or scene list. `terrain.ts` and `vault.ts` are pinned by parity fixtures in cashubtc/wallet; retuning their constants is a keep-in-lockstep edit with that repo.
 
 When in doubt, run `/impeccable critique` against the surface in question before shipping.
