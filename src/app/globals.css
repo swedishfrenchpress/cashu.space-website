@@ -418,18 +418,46 @@ html {
 /*
  * Spec pane left padding clears the floating Implementations Card on lg+.
  * The offset is the Card's effective right edge (340px width, sitting at
- * left: 0 in the absolute parent) plus a breathing-room hair (≈40px). Lives
- * as a token so we can tune it in one place instead of inline magic numbers
- * scattered across the component.
+ * left: 0 in the absolute parent) minus wherever the centred pane starts,
+ * plus a breathing-room hair. Lives as a token so we can tune it in one place
+ * instead of inline magic numbers scattered across the component.
+ *
+ * Both this and the pane's max width were retuned together (2026-08-14): the
+ * pane was 768px carrying a 437px longest line, so ~90px of its content box
+ * was dead air on the right. At 704px the pane starts 34px further right,
+ * which cuts the Card overlap to ~138px, so the offset comes down with it and
+ * the code keeps the same ~37px clearance from the Card's edge. Change one
+ * and you must recheck the other.
  */
 :root {
-  --spec-card-offset: 200px;
+  --spec-card-offset: 176px;
 }
 
 @media (min-width: 1024px) {
   .spec-pane {
     padding-left: var(--spec-card-offset);
   }
+}
+
+/*
+ * Comment column for the spec pane. Holds the code half of a commented line so
+ * the `//` column starts at a fixed x.
+ *
+ * Space padding cannot do this job here. The pixel face (Geist Pixel Square,
+ * 16px) advances 9.12px where Geist Mono advances 8.4px — measured, not
+ * assumed — so a line carrying a mint id or a sat amount runs about 1.09x
+ * wide and drifts more than a character out of column. Sizing in `ch` resolves
+ * against the pre's own mono face, so the column is stable whatever notation
+ * the value is set in.
+ *
+ * 32ch fits the widest code half (the keyset-id line, ~30.6ch once the pixel
+ * run is accounted for) with a little headroom. Grow it if a longer value
+ * lands here; `white-space: pre` means an overflowing line pushes its comment
+ * right rather than wrapping, which is visible immediately.
+ */
+.spec-code {
+  display: inline-block;
+  width: 32ch;
 }
 
 @keyframes fadeIn {
@@ -1114,40 +1142,101 @@ html:not(.js) .reveal {
   gap: clamp(2.5rem, 5vw, 4rem);
 }
 
-/*
- * The band ships wrapped in a Reveal, so the hero's second flex child is that
- * wrapper, not .ascii-field itself. An auto top margin drops it to the
- * section's base: surplus viewport height collects as air ABOVE the terrain,
- * never inside it, and the band keeps its own height at every screen size.
- *
- * Child combinator on purpose — the headline / body / CTA Reveals are nested
- * inside .hero-spec__inner and must not pick this up.
- */
-.hero-spec > .reveal {
-  margin-top: auto;
-}
-
 .hero-spec__content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  text-align: center;
   gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
-/* Page peak. CLAUDE.md is explicit: hero headline = GT-Standard 600,
-   ≥3.75rem, line-height 0.95. Held to t-display proportions on a tight
-   max-width so the line break lands where the asymmetric grid expects. */
+/*
+ * Page peak. CLAUDE.md is explicit: hero headline = GT-Standard 600,
+ * ≥3.75rem, line-height 0.95.
+ *
+ * It now runs at the full t-display scale, which is the role this element
+ * was always supposed to have: the ramp comment at the top of this file
+ * lists t-display's job as "Page peaks: hero, page-closing CTA, route H1s",
+ * and DESIGN.md §1 states the hero runs 6rem-9rem.
+ *
+ * The bespoke clamp(3.75rem, 7vw, 6.5rem) that used to live here honoured
+ * neither. It pinned at 6.5rem -- the very bottom of the documented range --
+ * on any viewport past ~1486px, and fell to 5.6rem at 1280px, under the
+ * stated floor. The measurable cost: the /wallets route H1 rendered 29%
+ * larger than the homepage hero at 1440px and 38% larger at 1920px, so a
+ * secondary page out-shouted the page peak. The hero read flat because it
+ * had quietly opted out of the system's strongest move.
+ *
+ * Nothing new was introduced to fix it. This is t-display's own scale, and
+ * the deck and body around it were deliberately left alone so the headline
+ * reads as the peak rather than everything getting louder together.
+ */
 .hero-spec__headline {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(3.75rem, 7vw, 6.5rem);
+  font-size: clamp(3.75rem, 9vw, 9rem);
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
+  /* No optical-left correction: the hero is centred, so there is no left
+     margin for glyph side bearing to sit against. The corrections that used
+     to live here (headline 0.058em, deck and body 0.095em) were removed with
+     the switch to centred — reinstate them together if it ever goes back to
+     left-aligned, or the ink staggers by up to 8px at large sizes. */
+  margin: 0;
+  color: var(--ink);
+  /*
+   * The headline is the one element allowed out of the page shell.
+   *
+   * Inside it the box caps at --page-max minus gutters: 1088px from 1600px
+   * viewport upward. At 144px the line needs ~1283px to break cleanly in two,
+   * so it was forced to three and left "bitcoin." orphaned — with 1408-2368px
+   * of viewport sitting unused beside it. The shell cap was doing the damage,
+   * not the type size.
+   *
+   * Sized off the viewport instead so it uses the room that is actually
+   * there, capped at 1440px so it stops growing on ultrawide rather than
+   * running to the edges. The lead and CTA stay in the shell; a headline
+   * spanning wider than its supporting copy is the point of a centred
+   * composition, not a misalignment.
+   */
+  width: min(calc(100vw - 2 * var(--page-x)), 1440px);
+  max-width: none;
+  text-wrap: balance;
+}
+
+/*
+ * Deck and body are one unit: a tight internal gap against the much larger
+ * gap .hero-spec__content puts between the headline, the lead, and the CTA
+ * row. Tight group, generous separation.
+ */
+.hero-spec__lead {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 1.1vw, 0.875rem);
+}
+
+/*
+ * Deck — the standfirst. Not an eyebrow: it sits below the headline and above
+ * the body, and it carries the page's claim rather than labelling it.
+ *
+ * The three properties used to be the first line of the body paragraph, set
+ * at body size and weight above a longer sentence, so the punchiest text in
+ * the hero was reading from the second chair. Promoting it needs its own
+ * role because the gap it has to cover is large: the headline is 100px/600
+ * and the body is 23px/400.
+ *
+ * Separated from the body on three axes at once — size, weight, and tone —
+ * so the two roles stay distinguishable at 390px, where the size step
+ * compresses from 1.48x to 1.33x and size alone would stop carrying it.
+ */
+.hero-spec__deck {
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   color: var(--ink);
   margin: 0;
-  width: 100%;
-  max-width: none;
   text-wrap: balance;
 }
 
@@ -1159,8 +1248,15 @@ html:not(.js) .reveal {
   letter-spacing: -0.005em;
   color: var(--body);
   margin: 0;
-  width: 100%;
-  max-width: none;
+  /*
+   * A real cap, not `none`. The old copy only stayed in measure because a
+   * <br /> forced its break; a flowing sentence in a flex-start column grows
+   * to its natural width, which at 23px runs past the 75ch reading ceiling.
+   * `ch` is the "0" advance and GT-Standard's zero is wide, so 46ch lands
+   * around 65-70 characters of mixed-case prose.
+   */
+  max-width: 46ch;
+  margin-inline: auto;
   text-wrap: pretty;
 }
 
@@ -1170,30 +1266,123 @@ html:not(.js) .reveal {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: clamp(0.75rem, 1.5vw, 1rem);
 }
 
 /*
- * ASCII terrain band — full-bleed contour field at the hero's base.
- * Height is a viewport-tuned strip, not a ratio; the top edge dissolves
- * into the white above via a mask so the terrain reads as emerging from
- * the page, and the section's bottom hairline crops it like a figure rule.
+ * ASCII field — the hero's ground. A live contour field that fills the whole
+ * section, morphing slowly between terrain, the vault door, and the
+ * blind-signature round trip (see src/lib/ascii/).
+ *
+ * The Reveal wrapper carries the positioning, not .ascii-field itself: while
+ * unrevealed, .reveal holds `will-change: transform`, which establishes a
+ * containing block: an absolutely positioned child inside it would resolve
+ * inset:0 against a zero-height box and paint nothing until the reveal
+ * landed. Positioning the wrapper instead resolves against .hero-spec, which
+ * is already `position: relative; isolation: isolate`.
+ *
+ * z-index 0 keeps it under .hero-spec__inner's z-index 1 without leaving the
+ * hero's stacking context.
  */
-.hero-spec__band {
-  margin-top: clamp(3rem, 6vw, 5rem);
+.hero-spec__field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
 .ascii-field {
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: clamp(180px, 26vh, 320px);
+  height: 100%;
   pointer-events: none;
   user-select: none;
   /* The canvas resolves its ctx.font from this computed family. */
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 30%);
+  /*
+   * Readability mask, two gradients intersected.
+   *
+   * Vertical: fully transparent behind the sticky bar, still faint through the
+   * headline's band, full only past the CTA row — the copy always reads
+   * against near-open paper. The flat transparent run to 9% is load-bearing
+   * twice over: it stops the field competing with the navbar, and the renderer
+   * skips those rows outright (MASK_DEAD_TOP in ascii-field.tsx — keep the two
+   * numbers in sync or the field visibly clips).
+   *
+   * Horizontal: symmetric. The copy is centred, so the field is held down
+   * through the middle where the words are and runs at full strength out to
+   * both edges, framing the column rather than sitting behind it. It was a
+   * one-sided left dimmer while the copy was left-aligned; that shape would
+   * now quiet the wrong side. Between the two masks they keep the Fold-Line
+   * Rule's composition — title at the top, horizon at the bottom — as a
+   * density gradient rather than as the old band's height.
+   *
+   * mask-composite: intersect is the standard keyword; -webkit-mask-composite
+   * spells the same operation `source-in`. Both are listed because Safari
+   * honours the prefixed mask-image property and needs the prefixed keyword to
+   * match it.
+   */
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 9%,
+      rgb(0 0 0 / 0.32) 36%,
+      #000 70%
+    ),
+    linear-gradient(
+      to right,
+      #000 0,
+      rgb(0 0 0 / 0.26) 26%,
+      rgb(0 0 0 / 0.26) 74%,
+      #000 100%
+    );
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 9%,
+      rgb(0 0 0 / 0.32) 36%,
+      #000 70%
+    ),
+    linear-gradient(
+      to right,
+      #000 0,
+      rgb(0 0 0 / 0.26) 26%,
+      rgb(0 0 0 / 0.26) 74%,
+      #000 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/*
+ * Below the lg breakpoint the copy spans the full measure, so a left-edge
+ * dimmer would carve a hole out of nothing. Flatten the horizontal pass to a
+ * uniform hold-down and let the vertical fade do the work alone.
+ */
+@media (max-width: 767px) {
+  .ascii-field {
+    -webkit-mask-image:
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 9%,
+        rgb(0 0 0 / 0.26) 40%,
+        #000 78%
+      ),
+      linear-gradient(to right, rgb(0 0 0 / 0.45) 0, rgb(0 0 0 / 0.45) 100%);
+    mask-image:
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 9%,
+        rgb(0 0 0 / 0.26) 40%,
+        #000 78%
+      ),
+      linear-gradient(to right, rgb(0 0 0 / 0.45) 0, rgb(0 0 0 / 0.45) 100%);
+  }
 }
 
 /* Absolutely positioned so the bitmap size can never feed back into the
@@ -2091,11 +2280,14 @@ html:not(.js) .reveal {
   background-color: var(--card);
 }
 
-/* RFC-style caption: "Fig. NN" in the micro register, thesis in GT body
-   small. Sits outside the plate on the ground — the figure is the object,
-   the caption is the document's voice describing it. No rule above it:
-   the plate's own bottom keyline already draws the line (Hairline Rule —
-   no double rules). */
+/* RFC-style caption: the thesis sentence in GT body small. Sits outside the
+   plate on the ground — the figure is the object, the caption is the
+   document's voice describing it. No rule above it: the plate's own bottom
+   keyline already draws the line (Hairline Rule — no double rules).
+
+   The "Fig. NN" number that used to lead this line was dropped 2026-08-14;
+   .fig-caption__num went with it. Nothing in the copy referred to a figure
+   by number, so the label was register costume, not navigation. */
 .fig-caption {
   display: flex;
   align-items: baseline;
@@ -2104,14 +2296,6 @@ html:not(.js) .reveal {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
 }
 
-.fig-caption__num {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink);
-  white-space: nowrap;
-}
 
 .fig-caption__text {
   font-size: 0.875rem;
@@ -2610,6 +2794,38 @@ html:not(.js) .reveal {
   font-size: 0.8125rem;
   line-height: 1.3;
   color: var(--muted);
+}
+
+/*
+ * Status tag — maturity, not surface. "Beta" answers a different question
+ * from "iOS and Android", so it stops looking like the same kind of fact.
+ *
+ * Sharp, flat, hairline-outlined: the Flat Cipher Slab language one size
+ * down, not a rounded pill. `border-radius: 0` is doctrinal here — nothing
+ * on this site is rounded except the navbar's condensed box — and there is
+ * no fill and no shadow, so it reads as a stamped rim rather than a chip
+ * borrowed from a SaaS dashboard.
+ *
+ * Added 2026-08-14 on the user's direction. Worth knowing for whoever adds
+ * the next one: the project's own guidance treats badge chips as a
+ * category tell to avoid, so this stays limited to STATUS_FACTS and must
+ * not spread to descriptive facts.
+ */
+.wallet-row__fact--tag {
+  border: 1px solid var(--hair);
+  border-radius: 0;
+  padding: 2px 7px;
+  /* The `micro` step (0.75rem / 500 / 0.06em uppercase) — the ramp already
+     owns exactly this register, so the tag uses it rather than the 0.6875rem
+     I first reached for by eye. A new step for a one-off tag would have been
+     an unjustified addition to the scale. */
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  align-self: center;
 }
 
 /* Open chip — a real button, sized down a touch from the page CTA so a

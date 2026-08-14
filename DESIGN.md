@@ -20,7 +20,7 @@ typography:
     letterSpacing: "-0.02em"
   heroDisplay:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(3.75rem, 7vw, 6.5rem)"
+    fontSize: "clamp(3.75rem, 9vw, 9rem)"
     fontWeight: 600
     lineHeight: 0.95
     letterSpacing: "-0.02em"
@@ -60,6 +60,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "-0.005em"
+  heroDeck:
+    fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(1.5rem, 2.4vw, 2.25rem)"
+    fontWeight: 500
+    lineHeight: 1.15
+    letterSpacing: "-0.015em"
   label:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.875rem"
@@ -159,14 +165,14 @@ cashu.space dresses an open protocol in the visual register of a published RFC. 
 
 The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no animated tickers, no testimonial carousels, and no glassmorphism outside its one sanctioned surface (the navbar).
 
-Motion is permitted under one condition: it must depict real protocol structure. The hero overlays mint markers and animated dotted lines between them to show Lightning Network bridging — a true property of the protocol — never a decorative flow. See the Honest-Network Rule in §4.
+Motion is permitted under one condition: it must depict real protocol structure, or be plain material carrying no assertion at all. The hero's ground is a live ASCII field — a contour heightfield drawn in Geist Mono glyphs — that fills the section and cycles slowly between open terrain, a vault door, and a schematic of the blind-signature round trip that Cashu actually performs. A pointer lens bends the contour lines around the cursor. Never a decorative flow, and never a connection the protocol doesn't make. See the Honest-Network Rule in §4, and `src/lib/ascii/` for the field itself.
 
 Color is intentionally absent from everything the site says in its own voice. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal. The one carve-out is the Depicted-World Exception (§2): artifacts the page *depicts* — the tap-to-pay video, third-party marks — keep their source colour, because faking them grey would be its own kind of dishonesty.
 
 **Key Characteristics:**
 
 - Monochrome by doctrine: paper, ink, six grades of grey, no chromatic accent.
-- Display type does the heaviest lifting: GT-Standard at 6rem–9rem on the hero, set tight (line-height 0.95, letter-spacing −0.02em).
+- Display type does the heaviest lifting: the hero runs the full `t-display` scale, `clamp(3.75rem, 9vw, 9rem)`, set tight (line-height 0.95, letter-spacing −0.02em). It reaches 9rem past 1600px and holds there. Until 2026-08-14 the hero carried a bespoke `clamp(3.75rem, 7vw, 6.5rem)` that pinned at the bottom of this range and let the `/wallets` route H1 render 29% larger than the homepage peak; the bespoke step is gone.
 - Generous editorial whitespace; sections breathe at 80–128px vertical rhythm on large screens.
 - Sharp flat-slab buttons, hairline dividers, and no shadows — hierarchy comes from fill, border, position, and weight.
 - Cashu's protocol artefacts (amounts, ids, addresses) are set in Geist Pixel Square as a deliberate notation contrast.
@@ -211,8 +217,8 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 ### Hierarchy
 
-- **Display** (weight 600, `clamp(3.75rem, 9vw, 9rem)`, line-height 0.95, letter-spacing −0.02em): Short page-peak copy — the closing-CTA slogan, the H1 on dedicated routes (`/wallets`, future `/docs`, `/blog`). Sized to be monumental, which means it only fits copy under ~25 characters. Long descriptive hero prose does not belong at Display; it gets a bespoke scale below Display and above Headline, justified inline. The line break in Display copy is part of the composition, not an accident of viewport.
-- **Homepage Display** (weight 600, `clamp(3.75rem, 7vw, 6.5rem)`, line-height 0.95, letter-spacing −0.02em): The longer homepage statement, scaled below route Display so it can share the full content grid without shouting.
+- **Display** (weight 600, `clamp(3.75rem, 9vw, 9rem)`, line-height 0.95, letter-spacing −0.02em): Short page-peak copy — the closing-CTA slogan, the H1 on dedicated routes (`/wallets`, future `/docs`, `/blog`). Sized to be monumental. The line break in Display copy is part of the composition, not an accident of viewport. The homepage hero runs at this scale too — see below.
+- **Homepage Display** — *retired 2026-08-14, on the user's direction.* This was a bespoke `clamp(3.75rem, 7vw, 6.5rem)` step for the homepage H1, on the reasoning that longer descriptive hero prose should sit below route Display "so it can share the full content grid without shouting." The reasoning was deliberate and it was wrong in practice: the step pinned at 6.5rem past ~1486px and fell to 5.6rem at 1280px, so the homepage hero — the page peak — rendered **29% smaller than the `/wallets` route H1 at 1440px and 38% smaller at 1920px**. A secondary route out-shouted the front door, and the hero read flat for exactly that reason. The hero now uses Display unmodified. Measured across 360–2560px: no horizontal overflow, and the section still resolves on the fold at every size (2 lines to 1440px, 3 lines past 1600px, 4 on phones, unchanged from before). Do not reintroduce a homepage-only display step; if the hero copy grows too long for Display, shorten the copy.
 - **Footer Display** (weight 600, `clamp(3.75rem, 6vw, 5rem)`, line-height 0.95, letter-spacing −0.02em): The compact closing wordmark.
 - **Headline** (weight 600, `clamp(2rem, 4vw, 3rem)`, line-height 1.05, letter-spacing −0.015em): Section openings ("What is ecash?", "Wallets", "Mints").
 - **Title** (weight 600, `1.125rem`, line-height 1.3): Subheaders, card titles, anything ranked above body but below a section opening.
@@ -242,9 +248,21 @@ Buttons communicate interaction through contrasting fill, a precise border, quic
 
 **The Hairline Rule.** Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.
 
-**The Fold-Line Rule.** The hero fills one viewport height (`min(100svh - var(--nav-h), var(--hero-max))`) and anchors the terrain band to its base, so the closing hairline resolves *on* the fold rather than floating above it with dead ground below. Surplus height collects as air between the CTA row and the band — that gap is load-bearing composition, not a spacing bug, and must not be "corrected" by growing the band or centring the text. Two bounds keep it honest: `--nav-h` is subtracted because the bar is sticky and occupies flow space, and `--hero-max` (1200px) stops the chase on very tall displays, where an uncapped hero would open a void instead of a horizon. Past the cap the next section peeks in, which is the intended degradation.
+**The Fold-Line Rule.** The hero fills one viewport height (`min(100svh - var(--nav-h), var(--hero-max))`) and reads as a spec cover: title at the top, horizon at the bottom, the closing hairline resolving *on* the fold rather than floating above it with dead ground below. Two bounds keep it honest: `--nav-h` is subtracted because the bar is sticky and occupies flow space, and `--hero-max` (1200px) stops the chase on very tall displays, where an uncapped hero would open a void instead of a horizon. Past the cap the next section peeks in, which is the intended degradation.
+
+*Amended 2026-08-14, on the user's direction.* The ASCII field was a `clamp(180px, 26vh, 320px)` band pinned to the section's base; it is now a full-bleed layer filling the hero, with the copy sitting on top of it. **The rule's substance is unchanged — only its mechanism is.** "Title at the top, horizon at the bottom" is now enforced by the field's mask rather than by the band's height: a vertical gradient holds the field fully transparent behind the sticky bar and near-transparent through the headline, and a horizontal gradient holds down the left column where the copy is left-aligned, so density still collects toward the bottom-right. That density gradient is load-bearing composition and must not be "corrected" by flattening the mask to uniform. The old prohibition on growing the band is retired with the band.
 
 **The Honest-Network Rule.** Network visualisations and motion are permitted *only when they reflect real protocol structure*. Acceptable: Lightning Network bridges shown as animated dotted lines between mint markers; peer-to-peer token transfer between users. Forbidden: decorative flow, speculative connections, "mints talking to mints" (which Cashu doesn't do), or any animation that exists for aesthetic energy rather than to convey a true property of the protocol. When in doubt, the simpler static version is more honest than the animated one.
+
+*Amended 2026-08-14, on the user's direction, for the hero ASCII field.* The field cycles slowly (92s) between three named scenes, and each clears the rule on its own terms:
+
+- **Terrain** is a contour heightfield. It depicts nothing and claims nothing — it is a material, like paper grain. Texture is outside the rule's scope; the rule governs things that assert a structure.
+- **The vault door** is a depicted object, not a network. It carries no edges and implies no topology.
+- **The blind-signature round trip** *is* protocol structure, and is the scene that earns the motion: Alice's secret stays on her side, the blinded point travels out, the mint signs without seeing it, the signature returns, and the secret plus the signature resolve into a bearer token. Two nodes, one round trip, no third party. The travelling dashes are the same device the rule already blesses for Lightning bridges.
+
+What stays forbidden is unchanged and explicit: no mint-to-mint edge, no speculative connections, no third node standing in for "the network", and no scene added to the cycle purely because it would look good. A world map was proposed and rejected on exactly this ground — it asserts a global reach the protocol does not itself claim.
+
+*Recorded waiver, same date.* The `$ ¥ €` glyphs on high contours and `₿` at the peaks (`terrain.ts`) depict no protocol structure; the 2026-07-26 critique flagged this. It is retained as the site's own voice and the ₿ density was deliberately increased (`PEAK_BOOST`). Noted here so it is a decision rather than an oversight.
 
 ## 5. Components
 
