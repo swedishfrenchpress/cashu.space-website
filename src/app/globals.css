@@ -1177,8 +1177,25 @@ html:not(.js) .reveal {
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
+  /*
+   * Optical left alignment. Every element in the hero shares one layout box
+   * edge, but glyphs carry side bearing and buttons do not, so the *inked*
+   * left margin staggered four ways: at 1440px the CTA border sat at 166.4px,
+   * the body's "E" at 168.7, the deck's "I" at 169.8 and the headline's "O" at
+   * 173.9 — the headline 7.5px adrift, and worse as the type grows.
+   *
+   * Measured bearings for GT-Standard 600: "O" 0.058em, "e" 0.048em,
+   * "b" 0.081em. There is no single value that squares every line, so this
+   * aligns the first line — the one that actually reads against the margin —
+   * and leaves the rest within 1-3px instead of 7.5.
+   *
+   * em, so it tracks the clamp at every width. Negative margin rather than
+   * text-indent because text-indent moves only the first line, which would
+   * make a multi-line headline *more* ragged, not less. The box shifts whole,
+   * so the wrap width is unchanged.
+   */
+  margin: 0 0 0 -0.058em;
   color: var(--ink);
-  margin: 0;
   width: 100%;
   max-width: none;
   text-wrap: balance;
@@ -1216,7 +1233,11 @@ html:not(.js) .reveal {
   line-height: 1.15;
   letter-spacing: -0.015em;
   color: var(--ink);
-  margin: 0;
+  /* Optical left, same correction as the headline. Tuned for a flat-sided
+     cap: GT-Standard gives E, I, H and friends 0.095em of left bearing where
+     round caps like O carry 0.058em. This line starts "Instant", so 0.095em.
+     If the copy ever opens on a round letter, retune or the line overhangs. */
+  margin: 0 0 0 -0.095em;
   text-wrap: balance;
 }
 
@@ -1227,7 +1248,8 @@ html:not(.js) .reveal {
   line-height: 1.5;
   letter-spacing: -0.005em;
   color: var(--body);
-  margin: 0;
+  /* Optical left. "Every" opens on a flat-sided cap — see the deck above. */
+  margin: 0 0 0 -0.095em;
   /*
    * A real cap, not `none`. The old copy only stayed in measure because a
    * <br /> forced its break; a flowing sentence in a flex-start column grows
