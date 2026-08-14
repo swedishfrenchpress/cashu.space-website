@@ -1145,8 +1145,8 @@ html:not(.js) .reveal {
 .hero-spec__content {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
+  align-items: center;
+  text-align: center;
   gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
@@ -1177,26 +1177,29 @@ html:not(.js) .reveal {
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
-  /*
-   * Optical left alignment. Every element in the hero shares one layout box
-   * edge, but glyphs carry side bearing and buttons do not, so the *inked*
-   * left margin staggered four ways: at 1440px the CTA border sat at 166.4px,
-   * the body's "E" at 168.7, the deck's "I" at 169.8 and the headline's "O" at
-   * 173.9 — the headline 7.5px adrift, and worse as the type grows.
-   *
-   * Measured bearings for GT-Standard 600: "O" 0.058em, "e" 0.048em,
-   * "b" 0.081em. There is no single value that squares every line, so this
-   * aligns the first line — the one that actually reads against the margin —
-   * and leaves the rest within 1-3px instead of 7.5.
-   *
-   * em, so it tracks the clamp at every width. Negative margin rather than
-   * text-indent because text-indent moves only the first line, which would
-   * make a multi-line headline *more* ragged, not less. The box shifts whole,
-   * so the wrap width is unchanged.
-   */
-  margin: 0 0 0 -0.058em;
+  /* No optical-left correction: the hero is centred, so there is no left
+     margin for glyph side bearing to sit against. The corrections that used
+     to live here (headline 0.058em, deck and body 0.095em) were removed with
+     the switch to centred — reinstate them together if it ever goes back to
+     left-aligned, or the ink staggers by up to 8px at large sizes. */
+  margin: 0;
   color: var(--ink);
-  width: 100%;
+  /*
+   * The headline is the one element allowed out of the page shell.
+   *
+   * Inside it the box caps at --page-max minus gutters: 1088px from 1600px
+   * viewport upward. At 144px the line needs ~1283px to break cleanly in two,
+   * so it was forced to three and left "bitcoin." orphaned — with 1408-2368px
+   * of viewport sitting unused beside it. The shell cap was doing the damage,
+   * not the type size.
+   *
+   * Sized off the viewport instead so it uses the room that is actually
+   * there, capped at 1440px so it stops growing on ultrawide rather than
+   * running to the edges. The lead and CTA stay in the shell; a headline
+   * spanning wider than its supporting copy is the point of a centred
+   * composition, not a misalignment.
+   */
+  width: min(calc(100vw - 2 * var(--page-x)), 1440px);
   max-width: none;
   text-wrap: balance;
 }
@@ -1233,11 +1236,7 @@ html:not(.js) .reveal {
   line-height: 1.15;
   letter-spacing: -0.015em;
   color: var(--ink);
-  /* Optical left, same correction as the headline. Tuned for a flat-sided
-     cap: GT-Standard gives E, I, H and friends 0.095em of left bearing where
-     round caps like O carry 0.058em. This line starts "Instant", so 0.095em.
-     If the copy ever opens on a round letter, retune or the line overhangs. */
-  margin: 0 0 0 -0.095em;
+  margin: 0;
   text-wrap: balance;
 }
 
@@ -1248,8 +1247,7 @@ html:not(.js) .reveal {
   line-height: 1.5;
   letter-spacing: -0.005em;
   color: var(--body);
-  /* Optical left. "Every" opens on a flat-sided cap — see the deck above. */
-  margin: 0 0 0 -0.095em;
+  margin: 0;
   /*
    * A real cap, not `none`. The old copy only stayed in measure because a
    * <br /> forced its break; a flowing sentence in a flex-start column grows
@@ -1258,6 +1256,7 @@ html:not(.js) .reveal {
    * around 65-70 characters of mixed-case prose.
    */
   max-width: 46ch;
+  margin-inline: auto;
   text-wrap: pretty;
 }
 
@@ -1267,6 +1266,7 @@ html:not(.js) .reveal {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: clamp(0.75rem, 1.5vw, 1rem);
 }
 
@@ -1310,10 +1310,13 @@ html:not(.js) .reveal {
    * skips those rows outright (MASK_DEAD_TOP in ascii-field.tsx — keep the two
    * numbers in sync or the field visibly clips).
    *
-   * Horizontal: the copy is left-aligned, so the left column is held down and
-   * the field runs densest toward the bottom-right. Between them they keep the
-   * Fold-Line Rule's composition — title at the top, horizon at the bottom —
-   * now as a density gradient rather than as the band's height.
+   * Horizontal: symmetric. The copy is centred, so the field is held down
+   * through the middle where the words are and runs at full strength out to
+   * both edges, framing the column rather than sitting behind it. It was a
+   * one-sided left dimmer while the copy was left-aligned; that shape would
+   * now quiet the wrong side. Between the two masks they keep the Fold-Line
+   * Rule's composition — title at the top, horizon at the bottom — as a
+   * density gradient rather than as the old band's height.
    *
    * mask-composite: intersect is the standard keyword; -webkit-mask-composite
    * spells the same operation `source-in`. Both are listed because Safari
@@ -1328,7 +1331,13 @@ html:not(.js) .reveal {
       rgb(0 0 0 / 0.32) 36%,
       #000 70%
     ),
-    linear-gradient(to right, rgb(0 0 0 / 0.26) 0, rgb(0 0 0 / 0.26) 30%, #000 68%);
+    linear-gradient(
+      to right,
+      #000 0,
+      rgb(0 0 0 / 0.26) 26%,
+      rgb(0 0 0 / 0.26) 74%,
+      #000 100%
+    );
   mask-image:
     linear-gradient(
       to bottom,
@@ -1337,7 +1346,13 @@ html:not(.js) .reveal {
       rgb(0 0 0 / 0.32) 36%,
       #000 70%
     ),
-    linear-gradient(to right, rgb(0 0 0 / 0.26) 0, rgb(0 0 0 / 0.26) 30%, #000 68%);
+    linear-gradient(
+      to right,
+      #000 0,
+      rgb(0 0 0 / 0.26) 26%,
+      rgb(0 0 0 / 0.26) 74%,
+      #000 100%
+    );
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
