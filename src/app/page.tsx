@@ -43,19 +43,12 @@ export default function Home() {
                 Open source ecash for bitcoin.
               </h1>
             </Reveal>
-            {/* Deck then body, grouped so they share a tight gap and read as
-                one unit under the headline. The deck carries the claim; the
-                body carries the mechanism that makes the claim true. The old
-                single paragraph put the three properties in a subordinate
-                line above a sentence that restated the headline. */}
+            {/* The deck stands alone. The body sentence explaining the
+                blind-signature mechanism was cut 2026-08-14 on the user's
+                direction — the field's morph depicts the round trip, so the
+                copy doesn't restate it. Don't refill this slot. */}
             <Reveal immediate delay={240}>
-              <div className="hero-spec__lead">
-                <p className="hero-spec__deck">Instant, bearer, peer-to-peer.</p>
-                <p className="hero-spec__body">
-                  Every Cashu token is blind-signed, so the mint cannot link
-                  the one you spend to the one it signed.
-                </p>
-              </div>
+              <p className="hero-spec__deck">Instant, bearer, peer-to-peer.</p>
             </Reveal>
             <Reveal immediate delay={360}>
               <div className="hero-spec__cta">

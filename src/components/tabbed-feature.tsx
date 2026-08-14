@@ -13,6 +13,7 @@ type Tab = {
   cta: string;
   href: string;
   external?: boolean;
+  defaultView?: "ui" | "api";
 };
 
 const TABS: Tab[] = [
@@ -44,6 +45,10 @@ const TABS: Tab[] = [
     cta: "Read the spec",
     href: "https://docs.cashu.space/",
     external: true,
+    /* Arrives flipped to Code: one panel opening on the other view shows
+       the toggle is a toggle, and the spec's strongest material is the
+       file itself. */
+    defaultView: "api",
   },
   {
     id: "tokens",
@@ -180,7 +185,11 @@ export default function TabbedFeature() {
                   {/* Demo panel: captioned figure plate ↔ protocol code on a
                       shared drafting-sheet ground. The plate is the panel's
                       only visual focal point. */}
-                  <ProtocolDemo demo={tab.id} label={tab.label} />
+                  <ProtocolDemo
+                    demo={tab.id}
+                    label={tab.label}
+                    defaultView={tab.defaultView}
+                  />
                 </Reveal>
                 <div className="feature-block__action">
                   {tab.external ? (

@@ -19,12 +19,24 @@ const AI_LINKS: { name: string; href: string; icon: string; invert?: boolean }[]
     href: `https://claude.ai/new?q=${encodeURIComponent(AI_PROMPT)}`,
     icon: "/ai/claude.svg",
   },
-  {
-    name: "Gemini",
-    href: `https://gemini.google.com/app?q=${encodeURIComponent(AI_PROMPT)}`,
-    icon: "/ai/gemini.svg",
-  },
 ];
+
+// Membership rule for the row above: an assistant earns a mark only if its
+// URL actually carries the question into the composer. Gemini and Venice
+// were both removed on 2026-08-14 after testing showed neither reads a
+// prompt/q/query/text/message/input search param at all — they drop the
+// visitor on an empty box, which makes the "Ask AI about Cashu" label a
+// lie. Before adding a third, load its `?q=` URL and confirm the prompt is
+// sitting in the input; do not infer support from a URL that merely
+// preserves the query string.
+//
+// Known limit of the two that remain, measured 2026-08-14 in a clean
+// logged-out browser: neither prefills for a signed-out visitor. ChatGPT
+// redirects to `/?model=auto` and discards `q`; Claude redirects to
+// `/login` and discards it too. Both are believed to work once the visitor
+// has a session, which is the common case for someone who keeps an
+// assistant open, but that half is unverified here. If this row ever needs
+// to work for a signed-out reader, the URL is the wrong mechanism.
 
 function ExternalLink({
   href,
@@ -130,9 +142,8 @@ export default function SiteFooter() {
                         Next.js image optimizer (which blocks SVG by
                         default) stays out of the path. Lazy like the press
                         wordmarks: these are 14px decorative marks at the
-                        very bottom of the page, and gemini.svg is a Figma
-                        export with a base64 raster inside it, so the three
-                        of them cost ~55KB that no arriving visitor needs. */}
+                        very bottom of the page, so no arriving visitor
+                        needs to pay for them up front. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={ai.icon}

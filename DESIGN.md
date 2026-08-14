@@ -113,6 +113,9 @@ rounded:
   nav: "12px"
   card: "16px"
   glass: "24px"
+  # Full capsule. Licensed to the wallet-directory status tag alone
+  # (see §5 Status Tag). Not a general shape — do not reach for it.
+  full: "999px"
 spacing:
   xs: "8px"
   sm: "16px"
@@ -319,6 +322,26 @@ The bar follows the Onyx pattern (behaviour lifted from onyx.security on the use
 ### Divider
 
 - **Style:** A single 1px line in Hair (`#e4e4e7`), inset to the page-x rhythm so it visually aligns with the content above and below. No vertical dividers.
+
+### Status Tag — The Soft-Capsule Exception
+
+Used in the wallet directory to mark a project's *maturity* ("Beta") as a
+different class of fact from its *surface* ("iOS and Android").
+
+- **Style:** Chalk (`#f4f4f5`) fill, Body (`#3f3f46`) text, `rounded.full`,
+  `3px 9px`, GT-Standard 500 at `0.75rem`. No border, no shadow, sentence
+  case, no tracking.
+- **Why it is round:** user-directed 2026-08-14. The first version obeyed
+  the sharp-and-flat doctrine — hairline-outlined box, tracked-out
+  uppercase — and read as a generic SaaS status chip. The tell was the
+  outline-plus-caps-plus-tracking combination, not the corner radius;
+  softening the shape and dropping the shout is what removes it. This is
+  the only full radius on the site, and the only rounded surface besides
+  the navbar's condensed box.
+- **Bounds:** `STATUS_FACTS` only (`src/app/wallets/page.tsx`). Descriptive
+  facts stay in Geist Mono with no container. Buttons, the segmented
+  control, and every panel stay sharp. Keep the set small — the moment
+  everything is a tag, nothing is.
 
 ### Placeholder Surface
 

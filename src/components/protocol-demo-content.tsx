@@ -459,8 +459,11 @@ function SpecUi() {
             >
               {n.id}
             </span>
+            {/* Truncation only where the ratio frame rules; below sm the
+                plate is content-sized, so real titles wrap instead of
+                losing their tails ("Notation & mod…" at 390px). */}
             <span
-              className="t-mono truncate text-body"
+              className="t-mono text-body sm:truncate"
               style={{ fontSize: "0.8125rem" }}
             >
               {n.title}

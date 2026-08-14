@@ -965,7 +965,7 @@ html:not(.js) .reveal {
 }
 
 /*
- * Ask-AI block — quiet logo+label row "ChatGPT · Claude · Gemini".
+ * Ask-AI block — quiet logo+label row: ChatGPT, Claude, Venice.
  * Each link pairs the provider mark with its name. The marks ride at
  * 14px so they read as wordmark companions, not as decorative chrome —
  * brand identity reserved here is a documented exception to the
@@ -1009,9 +1009,10 @@ html:not(.js) .reveal {
 }
 
 /* A monochrome mark (e.g. OpenAI's black glyph) would vanish on the Ink
-   ground — force it to Paper. Brand-coloured marks (Claude, Gemini) keep
-   their colour under the sanctioned third-party-logo exception and are not
-   given this class. */
+   ground — force it to Paper. Marks that already carry an on-dark colour
+   from their own brand kit (Claude's clay, Venice's off-white) keep it
+   under the sanctioned third-party-logo exception and are not given this
+   class. */
 .footer-ai__logo--invert {
   filter: brightness(0) invert(1);
 }
@@ -1199,29 +1200,11 @@ html:not(.js) .reveal {
 }
 
 /*
- * Deck and body are one unit: a tight internal gap against the much larger
- * gap .hero-spec__content puts between the headline, the lead, and the CTA
- * row. Tight group, generous separation.
- */
-.hero-spec__lead {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(0.5rem, 1.1vw, 0.875rem);
-}
-
-/*
- * Deck — the standfirst. Not an eyebrow: it sits below the headline and above
- * the body, and it carries the page's claim rather than labelling it.
- *
- * The three properties used to be the first line of the body paragraph, set
- * at body size and weight above a longer sentence, so the punchiest text in
- * the hero was reading from the second chair. Promoting it needs its own
- * role because the gap it has to cover is large: the headline is 100px/600
- * and the body is 23px/400.
- *
- * Separated from the body on three axes at once — size, weight, and tone —
- * so the two roles stay distinguishable at 390px, where the size step
- * compresses from 1.48x to 1.33x and size alone would stop carrying it.
+ * Deck — the standfirst. Not an eyebrow: it sits below the headline and
+ * carries the page's claim rather than labelling it. It stands alone: the
+ * body sentence that explained the blind-signature mechanism was cut
+ * 2026-08-14 (user direction), and .hero-spec__lead / .hero-spec__body
+ * went with it.
  */
 .hero-spec__deck {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
@@ -1232,26 +1215,6 @@ html:not(.js) .reveal {
   color: var(--ink);
   margin: 0;
   text-wrap: balance;
-}
-
-.hero-spec__body {
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
-  font-weight: 400;
-  line-height: 1.5;
-  letter-spacing: -0.005em;
-  color: var(--body);
-  margin: 0;
-  /*
-   * A real cap, not `none`. The old copy only stayed in measure because a
-   * <br /> forced its break; a flowing sentence in a flex-start column grows
-   * to its natural width, which at 23px runs past the 75ch reading ceiling.
-   * `ch` is the "0" advance and GT-Standard's zero is wide, so 46ch lands
-   * around 65-70 characters of mixed-case prose.
-   */
-  max-width: 46ch;
-  margin-inline: auto;
-  text-wrap: pretty;
 }
 
 /* Row B — CTA row. Primary chip + secondary "View documentation" chip,
@@ -1945,99 +1908,35 @@ html:not(.js) .reveal {
 
 .feature-scroller__title {
   max-width: 16ch;
+  /* Balanced so the phone width doesn't strand "parts." on its own line. */
+  text-wrap: balance;
 }
 
-/* Nav: horizontal jump-row on mobile, vertical list on lg+. */
+/* Nav: jump-row below lg, vertical list on lg+. The row wraps when the
+   rail is narrower than the four items (at 390px: two rows of two), so
+   every part stays visible. This replaced the overflow-scroll row with the
+   scroll-timeline edge fade: the fourth item sat fully off-screen and the
+   fade dimmed nothing but whitespace, so no affordance survived. */
 .feature-nav {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.feature-nav::-webkit-scrollbar {
-  display: none;
 }
 
-/*
- * Scroll affordance for the mobile jump-row. With the scrollbar hidden, the
- * row ends flush at the viewport edge and "04 Tokens" reads as though it
- * doesn't exist (at 390px, 138px of the row is off-screen). A mask fades the
- * overflowing edge so the cut is visible as a cut.
- *
- * The fade widths are driven by a scroll timeline, so each edge only fades
- * while there is actually something past it — and when the row fits (or the
- * browser has no scroll-driven animations) the timeline is inactive, the
- * initial 0px holds, and nothing is dimmed.
- */
-@property --nav-fade-start {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --nav-fade-end {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-.feature-nav {
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 var(--nav-fade-start),
-    #000 calc(100% - var(--nav-fade-end)),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 var(--nav-fade-start),
-    #000 calc(100% - var(--nav-fade-end)),
-    transparent 100%
-  );
-  animation: feature-nav-edges linear both;
-  animation-timeline: scroll(self inline);
-}
-
-/* Fallback for browsers without scroll-driven animations: below 513px the
-   row is always wider than its rail (the four labels measure ~465px against
-   a viewport minus 48px of page padding), so a static end-fade is always
-   telling the truth. Above that width the row may fit, so nothing is faded
-   and those browsers simply keep today's behaviour. Where the timeline does
-   run, its keyframes override this value in both directions. */
-@media (max-width: 512px) {
+/* Phones: the break is two by two, not three plus an orphan — at 390px the
+   free wrap fits three items on the first line and strands "04 Tokens"
+   alone. Grid pins the pairing regardless of label widths. */
+@media (max-width: 639px) {
   .feature-nav {
-    --nav-fade-end: 36px;
-  }
-}
-
-@keyframes feature-nav-edges {
-  0% {
-    --nav-fade-start: 0px;
-    --nav-fade-end: 36px;
-  }
-  8% {
-    --nav-fade-start: 36px;
-  }
-  92% {
-    --nav-fade-end: 36px;
-  }
-  100% {
-    --nav-fade-start: 36px;
-    --nav-fade-end: 0px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
   .feature-nav {
     flex-direction: column;
-    overflow: visible;
-    animation: none;
-    -webkit-mask-image: none;
-    mask-image: none;
   }
 }
 
@@ -2070,7 +1969,15 @@ html:not(.js) .reveal {
 }
 
 .feature-nav__item:hover {
-  color: var(--body);
+  color: var(--ink);
+}
+
+/* Coarse pointers: the segments clear the 44px target, the same bump the
+   demo toggle carries. */
+@media (pointer: coarse) {
+  .feature-nav__item {
+    padding-block: 14px;
+  }
 }
 
 .feature-nav__item.is-active {
@@ -2261,6 +2168,17 @@ html:not(.js) .reveal {
   line-height: 1.4rem;
 }
 
+/* Phones: one more step down (12px) so less of each 58ch line hides past
+   the pane's edge; the edge fade and touch scroll carry the rest. Pixel
+   spans stay matched so mixed lines don't jump size mid-line. */
+@media (max-width: 639px) {
+  .feature-demo pre.t-mono,
+  .feature-demo pre .t-pixel {
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+}
+
 /* Overflow safety net only — snippets are authored to fit. If a line ever
    scrolls, the bar must not be the loudest element in the frame: thin and
    quiet in the pane's own greys. */
@@ -2279,6 +2197,72 @@ html:not(.js) .reveal {
 
 .feature-demo pre::-webkit-scrollbar-track {
   background-color: transparent;
+}
+
+/* Overflow affordance for the pane, the jump-row's former edge-fade
+   grammar rehomed here: with the scrollbar thin (and invisible on iOS
+   until touched), a clipped mono line must read as a cut, not a defect.
+   The fade widths ride a scroll timeline, so each edge dims only while
+   content actually continues past it; when the pane fits (or the browser
+   lacks scroll-driven animations) the timeline is inactive, the initial
+   0px holds, and nothing is dimmed. */
+@property --pane-fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --pane-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.feature-demo pre {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--pane-fade-start),
+    #000 calc(100% - var(--pane-fade-end)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--pane-fade-start),
+    #000 calc(100% - var(--pane-fade-end)),
+    transparent 100%
+  );
+  animation: feature-pane-edges linear both;
+  animation-timeline: scroll(self inline);
+}
+
+/* Fallback for browsers without scroll-driven animations: below sm the
+   panes always overflow (58ch of 12px mono against a ~310px view), so a
+   static end-fade is always telling the truth. At sm and up the panes are
+   authored to fit, so nothing is faded. Where the timeline does run, its
+   keyframes override this value in both directions. */
+@media (max-width: 639px) {
+  .feature-demo pre {
+    --pane-fade-end: 28px;
+  }
+}
+
+@keyframes feature-pane-edges {
+  0% {
+    --pane-fade-start: 0px;
+    --pane-fade-end: 28px;
+  }
+  8% {
+    --pane-fade-start: 28px;
+  }
+  92% {
+    --pane-fade-end: 28px;
+  }
+  100% {
+    --pane-fade-start: 28px;
+    --pane-fade-end: 0px;
+  }
 }
 
 /* Figure plates — §5 Demo Panel. A published technical plate, not a file
@@ -2563,8 +2547,16 @@ html:not(.js) .reveal {
   align-items: flex-start;
 }
 
+/* One step below .t-headline: the sticky "The protocol, in four parts." is
+   the section's only full headline and the four pillar titles read as
+   chapters under it — at full rank the two stacked as twin headlines on
+   phones and competed side by side at section arrival on desktop
+   (2026-08-14). Unlayered and later in the file than .t-headline, so the
+   size declaration wins at equal specificity. */
 .feature-block__title {
   width: 100%;
+  font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+  line-height: 1.1;
   text-wrap: balance;
 }
 
@@ -2819,30 +2811,48 @@ html:not(.js) .reveal {
  * Status tag — maturity, not surface. "Beta" answers a different question
  * from "iOS and Android", so it stops looking like the same kind of fact.
  *
- * Sharp, flat, hairline-outlined: the Flat Cipher Slab language one size
- * down, not a rounded pill. `border-radius: 0` is doctrinal here — nothing
- * on this site is rounded except the navbar's condensed box — and there is
- * no fill and no shadow, so it reads as a stamped rim rather than a chip
- * borrowed from a SaaS dashboard.
+ * THE SOFT-CAPSULE EXCEPTION (user-directed 2026-08-14, replacing the
+ * outlined stamp shipped earlier the same day). This is the second surface
+ * on the site allowed a radius, after the navbar's condensed box, and the
+ * only one allowed a *full* one. It is a deliberate borrow from the iOS
+ * badge: filled capsule, no rim, no shadow, sentence case.
  *
- * Added 2026-08-14 on the user's direction. Worth knowing for whoever adds
- * the next one: the project's own guidance treats badge chips as a
- * category tell to avoid, so this stays limited to STATUS_FACTS and must
- * not spread to descriptive facts.
+ * The first attempt was a sharp hairline-outlined box set in tracked-out
+ * uppercase — doctrinally correct per the Flat Cipher Slab rules, and it
+ * read as exactly the SaaS-dashboard chip those rules exist to prevent.
+ * The tell was never the radius. It was the combination of an outline, all
+ * caps, and 0.06em tracking on a 12px word, which is the house style of
+ * every status pill on every AI-generated landing page. Softening the
+ * shape and dropping the shout is what removes the resemblance:
+ *
+ *   - Fill, no border. iOS badges are tinted grounds, not rims. Chalk on
+ *     Paper is the monochrome reading of systemGray6 — visible as a shape,
+ *     silent as a value. Nothing here reaches for a hue.
+ *   - Sentence case, no tracking. "Beta" is a word, not a klaxon. The
+ *     uppercase micro step stays where it belongs (labels, eyebrows).
+ *   - UI face, not mono. The descriptive facts beside it are data and stay
+ *     in Geist Mono; this is a piece of interface furniture and takes
+ *     GT-Standard, which is also what makes it read iOS rather than
+ *     terminal.
+ *
+ * Body (not Muted) on the Chalk fill: Muted lands at 4.40:1 once there is
+ * a tint behind it, which fails AA for 12px text — it only passed while
+ * the tag ground was pure Paper. Body holds 9.50:1 light, 12.39:1 dark.
+ *
+ * Bounded, like every other exception here: STATUS_FACTS only. Buttons,
+ * the segmented control, panels, and the descriptive facts all stay sharp.
+ * The moment a second kind of thing gets a capsule, this is just rounding.
  */
 .wallet-row__fact--tag {
-  border: 1px solid var(--hair);
-  border-radius: 0;
-  padding: 2px 7px;
-  /* The `micro` step (0.75rem / 500 / 0.06em uppercase) — the ramp already
-     owns exactly this register, so the tag uses it rather than the 0.6875rem
-     I first reached for by eye. A new step for a one-off tag would have been
-     an unjustified addition to the scale. */
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--chalk);
+  padding: 3px 9px;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
+  line-height: 1.25;
+  color: var(--body);
   white-space: nowrap;
   align-self: center;
 }

@@ -31,11 +31,13 @@ const ASCII_FRAMES: Record<DemoId, { ui: number; api: number }> = {
 export default function ProtocolDemo({
   demo,
   label,
+  defaultView = "ui",
 }: {
   demo: DemoId;
   label: string;
+  defaultView?: "ui" | "api";
 }) {
-  const [view, setView] = useState<"ui" | "api">("ui");
+  const [view, setView] = useState<"ui" | "api">(defaultView);
   const entry = DEMOS[demo];
 
   return (
