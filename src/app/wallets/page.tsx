@@ -43,6 +43,13 @@ type DirectoryGroup = {
   entries: Entry[];
 };
 
+/* Facts that describe a project's *maturity* rather than its surface. These
+   render as a bordered tag instead of plain mono, because they answer a
+   different question from "iOS and Android": one tells you where it runs, the
+   other tells you how much to trust it yet. Keep this set small — the moment
+   everything is a tag, nothing is. */
+const STATUS_FACTS = new Set(["Beta"]);
+
 // Grouped by surface. Wallets come first (Mobile, then Web), then the
 // developer implementations, then operator tooling. Each non-wallet category
 // gets its own labelled band so nothing is mislabelled as a wallet. Wallets
@@ -52,7 +59,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Mobile",
     scope: "Ecash in your pocket. Wallets for your phone.",
     entries: [
-      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["PWA"] },
+      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["iOS, Android, and PWA", "Beta"] },
       { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android"] },
       { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS"] },
       { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android"] },
@@ -172,7 +179,14 @@ export default function WalletsPage() {
                           variable-width host inline and drifted per row. */}
                       <span className="wallet-row__facts">
                         {entry.facts?.map((fact) => (
-                          <span key={fact} className="wallet-row__fact">
+                          <span
+                            key={fact}
+                            className={`wallet-row__fact${
+                              STATUS_FACTS.has(fact)
+                                ? " wallet-row__fact--tag"
+                                : ""
+                            }`}
+                          >
                             {fact}
                           </span>
                         ))}

@@ -162,20 +162,22 @@ ${TOKEN_HEAD}…${TOKEN_TAIL}
 
 /* Published technical plates — the FIGURE half of the toggle. Each is a
    real <figure>: a machined Card plate on the shared drafting sheet,
-   captioned below in the site's own voice ("Fig. NN" + a thesis sentence,
-   GT-Standard) the way a spec captions its diagrams. Deliberately NOT the
-   CodePane's file-strip chrome: a figure is not a file, and the two views
-   should read as two registers of one document, not one box with two
-   fillings. Interiors speak machine notation — mono field names, pixel
-   amounts; captions speak English. Everything protocol-shaped stays real.
-   Plate/caption styling lives in globals.css (.fig, .fig-plate,
-   .fig-caption). */
+   captioned below in the site's own voice the way a spec captions its
+   diagrams. Deliberately NOT the CodePane's file-strip chrome: a figure is
+   not a file, and the two views should read as two registers of one
+   document, not one box with two fillings. Interiors speak machine
+   notation — mono field names, pixel amounts; captions speak English.
+   Everything protocol-shaped stays real. Plate/caption styling lives in
+   globals.css (.fig, .fig-plate, .fig-caption).
+
+   The "Fig. NN" number was dropped 2026-08-14 on the user's direction.
+   Numbering a figure earns its keep only when something refers to it by
+   number; nothing here does, so the label was register costume rather than
+   navigation. The caption sentence carries the whole job. */
 function Fig({
-  num,
   caption,
   children,
 }: {
-  num: string;
   caption: string;
   children: ReactNode;
 }) {
@@ -183,7 +185,6 @@ function Fig({
     <figure className="fig">
       <div className="fig-plate px-6 py-6 sm:px-7 sm:py-7">{children}</div>
       <figcaption className="fig-caption">
-        <span className="fig-caption__num">Fig. {num}</span>
         <span className="fig-caption__text">{caption}</span>
       </figcaption>
     </figure>
@@ -275,7 +276,6 @@ const HELD = DENOMS.filter((d) => (BALANCE & d) === d);
 function WalletsUi() {
   return (
     <Fig
-      num="01"
       caption="A balance is a set of proofs. The inked denominations are 2,101 in binary."
     >
       <Field>BALANCE</Field>
@@ -371,7 +371,6 @@ function Crossing({ verb, dir }: { verb: string; dir: "right" | "left" }) {
 function MintsUi() {
   return (
     <Fig
-      num="02"
       caption="A mint is a reserve. It holds the bitcoin, you hold the claim."
     >
       {/* One 1fr_auto_1fr grid for the whole sheet: labels, amounts with
@@ -442,7 +441,6 @@ const NUTS = [
 function SpecUi() {
   return (
     <Fig
-      num="03"
       caption="The spec is a public registry. Every NUT is a numbered, versioned document."
     >
       <Field>REGISTRY</Field>
@@ -498,7 +496,6 @@ function SpecUi() {
 function TokensUi() {
   return (
     <Fig
-      num="04"
       caption="A token is a bearer string. Whoever holds it, holds the sats."
     >
       <Field>TOKEN</Field>

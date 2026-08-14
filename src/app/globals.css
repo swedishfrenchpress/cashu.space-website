@@ -2243,11 +2243,14 @@ html:not(.js) .reveal {
   background-color: var(--card);
 }
 
-/* RFC-style caption: "Fig. NN" in the micro register, thesis in GT body
-   small. Sits outside the plate on the ground — the figure is the object,
-   the caption is the document's voice describing it. No rule above it:
-   the plate's own bottom keyline already draws the line (Hairline Rule —
-   no double rules). */
+/* RFC-style caption: the thesis sentence in GT body small. Sits outside the
+   plate on the ground — the figure is the object, the caption is the
+   document's voice describing it. No rule above it: the plate's own bottom
+   keyline already draws the line (Hairline Rule — no double rules).
+
+   The "Fig. NN" number that used to lead this line was dropped 2026-08-14;
+   .fig-caption__num went with it. Nothing in the copy referred to a figure
+   by number, so the label was register costume, not navigation. */
 .fig-caption {
   display: flex;
   align-items: baseline;
@@ -2256,14 +2259,6 @@ html:not(.js) .reveal {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
 }
 
-.fig-caption__num {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink);
-  white-space: nowrap;
-}
 
 .fig-caption__text {
   font-size: 0.875rem;
@@ -2762,6 +2757,34 @@ html:not(.js) .reveal {
   font-size: 0.8125rem;
   line-height: 1.3;
   color: var(--muted);
+}
+
+/*
+ * Status tag — maturity, not surface. "Beta" answers a different question
+ * from "iOS and Android", so it stops looking like the same kind of fact.
+ *
+ * Sharp, flat, hairline-outlined: the Flat Cipher Slab language one size
+ * down, not a rounded pill. `border-radius: 0` is doctrinal here — nothing
+ * on this site is rounded except the navbar's condensed box — and there is
+ * no fill and no shadow, so it reads as a stamped rim rather than a chip
+ * borrowed from a SaaS dashboard.
+ *
+ * Added 2026-08-14 on the user's direction. Worth knowing for whoever adds
+ * the next one: the project's own guidance treats badge chips as a
+ * category tell to avoid, so this stays limited to STATUS_FACTS and must
+ * not spread to descriptive facts.
+ */
+.wallet-row__fact--tag {
+  border: 1px solid var(--hair);
+  border-radius: 0;
+  padding: 2px 7px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  align-self: center;
 }
 
 /* Open chip — a real button, sized down a touch from the page CTA so a
