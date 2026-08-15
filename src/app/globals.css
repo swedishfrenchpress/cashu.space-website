@@ -1174,6 +1174,10 @@ html:not(.js) .reveal {
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
+  /* All caps, user-directed 2026-08-15: rendered as text-transform, not
+     retyped markup, so the source string stays sentence case for screen
+     readers and search engines. */
+  text-transform: uppercase;
   /* No optical-left correction: the hero is centred, so there is no left
      margin for glyph side bearing to sit against. The corrections that used
      to live here (headline 0.058em, deck and body 0.095em) were removed with
@@ -1217,6 +1221,7 @@ html:not(.js) .reveal {
   color: var(--ink);
   margin: 0;
   text-wrap: balance;
+  text-transform: uppercase;
 }
 
 /* Row B — CTA row. Primary chip + secondary "View documentation" chip,
