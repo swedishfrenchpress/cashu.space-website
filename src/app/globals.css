@@ -229,7 +229,7 @@
     --on-ink: #0a0a0b;
     --edge: #ffffff;
 
-    --panel: #131316;
+    --panel: #343438;
     /* Slate, not Hair. Two near-blacks cannot separate by ground: --panel
        on --paper measures 1.07:1 and no value in this range beats ~1.4, so
        the 1px line IS the boundary and it has to clear a real threshold —
@@ -272,7 +272,7 @@
   --on-ink: #0a0a0b;
   --edge: #ffffff;
 
-  --panel: #131316;
+  --panel: #343438;
   /* See the note in the media-query block above; keep both identical. */
   --panel-hair: #3f3f46;
   --panel-fg: #f4f4f5;
