@@ -1332,17 +1332,31 @@ html:not(.js) .reveal {
    * spanning wider than its supporting copy is the point of a centred
    * composition, not a misalignment.
    *
+   * RETIRED 2026-08-16. All of the above is history: the headline is back on
+   * the page shell's own measure, the same one the deck and the CTAs use.
+   *
    * The escape was necessary and it was not sufficient. The headline is
    * THREE lines, not the two this comment used to promise: measured at 144px
-   * against this 1440px box, "OPEN SOURCE ECASH" is 1513px and "ECASH FOR
-   * BITCOIN." is 1446px, so both halves of both possible two-line splits
-   * overflow. The old "~1283px to break cleanly in two" figure was wrong.
-   * Raising the cap does not rescue it either — at 1600 the viewport binds
-   * first (1440px of box at 144px type) and the shorter split still misses
-   * by 6px. See page.tsx for why the type size and the copy are both off
-   * the table.
+   * against the escape's 1440px box, "OPEN SOURCE ECASH" is 1513px and
+   * "ECASH FOR BITCOIN." is 1446px, so both halves of both possible two-line
+   * splits overflowed. The old "~1283px to break cleanly in two" figure was
+   * wrong. Once the rag was authored in the markup instead of balanced (see
+   * page.tsx), the widest line became "OPEN SOURCE" at 1003px — which the
+   * shell's 1088px already holds, so the extra 352px bought nothing.
+   *
+   * Measured at 768/1024/1280/1440/1600/1920/2560 before and after: three
+   * lines at every width either way, identical. The lines are centred and
+   * none of them fills either box, so retiring it is a visual no-op.
+   *
+   * The property stays rather than being deleted: .hero-spec__content is
+   * `align-items: center`, so with no width the h1 shrinks to max-content and
+   * .hero-spec's `overflow: hidden` clips it on narrow viewports. An explicit
+   * width is load-bearing; only its value changed.
    */
-  width: min(calc(100vw - 2 * var(--page-x)), 1440px);
+  width: min(
+    calc(100vw - 2 * var(--page-x)),
+    calc(var(--page-max) - 2 * var(--page-x))
+  );
   max-width: none;
 }
 

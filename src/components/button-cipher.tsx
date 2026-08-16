@@ -72,8 +72,16 @@ export default function ButtonCipher() {
          going `color: transparent` and painting scrambled hex over the
          label, which is fine for a word and destructive for anything else:
          a control whose visible content is an icon inheriting currentColor
-         would simply vanish for 460ms and paint garbage where it was. The
-         nav's GitHub CTA becomes exactly that once the bar condenses. */
+         would simply vanish for 460ms and paint garbage where it was.
+
+         This used to end "the nav's GitHub CTA becomes exactly that once the
+         bar condenses." The bar has not condensed since 2026-08-16, when the
+         Onyx two-state apparatus was retired for the masthead (DESIGN.md §5),
+         and the GitHub mark is icon-only in every state now — so it is
+         permanently the case this guards against rather than conditionally.
+         It never reaches here anyway: it carries no .btn-* class, so the
+         selector does not match it. The opt-out stays for the next control
+         that is a slab with a glyph inside. */
       const start = () => {
         if (button.dataset.cipher === "off") return;
         finish();
