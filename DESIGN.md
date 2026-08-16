@@ -119,9 +119,12 @@ rounded:
   # `nav` and `glass` are deleted, not merely unused: the navbar's condensed
   # box was the sole consumer of both and it was retired 2026-08-16 (§5
   # Navigation). The masthead is square.
+  #
+  # Nothing the site ships is rounded. `card` survives for the Placeholder
+  # Surface only — a scaffold that is replaced before it goes out — and
+  # `full` lost its one licence when the status tag joined the signal-square
+  # family (§5 Status Tag, 2026-08-16). Both are here as record, not stock.
   card: "16px"
-  # Full capsule. Licensed to the wallet-directory status tag alone
-  # (see §5 Status Tag). Not a general shape — do not reach for it.
   full: "999px"
 spacing:
   xs: "8px"
@@ -193,7 +196,7 @@ Motion is permitted under one condition: it must depict real protocol structure,
 
 What replaced it is the **arrival, and nothing else** — see the Set-Once Rule in §4. The closing hairline draws across the fold, one word of the headline resolves out of hex, the copy settles on the existing staged reveal, and by ~1.1s the page is completely still and stays that way. That puts the hero inside the vocabulary the rest of the site already speaks: the masthead's clip-path wipe, the button cipher pass, the reveal settles — all one-shot, all typographic, all *caused*. The looping figure was the only thing on the page that moved without a cause. See `src/components/hero-cipher.tsx` and `hero-rule-draw` in `globals.css`.
 
-Color is almost absent from everything the site says in its own voice. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal. Two carve-outs, both named in §2: the Depicted-World Exception, which lets artifacts the page *depicts* keep their source colour because faking them grey would be its own kind of dishonesty; and the Signal-Green Exception, added 2026-08-16 on the user's direction, which puts one green on the property marks in the protocol-parts column and nowhere else.
+Color is almost absent from everything the site says in its own voice. The palette is paper, ink, and a graded family of greys. This is a doctrine, not a placeholder. The bitcoin-curious audience reads sovereignty in restraint; any added accent would dilute the signal. Two carve-outs, both named in §2: the Depicted-World Exception, which lets artifacts the page *depicts* keep their source colour because faking them grey would be its own kind of dishonesty; and the Signal-Green Exception, added 2026-08-16 on the user's direction, which puts one green in one shape — a 7px square opening a stated property — and nowhere else.
 
 **Key Characteristics:**
 
@@ -232,16 +235,22 @@ A single non-chromatic family, scaled in lightness only. Names are atmospheric a
 
 *Narrowed 2026-08-16, on the user's direction.* Surface (a) was the tap-to-pay video, a documentary capture of real hardware, and it was the original reason this exception exists. The video band was deleted outright — clip, poster, copy and section — so the exception loses its founding case and keeps only the marks. (The four-parts demo panels sat here before that, as real app screenshots; they became spec figures in the site's own voice and then were deleted with the section that held them.) Everything in the site's own voice — type, backgrounds, borders, buttons, icons, figures, chrome — stays monochrome. Editorial photography *reports* rather than depicts, so it still desaturates via `grayscale(1) contrast(1.05)` and its wordmarks force to Paper (see the press band). A new colour surface that is not a third-party mark falls under the No-Colour Rule, or under the Signal-Green Exception if it is literally the mark that exception names.
 
-**The Signal-Green Exception.** *Added 2026-08-16, on the user's direction, overriding the No-Colour Rule for exactly one mark.* `--signal` (`#6fe3a4`) fills the 7px square that opens each property in the protocol-parts column (§5, The Split Spec Sheet). This is the first and only chromatic value the site uses **in its own voice**, and unlike the Depicted-World Exception it is not justified by depicting anything. It is a design decision, taken deliberately after the reference layout it comes from.
+**The Signal-Green Exception.** *Added 2026-08-16, on the user's direction, overriding the No-Colour Rule for exactly one mark, and widened the same day to a second consumer of that mark. Briefly widened a third time, to the hero's pointer plume, and **narrowed back within hours when the hero went monochrome** — see the note at the end.* `--signal` (`#6fe3a4`) and its page-ground sibling `--signal-page` fill one shape in two places and nothing else: the 7px square that opens a **stated property** — each property in the protocol-parts column (§5, The Split Spec Sheet) and the wallet-directory status tag (§5, Status Tag).
 
 The scope is the whole of the rule, and it is narrow on purpose:
 
-- **One element.** `.protocol-part__mark`. Not type, not a border, not a background, not a link, not a focus ring, not a state (there is no green "success" and no red anything), not a hover, not a second instance of the same list somewhere else.
-- **One ground.** The value was picked against the always-dark `--panel` column and is contrast-checked nowhere else. It is decorative and `aria-hidden`, so it carries no information a screen reader or a monochrome display would lose — which is the only reason a single saturated value is admissible at all. Never make it the sole carrier of a meaning.
-- **One token, declared once.** `--signal` lives in `:root` and is not redeclared per scheme, because the ground it sits on never flips.
-- **Sharp and flat.** `border-radius: 0`, no shadow, no glow, no gradient. The Flat Cipher Slab logic applies to a 7px square as much as to a button.
+- **One shape, two consumers.** `.protocol-part__mark` and `.wallet-row__fact--tag::before` — a 7px square opening a line of tracked uppercase Mono, the same recipe in both places. Not type, not a border, not a background, not a link, not a focus ring, not a state (there is no green "success" and no red anything), **not a hover**, not a fill, not a gradient, not a glow, not a dot or a bar or a ring.
+- **The green never appears at scale.** Its largest instance on the site is 7 pixels square. That is not an accident of where it happens to be used — it is the reason a single saturated value is admissible on a monochrome page at all, and the hero episode below is what established it.
+- **Two grounds, therefore two values.** `--signal` (`#6fe3a4`) is the value picked against the always-dark `--panel` column, which never flips. The directory's ground *does* flip, and `#6fe3a4` measures **1.59:1** on Paper — the square all but disappears in light. So the page-ground consumer takes `--signal-page`: `#1b9d55` in light (**3.50:1**, same 147° hue taken down), collapsing to `--signal` in both dark blocks (**12.44:1**). Anything new on a flipping ground uses `--signal-page`; anything on a fixed dark ground uses `--signal`.
+- **Decorative, always.** Both consumers are `::before` content with no accessible name, so neither carries information a screen reader or a monochrome display would lose. **Never make it the sole carrier of a meaning.** On the directory the word "Beta" states the fact and the square only marks it as a different *class* of fact; strip the colour and the row still reads.
+- **Sharp and flat.** `border-radius: 0`, no shadow, no glow, no gradient, no soft alpha. The Flat Cipher Slab logic applies to a 7px square as much as to a button.
 
-If a future surface wants this green, the answer is no: the exception is a scoped licence, not a newly opened palette slot. Widening it is a user decision, the same way opening it was.
+If a future surface wants this green, the answer is still no: the exception is a scoped licence, not a newly opened palette slot. Widening it is a user decision, the same way opening it was.
+
+**The hero episode, recorded because it is the rule's best evidence.** *2026-08-16.* The exception was widened a third time, to a mint plume the pointer threw through the hero's dither field, and **narrowed back the same day on the user's direction** — the hero is monochrome and the green never returned to it. Two things were learned and both are now load-bearing above:
+
+1. **Scale is the whole exception.** At 7px the green is a mark. At hero scale it was the largest chromatic event on a monochrome page, carrying no information, and it read as exactly the pastel/Web3 register PRODUCT.md's anti-references rule out — the least ownable hue in the crypto-adjacent space for a protocol that has deliberately refused Bitcoin's own orange. The clause "the green never appears at scale" is that finding, generalised.
+2. **The colour was borrowed, and colour is the most legible thing to borrow.** `--signal` came from aspensearch.com (`#a1ffcb`), the same source as the masthead clock and the split band. A borrowed 7px square is a detail; a borrowed full-bleed accent is the other site's signature on your page. **If the green is ever proposed for a fourth consumer, weigh that first, and weigh it by area.**
 
 **The Brand-Mark Exemption.** *Recorded 2026-08-16.* The Cashu mascot (`/cashu-no-bg.png`, in the masthead plate on every route and in the 404's header) is a full-colour raster, and until this entry **no named rule covered it**: the Depicted-World Exception is scoped to *third-party* marks and the Signal-Green Exception names one 7px square, so §2 as written forbade the site's own logo. That was a gap in the document, not a defect in the page.
 
@@ -390,13 +399,43 @@ This makes the rule's own closing line literal at the hero for the first time �
 
 **The open item is unchanged and should stay visible:** the blind-signature round trip, which this rule's 2026-08-14 amendment called "the scene that earns the motion", is still deleted and still the strongest candidate for anything that goes back into the hero. Its geometry is recoverable (`git show 5e4c0e8^:src/lib/ascii/bdhke.ts`). The bar for a replacement is the rule's **first** branch, not the second: a figure that depicts real protocol structure. "It would look good behind the type" is what put the blob there, and it is not a reason.
 
-**The Set-Once Rule.** *Added 2026-08-16, on the user's direction, with the deletion of the hero's ground.*
+*Amended again 2026-08-16, on the user's direction: **the hero has a ground and it stands on the second branch.*** `hero-field.tsx` draws a field of Geist Mono hex whose occupancy is 4-octave Perlin noise, plus a fluid wake the pointer stirs through it. This is material and material is all it is — the same standing the deleted dot figure had, in the same words, and the honest thing to do is say so rather than construct a reading in which noise depicts something.
+
+Three things separate it from the figure that was cut, and none of them is a claim to the first branch:
+
+- **It asserts nothing.** The blob's specific failure was not that it was decorative; it was that a pulsing dotted spheroid *looks like a diagram* of something, on a page about a protocol, while diagramming nothing. A field of hex does not read as a claim about Cashu — it reads as the substrate the page is printed on. There is no silhouette to misread, and deliberately no words: anything legible here would be an assertion nobody wrote.
+- **It is caused.** The blob looped with no cause; this holds still until the reader disturbs it. See the Set-Once Rule's first amendment above.
+- **It is not a figure.** It has no edge, no centre, no subject, and it clears the type entirely. The distinction the rule needs here is between a *ground* and a *figure*: a figure occupies attention and therefore owes an assertion, a ground is the paper. This is stock, not illustration.
+
+**The open item is unaffected and the bar has not moved.** If anything is ever drawn in the hero that has a shape — a mark, a diagram, a subject — the first branch still governs it, and the blind-signature round trip is still what should fill that slot. Do not read this amendment as licence for a *figure* made of noise.
+
+**The Set-Once Rule.** *Added 2026-08-16, on the user's direction, with the deletion of the hero's ground. **Amended later the same day, also on the user's direction, when a ground came back** — see the amendment below, which is the operative version.*
 
 **The hero sets once and then holds.** Its entire motion is the arrival — the closing hairline draws across the fold (`hero-rule-draw`, 1100ms), one word of the headline resolves out of hex (`hero-cipher.tsx`, 760ms), and the headline, deck and CTAs settle on the staged reveal. By roughly 1.1 seconds nothing in the hero is moving, and nothing moves again for the length of the visit. There is no cycle, no clock, no idle loop and no hover response.
 
 This is doctrine, not a temporary state while a better figure is found. The site's whole motion vocabulary is one-shot, typographic and *caused*: the masthead's clip-path wipe answers a pointer, the button cipher answers a hover, the reveals answer a scroll. An ambient loop answers nothing, which is why it read as a screensaver and why "confident through silence" — PRODUCT.md's own phrase for this brand — is contradicted by a hero that will not stop moving.
 
-What this forbids, explicitly, so it is not relitigated by increments: no ambient background animation, no idle cycle, no looping canvas, no figure that re-runs on a timer, no parallax, and no hero motion that fires on anything other than first arrival. **A figure that depicts real protocol structure is still admissible** under the Honest-Network Rule's first branch — but if one returns it should advance on scroll or on arrival, so the reader causes the motion, rather than running a clock of its own.
+What this forbids, explicitly, so it is not relitigated by increments: no ambient background animation, no idle cycle, no looping canvas, no figure that re-runs on a timer, no parallax, and ~~no hero motion that fires on anything other than first arrival~~ **no hero motion the reader has not caused** (amended below). **A figure that depicts real protocol structure is still admissible** under the Honest-Network Rule's first branch — but if one returns it should advance on scroll or on arrival, so the reader causes the motion, rather than running a clock of its own.
+
+#### The Set-Once Rule, first amendment: caused motion
+
+*2026-08-16, hours after the rule was written, on the user's direction and against aspensearch.com. The hero has a ground again: `hero-field.tsx` — a frozen field of Geist Mono hex with a monochrome wake the pointer stirs through it. (The ground shipped that afternoon as a Bayer dither with a mint plume and was rebuilt the same evening, user-directed, for being too close a copy of the reference — see §5. The terms below are what admitted a ground in the first place and they did not change.)*
+
+**What was struck is one clause: "and no hover response." What survives is everything that clause was written to protect.** The rule's own argument is quoted above and it is about causation, not about hovering — *"the masthead's clip-path wipe answers a pointer, the button cipher answers a hover, the reveals answer a scroll. An ambient loop answers nothing."* A trail that exists only under the cursor answers a pointer. It was on the wrong side of the rule's list and the right side of the rule's reason.
+
+The rule's closing sentence already anticipated the shape of this: *"it should advance on scroll or on arrival, so the reader causes the motion."* The amendment adds a third cause to that pair and changes nothing else.
+
+**The terms are exact, and they are what makes this an amendment rather than a repeal:**
+
+- **The field does not drift.** It is baked into a texture once per viewport size. There is no `time` uniform anywhere in `src/lib/hero-field/shaders.ts` — not set to zero, not present. The reference this comes from advances its noise every frame; ours cannot.
+- **There is no `requestAnimationFrame` at rest.** The loop starts on a `pointermove` and stops ~2.2s after the last one. Between times the hero costs exactly what a static image costs. *Verified, not asserted:* `window.__heroFieldFrames` exists so this is testable, and it must not increment across a quiet interval.
+- **The loop lands where it started.** Before stopping it clears the trail and renders once more, so the resting frame is bit-identical to the frame before the pointer arrived (measured: 0 differing pixels of 1,215,360).
+- **The type is untouched.** A box SDF fitted to the type's own extent clears both layers off the title block — the ground a long way out, the wake right at the letters (measured: 0 field pixels inside the headline box, both schemes, while sweeping straight through it).
+- **The ground and the plume are gated separately.** *Corrected after the first critique, which asked the right question: if the field is frozen, why withhold it from someone who asked for less motion?* It is a still image, so everyone who can run WebGL2 gets it — reduced-motion visitors and every phone included. Only the **plume** needs a cause, so it is built only where a fine hover pointer exists and motion has not been declined; without both, no solver is allocated at all and no pointer listener is attached (measured: canvas present, ground painted, **0 frames** after 25 pointer events). Gating the ground on a mouse would have handed most of this site's traffic — a link opened on a phone — a different hero from everyone else's.
+
+**Still forbidden, unchanged:** ambient background animation, idle cycles, timers, parallax, scroll-linked figure motion that runs past its trigger, and any hero figure that moves without the reader moving it. If the field is ever found drifting, cycling, or holding a rAF at rest, it is in breach of this rule and not an exception to it.
+
+**What the ground is, honestly:** Perlin noise deciding which cells of a hex field are occupied. It clears the Honest-Network Rule's *second* branch only — see that rule's own accounting below, which this amendment does not improve.
 
 ## 5. Components
 
@@ -464,25 +503,62 @@ The bar meets the page on a clean line instead, and the value step from `--nav-b
 
 - **Style:** A single 1px line in Hair (`#e4e4e7`), inset to the page-x rhythm so it visually aligns with the content above and below. No vertical dividers.
 
-### Status Tag — The Soft-Capsule Exception
+### Status Tag — The Signal Square
 
 Used in the wallet directory to mark a project's *maturity* ("Beta") as a
 different class of fact from its *surface* ("iOS and Android").
 
-- **Style:** Chalk (`#f4f4f5`) fill, Body (`#3f3f46`) text, `rounded.full`,
-  `3px 9px`, GT-Standard 500 at `0.75rem`. No border, no shadow, sentence
-  case, no tracking.
-- **Why it is round:** user-directed 2026-08-14. The first version obeyed
-  the sharp-and-flat doctrine — hairline-outlined box, tracked-out
-  uppercase — and read as a generic SaaS status chip. The tell was the
-  outline-plus-caps-plus-tracking combination, not the corner radius;
-  softening the shape and dropping the shout is what removes it. Since the
-  navbar's condensed box was retired 2026-08-16 (§5 Navigation) this is the
-  only rounded surface on the site at all, full radius or otherwise.
+- **Style:** A 7px `--signal-page` square, `8px`, then the word in Geist
+  Mono at `0.75rem`, uppercase, tracked `0.06em`, in Ink. No fill, no
+  border, no padding, no radius. It is `.protocol-part__mark`'s recipe
+  applied to one word: the square is an inline-block `::before` sitting on
+  the text baseline (lifted 1px, which centres it against the cap height),
+  and the facts row is `align-items: baseline` so 12px tag and 13px facts
+  sit on one line of type.
+- **Why it looks like the column:** user-directed 2026-08-16, pointing at
+  the protocol-parts property list. A maturity fact *is* a stated property,
+  and the site already has one way of opening those.
+- **What it replaced, and why that argument is closed.** Two earlier
+  versions, both 2026-08-14. The first was a sharp hairline-outlined box in
+  tracked uppercase, and it read as a generic SaaS status chip; the
+  diagnosis was that the tell is **outline + caps + tracking**, not the
+  corner radius. The fix at the time was a soft capsule — Chalk fill,
+  `rounded.full`, GT-Standard sentence case — the *only* full radius the
+  site ever licensed. That capsule is now deleted, and the original
+  diagnosis is exactly why this version is safe: there is no container at
+  all. Caps and tracking on a bulleted micro-label is a list item; a chip
+  needs a box. With the capsule gone there is **no `border-radius` in the
+  site's own voice at all** — `rounded.full` has no consumer, `rounded.card`
+  survives only in the Placeholder Surface spec below, which is by
+  definition never shipped — and the last grey plate goes with it.
 - **Bounds:** `STATUS_FACTS` only (`src/app/wallets/page.tsx`). Descriptive
-  facts stay in Geist Mono with no container. Buttons, the segmented
-  control, and every panel stay sharp. Keep the set small — the moment
-  everything is a tag, nothing is.
+  facts stay in Geist Mono, Muted, with no mark and no container. The square
+  distinguishes the maturity fact only for as long as it is the one fact
+  that carries one — keep the set small, and don't give a second kind of
+  fact a square instead of adding it here.
+
+### The Hero Field
+
+*Added 2026-08-16, on the user's direction, after aspensearch.com — then **rebuilt the same day, also user-directed, because the first version was a straight port of theirs**. `src/components/hero-field.tsx`, `src/lib/hero-field/`. Read the Set-Once Rule's first amendment (§4) first: the terms there are what make a ground admissible at all, and they are unchanged by the rebuild.*
+
+The hero's ground: a frozen field of Geist Mono hex, and a wake the pointer stirs through it.
+
+**What it replaced, and why that matters more than what it is.** The first build was an ordered Bayer dither with a mint-green fluid plume. That is the reference site's hero, ported down to its solver constants — and together with the masthead clock and the split band it made three borrowings from one source in a day. Both identifiable elements are gone: the halftone became type, and the wake became monochrome. **The gesture survives, the material does not.** That is the distinction to hold on to if anything else on this site is ever built from a reference.
+
+- **The ground.** 4-octave Perlin fbm, domain-warped, baked once into a texture per viewport size — one texel per cell. It is not drawn; it decides *occupancy*: a cell whose noise clears the threshold carries a character, so the field clusters and thins organically instead of tiling. Set in `--ghost`, which follows the scheme.
+- **The alphabet is hex, and it is not a message.** Sixteen glyphs, rasterised once into a strip texture (`glyphs.ts`) in the same face the site sets all its technical notation in, from the same alphabet the cipher pass scrambles through (`src/lib/cipher.ts`). A Cashu secret *is* a string of entropy, so a field of hex is the honest thing for the page's substrate to be made of: it says "this is ciphertext" without claiming to say anything in particular. **Never put words here** — that would be copy nobody wrote, at a size nobody can read.
+- **The wake stirs, it does not decrypt.** The Navier–Stokes solver is unchanged and still shapes it — that curl and settle was the thing worth keeping — but what it modulates is which character a cell shows and how hard it is set. Inside the wake a cell churns the alphabet at the cipher pass's own **46ms quantum** and sets in `--body`; behind it the cell drops back to its resting character in `--ghost`. Nothing resolves into anything, and the code does not pretend otherwise: there is no message under the field.
+- **`--body`, not `--ink`.** A clear resolve, but still a step below the value the headline is set in, so the wake can never out-set the page peak.
+- **Monochrome, on purpose.** The plume used to be `--signal-page`. It is not any more — see §2's hero episode for what that cost and what it taught.
+- **Occupancy multiplies density, not alpha.** Every falloff — the type mask, the edge fade — scales the value *before* the occupancy threshold, so characters drop out; fading type with alpha greys the letterforms and the field turns into a smudge. Same lesson the deleted ASCII field taught about a partial mix.
+- **The type is cleared, and the mask fits the ink, not the box.** A box SDF around the union of `.hero-spec__content`'s **children** — the block itself is a full-width flex column, and fitting the mask to it cleared nearly the whole hero and left the field as two slivers in the margins. The ground fades out a long way from the type (120px feather), the wake runs right up to the letters (26px), because one that stops short reads as broken. *Measured: zero field pixels inside the headline's box, both schemes, while sweeping straight through it.*
+- **The section's edges are cleared too, and this is not optional.** A box SDF puts its highest values *furthest* from the box — the top and bottom of the canvas — so the field's densest band landed under the masthead and its second washed across the closing hairline. Measured on the dither version: **23.7%** under the bar against 0.6–2.6% mid-field, which is the retired `--nav-edge` strip reinstated by accident twelve hours after it was rejected by name. A 150px top and 96px bottom fade takes it to **1.1%**.
+- **Quiet on purpose, and equally quiet in both schemes.** The gain is calibrated against the light pairing — `--ghost` `#d4d4d8` on `#ffffff`, a 1.478:1 step. `--ghost` does *not* hold that step: at night it is `#3f3f46` on `#0a0a0b`, **1.894:1**. `gainFor()` trades occupancy against the step the scheme gives, holding perceived weight constant rather than the number.
+- **Real device pixel ratio, capped at 2.** The dither was pinned to dpr 1 and needed `image-rendering: pixelated` to survive the compositor's upscale. Letterforms are the opposite case: they want the device's own resolution and smooth sampling, so the canvas takes it and the pixelated hack is gone.
+- **Nothing renders before `fonts.ready`.** The atlas is cut through a 2D canvas, and `ctx.font` falls back silently — a miss ships the field in the system monospace, on a site with a three-typeface rule, in a way that still looks fine and so survives review.
+- **Two tiers.** The ground is a still image, so it mounts for everyone with WebGL2 — reduced-motion and touch included. The wake needs a pointer that can cause it, so the solver is built only where one exists; without it, no listeners and no rAF. See §4.
+- **~13KB gzipped, no dependencies.** The reference drives this through Three + `@react-three/fiber` + `@react-three/postprocessing`, ~1.1MB minified. **Don't add one.**
+- **Bounds:** the hero, and only the hero. Not a section background, not a card texture, not a page-wide grain. A second instance is a new decision.
 
 ### Placeholder Surface
 
@@ -547,7 +623,7 @@ The section that ends the homepage argument: a headline and lead, then a floatin
 
 ### Don't
 
-- **Don't** introduce chromatic accent in the site's own voice. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Never on cashu.space. Colour appears in exactly two places, both named in §2: third-party marks, under the Depicted-World Exception; and `--signal` on the protocol-parts property squares, under the Signal-Green Exception. The second is a scoped licence for one element on one ground, not a palette slot — don't reach for it anywhere else, and don't read it as permission to open a third.
+- **Don't** introduce chromatic accent in the site's own voice. Generic crypto landing pages are the anti-reference — neon gradients on black, gradient text, animated 3D coins. Never on cashu.space. Colour appears in exactly two places, both named in §2: third-party marks, under the Depicted-World Exception; and the signal green, under the Signal-Green Exception, on two named consumers — the protocol-parts property squares and the wallet-directory status tag. That is a list of licensed consumers, not a palette slot: don't reach for it in a third place, don't reach for it as a fill, a glow, a gradient or a state, and above all don't reach for it at scale — it was briefly given the hero and taken back the same day (§2).
 - **Don't** add Web3 / DeFi tropes: pastel gradients, blob shapes, decorative network animations that misrepresent how the protocol works (e.g. mints "talking" to mints, which Cashu doesn't do). Motion is permitted only under the Honest-Network Rule — see §4.
 - **Don't** dress up privacy. No locks, no shields, no padlocks, no ALL-CAPS "YOUR DATA, SECURED™" copy. Privacy is a property of the protocol, stated plainly.
 - **Don't** use `box-shadow` anywhere. No drop shadow, inner shadow, coloured glow, or button exception.

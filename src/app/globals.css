@@ -73,12 +73,21 @@
   --panel-muted: rgba(255, 255, 255, 0.68);
 
   /* Signal — the system's one chromatic value, user-directed 2026-08-16.
-     It marks the property lists in the protocol-parts column and nothing
-     else. See the Signal-Green Exception, DESIGN.md §2: the No-Colour Rule
-     still governs every other surface, and this token is scoped to the
-     always-dark ground it was picked against. Never used for type, for a
-     state, or as a brand accent. */
+     It fills the 7px square that opens a stated property: the protocol-parts
+     property lists, and (widened the same day, on the user's direction) the
+     wallet-directory status tag. See the Signal-Green Exception, DESIGN.md
+     §2. The No-Colour Rule still governs every other surface. Never used for
+     type, for a state, or as a brand accent.
+
+     TWO VALUES, ONE MARK. --signal is the value picked against the
+     always-dark --panel column, and it does not flip because that ground
+     never does. --signal-page is the same mark on the page ground, which
+     DOES flip, so it has to: #6fe3a4 measures 1.59:1 on Paper — the square
+     all but disappears in light mode. The light value is the same hue
+     (147°) taken down to 3.5:1. Both are declared in :root; the dark blocks
+     collapse --signal-page back onto --signal. */
   --signal: #6fe3a4;
+  --signal-page: #1b9d55;
 
   /* Interaction washes. */
   --wash: rgba(9, 9, 11, 0.06);
@@ -239,6 +248,10 @@
     --panel-hair: #3f3f46;
     --panel-fg: #f4f4f5;
 
+    /* On a dark page the mark needs no darkening — this is the ground the
+       value was picked against in the first place. */
+    --signal-page: var(--signal);
+
     --press-mark: brightness(0) invert(1);
 
     /* The masthead lifts off the page at night. --nav-plate is --paper by
@@ -276,6 +289,8 @@
   /* See the note in the media-query block above; keep both identical. */
   --panel-hair: #3f3f46;
   --panel-fg: #f4f4f5;
+
+  --signal-page: var(--signal);
 
   --press-mark: brightness(0) invert(1);
 
@@ -1287,17 +1302,63 @@ html:not(.js) .reveal {
 }
 
 /*
+ * The hero's ground (hero-field.tsx), readmitted 2026-08-16 on the user's
+ * direction — see the Set-Once Rule's amendment in DESIGN.md §4 for why a
+ * ground is admissible again and on exactly what terms.
+ *
+ * It carries no styling of its own beyond position. Deliberately:
+ *
+ *   - No background. The canvas is transparent and draws only the stipple and
+ *     the plume, so --paper shows through and the scheme flip stays in CSS.
+ *     A background here would put an opaque full-bleed plate in the hero,
+ *     which is the surface a contrast extension repaints (CLAUDE.md).
+ *   - pointer-events: none. It covers the whole section including the two
+ *     CTAs, which have to stay clickable. The component listens on `window`
+ *     for exactly this reason and scopes itself with a bounds check.
+ *   - No opacity and no filter. The field's quietness is the --ghost value and
+ *     the shader's ground gain, both chosen against the ramp. Dimming a 1-bit
+ *     dither with opacity would grey the dots instead of thinning them, which
+ *     is the lesson the deleted ASCII field's morph mix already taught.
+ *
+ * There is no reduced-motion rule for it because there is nothing to cancel:
+ * the component never mounts under that setting, so the element does not
+ * exist rather than existing and holding still.
+ */
+.hero-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /*
+   * The backing store is pinned to 1 device pixel per CSS pixel (see
+   * `scene.ts`) because the dither is a lattice: at dpr 2 each cell is drawn
+   * from four texels and the pattern stops being 1-bit. The cost is that on a
+   * retina display the compositor upscales 2x — and its default is bilinear,
+   * which softens exactly the hard on/off edge the whole effect is made of.
+   * Nearest-neighbour upscaling keeps the cell square. No-op at dpr 1.
+   */
+  image-rendering: pixelated;
+}
+
+/*
  * margin-block: auto in a flex column splits the free space above and below
  * the single child, which is what centres the title block. When the content
  * outgrows min-height the free space is zero, the auto margins collapse, and
  * the padding above does the work — so the short-viewport behaviour is
  * unchanged from when the copy was pinned to the top.
  *
- * The z-index that used to sit here went with the figure: there is nothing
- * left to stack above.
+ * The z-index is back (2026-08-16) for the same reason it left: it went with
+ * the old figure and returns with the new ground. The type has to sit above
+ * the canvas — though the shader also clears a box around .hero-spec__content
+ * so nothing is drawn behind the headline in the first place. Both, because
+ * the stacking is structural and the mask is compositional.
  */
 .hero-spec__inner {
   position: relative;
+  z-index: 1;
   margin-block: auto;
 }
 
@@ -2853,9 +2914,13 @@ html:not(.js) .reveal {
 /* Decision facts (platform, status) — their own column, not free text
    after the host, so they align. Still data, not badges: no fill, no
    border, spacing does the separating. */
+/* Baseline, not the default stretch: the status tag sets 12px against the
+   descriptive facts' 13px, and stretch would hang the smaller one from the
+   top of the flex line instead of sitting it on the same line of type. */
 .wallet-row__facts {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
   column-gap: 1.25em;
   row-gap: 2px;
   align-self: center;
@@ -2872,50 +2937,60 @@ html:not(.js) .reveal {
  * Status tag — maturity, not surface. "Beta" answers a different question
  * from "iOS and Android", so it stops looking like the same kind of fact.
  *
- * THE SOFT-CAPSULE EXCEPTION (user-directed 2026-08-14, replacing the
- * outlined stamp shipped earlier the same day). This is the second surface
- * on the site allowed a radius, after the navbar's condensed box, and the
- * only one allowed a *full* one. It is a deliberate borrow from the iOS
- * badge: filled capsule, no rim, no shadow, sentence case.
+ * THE SIGNAL-SQUARE FAMILY (user-directed 2026-08-16). This replaces the
+ * Soft-Capsule Exception of 2026-08-14 — Chalk fill, `border-radius: 999px`,
+ * GT-Standard sentence case — which is deleted, and with it the site's last
+ * rounded surface and its last grey plate. The directive was to put the tag
+ * in the same family as the 7px `--signal` square that opens each property
+ * in the protocol-parts column, so it now uses that column's exact recipe:
+ * a sharp green square, then 12px Geist Mono uppercase tracked 0.06em.
  *
- * The first attempt was a sharp hairline-outlined box set in tracked-out
- * uppercase — doctrinally correct per the Flat Cipher Slab rules, and it
- * read as exactly the SaaS-dashboard chip those rules exist to prevent.
- * The tell was never the radius. It was the combination of an outline, all
- * caps, and 0.06em tracking on a 12px word, which is the house style of
- * every status pill on every AI-generated landing page. Softening the
- * shape and dropping the shout is what removes the resemblance:
+ * Which retires an argument this comment used to make. The capsule existed
+ * because the *first* attempt — hairline-outlined box, uppercase, tracked —
+ * read as a generic SaaS status chip, and the diagnosis was that the tell
+ * was "outline + caps + tracking", not the corner radius. That diagnosis
+ * still holds and is exactly why this version works: there is no container
+ * at all now. Caps and tracking on a bulleted micro-label is a list item,
+ * which is what the protocol-parts properties are. A chip needs a box.
  *
- *   - Fill, no border. iOS badges are tinted grounds, not rims. Chalk on
- *     Paper is the monochrome reading of systemGray6 — visible as a shape,
- *     silent as a value. Nothing here reaches for a hue.
- *   - Sentence case, no tracking. "Beta" is a word, not a klaxon. The
- *     uppercase micro step stays where it belongs (labels, eyebrows).
- *   - UI face, not mono. The descriptive facts beside it are data and stay
- *     in Geist Mono; this is a piece of interface furniture and takes
- *     GT-Standard, which is also what makes it read iOS rather than
- *     terminal.
+ *   - No fill, no border, no padding. The square and the spacing do the
+ *     separating, the same way they do in the column.
+ *   - Mono, not GT-Standard. The old note argued the tag was interface
+ *     furniture and the facts beside it were data. In the family it is a
+ *     stated property, and every stated property on this site is mono.
+ *   - Ink, not Body. With the Chalk ground gone there is nothing left to
+ *     step down from; Ink (17.72:1 light, 18.00:1 dark) against the
+ *     neighbouring facts' Muted (4.83:1) is what now marks it as the
+ *     different class of fact.
  *
- * Body (not Muted) on the Chalk fill: Muted lands at 4.40:1 once there is
- * a tint behind it, which fails AA for 12px text — it only passed while
- * the tag ground was pure Paper. Body holds 9.50:1 light, 12.39:1 dark.
+ * The square is `--signal-page`, not `--signal`: this ground flips and the
+ * protocol-parts column's does not. See the token note in :root.
  *
- * Bounded, like every other exception here: STATUS_FACTS only. Buttons,
- * the segmented control, panels, and the descriptive facts all stay sharp.
- * The moment a second kind of thing gets a capsule, this is just rounding.
+ * Bounded, like every other exception here: STATUS_FACTS only. The square
+ * marks the maturity fact and nothing else in the row — give one to every
+ * fact and it stops distinguishing anything.
  */
 .wallet-row__fact--tag {
-  border: 0;
-  border-radius: 999px;
-  background-color: var(--chalk);
-  padding: 3px 9px;
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.25;
-  color: var(--body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
   white-space: nowrap;
-  align-self: center;
+}
+
+/* Sharp, flat, 7px — .protocol-part__mark's twin. Inline-block rather than
+   a flex child so the tag keeps a text baseline and sits on the facts row
+   with its mono siblings; an empty inline-block's baseline is its bottom
+   edge, so the square lands on the baseline and the 1px lift centres it
+   against the 12px cap height. */
+.wallet-row__fact--tag::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  margin-bottom: 1px;
+  background-color: var(--signal-page);
 }
 
 /* The site's one inline prose link. Nearly every destination here is a

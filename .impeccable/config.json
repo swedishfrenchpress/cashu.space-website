@@ -52,12 +52,6 @@
         "reason": "user confirmed 2026-08-14 (AskUserQuestion): four-parts block titles demoted one step below t-headline, clamp(1.75rem,2.6vw,2.25rem), so the section title is the section's only full headline"
       },
       {
-        "rule": "design-system-radius",
-        "value": "999px",
-        "createdAt": "2026-08-14T19:13:44.004Z",
-        "reason": "user confirmed 2026-08-14: asked for the wallet Beta tag to be rounded and iOS-like; documented as the Soft-Capsule Exception in DESIGN.md §5 and added as rounded.full"
-      },
-      {
         "rule": "design-system-font-size",
         "value": "4rem",
         "createdAt": "2026-08-16T11:19:27.206Z",

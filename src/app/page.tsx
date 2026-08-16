@@ -1,5 +1,6 @@
 import Link from "next/link";
 import HeroCipher from "@/components/hero-cipher";
+import HeroField from "@/components/hero-field";
 import InThePress from "@/components/in-the-press";
 import NewTabHint from "@/components/new-tab-hint";
 import ProtocolParts from "@/components/protocol-parts";
@@ -28,22 +29,28 @@ export default function Home() {
             too, so the air distributes above and below the title block rather
             than pooling into a void beneath it.
 
-            THE HERO HAS NO GROUND, and that is the design. It carried a
-            full-bleed figure for months — an ASCII field, then a wide dot
-            figure from thinking-orbs — and the dot figure was deleted
-            2026-08-16 on the user's direction for reading as generic: a blob,
-            which is PRODUCT.md's own second anti-reference, depicting nothing,
-            looping forever with no cause. See the Set-Once Rule, DESIGN.md §4,
-            before putting anything back here. If something does come back, the
-            bar is that it depicts real protocol structure — not that it looks
-            good behind the type.
+            THE HERO HAS A GROUND AGAIN as of 2026-08-16, on the user's
+            direction and after aspensearch.com: a frozen field of Geist Mono hex
+            with a wake the pointer stirs through it (hero-field.tsx). Read the Set-Once Rule's amendment in DESIGN.md
+            §4 before touching it — the rule was not repealed, it was narrowed
+            to what it always argued, which is that motion must be *caused*.
+            The field does not drift, there is no rAF at rest, and the loop
+            stops on a frame identical to the one it started from. The hero is
+            still exactly as still as it was with no ground at all.
 
-            The whole of the motion is the arrival: the hairline draws across
-            the fold (globals.css, `hero-rule-draw`), "ecash" resolves out of
-            hex, and the headline, deck and CTAs settle on the existing staged
-            Reveal. By ~1.1s nothing on the page is moving, and nothing moves
-            again. */}
+            What that does NOT license is the thing that was deleted from here:
+            the wide dot figure from thinking-orbs, a blob (PRODUCT.md's own
+            second anti-reference) that looped forever with no cause. An
+            ambient loop is still forbidden. So is a hero figure that runs a
+            clock.
+
+            The arrival is unchanged: the hairline draws across the fold
+            (globals.css, `hero-rule-draw`), "ecash" resolves out of hex, and
+            the headline, deck and CTAs settle on the staged Reveal. By ~1.1s
+            nothing is moving, and nothing moves again until the reader moves
+            it. */}
         <section className="hero-spec">
+          <HeroField />
           <div className="hero-spec__inner page-shell">
             <div className="hero-spec__content">
               <Reveal immediate delay={120}>

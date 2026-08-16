@@ -63,10 +63,12 @@ type DirectoryGroup = {
 };
 
 /* Facts that describe a project's *maturity* rather than its surface. These
-   render as a bordered tag instead of plain mono, because they answer a
-   different question from "iOS and Android": one tells you where it runs, the
-   other tells you how much to trust it yet. Keep this set small — the moment
-   everything is a tag, nothing is. */
+   render opened by a 7px --signal square and set in tracked uppercase, in
+   the protocol-parts property family (user-directed 2026-08-16, replacing
+   the grey capsule) — because they answer a different question from "iOS
+   and Android": one tells you where it runs, the other tells you how much
+   to trust it yet. Keep this set small: the square only distinguishes the
+   maturity fact for as long as it is the only fact that carries one. */
 const STATUS_FACTS = new Set(["Beta"]);
 
 // Grouped by surface. Wallets come first (Mobile, then Web), then the
