@@ -50,9 +50,25 @@ const PARTS: Part[] = [
     body: "Independent, open source, and free. Run a Cashu wallet on iOS, Android, or in the browser, and hold bearer tokens the way you hold cash.",
     orb: "composing",
     orbLabel: "A dotted band undulating around a sphere.",
+    /* "THE TOKEN IS THE MONEY" replaced "SELF-CUSTODIAL BY DEFAULT"
+       (user-directed 2026-08-16). The old line was false, and false in the
+       one way this site cannot afford: ecash is NOT self-custody. The mint
+       holds the bitcoin; what you hold is a bearer claim on it. Entry 02
+       says exactly that two columns away — "Ecash is a claim on its mint,
+       not a deposit" — so the page was contradicting itself, and the
+       footer's "balances held with a mint are a claim on that mint" a third
+       time. Borrowing bitcoin's strongest word for a custodial-backed
+       instrument is the kind of claim PRODUCT.md's whole voice exists to
+       avoid.
+
+       The replacement states the property that IS true of a wallet here:
+       the token is a bearer string, so holding the data is holding the
+       money — which is also what makes losing it final. Distinct from
+       entry 04's "BEARER STRINGS OF BITCOIN", which describes the token;
+       this describes what holding one means. */
     points: [
       "IOS, ANDROID, AND BROWSER",
-      "SELF-CUSTODIAL BY DEFAULT",
+      "THE TOKEN IS THE MONEY",
       "NO ACCOUNTS, NO SIGNUP",
       "OPEN SOURCE, INDEPENDENTLY BUILT",
     ],

@@ -45,7 +45,31 @@ type Entry = {
      stay verifiable against the project's own site or repo — the registry
      states facts, it does not endorse. Facts that hold for the whole
      directory ("Open source" — everything here is) say nothing and stay
-     out. */
+     out.
+
+     LICENCE is the second decision fact, added 2026-08-16. The directory
+     gave a chooser almost nothing to choose on: platform, and "Beta" on
+     four rows. Licence is objective, it does not go stale the way a release
+     date does, and it actually separates these projects for a
+     sovereign-minded reader — eNuts is copyleft, Sovran is MPL, the two
+     Rust/TS libraries are dual Apache-2.0-or-MIT, and the rest are MIT.
+     "Open source" was correctly excluded for saying nothing; *which*
+     licence says something.
+
+     Sourced 2026-08-16 from each project's own repository, not from a
+     directory or a search result: SPDX id via the GitHub API where GitHub
+     classified it, and the LICENSE file read directly where it did not
+     (cdk and cashu-ts are dual-licensed, which the API reports as
+     NOASSERTION; eNuts is GPL-3.0, which the API reported as none). Repo
+     identity was confirmed against each repo's own `homepage` or
+     description before its licence was trusted.
+
+     TWO ROWS DELIBERATELY CARRY NO LICENCE. AGI Cash's repo
+     (MakePrisms/agicash, homepage agi.cash) has no LICENSE file on its
+     default branch, and Athenut's site could not be tied to a specific
+     repo with confidence. A blank cell here means "not verified", which is
+     the honest state; do not fill either from a search hit, and do not
+     infer "no LICENSE file" means "not open source" in the copy. */
   facts?: string[];
 };
 
@@ -71,12 +95,12 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Mobile wallets",
     scope: "Ecash in your pocket. Hold bearer tokens on your phone.",
     entries: [
-      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["iOS, Android, and PWA", "Beta"] },
-      { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android"] },
-      { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS"] },
-      { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android"] },
-      { name: "Numo",      href: "https://numopay.org",        facts: ["Android", "Point of sale"] },
-      { name: "Sovran",    href: "https://sovran.money/en/",   facts: ["iOS", "Beta"] },
+      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["iOS, Android, and PWA", "MIT", "Beta"] },
+      { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android", "GPL-3.0"] },
+      { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS", "MIT"] },
+      { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android", "MIT"] },
+      { name: "Numo",      href: "https://numopay.org",        facts: ["Android", "Point of sale", "MIT"] },
+      { name: "Sovran",    href: "https://sovran.money/en/",   facts: ["iOS", "MPL-2.0", "Beta"] },
     ],
   },
   {
@@ -94,10 +118,10 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Libraries",
     scope: "Libraries and SDKs for building on the Cashu protocol.",
     entries: [
-      { name: "Nutshell", href: "https://github.com/cashubtc/nutshell", facts: ["Python", "Reference implementation"] },
-      { name: "CDK",      href: "https://github.com/cashubtc/cdk",      facts: ["Rust"] },
-      { name: "Cashu TS", href: "https://github.com/cashubtc/cashu-ts", facts: ["TypeScript"] },
-      { name: "Coco",     href: "https://github.com/cashubtc/coco",     facts: ["TypeScript"] },
+      { name: "Nutshell", href: "https://github.com/cashubtc/nutshell", facts: ["Python", "Reference implementation", "MIT"] },
+      { name: "CDK",      href: "https://github.com/cashubtc/cdk",      facts: ["Rust", "Apache-2.0 or MIT"] },
+      { name: "Cashu TS", href: "https://github.com/cashubtc/cashu-ts", facts: ["TypeScript", "Apache-2.0 or MIT"] },
+      { name: "Coco",     href: "https://github.com/cashubtc/coco",     facts: ["TypeScript", "MIT"] },
     ],
   },
   {
@@ -106,7 +130,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
        page is a directory and the two wallet groups name themselves. */
     scope: "Software for running and managing your own mint.",
     entries: [
-      { name: "Orchard", href: "https://orchard.space", facts: ["Self-hosted"] },
+      { name: "Orchard", href: "https://orchard.space", facts: ["Self-hosted", "MIT"] },
     ],
   },
 ];
