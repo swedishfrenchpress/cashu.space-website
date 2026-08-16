@@ -3,7 +3,7 @@
 /**
  * ThemeToggle — flips the site between light and dark by writing
  * data-theme on <html>, which every consumer already watches: the CSS
- * tokens and the hero AsciiField.
+ * tokens and the hero HeroOrb.
  *
  * Choosing the scheme the OS already prefers clears the override
  * entirely, so the site returns to following the OS setting live. The

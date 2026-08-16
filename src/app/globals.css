@@ -1276,11 +1276,11 @@ html:not(.js) .reveal {
 }
 
 /*
- * ASCII field — the hero's ground. A live contour field that fills the whole
- * section, morphing slowly between terrain, the vault door, and the
- * blind-signature round trip (see src/lib/ascii/).
+ * The hero's ground. A wide dot figure filling the whole section, with the
+ * Bitcoin mark surfacing out of it and receding on a 72s cycle (see
+ * src/components/hero-orb.tsx). Replaced the live ASCII field 2026-08-16.
  *
- * The Reveal wrapper carries the positioning, not .ascii-field itself: while
+ * The Reveal wrapper carries the positioning, not .hero-orb itself: while
  * unrevealed, .reveal holds `will-change: transform`, which establishes a
  * containing block: an absolutely positioned child inside it would resolve
  * inset:0 against a zero-height box and paint nothing until the reveal
@@ -1296,115 +1296,94 @@ html:not(.js) .reveal {
   z-index: 0;
 }
 
-.ascii-field {
+.hero-orb {
   position: relative;
   overflow: hidden;
   width: 100%;
   height: 100%;
   pointer-events: none;
   user-select: none;
-  /* The canvas resolves its ctx.font from this computed family. */
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
   /*
-   * Readability mask, two gradients intersected (amended 2026-08-14, user-
-   * approved option A: see the Fold-Line and Centred-Hero entries, DESIGN.md
-   * §4).
-   *
-   * Vertical: fully transparent behind the sticky bar, still faint through the
-   * headline's band, full past the copy — the words always read against
-   * near-open paper. The flat transparent run to 9% is load-bearing twice
-   * over: it stops the field competing with the navbar, and the renderer
-   * skips those rows outright (MASK_DEAD_TOP in ascii-field.tsx — keep the two
-   * numbers in sync or the field visibly clips).
-   *
-   * Second pass: an elliptical quiet zone around the centred copy block, not
-   * a full-height stripe. The stripe held the middle down at every height,
-   * which cut a hole out of the horizon under the CTAs and crushed the morph
-   * scenes wherever they stood (0.09-0.22 effective strength across the vault
-   * and round trip at 1440). The ellipse quiets the same copy block, then
-   * releases the bottom-centre, so the field runs full-strength along the
-   * whole horizon — which is where the scenes now stage (bottom-centre, see
-   * SCENE_* in ascii-field.tsx; the mask and the stage move together). The
-   * 0.30 inner hold matches the old stripe's register (0.26 desktop, 0.45
-   * mobile); the 72% plateau keeps the CTA row inside the quiet before the
-   * short ramp to full.
-   *
-   * mask-composite: intersect is the standard keyword; -webkit-mask-composite
-   * spells the same operation `source-in`. Both are listed because Safari
-   * honours the prefixed mask-image property and needs the prefixed keyword to
-   * match it.
+   * The Bitcoin mark's raster resolves its face from this computed family —
+   * ctx.font cannot take a CSS var. The mark is built from the font's own B
+   * plus two rules, not typed: the shipped GT-Standard trial faces cover 271
+   * characters and carry no U+20BF (nor $ ¥ €), so fillText("₿") here lands
+   * in a system font or in tofu. See src/lib/orb/btc-glyph.ts.
    */
-  -webkit-mask-image:
-    linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 9%,
-      rgb(0 0 0 / 0.32) 36%,
-      #000 70%
-    ),
-    radial-gradient(
-      50% 40% at 50% 40%,
-      rgb(0 0 0 / 0.3) 0 72%,
-      #000 100%
-    );
-  mask-image:
-    linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 9%,
-      rgb(0 0 0 / 0.32) 36%,
-      #000 70%
-    ),
-    radial-gradient(
-      50% 40% at 50% 40%,
-      rgb(0 0 0 / 0.3) 0 72%,
-      #000 100%
-    );
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  /*
+   * Readability mask, rebuilt 2026-08-16 with the figure it masks
+   * (user-directed; see the Fold-Line Rule, DESIGN.md §4).
+   *
+   * ONE gradient now, not two intersected. The elliptical quiet zone that
+   * used to be the second pass was written for an EVEN texture: a full-bleed
+   * glyph grid has no density of its own, so the mask had to supply the
+   * quiet around the centred copy. The dot figure has density of its own —
+   * its ring stack crowds at the top and bottom of the ellipse and opens out
+   * at the equator — so a centre-dim would quiet the figure's most open
+   * region and, worse, sit exactly on the stage where the mark resolves.
+   * Retired, and mask-composite with it: there is nothing left to compose.
+   *
+   * The flat transparent run to 9% is load-bearing twice over, unchanged: it
+   * stops the field competing with the masthead, and the renderer culls every
+   * mark above it (MASK_DEAD_TOP in hero-orb.tsx — keep the two numbers in
+   * sync or the field visibly clips).
+   *
+   * The stops follow the figure, which is a band across the bottom third
+   * rather than a full-height ground: its top arc lands around 65%, so the
+   * ramp is placed to meet it there and give the band a soft upper edge
+   * instead of a hard one, then releases to full by 86% where the mass sits
+   * and where the horizon has to run unbroken into the closing hairline.
+   * The copy is on open paper now and the mask no longer has to defend it.
+   */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 9%,
+    rgb(0 0 0 / 0.1) 46%,
+    rgb(0 0 0 / 0.42) 68%,
+    #000 86%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 9%,
+    rgb(0 0 0 / 0.1) 46%,
+    rgb(0 0 0 / 0.42) 68%,
+    #000 86%
+  );
 }
 
 /*
- * Below the lg breakpoint the copy spans nearly the full measure, so the
- * ellipse widens (68% of a narrow viewport) to keep the line ends quiet;
- * the vertical fade still does most of the work. The old flat 0.45 hold-down
- * went with the stripe: it dimmed the horizon along with the copy, and the
- * vault — which now crests bottom-centre on phones too — needs that ground.
+ * Narrow: the copy occupies proportionally more of the hero — the headline
+ * runs to three lines and the CTAs stack — so the ramp starts lower and lands
+ * later. Same single gradient; the ellipse that widened to 68% here went with
+ * the radial.
  */
 @media (max-width: 767px) {
-  .ascii-field {
-    -webkit-mask-image:
-      linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 9%,
-        rgb(0 0 0 / 0.26) 40%,
-        #000 78%
-      ),
-      radial-gradient(
-        68% 38% at 50% 40%,
-        rgb(0 0 0 / 0.3) 0 72%,
-        #000 100%
-      );
-    mask-image:
-      linear-gradient(
-        to bottom,
-        transparent 0,
-        transparent 9%,
-        rgb(0 0 0 / 0.26) 40%,
-        #000 78%
-      ),
-      radial-gradient(
-        68% 38% at 50% 40%,
-        rgb(0 0 0 / 0.3) 0 72%,
-        #000 100%
-      );
+  .hero-orb {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 9%,
+      rgb(0 0 0 / 0.08) 52%,
+      rgb(0 0 0 / 0.34) 72%,
+      #000 90%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 9%,
+      rgb(0 0 0 / 0.08) 52%,
+      rgb(0 0 0 / 0.34) 72%,
+      #000 90%
+    );
   }
 }
 
 /* Absolutely positioned so the bitmap size can never feed back into the
    wrapper's layout size (prevents a ResizeObserver loop). */
-.ascii-field__canvas {
+.hero-orb__canvas {
   position: absolute;
   inset: 0;
   width: 100%;

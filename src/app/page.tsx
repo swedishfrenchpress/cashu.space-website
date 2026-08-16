@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AsciiField from "@/components/ascii-field";
+import HeroOrb from "@/components/hero-orb";
 import InThePress from "@/components/in-the-press";
 import ProtocolParts from "@/components/protocol-parts";
 import ReferenceImplementations from "@/components/reference-implementations";
@@ -14,24 +14,30 @@ export default function Home() {
 
       {/* Hero — single-column spec opener, centred on purpose (the site's one
           departure from left-aligned editorial; see the Centred-Hero
-          Exception, DESIGN.md §4). A live ASCII field fills the whole section
-          as its ground, morphing slowly between the terrain, the vault door,
-          and the blind-signature round trip; the headline, lead, and paired
-          CTAs sit centred on top of it, the headline escaping the page shell.
-          The field's symmetric mask holds it near-empty behind the copy
-          column and lets it run full-strength out to both edges, so "title
-          at the top, horizon at the bottom" survives the field going
-          full-bleed. The staged reveal runs headline, then body, then CTA,
-          with the field fading in last. */}
+          Exception, DESIGN.md §4). A wide dot figure fills the whole section
+          as its ground — the thinking-orbs `listening` mode stretched into an
+          ellipse roughly twice as wide as it is tall, with the Bitcoin mark
+          surfacing out of the field and receding again on a 72s cycle. The
+          headline, deck, and paired CTAs sit centred on top of it, the
+          headline escaping the page shell. The figure's mask is a vertical
+          fade alone: it holds the ground near-empty through the copy and
+          releases at the bottom, so "title at the top, horizon at the bottom"
+          survives the figure going full-bleed. The staged reveal runs
+          headline, then body, then CTA, with the figure fading in alongside.
+
+          NOTE: hero-orb.tsx measures `.hero-spec__content` below to stage the
+          Bitcoin mark in the clear band beneath the copy. Renaming that class
+          does not break the figure — the mark falls back to a fixed fraction
+          — but it does silently stop the measurement. */}
       <section id="main-content" className="hero-spec">
         <Reveal
           immediate
           variant="fade"
           slow
-          delay={480}
+          delay={360}
           className="hero-spec__field"
         >
-          <AsciiField />
+          <HeroOrb />
         </Reveal>
 
         <div className="hero-spec__inner page-shell">
