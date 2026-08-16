@@ -1303,14 +1303,9 @@ html:not(.js) .reveal {
   height: 100%;
   pointer-events: none;
   user-select: none;
-  /*
-   * The Bitcoin mark's raster resolves its face from this computed family —
-   * ctx.font cannot take a CSS var. The mark is built from the font's own B
-   * plus two rules, not typed: the shipped GT-Standard trial faces cover 271
-   * characters and carry no U+20BF (nor $ ¥ €), so fillText("₿") here lands
-   * in a system font or in tofu. See src/lib/orb/btc-glyph.ts.
-   */
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  /* No font-family here. The canvas draws arcs and nothing else — the one
+     consumer was the Bitcoin mark's offscreen raster, removed 2026-08-16
+     along with btc-glyph.ts. */
   /*
    * Readability mask, rebuilt 2026-08-16 with the figure it masks
    * (user-directed; see the Fold-Line Rule, DESIGN.md §4).
@@ -1335,6 +1330,10 @@ html:not(.js) .reveal {
    * instead of a hard one, then releases to full by 86% where the mass sits
    * and where the horizon has to run unbroken into the closing hairline.
    * The copy is on open paper now and the mask no longer has to defend it.
+   *
+   * The ramp's lower half was also protecting the Bitcoin mark's stage from
+   * being crushed; the mark went 2026-08-16 and the stops are unchanged
+   * anyway, because the figure's own mass sits in the same band.
    */
   -webkit-mask-image: linear-gradient(
     to bottom,

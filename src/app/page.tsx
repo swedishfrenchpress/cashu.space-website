@@ -16,19 +16,18 @@ export default function Home() {
           departure from left-aligned editorial; see the Centred-Hero
           Exception, DESIGN.md §4). A wide dot figure fills the whole section
           as its ground — the thinking-orbs `listening` mode stretched into an
-          ellipse roughly twice as wide as it is tall, with the Bitcoin mark
-          surfacing out of the field and receding again on a 72s cycle. The
-          headline, deck, and paired CTAs sit centred on top of it, the
-          headline escaping the page shell. The figure's mask is a vertical
-          fade alone: it holds the ground near-empty through the copy and
-          releases at the bottom, so "title at the top, horizon at the bottom"
-          survives the figure going full-bleed. The staged reveal runs
-          headline, then body, then CTA, with the figure fading in alongside.
+          ellipse roughly twice as wide as it is tall, sitting as a band across
+          the bottom third and cropping past the closing hairline. The
+          headline, deck, and paired CTAs sit centred above it on open paper,
+          the headline escaping the page shell. The figure's mask is a vertical
+          fade alone, meeting the band's top arc so it has a soft upper edge.
+          The staged reveal runs headline, then body, then CTA, with the figure
+          fading in alongside.
 
-          NOTE: hero-orb.tsx measures `.hero-spec__content` below to stage the
-          Bitcoin mark in the clear band beneath the copy. Renaming that class
-          does not break the figure — the mark falls back to a fixed fraction
-          — but it does silently stop the measurement. */}
+          A Bitcoin mark used to surface out of the field on a 72s cycle; it
+          was removed 2026-08-16 on the user's direction. The ground depicts
+          nothing at all now — see the Honest-Network Rule, DESIGN.md §4,
+          before putting any figure back into it. */}
       <section id="main-content" className="hero-spec">
         <Reveal
           immediate
