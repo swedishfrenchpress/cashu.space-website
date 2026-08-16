@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NewTabHint from "@/components/new-tab-hint";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
@@ -142,6 +143,36 @@ export default function WalletsPage() {
               same spec. Any client that implements the Cashu protocol is
               conformant. This list is non-exhaustive, a snapshot of what
               people use today, not an endorsement.
+            </p>
+            {/* The decision fact, cited rather than restated.
+
+                A directory of thirteen rows with one identical OPEN slab
+                each gives a chooser almost nothing to choose on: platform,
+                and "Beta" on four of them. The fact that would actually
+                separate these wallets for this audience is which optional
+                NUTs each one implements — and cashubtc/nuts already keeps
+                that table, maintained by the people who write the specs.
+
+                So it is linked, not copied. Duplicating it here would be a
+                second source of truth that goes stale the first time a
+                wallet ships a NUT, on the page whose lead promises a
+                snapshot and whose footer says to read the spec before
+                trusting anyone, including us. The wording stays hedged on
+                purpose: the table covers seven implementations, not all
+                thirteen rows below, so it must not read as a complete
+                per-wallet matrix. */}
+            <p className="t-body text-muted">
+              Optional NUT support varies between wallets. The{" "}
+              <a
+                href="https://github.com/cashubtc/nuts#optional"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="prose-link"
+              >
+                spec repo
+                <NewTabHint />
+              </a>{" "}
+              tracks which implementations support what.
             </p>
           </div>
         </Reveal>

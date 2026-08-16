@@ -448,6 +448,14 @@ The bar meets the page on a clean line instead, and the value step from `--nav-b
 
 **What this replaced, and what died with it.** From 2026-07-25 the bar followed the Onyx pattern — transparent at rest, condensing on scroll into a floating box with a glass ground, 20px blur, 12px radius, a `--glass-hair` rim and `--nav-shadow`. A full-bleed bar and a box that pulls in from the viewport edges are opposite gestures and cannot both be true, so the whole two-state apparatus is gone: the condense hysteresis, the settle-delayed `--nav-h` guard, `--nav-inset`, `--nav-condensed-max`, `--nav-shadow`, and the `--glass-*` ramp. **That box was the site's only sanctioned `box-shadow` and its only translucent surface. Both exceptions are now closed** — see §4. Any rule elsewhere in this document that still grants the navbar a licence is describing a surface that no longer exists; do not reintroduce glass, radius, or shadow on the strength of it.
 
+### Prose Link
+
+*Added 2026-08-16.* The site's one inline text link. Nearly every destination here is a `.btn-*` or a `nav-link`; this exists for the rare sentence that has to **cite a source rather than restate it** — the first case being the NUT compatibility table on the directory page, which `cashubtc/nuts` maintains and this site therefore does not copy.
+
+- **Style:** Ink text, 1px underline in Mist at `0.2em` offset, strengthening to Ink on hover over `--dur-base`. No colour, no glyph, no arrow.
+- **Why underlined and not coloured:** a blue link would open the palette the No-Colour Rule closes, and §6 rules out `Visit →` pseudo-links and arrow glyphs. The word carries the meaning and the line carries the affordance. Mist rather than Fog because the underline *is* the affordance: 4.8:1 on Paper against Fog's 2.3:1, which is the Legible-Rim Rule's reasoning applied to a text decoration.
+- **Bounds:** body prose only. It is not a substitute for a button, and a paragraph that wants three of them is a list that has not been written yet.
+
 ### Divider
 
 - **Style:** A single 1px line in Hair (`#e4e4e7`), inset to the page-x rhythm so it visually aligns with the content above and below. No vertical dividers.

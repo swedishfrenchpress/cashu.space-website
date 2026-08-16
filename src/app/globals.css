@@ -2877,6 +2877,27 @@ html:not(.js) .reveal {
   align-self: center;
 }
 
+/* The site's one inline prose link. Nearly every destination here is a
+   button or a nav item; this is for the rare sentence that has to cite a
+   source rather than restate it. Plain underline, no colour, no glyph — §6
+   rules out `Visit →` pseudo-links and arrows, and a blue link would open
+   the palette the No-Colour Rule closes. The rule is Ink text with a Muted
+   underline that strengthens to Ink on hover: the word carries the meaning,
+   the line carries the affordance, and Muted clears 4.8:1 on Paper rather
+   than the 2.3:1 Fog would have given it. */
+.prose-link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--muted);
+  transition: text-decoration-color var(--dur-base) var(--ease-out-quart);
+}
+
+.prose-link:hover {
+  text-decoration-color: var(--ink);
+}
+
 /* Open chip — a real button, at the one site-wide button size.
 
    It used to carry `padding: 10px 20px`, a --small modifier by another name:
