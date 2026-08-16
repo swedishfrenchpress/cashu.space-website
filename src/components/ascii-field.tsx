@@ -15,8 +15,6 @@ import {
   FILLS,
   LEVEL_GLYPH,
   PEAK_LEVEL,
-  TERRAIN_SCALE,
-  brightness,
   OPEN_FIELD_GAIN,
   createTerrainField,
   displayLevel,
@@ -28,12 +26,6 @@ import {
   vaultBrightness,
   vaultCoverage,
 } from "@/lib/ascii/vault";
-import {
-  WarpPointer,
-  bloomedRadius,
-  displacement,
-  swirlAngle,
-} from "@/lib/ascii/warp";
 
 /**
  * AsciiField — the hero's ground. A canvas grid of Geist Mono glyphs filling
@@ -49,9 +41,15 @@ import {
  * runtime), it takes over.
  *
  * Two clocks. `t` is field time (wall-clock × SPEED) and drives the noise;
- * `wall` is plain elapsed seconds and drives the scene timeline and the
- * pointer lens envelopes, which are specified in real seconds and must not
- * inherit the field's speed scaling.
+ * `wall` is plain elapsed seconds and drives the scene timeline, which is
+ * specified in real seconds and must not inherit the field's speed scaling.
+ *
+ * The field does not respond to the pointer. A contour lens that bent the
+ * sampling around the cursor was removed 2026-08-16 on the user's direction:
+ * over a full-bleed hero the distortion read as a smear across the headline's
+ * ground rather than as an interaction, and the scenes it deformed are the
+ * part carrying the meaning. The field is weather, not a control — don't
+ * reintroduce a hover response here.
  *
  * Theme: resolves like the site CSS — an html data-theme="dark|light"
  * attribute wins, else prefers-color-scheme — and repaints live when either
@@ -61,7 +59,7 @@ import {
  * Draws every 2nd rAF (~30fps), DPR capped at 2, pauses offscreen and on
  * hidden tabs, and renders a single static frame under reduced motion.
  * `staticTime` freezes the renderer at a chosen moment of pure terrain — no
- * morph, no lens — for quieter supporting surfaces. `renderFullField`
+ * morph — for quieter supporting surfaces. `renderFullField`
  * disables the hero mask's top-row optimization when a supporting surface
  * uses its own mask.
  */
@@ -177,7 +175,6 @@ export default function AsciiField({
     let height = 0;
     let rafId = 0;
     let resizeRaf = 0;
-    let rectRaf = 0;
     let frameCount = 0;
     let disposed = false;
     let inView = true;
@@ -214,15 +211,9 @@ export default function AsciiField({
     };
 
     const field = createTerrainField(OPEN_FIELD_GAIN);
-    const pointer = new WarpPointer();
-    /* Cached so a pointermove never forces layout. Refreshed on resize and on
-       scroll (the hero moves under the viewport as the page scrolls); at most
-       one frame stale, which a hover lens cannot perceive. */
-    let rect = wrap.getBoundingClientRect();
 
     const mqReduce = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reduced = mqReduce.matches;
-    const mqFine = window.matchMedia("(hover: hover) and (pointer: fine)");
 
     /* Same resolution order as the CSS tokens: html data-theme wins, else
        the OS scheme. */
@@ -235,7 +226,7 @@ export default function AsciiField({
     };
     let dark = resolveDark();
 
-    /** Elapsed wall-clock seconds — the timeline's and the lens's clock. */
+    /** Elapsed wall-clock seconds — the timeline's clock. */
     const currentWall = () =>
       reduced ? 0 : (performance.now() - start) / 1000;
     /** Field time — the noise's clock. */
@@ -335,53 +326,16 @@ export default function AsciiField({
           ? roundTrip(active.sceneTime / ROUND_TRIP_SECONDS)
           : null;
 
-      /* Pointer lens. Advanced once per frame, before any sampling. */
-      pointer.advance(wall);
-      const k = reduced || staticMode ? 0 : pointer.currentK(wall);
-      const lensR = k > 0 ? bloomedRadius(k) : 0;
-      const lensX = pointer.x;
-      const lensY = pointer.y;
-
       const buckets: number[][] = fills.map(() => []);
       for (let row = firstRow; row < rows; row++) {
         const py = row * CELL_H + CELL_H / 2;
         for (let col = 0; col < cols; col++) {
           const px = col * CELL_W + CELL_W / 2;
 
-          /* Sample position in pixels. Unwarped it is the cell centre; inside
-             the lens it is pulled toward the pointer, so the terrain visibly
-             flees it and the contour lines bend around the rim. */
-          let sx = px;
-          let sy = py;
-          let warped = false;
-          if (lensR > 0) {
-            const ddx = px - lensX;
-            const ddy = py - lensY;
-            const d = Math.hypot(ddx, ddy);
-            if (d > 0 && d < lensR) {
-              const f = displacement(d, k);
-              if (f > 0) {
-                const theta = swirlAngle(f);
-                const cos = Math.cos(theta);
-                const sin = Math.sin(theta);
-                const inv = f / d;
-                sx = px - (ddx * cos - ddy * sin) * inv;
-                sy = py - (ddx * sin + ddy * cos) * inv;
-                warped = true;
-              }
-            }
-          }
-          /* Warped cells leave the separable grid, so they pay the exact
-             per-cell field. At a 220px lens that is a few hundred cells —
-             nothing against the thousands the fast path covers. */
-          const terrainB = warped
-            ? brightness(
-                (sx / CELL_W) * TERRAIN_SCALE,
-                (sy / CELL_H) * TERRAIN_SCALE,
-                t,
-                OPEN_FIELD_GAIN,
-              )
-            : field.brightnessAt(col, row);
+          /* Every cell samples at its own centre, so the whole grid rides the
+             separable fast path — there is no displaced-sample case left now
+             that the pointer lens is gone. */
+          const terrainB = field.brightnessAt(col, row);
 
           /* The morph is a brightness lerp, then a threshold — never a glyph
              crossfade. Dots condense first and ₿ lands last, so the landscape
@@ -393,12 +347,12 @@ export default function AsciiField({
             const isVault = active.scene === "vault";
             const scale = isVault ? vaultScale : bdhkeScale;
             const cover = isVault
-              ? vaultCoverage(sx, sy, cx, cy, scale)
-              : bdhkeCoverage(sx, sy, cx, cy, scale);
+              ? vaultCoverage(px, py, cx, cy, scale)
+              : bdhkeCoverage(px, py, cx, cy, scale);
             if (cover > 0) {
               const shapeB = isVault
-                ? vaultBrightness(sx, sy, cx, cy, terrainB, scale, true)
-                : bdhkeBrightness(sx, sy, cx, cy, terrainB, scale, trip!, t);
+                ? vaultBrightness(px, py, cx, cy, terrainB, scale, true)
+                : bdhkeBrightness(px, py, cx, cy, terrainB, scale, trip!, t);
               b = terrainB + (shapeB - terrainB) * active.mix * cover;
             }
           }
@@ -533,7 +487,6 @@ export default function AsciiField({
         /* Re-resolved here, not captured once at setup: dragging the window
            to a different-DPI monitor fires a resize but not a reload. */
         dpr = Math.min(MAX_DPR, window.devicePixelRatio || 1);
-        rect = wrap.getBoundingClientRect();
         applyCanvasSize();
         paintCurrent();
       });
@@ -555,71 +508,16 @@ export default function AsciiField({
     const onReduceChange = (e: MediaQueryListEvent) => {
       reduced = e.matches;
       if (reduced) {
-        pointer.reset();
         staticTransitioning = false;
         staticFrom = staticTo;
       }
       sync();
     };
 
-    /*
-     * Pointer lens.
-     *
-     * The field is `pointer-events: none` and stays that way — it lies under
-     * the headline and both CTAs, and must never intercept a click. So the
-     * lens listens on the window and hit-tests the cached rect itself. That
-     * also keeps the component free of any assumption about what wraps it.
-     *
-     * Mouse and pen only: on touch there is no hover, and a tap has to reach
-     * the buttons.
-     */
-    /* Tracked separately from `pointer.active`, which stays true through the
-       release settle. Keying re-entry off `active` would call move() instead of
-       engage() on a pointer that came back mid-decay, so the lens would follow
-       the cursor while still fading to nothing. */
-    let pointerInside = false;
-
-    const onPointerMove = (e: PointerEvent) => {
-      if (reduced || staticMode) return;
-      if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
-      if (!mqFine.matches) return;
-      const now = (performance.now() - start) / 1000;
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
-        if (pointerInside) {
-          pointerInside = false;
-          pointer.release(now);
-        }
-        return;
-      }
-      if (pointerInside) {
-        pointer.move(x, y);
-      } else {
-        pointerInside = true;
-        /* engage() ramps from the current envelope, so coming back during the
-           settle resumes rather than snapping shut and reopening. */
-        pointer.engage(x, y, now);
-      }
-    };
-
-    const onPointerLeaveWindow = () => {
-      pointerInside = false;
-      pointer.release((performance.now() - start) / 1000);
-    };
-
-    const onScroll = () => {
-      cancelAnimationFrame(rectRaf);
-      rectRaf = requestAnimationFrame(() => {
-        rect = wrap.getBoundingClientRect();
-      });
-    };
-
     resolveFont();
     const initial = wrap.getBoundingClientRect();
     width = initial.width;
     height = initial.height;
-    rect = initial;
     applyCanvasSize();
     sync();
 
@@ -632,10 +530,6 @@ export default function AsciiField({
     document.addEventListener("visibilitychange", onVisibility);
     mqReduce.addEventListener("change", onReduceChange);
     mqDark.addEventListener("change", onThemeChange);
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    document.addEventListener("pointerleave", onPointerLeaveWindow);
-    window.addEventListener("blur", onPointerLeaveWindow);
-    window.addEventListener("scroll", onScroll, { passive: true });
 
     /* Re-measure once webfonts settle: the first frames may paint in the
        fallback mono, and the ₿ probe is only meaningful post-load. */
@@ -656,17 +550,12 @@ export default function AsciiField({
       updateStaticTimeRef.current = () => {};
       cancelAnimationFrame(rafId);
       cancelAnimationFrame(resizeRaf);
-      cancelAnimationFrame(rectRaf);
       ro.disconnect();
       io.disconnect();
       mo.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
       mqReduce.removeEventListener("change", onReduceChange);
       mqDark.removeEventListener("change", onThemeChange);
-      window.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("pointerleave", onPointerLeaveWindow);
-      window.removeEventListener("blur", onPointerLeaveWindow);
-      window.removeEventListener("scroll", onScroll);
     };
   }, [renderFullField, staticMode, staticTransitionMs]);
 

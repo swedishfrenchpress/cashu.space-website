@@ -232,29 +232,22 @@ export default function SiteHeader() {
 
             <div className="site-nav__actions">
               <ThemeToggle />
-              {/* Two states, one control. At rest it is a labelled slab; once
-                  the bar condenses the label collapses to nothing and the
-                  mark takes over, so the shrunken box spends its width on
-                  navigation instead of a sentence. Both children ship in the
-                  markup and swap in CSS — nothing here depends on the
-                  condense state, so the server frame and the first client
-                  frame agree.
+              {/* One state: the mark. This was a labelled slab at rest that
+                  collapsed to the icon on scroll, and the swap moved the
+                  whole right cluster mid-scroll for no gain (user-directed
+                  2026-08-16). The mark alone reads as GitHub everywhere it
+                  appears, so the label was carrying a 300ms width animation
+                  and nothing else.
 
-                  aria-label is unconditional and matches the visible label
-                  exactly, which is what keeps the accessible name stable
-                  across the swap: in the collapsed state the only child left
-                  is an aria-hidden glyph, and without it the link would
+                  aria-label is what names the control now that the only
+                  child is an aria-hidden glyph; without it the link would
                   announce as "link, https://github.com/cashubtc". */}
               <a
                 href="https://github.com/cashubtc"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-secondary site-nav__cta"
+                className="site-nav__cta focus-ring"
                 aria-label="View on GitHub"
-                /* Suppress the hover cipher while this is a bare mark — the
-                   pass blanks currentColor, which would erase the icon
-                   rather than scramble a label. See button-cipher.tsx. */
-                data-cipher={condensed || isOpen ? "off" : undefined}
               >
                 <svg
                   className="site-nav__cta-icon"
@@ -264,7 +257,6 @@ export default function SiteHeader() {
                 >
                   <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.04-.72.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.77.12 3.06.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.39-5.26 5.68.41.35.78 1.05.78 2.12v3.14c0 .31.21.68.79.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z" />
                 </svg>
-                <span className="site-nav__cta-label">View on GitHub</span>
               </a>
 
               <button
