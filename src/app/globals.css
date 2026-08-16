@@ -30,30 +30,33 @@
   --on-ink: #ffffff;  /* text on inverting chips */
   --edge: #000000;    /* pure-black accents: focus, selection, brand */
 
-  /* Figure-plate optics (§5 Demo Panel). --fig-ground is the drafting
-     sheet the plates and code panes sit on — one full step below Card so
-     the plate reads as an object, not an implication. --fig-edge/--fig-lit/
-     --fig-shade are the machined keyline set: each scheme expresses "lit
-     above, seated below" with the ramp values it has — light darkens the
-     bottom edge, dark lightens the top edge. Borders only; the No-Shadow
-     Rule holds.
-
-     The whole set sits one tone off the sheet on purpose. The ASCII field
-     spans several greys, so a Hair keyline disappeared wherever its value
-     met the ground. Stepping the set one tone (light: ghost sides and lit
-     rim, faint seat; dark: faint rim, ghost sides and seat) keeps the
-     polarity identical and separates the plate from the glyph field. */
-  --fig-ground: #f4f4f5; /* chalk */
-  --fig-edge: #d4d4d8;   /* ghost — the sides */
-  --fig-lit: #d4d4d8;    /* ghost — top edge, same as sides in light */
-  --fig-shade: #a1a1aa;  /* faint — the darker seat */
-
   /* Always-dark showcase surfaces. --panel-hair is invisible in light
      (border matches the fill) and separates the panel from the near-black
      page in dark. */
   --panel: #000000;
   --panel-hair: #000000;
   --panel-fg: #ffffff;
+
+  /* The always-dark column's own ramp (protocol-parts.tsx). Declared once,
+     in :root, and deliberately NOT repeated in the two dark blocks: these
+     are values on an ink ground that never flips, so a dark override would
+     be the same number written twice and one more pair to keep in sync.
+     --panel-rule is the row divider — Hair is a Paper-ground value and
+     disappears on ink, and --panel-hair is #000 in light for exactly the
+     reason that makes it useless as an interior line. --panel-note and
+     --panel-muted are the two steps below --panel-fg: note carries 12px
+     mono (small type needs the weight), muted carries body prose. */
+  --panel-rule: rgba(255, 255, 255, 0.14);
+  --panel-note: rgba(255, 255, 255, 0.86);
+  --panel-muted: rgba(255, 255, 255, 0.68);
+
+  /* Signal — the system's one chromatic value, user-directed 2026-08-16.
+     It marks the property lists in the protocol-parts column and nothing
+     else. See the Signal-Green Exception, DESIGN.md §2: the No-Colour Rule
+     still governs every other surface, and this token is scoped to the
+     always-dark ground it was picked against. Never used for type, for a
+     state, or as a brand accent. */
+  --signal: #6fe3a4;
 
   /* Navbar glass + interaction washes. */
   --glass: rgba(255, 255, 255, 0.7);
@@ -172,14 +175,6 @@
     --on-ink: #0a0a0b;
     --edge: #ffffff;
 
-    /* Figure-plate optics: dark carries the lit rim on top (faint is the
-       lighter value in this ramp) and seats on ghost, mirroring light. The
-       set stays one tone off the ASCII sheet — see the light block. */
-    --fig-ground: #101012; /* band */
-    --fig-edge: #3f3f46;   /* ghost — the sides */
-    --fig-lit: #71717a;    /* faint — the lit top rim */
-    --fig-shade: #3f3f46;  /* ghost — bottom edge, same as sides in dark */
-
     --panel: #131316;
     --panel-hair: #27272a;
     --panel-fg: #f4f4f5;
@@ -212,14 +207,6 @@
   --ink-hover: #e4e4e7;
   --on-ink: #0a0a0b;
   --edge: #ffffff;
-
-  /* Figure-plate optics: dark carries the lit rim on top (faint is the
-     lighter value in this ramp) and seats on ghost, mirroring light. The
-     set stays one tone off the ASCII sheet — see the light block. */
-  --fig-ground: #101012; /* band */
-  --fig-edge: #3f3f46;   /* ghost — the sides */
-  --fig-lit: #71717a;    /* faint — the lit top rim */
-  --fig-shade: #3f3f46;  /* ghost — bottom edge, same as sides in dark */
 
   --panel: #131316;
   --panel-hair: #27272a;
@@ -345,7 +332,6 @@
   --color-band: var(--band);
   --color-chalk: var(--chalk);
   --color-hair: var(--hair);
-  --color-fig-edge: var(--fig-edge);
   --color-ghost: var(--ghost);
   --color-faint: var(--faint);
   --color-muted: var(--muted);
@@ -2017,526 +2003,377 @@ html:not(.js) .reveal {
 }
 
 /* ===================================================================
- * Warp-flavored restyle — feature scroller + video. Monochrome
- * throughout: warp's tinted panels become chalk (var(--chalk)) grounds
- * with hair (var(--hair)) rims. Flat, sharp.
+ * Protocol parts — the split spec sheet (protocol-parts.tsx).
  *
- * The .section-eyebrow rule that opened this block is gone: nothing used
- * it, and DESIGN.md §6 rules section eyebrows out by name ("sections
- * separate by space and headline, not by labelled introductions"). It was
- * a live stylesheet entry for a component the doctrine forbids.
+ * Full-bleed two-column band: a sticky Paper column on the left holding
+ * the section's whole argument, an always-dark column on the right
+ * scrolling four numbered entries past it. Each entry is a hanging index,
+ * a title, a description, an animated plate, and the properties it
+ * carries. Replaced the sticky-tab feature scroller, its demo panels, the
+ * video band, and the properties bento in one move, 2026-08-16.
+ *
+ * This band does not sit in the page shell. It is full-bleed on purpose:
+ * a 1280px-capped composition cannot hold the three-column entry row (the
+ * description column lands under 250px, ~28 characters a line, and the
+ * layout stops being the layout). The break with the shell's left edge is
+ * the price, and it is paid by a surface that already reads as its own
+ * object — a full-height panel with its own ground, like the hero field.
+ * Do not "align" it back to the shell without re-deriving the row.
  * =================================================================== */
-
-/* -------------------------------------------------------------------
- * Feature scroller — sticky left column (heading + tab-list) tracks a
- * scrolling right stack. The heading rides with the nav so "The protocol,
- * in four parts." stays on screen for the whole section.
- * ------------------------------------------------------------------- */
-.feature-scroller__body {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2rem, 4vw, 3rem);
+.protocol-parts {
+  background-color: var(--paper);
 }
 
+/* The split is 40/60, not the reference's 50/50. At the width the
+   reference was captured at (~2000px) an even split leaves each half wide
+   enough; at 1440 it does not, and the entry row's two content columns
+   were the first thing to break. The left column loses width it was not
+   using — its headline is three short lines and its paragraph is capped
+   at measure either way. */
 @media (min-width: 1024px) {
-  .feature-scroller__body {
+  .protocol-parts {
     display: grid;
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    gap: clamp(3rem, 6vw, 6rem);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
     align-items: start;
   }
 }
 
-/* Left column — heading + nav. Sticky on lg+ so both persist while the
-   feature blocks scroll past on the right. */
-.feature-scroller__aside {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1.5rem, 3vw, 2.25rem);
+/* --- left: the sticky argument ------------------------------------ */
+
+.protocol-parts__aside {
+  padding-inline: var(--page-x);
+  padding-block: var(--section-air);
 }
 
+.protocol-parts__aside-inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3.5rem);
+}
+
+/* Sticky and viewport-tall on desktop: the headline holds the top of the
+   panel and the paragraph sits on its floor, so the argument stays whole
+   while all four entries scroll past it. Height is svh, not vh, so mobile
+   browser chrome cannot push the paragraph out of the panel. */
 @media (min-width: 1024px) {
-  .feature-scroller__aside {
+  .protocol-parts__aside {
     position: sticky;
-    top: clamp(88px, 12vh, 148px);
+    top: var(--nav-h);
+    height: calc(100svh - var(--nav-h));
+    padding-block: clamp(3rem, 8vh, 6rem);
+    padding-right: clamp(2rem, 3.5vw, 3.5rem);
+  }
+
+  .protocol-parts__aside-inner {
+    height: 100%;
+    justify-content: space-between;
   }
 }
 
-.feature-scroller__title {
-  max-width: 16ch;
-  /* Balanced so the phone width doesn't strand "parts." on its own line. */
-  text-wrap: balance;
-}
-
-/* Nav: jump-row below lg, vertical list on lg+. The row wraps when the
-   rail is narrower than the four items (at 390px: two rows of two), so
-   every part stays visible. This replaced the overflow-scroll row with the
-   scroll-timeline edge fade: the fourth item sat fully off-screen and the
-   fade dimmed nothing but whitespace, so no affordance survived. */
-.feature-nav {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-/* Phones: the break is two by two, not three plus an orphan — at 390px the
-   free wrap fits three items on the first line and strands "04 Tokens"
-   alone. Grid pins the pairing regardless of label widths. */
-@media (max-width: 639px) {
-  .feature-nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1024px) {
-  .feature-nav {
-    flex-direction: column;
-  }
-}
-
-.feature-nav__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--body);
-  cursor: pointer;
-  text-align: left;
-  white-space: nowrap;
+/* A display step of its own, between Headline (3rem) and Display (9rem).
+   It is not Display: the hero owns the page peak, and 2026-08-14 already
+   established that a second surface at hero scale reads as competition
+   rather than hierarchy. It is not Headline either — at 3rem it sat in a
+   440px-wide sticky panel looking like a caption for the column beside it.
+   Sized to break in three lines at 1440 the way the reference does.
+   See DESIGN.md §3. */
+.protocol-parts__title {
+  margin: 0;
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: clamp(2.25rem, 3.6vw, 4rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  /* Uppercase as text-transform, not retyped markup, so the source string
+     stays sentence case for screen readers and search — same treatment as
+     the hero headline. */
   text-transform: uppercase;
-  /* Colour only — the active background snaps. A background transition
-     here left two items reading as active for 220ms during every
-     scroll-spy handoff. */
-  transition: color var(--dur-fast) var(--ease-out-quart);
+  color: var(--ink);
+  /* Optical-left correction: this headline is left-aligned against a real
+     margin, so glyph side bearing has to be cancelled or the inked edge
+     sits inboard of the paragraph below it. -0.058em is the measured value
+     for GT-Standard 600 (DESIGN.md §4, Centred-Hero Exception, item 1) —
+     the hero drops the correction because it is centred; this one needs
+     it. */
+  margin-left: -0.058em;
+}
+
+.protocol-parts__lead {
+  margin: 0;
+  /* 44ch, not 65: the ch unit measures "0", which is wider than
+     GT-Standard's average glyph, so this sets ~50 real characters. */
+  max-width: 44ch;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--body);
+  text-wrap: pretty;
+  /* Flat caps ("C" opens the line) want a deeper correction than the round
+     caps the headline is set in. Measured value from DESIGN.md §4. */
+  margin-left: -0.095em;
+}
+
+/* --- right: the numbered entries ---------------------------------- */
+
+.protocol-parts__list {
+  background-color: var(--panel);
+  color: var(--panel-fg);
+  padding-inline: var(--page-x);
+  /* Invisible in light (the border matches the fill) and the boundary
+     between the panel and the near-black page in dark, which is the whole
+     job of --panel-hair. */
+  border-left: 1px solid var(--panel-hair);
 }
 
 @media (min-width: 1024px) {
-  .feature-nav__item {
-    width: 100%;
+  .protocol-parts__list {
+    padding-left: clamp(2rem, 3.5vw, 3.5rem);
+    padding-right: var(--page-x);
   }
 }
 
-.feature-nav__item:hover {
-  color: var(--ink);
+.protocol-part {
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  padding-block: clamp(3.5rem, 6vw, 5.5rem);
 }
 
-/* Coarse pointers: the segments clear the 44px target, the same bump the
-   demo toggle carries. */
-@media (pointer: coarse) {
-  .feature-nav__item {
-    padding-block: 14px;
+/* Rows separate from each other, not from the band's edges: no rule above
+   the first entry or below the last. Hairline register, on the one line
+   value that survives an ink ground. */
+.protocol-part + .protocol-part {
+  border-top: 1px solid var(--panel-rule);
+}
+
+/* Entry layout, in three tiers.
+ *
+ * Below 1024 everything stacks in document order.
+ *
+ * 1024–1439: the hanging index appears and the plate and the property
+ * list pair up beneath, but the title and description still stack across
+ * the full entry width — at these widths a third column puts the
+ * description under 250px and it stops being prose.
+ *
+ * 1440+: the reference arrangement. Description moves up beside the title,
+ * plate under the title, list under the description. */
+@media (min-width: 1024px) {
+  .protocol-part {
+    grid-template-columns: 2.75rem minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(1.5rem, 2.5vw, 2.5rem);
+    /* Tight, because in this tier the title and its own description are two
+       consecutive grid rows and a 4rem row-gap put a section's worth of air
+       between a sentence and the paragraph explaining it. The air the entry
+       actually needs is above the plate, which is where it is put. */
+    row-gap: clamp(1rem, 1.6vw, 1.5rem);
+    align-items: start;
+  }
+
+  .protocol-part__index {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .protocol-part__head,
+  .protocol-part__body {
+    grid-column: 2 / 4;
+  }
+
+  /* The plate carries the entry's internal break. It sets the row height,
+     so the property list bottom-aligns to the same enlarged row without
+     needing a margin of its own. */
+  .protocol-part__plate {
+    grid-column: 2;
+    margin-top: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  /* Bottom-aligned with the plate: the list is the entry's floor, the way
+     the reference sets it. */
+  .protocol-part__points {
+    grid-column: 3;
+    align-self: end;
   }
 }
 
-.feature-nav__item.is-active {
-  background-color: var(--ink);
-  color: var(--on-ink);
-}
+@media (min-width: 1440px) {
+  /* Title and description share row 1 here, so the row-gap now separates
+     the copy from the plate and the plate's own margin is not needed. */
+  .protocol-part {
+    row-gap: clamp(3rem, 4.5vw, 4.5rem);
+  }
 
-.feature-nav__num {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.75rem;
-  opacity: 0.6;
-}
+  .protocol-part__plate {
+    margin-top: 0;
+  }
 
-.feature-track {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(3.5rem, 8vw, 7rem);
-}
+  .protocol-part__head {
+    grid-column: 2;
+    grid-row: 1;
+  }
 
-.feature-block {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(1.5rem, 3vw, 2rem);
-  scroll-margin-top: clamp(96px, 14vh, 168px);
-}
+  .protocol-part__body {
+    grid-column: 3;
+    grid-row: 1;
+  }
 
-/* Grey specimen panel behind the kept photo — warp's screenshot frame,
-   monochrome. Replaces the old white-square-on-photo overlay. */
-.feature-media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  background-color: var(--chalk);
-  border: 1px solid var(--hair);
-}
+  .protocol-part__plate {
+    grid-row: 2;
+  }
 
-/* Demo variant of the media panel — UI/Code switcher (see
-   protocol-demo.tsx). Two stacked views crossfade over a shared ASCII
-   contour sheet; a square segmented control floats bottom-center. The
-   Figure and Code views select nearby frozen field frames. The canvas
-   interpolates its terrain time for one brief recalculation, then goes idle,
-   so the ground changes without adding another ambient animation loop.
-   Mobile relaxes the 16:10 to a taller frame so the code pane fits without
-   inner scrolling.
-
-   min-height is the floor that keeps the frame tall enough for its fixed-
-   height figure plates plus the floating toggle's reserved lane. Without it,
-   the 16:10 (or 4:5) frame shrinks with column width and, below ~640px of
-   frame width, gets shorter than the tallest plate — so the plate overflows
-   under the toggle. The floor holds ~360px of plate room after the 64px
-   toggle lane and top padding, which clears every current plate. */
-.feature-demo {
-  aspect-ratio: 4 / 5;
-  min-height: 440px;
-  isolation: isolate;
-  background-color: var(--fig-ground);
-  /* Height of the lane the floating toggle reserves at the frame's base.
-     Coarse pointers grow the segments to the 44px target, so the lane grows
-     with them — otherwise the taller control eats into the plate. */
-  --demo-toggle-lane: 72px;
-}
-
-@media (pointer: coarse) {
-  .feature-demo {
-    --demo-toggle-lane: 80px;
+  .protocol-part__points {
+    grid-row: 2;
   }
 }
 
-/* Below the sm breakpoint a ratio-driven frame cannot hold its own content:
-   a caption that wraps to three lines pushes the plate 28px into the toggle
-   (measured at 390px). Here the panel stops being a fixed box and sizes to
-   what it contains — both views share one grid cell, so the crossfade still
-   has no layout shift and the row takes the taller of the two. §5 asks a
-   plate to size to its content; this lets the frame do the same. */
-@media (max-width: 639px) {
-  .feature-demo {
-    aspect-ratio: auto;
-    min-height: 0;
-    display: grid;
-  }
-}
-
-@media (min-width: 640px) {
-  .feature-demo {
-    aspect-ratio: 16 / 10;
-  }
-}
-
-.feature-demo__view {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  /* `safe` so an overflowing child resolves into the padded area instead
-     of cropping symmetrically past both edges (which ate the pane's
-     filename strip and ran code under the toggle). */
-  align-items: safe center;
-  justify-content: safe center;
-  padding: clamp(16px, 4vw, 40px);
-  padding-bottom: var(--demo-toggle-lane, 64px); /* clears the floating toggle */
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--dur-base) var(--ease-out-quart);
-  background-color: transparent;
-}
-
-/* Static samples of the homepage's real ASCII contour field replace the
-   generic graph paper. On a Figure/Code change the canvas interpolates the
-   field's terrain time: contours migrate cell by cell, so glyphs promote,
-   demote, and disappear into the new sample instead of crossfading as a
-   bitmap. The material changes with the artifact, but it never loops or
-   competes with the page's one live field.
-
-   The field is masked down under the central artifact, then allowed to gain
-   density at the panel edges. That keeps the plate/code pane legible while
-   still making the surface unmistakably typographic. */
-.feature-demo__ascii {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.feature-demo__ascii-field {
-  position: absolute;
-  inset: 0;
-  opacity: 0.46;
-  -webkit-mask-image: radial-gradient(
-    88% 82% at 50% 44%,
-    rgb(0 0 0 / 0.08) 0,
-    rgb(0 0 0 / 0.18) 42%,
-    #000 100%
-  );
-  mask-image: radial-gradient(
-    88% 82% at 50% 44%,
-    rgb(0 0 0 / 0.08) 0,
-    rgb(0 0 0 / 0.18) 42%,
-    #000 100%
-  );
-  -webkit-mask-composite: source-over;
-  mask-composite: add;
-}
-
-.feature-demo__view.is-active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* The artifacts are flex items, and a flex item's automatic minimum size is
-   its min-content — for the code pane that is its longest unwrappable mono
-   line (~452px), which refused to shrink, pushed the pane past the frame,
-   and disabled the pre's own overflow-x safety net. min-width: 0 hands the
-   overflow decision back to the pre, where the thin-scrollbar net lives. */
-.feature-demo__view > * {
-  min-width: 0;
-}
-
-/* Narrow counterpart to the content-driven frame above: the views leave the
-   absolute stack and share one grid cell, so the taller of the two sets the
-   panel's height and neither can overrun the toggle. Declared after the
-   base rule because it overrides `position`/`inset` at equal specificity. */
-@media (max-width: 639px) {
-  .feature-demo__view {
-    position: relative;
-    inset: auto;
-    grid-area: 1 / 1;
-    /* Same automatic-minimum-size trap one level up: as a grid item the
-       view's min-content (driven by the code pane's longest line) forced
-       the shared 1/1 track wider than the frame, clipping both views on
-       phones. Zeroed, the track sizes to the frame and content shrinks. */
-    min-width: 0;
-  }
-}
-
-/* Pane type scale — one step down from .t-mono (13px) so eight lines of
-   spec clear the 16:10 frame at the lg column width; pixel spans match so
-   mixed lines don't jump size mid-line. Element+class beats the bare .t-*
-   role classes on specificity. */
-.feature-demo pre.t-mono {
-  font-size: 0.8125rem;
-  line-height: 1.4rem;
-}
-
-.feature-demo pre .t-pixel {
-  font-size: 0.8125rem;
-  line-height: 1.4rem;
-}
-
-/* Phones: one more step down (12px) so less of each 58ch line hides past
-   the pane's edge; the edge fade and touch scroll carry the rest. Pixel
-   spans stay matched so mixed lines don't jump size mid-line. */
-@media (max-width: 639px) {
-  .feature-demo pre.t-mono,
-  .feature-demo pre .t-pixel {
-    font-size: 0.75rem;
-    line-height: 1.25rem;
-  }
-}
-
-/* Overflow safety net only — snippets are authored to fit. If a line ever
-   scrolls, the bar must not be the loudest element in the frame: thin and
-   quiet in the pane's own greys. */
-.feature-demo pre {
-  scrollbar-width: thin;
-  scrollbar-color: var(--ghost) transparent;
-}
-
-.feature-demo pre::-webkit-scrollbar {
-  height: 6px;
-}
-
-.feature-demo pre::-webkit-scrollbar-thumb {
-  background-color: var(--ghost);
-}
-
-.feature-demo pre::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-/* Overflow affordance for the pane, the jump-row's former edge-fade
-   grammar rehomed here: with the scrollbar thin (and invisible on iOS
-   until touched), a clipped mono line must read as a cut, not a defect.
-   The fade widths ride a scroll timeline, so each edge dims only while
-   content actually continues past it; when the pane fits (or the browser
-   lacks scroll-driven animations) the timeline is inactive, the initial
-   0px holds, and nothing is dimmed. */
-@property --pane-fade-start {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-@property --pane-fade-end {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
-.feature-demo pre {
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 var(--pane-fade-start),
-    #000 calc(100% - var(--pane-fade-end)),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 var(--pane-fade-start),
-    #000 calc(100% - var(--pane-fade-end)),
-    transparent 100%
-  );
-  animation: feature-pane-edges linear both;
-  animation-timeline: scroll(self inline);
-}
-
-/* Fallback for browsers without scroll-driven animations: below sm the
-   panes always overflow (58ch of 12px mono against a ~310px view), so a
-   static end-fade is always telling the truth. At sm and up the panes are
-   authored to fit, so nothing is faded. Where the timeline does run, its
-   keyframes override this value in both directions. */
-@media (max-width: 639px) {
-  .feature-demo pre {
-    --pane-fade-end: 28px;
-  }
-}
-
-@keyframes feature-pane-edges {
-  0% {
-    --pane-fade-start: 0px;
-    --pane-fade-end: 28px;
-  }
-  8% {
-    --pane-fade-start: 28px;
-  }
-  92% {
-    --pane-fade-end: 28px;
-  }
-  100% {
-    --pane-fade-start: 28px;
-    --pane-fade-end: 0px;
-  }
-}
-
-/* Figure plates — §5 Demo Panel. A published technical plate, not a file
-   pane: Card fill on the ASCII sheet, hairline keyline whose top edge
-   is lit and bottom edge seated (--fig-lit/--fig-shade — fill and border
-   only, the No-Shadow Rule holds), captioned below in the site's own
-   voice. The interior speaks machine notation; the caption speaks GT. */
-.fig {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 560px;
-}
-
-.fig-plate {
-  border: 1px solid var(--fig-edge);
-  border-top-color: var(--fig-lit);
-  border-bottom-color: var(--fig-shade);
-  background-color: var(--card);
-}
-
-/* RFC-style caption: the thesis sentence in GT body small. Sits outside the
-   plate on the ground — the figure is the object, the caption is the
-   document's voice describing it. No rule above it: the plate's own bottom
-   keyline already draws the line (Hairline Rule — no double rules).
-
-   The "Fig. NN" number that used to lead this line was dropped 2026-08-14;
-   .fig-caption__num went with it. Nothing in the copy referred to a figure
-   by number, so the label was register costume, not navigation. */
-.fig-caption {
+/* The index and the part name. Inline on phones where they read as one
+   line of metadata above the title; stacked into the hanging gutter on
+   desktop, where the number sits on the title's first baseline. */
+.protocol-part__index {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin-top: 12px;
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
+@media (min-width: 1024px) {
+  .protocol-part__index {
+    flex-direction: column;
+    gap: 6px;
+    /* Optical alignment with the title's first line rather than its box:
+       the title runs line-height 1.1 at up to 34px, so its cap sits a few
+       pixels below the top of its own row. */
+    padding-top: 0.4em;
+  }
+}
 
-.fig-caption__text {
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1.45;
-  color: var(--body);
+.protocol-part__num {
+  color: var(--panel-muted);
+}
+
+.protocol-part__name {
+  color: var(--panel-note);
+}
+
+.protocol-part__title {
+  margin: 0;
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.2vw, 2.125rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--panel-fg);
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.protocol-part__body p {
+  margin: 0;
+  /* Measured, not guessed: 50ch computed to 537px here and set 71 real
+     characters a line, the top of the 65–75 band. 46ch lands ~66. See the
+     ch note on the lead above. */
+  max-width: 46ch;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--panel-muted);
   text-wrap: pretty;
 }
 
-/* Square segmented control — the feature-nav register one size down.
-   Carries its own opaque Card ground + keyline so it reads on all four
-   surface combinations (light/dark theme × UI/Code view). Flat like every
-   other control in the system. The rim takes --fig-edge, not --hair, so it
-   stays distinct from the multi-tone ASCII field. */
-.feature-demo__toggle {
+/* --- the plate ---------------------------------------------------- */
+
+/* The plate is sized in CSS and measured back by the canvas, never scaled
+   by CSS — see orb-figure.tsx. The 320px cap is above the 300pt frame the
+   library's dot radii are tuned for, which is the top of the range where
+   the geometry still reads as designed rather than as a magnification. */
+.orb-plate {
+  position: relative;
+  width: clamp(190px, 20vw, 320px);
+  aspect-ratio: 1;
+}
+
+.orb-plate__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The registration marks: four corner brackets the orb overruns. Without
+   some frame a thinking-orbs animation reads as what it was built to be —
+   a loading spinner — and four spinners down a column say the page is
+   still working. Bracketed, indexed and titled, the same animation reads
+   as a figure in a numbered document, which is the register this site is
+   in. The reference does the same job with a dotted rule around its
+   wireframes.
+
+   Corners rather than that full dotted rectangle, which is where this
+   started: `shaping` spends a third of its cycle as a dotted square, and
+   at inset 15% the figure's square landed within a few pixels of the
+   frame's, so the plate read as one doubled box instead of a figure inside
+   a crop. Corner marks cannot collide with any figure in the set. Eight
+   gradients because a single element draws four L-brackets in no fewer. */
+.orb-plate__crop {
+  --mark: 16px;
   position: absolute;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: inline-flex;
-  gap: 3px;
-  padding: 3px;
-  background: var(--card);
-  border: 1px solid var(--fig-edge);
+  inset: 8%;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--panel-rule), var(--panel-rule)),
+    linear-gradient(var(--panel-rule), var(--panel-rule)),
+    linear-gradient(var(--panel-rule), var(--panel-rule)),
+    linear-gradient(var(--panel-rule), var(--panel-rule)),
+    linear-gradient(var(--panel-rule), var(--panel-rule)),
+    linear-gradient(var(--panel-rule), var(--panel-rule)),
+    linear-gradient(var(--panel-rule), var(--panel-rule)),
+    linear-gradient(var(--panel-rule), var(--panel-rule));
+  background-repeat: no-repeat;
+  background-size:
+    var(--mark) 1px, 1px var(--mark),
+    var(--mark) 1px, 1px var(--mark),
+    var(--mark) 1px, 1px var(--mark),
+    var(--mark) 1px, 1px var(--mark);
+  background-position:
+    left top, left top,
+    right top, right top,
+    left bottom, left bottom,
+    right bottom, right bottom;
 }
 
-.feature-demo__toggle-btn {
-  border: 0;
-  background: transparent;
-  padding: 7px 16px;
-  cursor: pointer;
-  color: var(--muted);
-  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+/* --- the property list -------------------------------------------- */
+
+.protocol-part__points ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.protocol-part__points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
   font-size: 0.75rem;
-  font-weight: 500;
+  line-height: 1.4;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition:
-    color var(--dur-fast) var(--ease-out-quart),
-    background-color var(--dur-fast) var(--ease-out-quart);
+  color: var(--panel-note);
 }
 
-.feature-demo__toggle-btn:hover {
-  color: var(--ink);
+/* Sharp, flat, 7px. Square because every other mark in the system is —
+   the buttons, the segmented control, the plates. The one place the
+   Signal-Green Exception applies. */
+.protocol-part__mark {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  /* Optically centred on the first line rather than on the whole item, so
+     a wrapping property keeps its mark beside its first word. */
+  margin-top: 0.32em;
+  background-color: var(--signal);
 }
 
-.feature-demo__toggle-btn[aria-pressed="true"] {
-  background: var(--ink);
-  color: var(--on-ink);
-}
-
-/* Offset 0, not .focus-ring's 4px: at 4px the ring could land on a dark
-   ASCII glyph where light-mode --edge (#000) vanishes; at 0 it draws on
-   the control's own Card chip, which always contrasts with --edge. */
-.feature-demo__toggle-btn:focus-visible {
-  outline: 2px solid var(--edge);
-  outline-offset: 0;
-}
-
-/* The pressed segment is filled with Ink, so an --edge ring drawn on its
-   edge is invisible in light mode (Ink on Ink). Invert it and pull it
-   inside the fill, where On-Ink always reads. */
-.feature-demo__toggle-btn[aria-pressed="true"]:focus-visible {
-  outline-color: var(--on-ink);
-  outline-offset: -4px;
-}
-
-/* Touch: the two segments must each clear the 44px minimum target. */
-@media (pointer: coarse) {
-  .feature-demo__toggle-btn {
-    padding: 13px 20px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .feature-demo__view,
-  .feature-demo__toggle-btn {
-    transition: none;
-  }
-}
 
 /*
  * In the press — dark closing band of press cards (see in-the-press.tsx).
@@ -2683,129 +2520,6 @@ html:not(.js) .reveal {
     transition: none;
     transform: none;
   }
-}
-
-.feature-block__text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(0.75rem, 1.5vw, 1.25rem);
-  width: 100%;
-  max-width: none;
-}
-
-/* The block's CTA sits below the figure it acts on, so it is its own row
-   rather than the tail of the text stack. Flex keeps the slab at content
-   width — a bare anchor would stretch to the column under .feature-block's
-   default align-items: stretch. */
-.feature-block__action {
-  display: flex;
-  align-items: flex-start;
-}
-
-/* One step below .t-headline: the sticky "The protocol, in four parts." is
-   the section's only full headline and the four pillar titles read as
-   chapters under it — at full rank the two stacked as twin headlines on
-   phones and competed side by side at section arrival on desktop
-   (2026-08-14). Unlayered and later in the file than .t-headline, so the
-   size declaration wins at equal specificity. */
-.feature-block__title {
-  width: 100%;
-  font-size: clamp(1.75rem, 2.6vw, 2.25rem);
-  line-height: 1.1;
-  text-wrap: balance;
-}
-
-/* The pillar title spans the column; its lead does not. Uncapped it inherited
-   .feature-block__text's `max-width: none` and ran to the full 8fr track —
-   82 characters on the Tokens pillar, past the measure. */
-.feature-block__caption {
-  width: 100%;
-  max-width: var(--measure-lead);
-  color: var(--body);
-  text-wrap: pretty;
-}
-
-/* -------------------------------------------------------------------
- * Video feature — full-bleed autoplay clip, monochrome darken overlay,
- * text + on-ink CTA anchored to the lower-left.
- * ------------------------------------------------------------------- */
-.video-feature {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  background-color: #000000;
-  min-height: clamp(520px, 80vh, 780px);
-  display: flex;
-  align-items: flex-end;
-}
-
-.video-feature__media {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Two stacked scrims. The vertical gradient bottom-weights the darken so
-   the lower-left copy has a legible ground; the horizontal one deepens the
-   left edge where the title and lead sit, without flattening the whole
-   frame to black. Copy was hard to read over the bright phone still — this
-   restores contrast while keeping the clip visible. */
-.video-feature__overlay {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.45) 0%,
-      rgba(0, 0, 0, 0.35) 35%,
-      rgba(0, 0, 0, 0.88) 100%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.6) 0%,
-      rgba(0, 0, 0, 0.2) 55%,
-      rgba(0, 0, 0, 0) 100%
-    );
-}
-
-.video-feature__inner {
-  width: 100%;
-  padding-block: clamp(48px, 8vw, 120px);
-}
-
-.video-feature__content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  width: 100%;
-  max-width: none;
-}
-
-.video-feature__title {
-  width: 100%;
-  color: #ffffff;
-  max-width: none;
-  text-wrap: balance;
-}
-
-/* 65ch, not 75ch: `ch` measures the "0" glyph, which in GT-Standard is wider
-   than the average letter — a 75ch cap rendered ~86 real characters per line,
-   past the measure DESIGN.md sets. The cap is stated in the unit CSS has;
-   the number is tuned to the count that actually lands. */
-/* 54ch, not 65ch: the ch unit measures the "0" glyph, which is wider than
-   GT-Standard's average character, so a nominal 65ch was setting ~86 real
-   characters — past the 65–75 measure DESIGN.md §6 commits to. */
-.video-feature__body {
-  width: 100%;
-  max-width: 54ch;
-  color: rgba(255, 255, 255, 0.82);
-  text-wrap: pretty;
 }
 
 .implementations-intro {

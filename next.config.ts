@@ -6,7 +6,7 @@ import type { NextConfig } from "next";
    serialize behind the connection limit. Thirty days of freshness collapses
    that to nothing for a returning visitor.
    `immutable` is deliberately absent: these paths carry no content hash, so a
-   swapped video under an immutable header would be pinned in caches for the
+   swapped asset under an immutable header would be pinned in caches for the
    full year with no way to reach the people holding it. `stale-while-
    revalidate` buys the same instant repeat load while still letting a
    replacement propagate within a day of the window closing. */
@@ -22,7 +22,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:file(tap-to-pay.mp4|tap-to-pay-poster.jpg|og-image.jpg)",
+        /* Was `tap-to-pay.mp4|tap-to-pay-poster.jpg|og-image.jpg`. The video
+           and its poster went with the band that played them (2026-08-16);
+           the social card is the only single-file asset left here. */
+        source: "/og-image.jpg",
         headers: [{ key: "Cache-Control", value: STATIC_MEDIA }],
       },
       {

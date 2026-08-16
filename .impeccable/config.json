@@ -56,6 +56,18 @@
         "value": "999px",
         "createdAt": "2026-08-14T19:13:44.004Z",
         "reason": "user confirmed 2026-08-14: asked for the wallet Beta tag to be rounded and iOS-like; documented as the Soft-Capsule Exception in DESIGN.md §5 and added as rounded.full"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "4rem",
+        "createdAt": "2026-08-16T11:19:27.206Z",
+        "reason": "user confirmed: new Panel Display step for the protocol-parts sticky column, documented in DESIGN.md section 3"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "2.125rem",
+        "createdAt": "2026-08-16T11:19:27.251Z",
+        "reason": "user confirmed: new Entry Title step for the protocol-parts entries, documented in DESIGN.md section 3"
       }
     ]
   }

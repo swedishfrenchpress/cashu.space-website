@@ -1,13 +1,11 @@
 import Link from "next/link";
 import AsciiField from "@/components/ascii-field";
-import ImplementationsGrid from "@/components/implementations-grid";
 import InThePress from "@/components/in-the-press";
+import ProtocolParts from "@/components/protocol-parts";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
-import TabbedFeature from "@/components/tabbed-feature";
-import TapToPay from "@/components/tap-to-pay";
 
 export default function Home() {
   return (
@@ -69,13 +67,16 @@ export default function Home() {
         </div>
       </section>
 
+      {/* One section now carries what three used to: the four parts, the
+          properties of each, and the figure work. The tabbed feature
+          scroller, the tap-to-pay video band, and the properties bento were
+          all removed 2026-08-16 on the user's direction — see
+          protocol-parts.tsx. */}
       <div id="why-cashu">
-        <TabbedFeature />
+        <ProtocolParts />
       </div>
-      <TapToPay />
-      <ImplementationsGrid />
       {/* The nav's "Implementations" label must land on the registry that
-          names them, not on the properties bento two sections above it. */}
+          names them. */}
       <div id="implementations">
         <ReferenceImplementations />
       </div>
