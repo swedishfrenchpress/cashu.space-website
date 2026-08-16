@@ -77,11 +77,12 @@
    * nav row. The closed mobile panel contributes 0 — its inner padding only
    * exists in the open state, so nothing leaks into the flow height.
    *
-   *   below lg  10 + 2 + 68px row (14px padding x2 + the 40px toggle) = 80.
-   *   lg and up 10 + 2 + ~69.6px row (14px padding x2 + the ~41.6px
-   *             .btn-secondary GitHub CTA — NOT the 40px .theme-toggle; the
-   *             padding trim at `.site-nav .btn-primary` deliberately spares
-   *             .btn-secondary) = 81.6, rounded up to 82.
+   *   both     10 + 2 + 68px row (14px padding x2 + the 40px toggle) = 80.
+   *
+   * One number for both breakpoints since 2026-08-16: the GitHub CTA used to
+   * be a labelled slab measuring ~41.6px, which made the lg+ row 1.6px taller
+   * than the mobile one. It is now a 40px bare mark sized in lockstep with
+   * .theme-toggle, so the toggle sets the row height everywhere.
    *
    * Always round UP when re-measuring. Erring short leaves a harmless sliver
    * of the next section showing; erring long hides the closing hairline under
@@ -1235,6 +1236,41 @@ html:not(.js) .reveal {
 }
 
 /*
+ * Hero scale for the paired CTAs (user-directed 2026-08-16). The slabs run
+ * at the sitewide 12px/24px everywhere else; under a headline that reaches
+ * 9rem they were reading as footnotes to it.
+ *
+ * Size only — every doctrinal property is inherited untouched: still square
+ * (`border-radius: 0`), still shadowless flat slabs, still all-caps, still
+ * identical between primary and secondary so hierarchy is carried by fill
+ * alone (DESIGN.md §5 Buttons). This is the same control at the page peak's
+ * scale, not a new variant.
+ *
+ * The cipher overlay is sized with them. It paints absolutely over the real
+ * label, so leaving it at the base 0.8125rem would shrink the text for the
+ * 460ms of the hover pass — a size jump exactly where the eye already is.
+ */
+.hero-spec__cta .btn-primary,
+.hero-spec__cta .btn-secondary {
+  padding: 17px 34px;
+  font-size: 0.9375rem;
+}
+
+.hero-spec__cta .button-cipher__label {
+  font-size: 0.9375rem;
+}
+
+/* Phones: the two slabs stack and the extra horizontal padding stops buying
+   presence — it just pushes them toward the gutters. Trim the sides, keep
+   the height. */
+@media (max-width: 479.98px) {
+  .hero-spec__cta .btn-primary,
+  .hero-spec__cta .btn-secondary {
+    padding: 17px 26px;
+  }
+}
+
+/*
  * ASCII field — the hero's ground. A live contour field that fills the whole
  * section, morphing slowly between terrain, the vault door, and the
  * blind-signature round trip (see src/lib/ascii/).
@@ -1580,13 +1616,6 @@ html:not(.js) .reveal {
   font-weight: 600;
 }
 
-/* CTA in the bar: square, per the Sharp Buttons rule (DESIGN.md §5).
-   Padding is trimmed so the flat slab sits comfortably in the bar. */
-.site-nav .btn-primary {
-  padding: 10px 22px;
-  font-size: 0.78125rem;
-}
-
 /* Right-side cluster: theme toggle + CTA on desktop; theme toggle +
    hamburger below lg. One grid cell, so the bar's 3-column (or mobile
    2-column) template is unchanged. */
@@ -1597,102 +1626,60 @@ html:not(.js) .reveal {
 }
 
 /*
- * GitHub CTA — labelled slab at rest, bare mark once condensed
- * (user-directed 2026-08-14).
+ * GitHub mark — a bare glyph in the right cluster, in every scroll state
+ * (user-directed 2026-08-16).
  *
- * The base button rule states "No icons inside buttons. The label is the
- * whole button." That rule is about buttons wearing a decorative glyph
- * *beside* their label, which is the thing that makes a control look like
- * stock UI-kit furniture. It is not violated here, because the two states
- * are never both present: at rest this is a pure label, and condensed it is
- * a pure icon. There is no label-plus-ornament state to prohibit.
+ * This was a labelled slab at rest that collapsed into the mark once the bar
+ * condensed. The swap animated the cluster's width on every scroll past the
+ * threshold and bought nothing legible: the octocat already names GitHub
+ * more directly than the sentence did, and the moving control drew the eye
+ * to the chrome at the exact moment the reader was leaving it.
  *
- * Condensed it also stops being a button at all. The rim comes off with the
- * label, and what is left is the theme toggle's treatment exactly — 34px
- * square, no ground, no border, Body ink, Wash on hover — because in the
- * shrunken bar it is the same class of thing the toggle is: a bare mark in a
- * cluster of bare marks. A rim around one of them and not the other would
- * claim a hierarchy that stops being true the moment the label is gone.
- * (User-directed; the first pass kept the slab and it read as a stray box.)
+ * What is left is the theme toggle's treatment verbatim — no ground, no rim,
+ * Body ink, Wash on hover — because it is the same class of thing: a bare
+ * mark in a cluster of bare marks. It carries no .btn-* class, so the base
+ * button rule ("no icons inside buttons") is not in play, and the hover
+ * cipher never attaches: that pass blanks currentColor, which would erase a
+ * glyph rather than scramble a label.
  *
- * The label collapses by width rather than `display: none` so the button
- * narrows over the same 300ms as the box it sits in — a hard swap mid-morph
- * reads as a glitch, and `display` cannot be transitioned. Collapsed it is
- * `max-width: 0` + `overflow: hidden` on the parent, which leaves the text in
- * the accessibility tree; that is fine and in fact wanted, because the
- * unconditional aria-label on the anchor is what actually names the control
- * in both states.
+ * It sizes in lockstep with .theme-toggle — 40px at rest, 34px condensed —
+ * so the pair never reads as two sizes; both clear the 24px AA pointer
+ * target. `aria-label` on the anchor is what names it.
  */
 .site-nav__cta {
-  /* No gap, ever. Exactly one child has width in either state, but flex gap
-     applies between items regardless of their size — an 8px gap here would
-     sit permanently beside the zero-width icon and push the resting label
-     off its old position. The cross-fade needs no separation because the two
-     children are never both legible. */
-  gap: 0;
-  transition:
-    padding var(--dur-nav) ease-in-out,
-    background-color var(--dur-fast) var(--ease-out-quart),
-    border-color var(--dur-fast) var(--ease-out-quart),
-    color var(--dur-fast) var(--ease-out-quart);
-}
-
-.site-nav__cta-icon {
-  /* 18px, the theme toggle's glyph size — the two sit side by side once
-     condensed and must read as one pair, not two sizes. */
-  width: 18px;
-  height: 18px;
-  flex: none;
-  /* Collapsed at rest, so the resting slab is exactly the label it always
-     was — no reserved gutter, no shifted text. */
-  max-width: 0;
-  opacity: 0;
-  transition:
-    max-width var(--dur-nav) ease-in-out,
-    opacity calc(var(--dur-nav) / 2) ease-in-out;
-}
-
-.site-nav__cta-label {
-  /* Comfortably past the rendered label (~130px at 13px uppercase with
-     0.06em tracking) so nothing clips, but not so far past it that the
-     collapse spends its first frames animating empty space. */
-  max-width: 12em;
-  overflow: hidden;
-  white-space: nowrap;
-  transition:
-    max-width var(--dur-nav) ease-in-out,
-    opacity calc(var(--dur-nav) / 2) ease-in-out;
-}
-
-/* 18px mark + 7px padding each side + the 1px transparent rim the base
-   button always carries = a 34px square, identical to the condensed toggle.
-   Sized by padding rather than an explicit width because the resting width
-   is `auto`, and auto→34px is not an animatable pair — the button has to
-   narrow by shedding padding and label, not by jumping to a number. */
-.site-header-shell.is-condensed .site-nav__cta {
-  padding: 7px;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
   background-color: transparent;
-  border-color: transparent;
   color: var(--body);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    width var(--dur-nav) ease-in-out,
+    height var(--dur-nav) ease-in-out;
 }
 
-/* Beats `.btn-secondary:hover` (2 classes) at 4. Wash + Edge is the theme
-   toggle's hover verbatim. */
-.site-header-shell.is-condensed .site-nav__cta:hover {
+.site-nav__cta:hover,
+.site-nav__cta:focus-visible {
   background-color: var(--wash);
-  border-color: transparent;
   color: var(--edge);
 }
 
-.site-header-shell.is-condensed .site-nav__cta-icon {
-  max-width: 18px;
-  opacity: 1;
+.site-nav__cta-icon {
+  /* 18px, the theme toggle's glyph size — the two sit side by side and must
+     read as one pair, not two sizes. */
+  width: 18px;
+  height: 18px;
+  flex: none;
 }
 
-.site-header-shell.is-condensed .site-nav__cta-label {
-  max-width: 0;
-  opacity: 0;
+.site-header-shell.is-condensed .site-nav__cta {
+  width: 34px;
+  height: 34px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1701,8 +1688,7 @@ html:not(.js) .reveal {
   .site-nav__wordmark,
   .theme-toggle,
   .site-nav__cta,
-  .site-nav__cta-icon,
-  .site-nav__cta-label {
+  .site-nav__cta-icon {
     transition: none;
   }
 }
@@ -1732,10 +1718,10 @@ html:not(.js) .reveal {
     height var(--dur-nav) ease-in-out;
 }
 
-/* The toggle is the tallest thing in the row (the brand is 28px, the CTA
-   ~40px), so the row's height is its height — the condensed padding alone
-   would not shrink the bar without this coming down too. 34px keeps the
-   pointer target at the 24px AA minimum with room to spare. */
+/* The toggle sets the row height (the brand is 28px; the GitHub mark tracks
+   the toggle exactly), so the bar cannot shrink unless this comes down too.
+   34px keeps the pointer target at the 24px AA minimum with room to spare —
+   keep it in step with `.is-condensed .site-nav__cta`. */
 .site-header-shell.is-condensed .theme-toggle {
   width: 34px;
   height: 34px;
