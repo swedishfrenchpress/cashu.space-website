@@ -238,14 +238,31 @@ function Spec() {
   );
 }
 
-/* Card — the floating implementations directory. Paper on Ink. Flat, no
-   shadow (the lift comes from z-index and overlap, not elevation). Three
-   featured rows + a quiet link to the rest. Featured repos are picked by
-   language coverage (Python/Rust/TypeScript) so the card mirrors the lead's
-   "Active across Python, Rust, and TypeScript" claim. Each row carries the
-   language mark on the left and the project's role on the right — name in
-   the middle. No stars: the visitor isn't choosing between nutshell and cdk
-   by GitHub vanity counts. */
+/* Card — the floating implementations directory. Flat, no shadow (the lift
+   comes from z-index and overlap, not elevation). Three featured rows + a
+   quiet link to the rest. Featured repos are picked by language coverage
+   (Python/Rust/TypeScript) so the card mirrors the lead's "Active across
+   Python, Rust, and TypeScript" claim. Each row carries the language mark on
+   the left and the project's role on the right — name in the middle. No
+   stars: the visitor isn't choosing between nutshell and cdk by GitHub vanity
+   counts.
+
+   ALWAYS LIGHT — the mirror of the site's always-dark showcase surfaces, and
+   the reason its greys are literals rather than tokens. The card's whole job
+   is to be the bright plate over the Spec pane, and the Spec pane does not
+   flip; a card that followed the scheme would go dark-on-dark in dark mode
+   and the overlap would vanish.
+
+   The rim is what pays for that. Since the section ground started flipping
+   (user-directed 2026-08-16) the card sits on Paper in light mode, and only
+   its overlapping third is over the dark pane — the other two thirds were
+   white on white with nothing to hold their edge. --hair draws it in light
+   and disappears into the black ground in dark, which is exactly where it
+   isn't wanted, so one declaration covers both.
+
+   focus-ring is overridden to a literal Ink in globals.css for the same
+   reason the fills are literals: --edge is #ffffff in dark, which would put a
+   white ring on a white card. */
 const FEATURED = ["nutshell", "cdk", "coco"] as const;
 
 /* The headline's count is derived from the directory it sits above, so the
@@ -270,7 +287,7 @@ const IMPLEMENTATIONS_WORD =
 function Card() {
   const featured = FEATURED.map((name) => REPOS.find((r) => r.name === name)!);
   return (
-    <div className="bg-white text-black w-full divide-y divide-zinc-200">
+    <div className="impl-card bg-white text-black w-full border border-hair divide-y divide-zinc-200">
       <div className="px-5 py-4">
         <span
           className="t-label text-zinc-500 uppercase"
@@ -305,9 +322,22 @@ function Card() {
   );
 }
 
+/*
+ * THE SECTION GROUND FOLLOWS THE SCHEME (user-directed 2026-08-16). It was
+ * `bg-black text-white` in both, which read as a slab of the site stuck in
+ * dark mode while the page around it changed. It is Paper-and-Ink now, so in
+ * light mode this is a document page with a code plate set into it — closer to
+ * the published-RFC north star than the showcase band ever was.
+ *
+ * The Spec pane deliberately does NOT follow it. A code listing reading dark
+ * is a convention, not a theme bug, and it is the value the Card floats
+ * against: flip the pane and the composition — bright plate over dark
+ * listing — has nothing left to stand on. Ground and rim move; pane and plate
+ * hold.
+ */
 export default function ReferenceImplementations() {
   return (
-    <section className="bg-black text-white section-y-default">
+    <section className="bg-paper text-ink section-y-default">
       <div className="page-shell flex flex-col gap-12 lg:gap-16">
         <div className="implementations-intro flex flex-col gap-6">
           <Reveal>
@@ -322,7 +352,7 @@ export default function ReferenceImplementations() {
                 unlayered and Tailwind utilities live in @layer utilities, so
                 the layer loses no matter the specificity. The cap reads as
                 authored and rendered at 89 characters. */}
-            <p className="t-body-lead text-zinc-400">
+            <p className="t-body-lead text-muted">
               Active across Python, Rust, and TypeScript. The cashubtc
               organization hosts the spec, the SDKs, and the reference
               wallets.
@@ -354,7 +384,7 @@ export default function ReferenceImplementations() {
               href="https://github.com/cashubtc"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary--on-ink"
+              className="btn-secondary"
             >
               View on GitHub
             </a>

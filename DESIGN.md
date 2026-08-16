@@ -44,7 +44,7 @@ typography:
     letterSpacing: "-0.01em"
   brandWordmark:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.25rem"
+    fontSize: "1.125rem"
     fontWeight: 600
     lineHeight: 1.2
     letterSpacing: "-0.02em"
@@ -110,9 +110,10 @@ typography:
     letterSpacing: "0.04em"
 rounded:
   none: "0"
-  nav: "12px"
+  # `nav` and `glass` are deleted, not merely unused: the navbar's condensed
+  # box was the sole consumer of both and it was retired 2026-08-16 (§5
+  # Navigation). The masthead is square.
   card: "16px"
-  glass: "24px"
   # Full capsule. Licensed to the wallet-directory status tag alone
   # (see §5 Status Tag). Not a general shape — do not reach for it.
   full: "999px"
@@ -144,10 +145,24 @@ components:
   button-secondary-hover:
     backgroundColor: "{colors.paper}"
     textColor: "{colors.ink-soft}"
+  # The masthead's own two-value palette. The bar is always-dark, so these do
+  # not reference the page ramp; --nav-plate/--nav-plate-fg are the exception
+  # and resolve to {colors.paper}/{colors.ink} so the plate follows the scheme.
+  masthead:
+    backgroundColor: "{colors.ink-soft}"
+    textColor: "#ffffff"
+    height: "56px"
+  masthead-plate:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.none}"
+    typography: "{typography.brandWordmark}"
   nav-link:
-    textColor: "{colors.slate}"
-    typography: "{typography.label}"
+    textColor: "rgba(255, 255, 255, 0.66)"
+    typography: "{typography.navLink}"
+    padding: "5px 10px"
   nav-link-hover:
+    backgroundColor: "{colors.paper}"
     textColor: "{colors.ink}"
   divider:
     backgroundColor: "{colors.hair}"
@@ -166,7 +181,7 @@ components:
 
 cashu.space dresses an open protocol in the visual register of a published RFC. Tight grid, fixed-width-quoted accents, monumental display type, and almost nothing decorative. The site reads as primary-source material — not a marketing page for a coin, not a fintech dashboard, not a Web3 launchpad. Visitors should feel they are looking at *the* document for Cashu, the way bitcoin.org once felt like *the* document for Bitcoin.
 
-The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no animated tickers, no testimonial carousels, and no glassmorphism outside its one sanctioned surface (the navbar).
+The system commits to a few sharp moves: massive editorial display type (GT-Standard) carries the page; neutrals stay pure (ink-on-paper, no tint, no warmth); structural elements are minimal — a thin horizontal rule, a pair of sharp-cornered buttons, generous whitespace. The Geist Pixel accent exists for one purpose: to mark machine-coded artefacts (token amounts, mint addresses, version numbers) when the spec calls for a notation different from prose. Cashu is not a SaaS, so the system actively rejects SaaS-landing-page chrome: no gradient borders, no soft drop shadows, no animated tickers, no testimonial carousels, and no glassmorphism anywhere at all — the navbar was the one sanctioned surface until 2026-08-16, and the masthead that replaced it is flat opaque ink (§5 Navigation).
 
 Motion is permitted under one condition: it must depict real protocol structure, or be plain material carrying no assertion at all. The hero's ground is a live ASCII field — a contour heightfield drawn in Geist Mono glyphs — that fills the section and cycles slowly between open terrain, a vault door, and a schematic of the blind-signature round trip that Cashu actually performs. It does not answer the pointer: a contour lens that bent the sampling around the cursor was removed 2026-08-16 (user-directed) because over a full-bleed hero it read as a smear across the headline's ground, and the scenes it deformed are the part carrying the meaning. The field is weather, not a control. Never a decorative flow, never a connection the protocol doesn't make, and never a hover response. See the Honest-Network Rule in §4, and `src/lib/ascii/` for the field itself.
 
@@ -264,7 +279,7 @@ Buttons communicate interaction through contrasting fill, a precise border, quic
 
 ### Named Rules
 
-**The No-Shadow Rule.** `box-shadow` is forbidden throughout the site, including buttons. If a surface needs separation, use spacing, fill contrast, or a 1px border. One sanctioned exception, added 2026-07-25 on the user's direction: the navbar's condensed box carries `--nav-shadow` (`0 4px 10px` near-transparent black) as part of the Onyx-pattern scroll behaviour — see §5 Navigation. No other surface inherits this licence.
+**The No-Shadow Rule.** `box-shadow` is forbidden throughout the site, including buttons. If a surface needs separation, use spacing, fill contrast, or a 1px border. **No exceptions.** From 2026-07-25 to 2026-08-16 the navbar's condensed box carried `--nav-shadow` as part of the Onyx scroll behaviour; the masthead that replaced it has no box to lift (§5 Navigation), the token is deleted, and the rule is absolute again. Nothing inherits a licence from a surface that no longer exists.
 
 **The Hairline Rule.** Structural separation between sections is achieved with a single 1px line in Hair (`#e4e4e7`), full content width, never bolder. No double rules, no decorative rules.
 
@@ -345,15 +360,31 @@ The rule is about rims, not about buttons, and binds every outlined control on t
 
 Everything. The cipher pass is texture, not elevation; it does not license shadows elsewhere.
 
-### Navigation
+### Navigation — The Masthead
 
-The bar follows the Onyx pattern (behaviour lifted from onyx.security on the user's direction, 2026-07-25; materials stay the site's own). Two states, one sticky shell:
+*Rebuilt 2026-08-16, on the user's direction, against a layout reference.* The bar is full-bleed, sticky, ink-ground, and **identical in every scroll state**. It is a masthead, not a floating control: it spans the viewport, it never condenses, and nothing about it animates its own size. From the plate to the right viewport edge it is **one uninterrupted ink run** — the ground is painted on the row, not on its cells, so no sub-pixel rounding between grid columns can open a hairline of page through it.
 
-- **Rest (page top):** fully transparent — no ground, no blur, no rule. The bar sits 10px (`--nav-inset`) below the viewport edge; the row aligns to the page-shell gutters like every section beneath it.
-- **Condensed (scrolled, or mobile panel open):** the inner frame becomes a floating box — glass ground + 20px blur, `rounded.nav` (12px) corners, `--glass-hair` rim, the site's one sanctioned `box-shadow` (`--nav-shadow`), dropped a further 4px and tightened to 1128px max-width with 24px inner padding. The transition runs 300ms ease-in-out; `prefers-reduced-motion` drops the translate and transitions. The box (glass, radius, shadow) is the navbar's exclusive licence; everything inside it stays square and flat.
-- **Links** (`nav-link`): Label-weight, colour Slate (`#3f3f46`). Hover transitions colour to Ink. No underline, no active background. Current route sets full Ink and one weight step up.
-- **The right cluster is bare marks.** The theme toggle and the GitHub link are icon-only in every state — no ground, no rim, an 18px glyph in Body ink on a square target that runs 40px at rest and 34px condensed, the two sized in lockstep so they never read as two things. The GitHub link carries no `.btn-*` class: it is not a button, and the Two-CTA Rule already says GitHub is not one of the two jobs. `aria-label` names it, and the cipher pass is out of scope for it by construction (that pass blanks `currentColor`, which erases a glyph instead of scrambling a label). Between 2026-08-14 and 2026-08-16 it was a labelled slab at rest that collapsed to the mark on scroll; the swap animated the cluster's width on every pass of the threshold and drew the eye to the chrome exactly as the reader was leaving it. **Don't restore the label, and don't put a rim on one mark and not the other.**
-- **Mobile:** Links collapse below `lg` into the hamburger panel, which opens inside the condensed box; the brand and theme toggle remain in the row. The panel keeps a full-width labelled `View on GitHub` slab — a dropped menu is a list of destinations, and a bare mark in a column of sentences would be the odd one out.
+Three things across the row, left to right:
+
+- **The plate.** A block hard against the left viewport edge — no page gutter — carrying the 24px pixel logo and the `Cashu` wordmark (GT-Standard 600 at `1.125rem`, `-0.02em`). It stretches the full row height, and it is the one place the bar breaks its ink. **It follows the scheme:** `--nav-plate` is `--paper` and `--nav-plate-fg` is `--ink`, so the cell is the page punched through the bar — white-on-black by day, near-black-on-Paper by night. *It shipped for one afternoon as a fixed `#ffffff`/`#f4f4f5` pair and the user rejected it on sight ("it's always white now"): a slab of daylight stuck in a dark bar. Don't put a literal back here.* One token, two consumers — the plate and the hover wipe — and they stay on the same value, because a bright hover over a dark brand cell would be two different plates on one bar.
+- **The lead.** Ink, and set well in from the plate (`clamp(18px, 4vw, 56px)`), the **UTC clock** — Geist Mono at `0.8125rem`, tabular figures, `HH:MM UTC`, 24-hour. Geist Mono and *not* Geist Pixel Square: the pixel face is reserved for protocol notation, and wall-clock time is technical metadata, not a protocol artefact. It updates on the minute, aligned to the boundary — **never per second.** A ticking seconds field in the chrome is the animated ticker §7 rules out. The server renders the slot empty (no server and client agree on a clock) and the client fades it up over `--dur-reveal`; the slot reserves `9ch` so the fill costs no layout shift. Hidden below `480px`, where the plate and the toggle need the width more than the masthead needs its timestamp.
+- **The tail.** The same ink, running flush to the right viewport edge: the links, then the theme toggle and the GitHub mark.
+
+**Two features of the layout reference shipped and were rejected on sight** (second pass, 2026-08-16). Both are deleted, and neither should come back:
+
+- **The slot** (`--nav-slot`): an open grid column between the clock and the links where the page showed through. Intended as a window cut in one bar; it read as a **hole punched in it**, worst over the hero where a blank block sat in the middle of a full-bleed headline.
+- **The dither edge** (`--nav-edge`): a two-row pixel checkerboard closing the bar's bottom across the full width. Intended as the bar fraying into the page; it read as **noise under it**.
+
+The bar meets the page on a clean line instead, and the value step from `--nav-bg` to the page ground carries the separation unaided in both schemes.
+
+- **Links** (`site-nav__link`): GT-Standard 500 at `0.9375rem`, colour `--nav-fg-quiet` (white at 66%), `5px 10px` of padding, tight `clamp(2px, 0.5vw, 8px)` gaps — the hover plate is what separates one item from the next, and at wider gaps the plates read as four unrelated buttons instead of one strip being scrubbed.
+- **The Wipe.** Hover (and `:focus-visible`) drives a Paper plate across the link left to right over `--dur-nav-wipe` (460ms) with `ease-out-quart`. The link renders the label **twice** — the base Paper-on-ink, and an `aria-hidden` copy ink-on-Paper clipped to zero width — so the travelling edge passes *through* the letterforms and each one flips as the edge reaches it. A single label cannot do this: its colour has to flip for the whole word at once, which leaves the uncovered half invisible for the length of the animation. `clip-path`, not `transform` — `scaleX` would squash the plate's own text. Slower than `--dur-base` on purpose: it is an edge travelling across a whole word, and at feedback speed it reads as a flicker rather than a slide. The overlay is a real element, not `content: attr(...)`, because VoiceOver announces generated content and a nav that reads every destination twice is worse than a nav with no hover effect. Removed under `prefers-reduced-motion`.
+- **Focus on the plate is inset.** The brand sits in the viewport's top-left corner, so the sitewide ring's `+4px` offset would draw its top and left edges off-screen. `.site-nav__brand` overrides to `outline-offset: -3px`; the cell is wide enough to carry the ring inside itself, and `--edge` flips so it reads in both schemes.
+- **Current route** holds the same plate down permanently. "You are here" is said in the bar's own vocabulary rather than in a second one invented for it. Route-level only — in-page anchors are never marked.
+- **The right cluster is bare marks.** The theme toggle and the GitHub link are icon-only — no ground, no rim, an 18px glyph in `--nav-fg-quiet` on a 40px square target, the two sized in lockstep so they never read as two things, both washing to `--nav-wash` on hover. The 40px target sets `--nav-row` (56px) together with the row's 8px of padding, and `--nav-row` *is* `--nav-h`. The GitHub link carries no `.btn-*` class: it is not a button, and the Two-CTA Rule already says GitHub is not one of the two jobs. `aria-label` names it, and the cipher pass is out of scope for it by construction (that pass blanks `currentColor`, which erases a glyph instead of scrambling a label). **Don't restore a label, and don't put a rim on one mark and not the other.**
+- **Mobile:** Links collapse below `lg` into the hamburger panel — a full-bleed sheet in the bar's own ink flush under the row, so an open menu is the bar getting taller rather than a sheet arriving over it. The plate, the clock and the theme toggle stay in the row. The panel closes on a full-width `View on GitHub` slab in `--nav-plate` — a dropped menu is a list of destinations, and a bare mark in a column of sentences would be the odd one out. It carries no `.btn-*` class either: the bar has its own two-value palette, and `.btn-primary` would drag the page's Ink/Paper pair onto an ink ground where the fill disappears.
+
+**What this replaced, and what died with it.** From 2026-07-25 the bar followed the Onyx pattern — transparent at rest, condensing on scroll into a floating box with a glass ground, 20px blur, 12px radius, a `--glass-hair` rim and `--nav-shadow`. A full-bleed bar and a box that pulls in from the viewport edges are opposite gestures and cannot both be true, so the whole two-state apparatus is gone: the condense hysteresis, the settle-delayed `--nav-h` guard, `--nav-inset`, `--nav-condensed-max`, `--nav-shadow`, and the `--glass-*` ramp. **That box was the site's only sanctioned `box-shadow` and its only translucent surface. Both exceptions are now closed** — see §4. Any rule elsewhere in this document that still grants the navbar a licence is describing a surface that no longer exists; do not reintroduce glass, radius, or shadow on the strength of it.
 
 ### Divider
 
@@ -371,9 +402,9 @@ different class of fact from its *surface* ("iOS and Android").
   the sharp-and-flat doctrine — hairline-outlined box, tracked-out
   uppercase — and read as a generic SaaS status chip. The tell was the
   outline-plus-caps-plus-tracking combination, not the corner radius;
-  softening the shape and dropping the shout is what removes it. This is
-  the only full radius on the site, and the only rounded surface besides
-  the navbar's condensed box.
+  softening the shape and dropping the shout is what removes it. Since the
+  navbar's condensed box was retired 2026-08-16 (§5 Navigation) this is the
+  only rounded surface on the site at all, full radius or otherwise.
 - **Bounds:** `STATUS_FACTS` only (`src/app/wallets/page.tsx`). Descriptive
   facts stay in Geist Mono with no container. Buttons, the segmented
   control, and every panel stay sharp. Keep the set small — the moment
@@ -413,7 +444,18 @@ The homepage's middle is one full-bleed band split in two. Left: a sticky Paper 
 - **The property list is the bento, folded in.** Four uppercase Mono items an entry, each opened by a 7px `--signal` square (§2, the Signal-Green Exception). The four properties the deleted bento stated as cards — open source, bearer token, unlinkable payments, ecash for the web — are distributed across the entries they actually belong to, so each one is read at the point where the reader is already looking at the thing it is a property of. The list bottom-aligns to the plate: it is the entry's floor.
 - **Honest content.** Unchanged from the pattern this replaced, and it is the part worth carrying forward. Every property in a list is true of the part it sits under, and nothing in the column is written to fill a slot. If an entry has three real properties, it gets three.
 
-*On the Demo Panel (Figure/Code), retired here.* The four-parts section used to demonstrate the protocol twice over — a captioned spec plate and the code behind it, on a shared frozen ASCII sheet, flipped by a square segmented control. It was a good pattern and it is gone with the section that held it, along with `protocol-demo.tsx`, `protocol-demo-content.tsx`, the `.fig`/`.fig-plate`/`.fig-caption` rules, and the `--fig-*` keyline tokens, which now have no consumer. Two things it established outlive it and still bind: **all depth comes from value steps, keylines, and masks — never blur, translucency, or shadow, and the one glass surface remains the navbar**; and **the Twilight Stack stays footer-reserved** — no bloom-to-black and no grain on the `--panel` column, which is flat ink and nothing else.
+*On the Demo Panel (Figure/Code), retired here.* The four-parts section used to demonstrate the protocol twice over — a captioned spec plate and the code behind it, on a shared frozen ASCII sheet, flipped by a square segmented control. It was a good pattern and it is gone with the section that held it, along with `protocol-demo.tsx`, `protocol-demo-content.tsx`, the `.fig`/`.fig-plate`/`.fig-caption` rules, and the `--fig-*` keyline tokens, which now have no consumer. Two things it established outlive it and still bind: **all depth comes from value steps, keylines, and masks — never blur, translucency, or shadow** (the navbar was the one glass surface this clause carved out, and it is gone as of 2026-08-16, so the clause now holds without remainder); and **the Twilight Stack stays footer-reserved** — no bloom-to-black and no grain on the `--panel` column, which is flat ink and nothing else.
+
+### Signature: The Reference Implementations Band
+
+The section that ends the homepage argument: a headline and lead, then a floating Card of featured repos overlapping the upper-left corner of a Spec pane showing real NUT-00 CBOR. The whole composition is **one value contrast** — a bright plate over a dark listing — and the rules follow from protecting it.
+
+- **The ground follows the scheme** (user-directed 2026-08-16). It was `bg-black text-white` in both, and a whole section stuck in dark mode while the page around it changed read as a bug rather than a decision. It is `--paper`/`--ink` now, so light mode is a document page with a code plate set into it — closer to the published-RFC north star than the showcase band ever was. The CTA moved from `btn-secondary--on-ink` to plain `btn-secondary` with it, and the lead from a zinc literal to `--muted`.
+- **The Spec pane does not follow it.** It stays `#18181b` with a `#27272a` filename strip in both schemes. A code listing reading dark is a convention, not a theme bug, and it is the value the Card floats against: flip the pane and the composition has nothing left to stand on. Its greys are literals and clear AA on their own — zinc-300 path, zinc-400 meta and comments, zinc-100 body, four ranks (zinc-500 measured 3.08:1 on the strip and misses AA at 14px).
+- **The Card is always light** — the mirror of the site's always-dark surfaces, and the reason its greys are literals too. A card that followed the scheme would go dark-on-dark in dark mode and the overlap would vanish. It carries a `--hair` rim: since the ground started flipping, only the Card's overlapping third sits on the dark pane and the other two thirds were white on white with nothing to hold their edge. `--hair` draws that rim on Paper and disappears into the dark ground, so one declaration covers both.
+- **Focus inside the Card is a literal Ink** (`.impl-card .focus-ring`). The sitewide ring paints `--edge`, which is `#ffffff` in dark — a white outline on a white card, i.e. no indicator at all. Same class of bug as the on-ink ring, opposite ground.
+- **Language marks keep their brand colour** — the Depicted-World Exception (§2). Readers need to see real Python, real Rust, real TypeScript at a glance. Do not re-monochrome them without reopening that decision.
+- **The counts are derived, never typed.** `Six` in the headline and `+ 3 more` in the Card share one denominator (`REPOS` minus the two catalogue entries), so the section whose whole argument is that we count honestly cannot fail its own arithmetic.
 
 ## 6. Do's and Don'ts
 

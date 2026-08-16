@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import NavClock from "./nav-clock";
 import Reveal from "./reveal";
 import ThemeToggle from "./theme-toggle";
 
@@ -16,41 +17,60 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Implementations", href: "/#implementations" },
 ];
 
-/*
- * Condense hysteresis. The box appears once the page has clearly scrolled
- * and only lets go near the very top, so the 300ms transition can't be made
- * to flicker by hovering the threshold.
+/**
+ * The label and the plate that wipes over it. Two stacked copies of the same
+ * word: the base sits Paper-on-ink, the plate sits ink-on-Paper and is
+ * clipped to zero width until hover. Because the plate carries its own text,
+ * the wipe edge passes *through* the letterforms — each one flips as the
+ * plate reaches it — instead of a background sliding under a label that has
+ * already changed colour and gone invisible over the part not yet covered.
+ *
+ * A real aria-hidden element, not `content: attr(...)`: VoiceOver announces
+ * generated content, and a nav that reads every destination twice is worse
+ * than a nav with no hover effect at all.
  */
-const CONDENSE_ON_Y = 24;
-const CONDENSE_OFF_Y = 8;
-
-/* Longer than --dur-nav (300ms) so a --nav-h measurement can never land on a
-   frame of the condense/expand transition. Keep the two in step if either
-   moves. */
-const SETTLE_MS = 360;
+function NavLabel({ label }: { label: string }) {
+  return (
+    <>
+      {label}
+      <span className="site-nav__plate" aria-hidden>
+        {label}
+      </span>
+    </>
+  );
+}
 
 /**
- * Onyx-pattern top bar (DESIGN.md §5 Navigation): at rest a transparent
- * strip inset 10px from the viewport edge — logo left, anchor links
- * centered, GitHub chip right at lg+; brand + hamburger below lg. On
- * scroll (or with the panel open) the frame condenses into a floating
- * glass box — the navbar's documented exception to the flat doctrine
- * (DESIGN.md §4); everything inside the box stays square. The chip is
- * secondary by doctrine — GitHub is not one of the two primary jobs
- * (get a wallet, read the spec; the Two-CTA Rule, DESIGN.md §1).
+ * Masthead bar (DESIGN.md §5 Navigation), user-directed 2026-08-16 against a
+ * layout reference. Full-bleed, always: a brand plate hard against the left
+ * edge, then one uninterrupted ink run to the right edge carrying the UTC
+ * clock, the links, and the controls. The plate is the page punched through
+ * the bar — Paper ground and Ink text, so it follows the scheme instead of
+ * sitting there as a permanent white slab at night.
  *
- * There is one scheme. An `onInk` prop once branched the bar to an
- * inverted variant for dark-ground routes, carrying its own shell, nav,
- * and panel modifiers plus a parallel set of CSS rules — but no route
- * ever passed it, and both routes that exist open on Paper. The dead
- * branch had already drifted (its glass hardcoded rgba(9,9,11,…) where
- * every live token uses rgba(10,10,11,…)), which is the usual fate of
- * code nothing renders. If an Ink-ground route arrives, rebuild the
- * variant against the tokens rather than reviving this.
+ * Two features of the reference shipped and were rejected on sight (second
+ * pass, same day): an open slot column between the clock and the links, which
+ * read as a hole punched in the bar rather than a window onto the page, and a
+ * pixel-dither strip along the bottom edge, which read as noise under it.
+ * Both are gone; the bar is continuous and meets the page on a clean line.
+ * Don't reintroduce either.
+ *
+ * This replaced the Onyx two-state bar (transparent at rest → floating glass
+ * box on scroll). The two are not compatible — a full-bleed segmented bar and
+ * a rounded box that pulls in from the viewport edges are opposite gestures —
+ * and the reference is the bar the site now wants. Retired with it: the
+ * condense hysteresis, the settle-delayed --nav-h guard, `--nav-inset`,
+ * `--nav-condensed-max`, and `--nav-shadow`. That last one was the site's
+ * only sanctioned box-shadow and the glass was its only translucent surface,
+ * so the No-Shadow Rule and the anti-glassmorphism verdict are now absolute
+ * again — there is no exception left to point at.
+ *
+ * There is one scheme. An `onInk` prop once branched the bar to an inverted
+ * variant for dark-ground routes; no route ever passed it and it is gone. The
+ * bar is ink-ground in both schemes now, which is what that branch was for.
  */
 export default function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
-  const [condensed, setCondensed] = useState(false);
   const navRef = useRef<HTMLElement | null>(null);
   const pathname = usePathname();
 
@@ -80,117 +100,44 @@ export default function SiteHeader() {
     setIsOpen(false);
   }
 
-  /* Scroll-condense driver, rAF-throttled. Runs once on mount too: an
-     anchor arrival (/#implementations) starts mid-page and must land with
-     the box already formed, not watch it assemble. */
-  useEffect(() => {
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      setCondensed((prev) =>
-        prev ? window.scrollY > CONDENSE_OFF_Y : window.scrollY > CONDENSE_ON_Y,
-      );
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    /* rAF, not a direct call: runs pre-paint, so an anchor arrival still
-       lands with the box formed, without setState in the effect body. */
-    raf = requestAnimationFrame(update);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
+  /* --nav-h drives the hero's fold line and every anchor's scroll-margin,
+     and it ships as a hand-measured constant that silently goes stale the
+     moment the bar's type or padding changes. The CSS value still paints the
+     first frame (no flash, and the layout never depends on JS); this only
+     replaces it with what the bar actually measures, and keeps it true
+     through font loading and resize.
 
-  /* --nav-h drives the hero's fold line, and it ships as a hand-measured
-     constant that silently goes stale the moment the bar's type or padding
-     changes. The CSS value still paints the first frame (no flash, and the
-     layout never depends on JS); this only replaces it with what the bar
-     actually measures, and keeps it true through font loading and resize.
-
-     The bar row is measured, not the shell or frame: the mobile panel lives
-     inside the frame and would otherwise fold its open height into the
-     token. Row height + the shell's top inset + the frame's borders is the
-     same derivation the CSS token comment documents.
-
-     Rest height only — the guard below is load-bearing. Since the condensed
-     bar shrinks its own row, an ungated observer would refire on every frame
-     of the 300ms condense and walk --nav-h down with it; the hero's
-     `min-height: calc(100vh - var(--nav-h))` would then grow underneath the
-     reader as they scrolled away from it, which is a layout shift caused by
-     scrolling. --nav-h means "how tall is the bar over the top of the page",
-     and the top of the page is exactly where the bar is not condensed.
-
-     Arriving mid-page (/#implementations) starts condensed, so there is no
-     rest height to measure and the CSS constant stands until the visitor
-     reaches the top. That is the right failure: the constant is accurate for
-     the shipped bar, and the two things --nav-h feeds — the hero fold and
-     anchor scroll-margin — are both fine with a value that errs tall.
-
-     Observer-driven syncs are also settle-delayed past --dur-nav. The
-     condensed class drops at the *start* of the expand transition, so a
-     plain guard would still let the 300ms of intermediate heights through
-     while the class already reads "at rest" — measuring the bar mid-grow and
-     walking --nav-h up frame by frame, right where the hero is on screen.
-     Waiting for the box to stop moving is the whole fix; the mount call
-     stays synchronous so the correct value lands on the first frame. */
+     The row, not the shell: the mobile panel lives in the shell and would
+     otherwise fold its open height into the token. With the condense gone
+     the bar has exactly one height, so this no longer needs the rest-height
+     guard and settle delay the two-state version carried — nothing about the
+     bar animates its own size any more. */
   useEffect(() => {
     const row = navRef.current;
     if (!row || typeof ResizeObserver === "undefined") return;
 
     const sync = () => {
-      if (row.closest(".site-header-shell.is-condensed")) return;
-      const shell = row.closest(".site-header-shell");
-      const frame = row.closest(".site-nav-frame");
-      const inset = shell
-        ? parseFloat(getComputedStyle(shell).paddingTop) || 0
-        : 0;
-      const frameStyle = frame ? getComputedStyle(frame) : null;
-      const borders = frameStyle
-        ? (parseFloat(frameStyle.borderTopWidth) || 0) +
-          (parseFloat(frameStyle.borderBottomWidth) || 0)
-        : 0;
-      const h = Math.ceil(
-        row.getBoundingClientRect().height + inset + borders,
-      );
+      const h = Math.ceil(row.getBoundingClientRect().height);
       if (h > 0) {
         document.documentElement.style.setProperty("--nav-h", `${h}px`);
       }
     };
 
-    let settle = 0;
-    const syncWhenSettled = () => {
-      clearTimeout(settle);
-      settle = window.setTimeout(sync, SETTLE_MS);
-    };
-
     sync();
-    const observer = new ResizeObserver(syncWhenSettled);
+    const observer = new ResizeObserver(sync);
     observer.observe(row);
-    document.fonts?.ready.then(syncWhenSettled).catch(() => {});
-    return () => {
-      observer.disconnect();
-      clearTimeout(settle);
-    };
+    document.fonts?.ready.then(sync).catch(() => {});
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <header
-      className={`site-header-shell${condensed || isOpen ? " is-condensed" : ""}`}
-    >
-      {/* The frame is the condensing box; the open panel must sit inside it
-          so the glass ground wraps the dropped links too. isOpen forces the
-          condensed state for the same reason: an open menu over an
-          un-scrolled page still needs a ground to read against. */}
-      <div className="site-nav-frame">
-        <Reveal immediate variant="fade" as="div">
-          <nav
-            ref={navRef}
-            aria-label="Primary"
-            className={`site-nav${isOpen ? " is-open" : ""}`}
-          >
+    <header className="site-header-shell">
+      <Reveal immediate variant="fade" as="div">
+        <nav ref={navRef} aria-label="Primary" className="site-nav">
+          {/* Lead. The brand plate stretches the full row height and sits
+              hard against the viewport edge — the one place the bar breaks
+              its ink, and the only part of it that follows the scheme. */}
+          <div className="site-nav__lead">
             <Link href="/" className="site-nav__brand focus-ring">
               <Image
                 src="/cashu-no-bg.png"
@@ -202,7 +149,10 @@ export default function SiteHeader() {
               />
               <span className="site-nav__wordmark">Cashu</span>
             </Link>
+            <NavClock />
+          </div>
 
+          <div className="site-nav__tail">
             <ul className="site-nav__list">
               {NAV_ITEMS.map((item) => (
                 <li key={item.href}>
@@ -211,19 +161,19 @@ export default function SiteHeader() {
                       href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="site-nav__link focus-ring"
+                      className="site-nav__link focus-ring--on-ink"
                     >
-                      {item.label}
+                      <NavLabel label={item.label} />
                     </a>
                   ) : (
                     <Link
                       href={item.href}
-                      className={`site-nav__link focus-ring${
+                      className={`site-nav__link focus-ring--on-ink${
                         isCurrent(item) ? " is-current" : ""
                       }`}
                       aria-current={isCurrent(item) ? "page" : undefined}
                     >
-                      {item.label}
+                      <NavLabel label={item.label} />
                     </Link>
                   )}
                 </li>
@@ -232,21 +182,23 @@ export default function SiteHeader() {
 
             <div className="site-nav__actions">
               <ThemeToggle />
-              {/* One state: the mark. This was a labelled slab at rest that
-                  collapsed to the icon on scroll, and the swap moved the
-                  whole right cluster mid-scroll for no gain (user-directed
-                  2026-08-16). The mark alone reads as GitHub everywhere it
-                  appears, so the label was carrying a 300ms width animation
-                  and nothing else.
+              {/* One state: the mark. The octocat names GitHub more directly
+                  than a label would, and the control is secondary by doctrine
+                  — GitHub is not one of the two primary jobs (get a wallet,
+                  read the spec; the Two-CTA Rule, DESIGN.md §1). It carries no
+                  .btn-* class, so the base button rule ("no icons inside
+                  buttons") is not in play and the hover cipher never attaches:
+                  that pass blanks currentColor, which would erase a glyph
+                  rather than scramble a label.
 
-                  aria-label is what names the control now that the only
-                  child is an aria-hidden glyph; without it the link would
-                  announce as "link, https://github.com/cashubtc". */}
+                  aria-label is what names the control now that the only child
+                  is an aria-hidden glyph; without it the link would announce
+                  as "link, https://github.com/cashubtc". */}
               <a
                 href="https://github.com/cashubtc"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="site-nav__cta focus-ring"
+                className="site-nav__cta focus-ring--on-ink"
                 aria-label="View on GitHub"
               >
                 <svg
@@ -261,16 +213,14 @@ export default function SiteHeader() {
 
               <button
                 type="button"
-                className="site-nav__toggle focus-ring"
+                className="site-nav__toggle focus-ring--on-ink"
                 aria-expanded={isOpen}
                 aria-controls="site-nav-panel"
                 aria-label={isOpen ? "Close menu" : "Open menu"}
                 onClick={() => setIsOpen((o) => !o)}
               >
                 <span
-                  className={`site-nav__toggle-icon${
-                    isOpen ? " is-open" : ""
-                  }`}
+                  className={`site-nav__toggle-icon${isOpen ? " is-open" : ""}`}
                   aria-hidden
                 >
                   <span />
@@ -278,60 +228,61 @@ export default function SiteHeader() {
                 </span>
               </button>
             </div>
-          </nav>
-        </Reveal>
-
-        {/* Mobile-only collapsible panel. Uses the grid-template-rows
-            0fr→1fr trick to animate to auto height without javascript
-            measurement. Rendered always for stable accessibility tree;
-            hidden visually & from AT when closed. */}
-        <div
-          id="site-nav-panel"
-          className={`site-nav-panel${isOpen ? " is-open" : ""}`}
-          aria-hidden={!isOpen}
-        >
-          <div className="site-nav-panel__inner">
-            <ul className="site-nav-panel__list">
-              {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
-                  {item.external ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="site-nav-panel__link focus-ring"
-                      onClick={() => setIsOpen(false)}
-                      tabIndex={isOpen ? 0 : -1}
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className={`site-nav-panel__link focus-ring${
-                        isCurrent(item) ? " is-current" : ""
-                      }`}
-                      aria-current={isCurrent(item) ? "page" : undefined}
-                      onClick={() => setIsOpen(false)}
-                      tabIndex={isOpen ? 0 : -1}
-                    >
-                      {item.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <a
-              href="https://github.com/cashubtc"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary site-nav-panel__cta"
-              tabIndex={isOpen ? 0 : -1}
-              onClick={() => setIsOpen(false)}
-            >
-              View on GitHub
-            </a>
           </div>
+        </nav>
+      </Reveal>
+
+      {/* Mobile-only collapsible panel. Uses the grid-template-rows 0fr→1fr
+          trick to animate to auto height without javascript measurement.
+          Rendered always for a stable accessibility tree; hidden visually and
+          from AT when closed. It carries the bar's own ink so an open menu
+          reads as the bar getting taller, not as a sheet arriving over it. */}
+      <div
+        id="site-nav-panel"
+        className={`site-nav-panel${isOpen ? " is-open" : ""}`}
+        aria-hidden={!isOpen}
+      >
+        <div className="site-nav-panel__inner">
+          <ul className="site-nav-panel__list">
+            {NAV_ITEMS.map((item) => (
+              <li key={item.href}>
+                {item.external ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="site-nav-panel__link focus-ring--on-ink"
+                    onClick={() => setIsOpen(false)}
+                    tabIndex={isOpen ? 0 : -1}
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={`site-nav-panel__link focus-ring--on-ink${
+                      isCurrent(item) ? " is-current" : ""
+                    }`}
+                    aria-current={isCurrent(item) ? "page" : undefined}
+                    onClick={() => setIsOpen(false)}
+                    tabIndex={isOpen ? 0 : -1}
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+          <a
+            href="https://github.com/cashubtc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="site-nav-panel__cta focus-ring--on-ink"
+            tabIndex={isOpen ? 0 : -1}
+            onClick={() => setIsOpen(false)}
+          >
+            View on GitHub
+          </a>
         </div>
       </div>
     </header>

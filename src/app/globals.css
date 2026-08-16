@@ -9,9 +9,20 @@
  * useful for testing and any future
  * manual toggle.
  *
- * Ink-ground surfaces (footer, the black showcase panels, video band)
- * do NOT flip — ink stays ink in both schemes; they use literals or the
- * --panel-* tokens below.
+ * FIXED-VALUE SURFACES do not flip — they use literals or the --panel-*
+ * tokens below. The list is short and it is not a licence to add to:
+ *
+ *   always dark   The Twilight Stack (closing CTA + footer), the
+ *                 protocol-parts column, the masthead, and the Spec pane in
+ *                 reference-implementations.tsx.
+ *   always light  The implementations Card, which floats over that pane and
+ *                 has to stay the bright plate in both schemes.
+ *
+ * The implementations band's own *ground* used to be on this list and is not
+ * any more (user-directed 2026-08-16): a whole section stuck in dark mode
+ * while the page around it changed read as a bug, so it is Paper-and-Ink now.
+ * The pane and the Card inside it still hold — the composition is a bright
+ * plate over a dark listing, and flipping either end collapses it.
  */
 :root {
   color-scheme: light;
@@ -58,13 +69,37 @@
      state, or as a brand accent. */
   --signal: #6fe3a4;
 
-  /* Navbar glass + interaction washes. */
-  --glass: rgba(255, 255, 255, 0.7);
-  --glass-solid: rgba(255, 255, 255, 0.94);
-  --glass-hair: rgba(9, 9, 11, 0.08);
+  /* Interaction washes. */
   --wash: rgba(9, 9, 11, 0.06);
   --wash-strong: rgba(9, 9, 11, 0.08);
   --backdrop: rgba(255, 255, 255, 0.85);
+
+  /*
+   * Masthead ramp. The bar itself is an always-dark surface like the footer
+   * and the protocol-parts column, so --nav-bg and its foreground steps are
+   * declared once and deliberately NOT repeated in the dark blocks: they are
+   * values on an ink ground that never flips, and a dark override would be
+   * the same number written twice. #18181b is Ink in light and a clear step
+   * above the #0a0a0b page in dark, so one value carries both schemes.
+   *
+   * THE PLATE FOLLOWS THE THEME (user-directed 2026-08-16, second pass). It
+   * is the page's own ground and the page's own ink, punched through the bar
+   * — so it is Paper-on-black in light and near-black-on-Paper in dark, and
+   * it never sits there as a permanent white slab at night. It was a fixed
+   * #ffffff / #f4f4f5 pair for one afternoon; the fixed version is what the
+   * user rejected, so don't reintroduce a literal here.
+   *
+   * One token, two consumers — the brand cell and the hover wipe. Keep them
+   * on the same value: they are the same material, and letting the hover stay
+   * bright while the brand went dark would put two different plates on one
+   * bar.
+   */
+  --nav-bg: #18181b;
+  --nav-fg: #ffffff;
+  --nav-fg-quiet: rgba(255, 255, 255, 0.66);
+  --nav-wash: rgba(255, 255, 255, 0.1);
+  --nav-plate: var(--paper);
+  --nav-plate-fg: var(--ink);
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -76,36 +111,41 @@
    * has to subtract it to land its closing hairline on the fold.
    *
    * Derivation (kept true at runtime by the ResizeObserver sync in
-   * site-header.tsx): --nav-inset (10px) + the frame's 2px of borders + the
-   * nav row. The closed mobile panel contributes 0 — its inner padding only
-   * exists in the open state, so nothing leaks into the flow height.
+   * site-header.tsx): the nav row and nothing else. The closed mobile panel
+   * contributes 0 — its inner padding only exists in the open state, so
+   * nothing leaks into the flow height.
    *
-   *   both     10 + 2 + 68px row (14px padding x2 + the 40px toggle) = 80.
+   *   both     56 row, and nothing under it.
    *
-   * One number for both breakpoints since 2026-08-16: the GitHub CTA used to
-   * be a labelled slab measuring ~41.6px, which made the lg+ row 1.6px taller
-   * than the mobile one. It is now a 40px bare mark sized in lockstep with
-   * .theme-toggle, so the toggle sets the row height everywhere.
+   * One number for both breakpoints: the bar has exactly one height in every
+   * state since the condense was retired 2026-08-16, and the controls that
+   * set the row are the same 40px on either side of lg.
    *
    * Always round UP when re-measuring. Erring short leaves a harmless sliver
    * of the next section showing; erring long hides the closing hairline under
    * the fold, which is the entire bug this token exists to fix.
    */
-  --nav-h: 80px;
+  --nav-h: 56px;
 
   /*
-   * Onyx-pattern bar geometry. The bar rests --nav-inset below the viewport
-   * edge at all times; once the page scrolls it condenses into a floating
-   * box (see .site-nav-frame): --nav-gutter insets the box from the viewport
-   * on narrow screens, --nav-condensed-max tightens it on wide ones (~12%
-   * under --page-max, the ratio lifted from the reference), and --nav-shadow
-   * is the box's one sanctioned lift — the sole box-shadow on the site
-   * (DESIGN.md §4).
+   * Masthead geometry. --nav-row is the bar's height, set by the 40px
+   * controls plus 8px of padding either side.
+   *
+   * Two things used to live here and are deliberately gone (user-directed
+   * 2026-08-16, second pass): --nav-slot, an open column between two ink
+   * segments where the page showed through, and --nav-edge, a pixel-dither
+   * strip closing the bar's bottom. Both came straight from the layout
+   * reference and both were rejected on sight — the slot read as a hole
+   * punched in the bar rather than a window, and the dither read as noise
+   * under it. The bar is now one continuous ink run from the plate to the
+   * right edge, and it meets the page on a clean line.
    */
-  --nav-inset: 10px;
-  --nav-condensed-max: 1128px;
-  --nav-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  --nav-row: 56px;
   --dur-nav: 300ms;
+  /* The hover plate's wipe. Deliberately slower than --dur-base: it is a
+     travelling edge across a whole word, and at feedback speed it reads as a
+     flicker instead of a slide. */
+  --dur-nav-wipe: 460ms;
 
   /*
    * Ceiling on the viewport-filling hero. The hero's fixed parts top out
@@ -146,15 +186,6 @@
   --measure-lead: 48ch;
 }
 
-/* The bar swaps the 40px toggle for the ~41.6px GitHub CTA at lg. Mirrors
-   the `max-width: 1023.98px` boundary the nav's own rules use — keep the
-   two in step. */
-@media (min-width: 1024px) {
-  :root {
-    --nav-h: 82px;
-  }
-}
-
 /* Dark ramp — declared twice because a media query and an attribute
    selector cannot share one rule. Keep both blocks identical. */
 @media (prefers-color-scheme: dark) {
@@ -179,15 +210,9 @@
     --panel-hair: #27272a;
     --panel-fg: #f4f4f5;
 
-    --glass: rgba(10, 10, 11, 0.65);
-    --glass-solid: rgba(10, 10, 11, 0.94);
-    --glass-hair: rgba(255, 255, 255, 0.1);
     --wash: rgba(255, 255, 255, 0.08);
     --wash-strong: rgba(255, 255, 255, 0.12);
     --backdrop: rgba(10, 10, 11, 0.85);
-    /* Deeper than light's 0.05 — a lift this subtle needs more weight to
-       register against the near-black page at all. */
-    --nav-shadow: 0 4px 10px rgba(0, 0, 0, 0.55);
   }
 }
 
@@ -212,15 +237,9 @@
   --panel-hair: #27272a;
   --panel-fg: #f4f4f5;
 
-  --glass: rgba(10, 10, 11, 0.65);
-  --glass-solid: rgba(10, 10, 11, 0.94);
-  --glass-hair: rgba(255, 255, 255, 0.1);
   --wash: rgba(255, 255, 255, 0.08);
   --wash-strong: rgba(255, 255, 255, 0.12);
   --backdrop: rgba(10, 10, 11, 0.85);
-  /* Deeper than light's 0.05 — a lift this subtle needs more weight to
-     register against the near-black page at all. */
-  --nav-shadow: 0 4px 10px rgba(0, 0, 0, 0.55);
 }
 
 /* width: 100% is load-bearing, not redundant. As a flex item the shell would
@@ -240,8 +259,8 @@
 
 /* Anchor destinations (nav links, g-chords) land below the sticky bar.
    Without this, arrivals at narrow widths tucked the section's first line
-   under the glass wherever the section's own top padding ran shorter than
-   the bar. */
+   under the masthead wherever the section's own top padding ran shorter
+   than the bar. */
 #why-cashu,
 #implementations {
   scroll-margin-top: var(--nav-h);
@@ -1114,7 +1133,7 @@ html:not(.js) .reveal {
    */
   min-height: min(calc(100vh - var(--nav-h)), var(--hero-max));
   min-height: min(calc(100svh - var(--nav-h)), var(--hero-max));
-  /* Clears the sticky glass bar and lets the headline breathe below it. */
+  /* Clears the sticky masthead and lets the headline breathe below it. */
   padding-top: clamp(72px, 9vw, 144px);
   /* The terrain band runs flush to the closing hairline. */
   padding-bottom: 0;
@@ -1394,144 +1413,115 @@ html:not(.js) .reveal {
 }
 
 /*
- * Onyx-pattern top bar (behaviour lifted from onyx.security, 2026-07-25,
- * on the user's direction; materials stay the site's own).
+ * MASTHEAD BAR (user-directed 2026-08-16, against a layout reference).
  *
- * Two states, one sticky shell:
+ * Full-bleed, sticky, ink-ground, and the same in every scroll state. Four
+ * things across the row:
  *
- *   rest       The bar sits --nav-inset below the viewport edge, fully
- *              transparent — no ground, no rule. The row aligns to the
- *              page-shell gutters like every section beneath it.
- *   condensed  Past a small scroll threshold (or with the mobile panel
- *              open) the inner frame becomes a floating box: glass ground
- *              + blur, 12px radius, hairline rim, the site's one sanctioned
- *              box-shadow (--nav-shadow), dropped 4px and tightened to
- *              --nav-condensed-max width with 24px inner padding. All of it
- *              transitions over --dur-nav ease-in-out, the reference's own
- *              timing.
+ *   plate    A Paper block hard against the left edge carrying the logo and
+ *            wordmark. The bar's only bright surface, and the only thing on
+ *            it that is not ink.
+ *   lead     Ink segment. Holds the plate and, set well in from it, the UTC
+ *            clock in Geist Mono.
+ *   tail     The same ink run, flush to the right edge: the links, the
+ *            theme toggle, the GitHub mark.
  *
- * The shell stays sticky (not fixed) so it keeps occupying flow space and
- * the hero's fold-line math is untouched; its flow height never changes
- * because the condensed drop is a transform. The shell itself is
- * hit-transparent so the gutters beside the condensed box don't swallow
- * clicks. Glass + blur + radius + shadow are the navbar's documented
- * exception to the flat/sharp doctrine (DESIGN.md §4–5); everything inside
- * the box stays square.
+ * TWO THINGS FROM THE REFERENCE ARE GONE, both rejected on sight when they
+ * shipped (user-directed 2026-08-16, second pass):
+ *
+ *   the slot   An empty grid column between lead and tail where the page
+ *              showed through. It was meant as a window cut in one bar. It
+ *              read as a hole punched in it — worst over the hero, where a
+ *              blank block sat in the middle of a full-bleed headline.
+ *   the edge   A pixel-dither strip closing the bar's bottom across the full
+ *              width. It read as noise under the bar, not as the bar fraying
+ *              into the page.
+ *
+ * So the bar is one continuous ink run and meets the page on a clean line.
+ * Don't reintroduce either; the value step from --nav-bg to the page is doing
+ * the separation in both schemes on its own.
+ *
+ * THIS REPLACED THE ONYX TWO-STATE BAR — transparent at rest, condensing into
+ * a floating glass box on scroll. The two gestures are opposites (a bar that
+ * spans the viewport vs. a box that pulls in from its edges) and cannot be
+ * held at once. Gone with it: the condense hysteresis, --nav-inset,
+ * --nav-condensed-max, --nav-shadow, and the --glass-* ramp. That shadow was
+ * the site's only sanctioned box-shadow and that glass its only translucent
+ * surface, so §4's No-Shadow Rule and the anti-glassmorphism verdict now hold
+ * without exception. Don't reintroduce either on the strength of a rule that
+ * still names the navbar — the surface it named no longer exists.
+ *
+ * No animated layout anywhere in here. The bar has one geometry; the only
+ * things that move are the hover plate's clip and the hamburger's bars.
  */
-/* The padding transition here (and max-width/padding on .site-nav-frame
-   below) animates layout, which a linter will flag and which is accepted.
-   The gutter *is* the condense on narrow screens — it's how the box pulls in
-   from the viewport edges — and there is no compositor-only spelling of it:
-   scaleX distorts the row's contents, and clip-path would mean rebuilding
-   the bar's geometry. Kept deliberately: one property, one element, 300ms,
-   on a state flip that hysteresis (CONDENSE_ON_Y / CONDENSE_OFF_Y in
-   site-header.tsx) already prevents from firing repeatedly. Don't animate
-   layout anywhere else on the strength of this. */
 .site-header-shell {
   position: sticky;
   top: 0;
   z-index: 50;
-  padding: var(--nav-inset) var(--nav-gutter, 0px) 0;
-  pointer-events: none;
-  transition: padding var(--dur-nav) ease-in-out;
-}
-
-.site-header-shell.is-condensed {
-  --nav-gutter: 10px;
-}
-
-.site-nav-frame {
-  pointer-events: auto;
-  width: 100%;
-  max-width: var(--page-max);
-  margin-inline: auto;
-  padding-inline: var(--page-x);
   background-color: transparent;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  /* Clips the open panel's full-bleed link washes to the rounded box. */
-  overflow: clip;
-  transition:
-    max-width var(--dur-nav) ease-in-out,
-    padding var(--dur-nav) ease-in-out,
-    transform var(--dur-nav) ease-in-out,
-    background-color var(--dur-nav) ease-in-out,
-    border-color var(--dur-nav) ease-in-out,
-    box-shadow var(--dur-nav) ease-in-out;
 }
 
-.site-header-shell.is-condensed .site-nav-frame {
-  max-width: var(--nav-condensed-max);
-  padding-inline: 24px;
-  transform: translateY(4px);
-  background-color: var(--glass);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-color: var(--glass-hair);
-  box-shadow: var(--nav-shadow);
+/* The ground is on the row, not on the two cells: with the slot gone there is
+   one uninterrupted ink field and painting it once means a sub-pixel rounding
+   between columns can never open a hairline of page through it.
+
+   minmax(0, 1fr) on the lead, not 1fr: the clock is a fixed-width mono run and
+   the wordmark does not wrap, so an auto-minimum column would refuse to shrink
+   and push the tail off a narrow viewport instead of letting the lead's empty
+   space absorb it. */
+.site-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  background-color: var(--nav-bg);
+  color: var(--nav-fg);
 }
 
-/* Browsers without backdrop-filter (older Firefox) — opt into a denser
-   ground so the box still reads as a surface over scrolling content. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .site-header-shell.is-condensed .site-nav-frame {
-    background-color: var(--glass-solid);
-  }
+.site-nav__lead,
+.site-nav__tail {
+  display: flex;
+  align-items: center;
+  min-height: var(--nav-row);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .site-header-shell,
-  .site-nav-frame {
-    transition: none;
-  }
-  .site-header-shell.is-condensed .site-nav-frame {
-    transform: none;
-  }
+.site-nav__lead {
+  min-width: 0;
+}
+
+.site-nav__tail {
+  justify-content: flex-end;
+  gap: clamp(12px, 2vw, 28px);
+  padding-inline: clamp(14px, 2vw, 26px) clamp(10px, 1.6vw, 18px);
 }
 
 /*
- * THE CONDENSED SHRINK (user-directed 2026-08-14). Condensing used to change
- * only the box — width, gutter, glass, drop — while the row inside kept its
- * full rest height, so the bar moved without ever getting smaller. Now the
- * row itself contracts: padding 14→8, logo 28→24, wordmark 1.25→1.0625rem,
- * and the two controls 40→34. Measured end to end the bar goes 80px → 62px.
+ * Brand plate. Stretches the full row so its edges are the bar's edges, and
+ * sits flush left with no page gutter — the reference's terminal block, and
+ * the one place the bar breaks its ink.
  *
- * Height, not width. --nav-condensed-max stays where it is: that ratio is
- * lifted from the layout reference, and pulling the box narrower as well
- * starts crowding four nav items that already sit at their comfortable
- * spacing on a laptop.
- *
- * This extends the animated-layout exception documented above rather than
- * quietly widening it. Same terms as the original: one element tree, one
- * state flip, 300ms, guarded by the CONDENSE_ON_Y / CONDENSE_OFF_Y
- * hysteresis so it cannot be strobed by hovering the threshold. The row's
- * contents are all small and text-light, so there is no long reflow chain
- * behind them. It still does not license animating layout elsewhere.
- *
- * --nav-h does NOT follow the shrink — see the rest-height guard and settle
- * delay in site-header.tsx. It names the bar's height over the top of the
- * page, and the top of the page is where the bar is not condensed.
+ * It is the page punched through the bar: --nav-plate is --paper and its text
+ * is --ink, so the cell is white-on-black by day and near-black-on-Paper by
+ * night. It shipped for one afternoon as a fixed #ffffff and read as a slab of
+ * daylight stuck in a dark bar; that is the version the user rejected.
  */
-.site-nav {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: clamp(16px, 3vw, 32px);
-  padding: 14px 0;
-  transition: padding var(--dur-nav) ease-in-out;
-}
-
-.site-header-shell.is-condensed .site-nav {
-  padding: 8px 0;
-}
-
 .site-nav__brand {
   display: inline-flex;
   align-items: center;
+  flex: none;
+  align-self: stretch;
   gap: 10px;
-  color: var(--edge);
+  padding-inline: clamp(14px, 2vw, 22px);
+  background-color: var(--nav-plate);
+  color: var(--nav-plate-fg);
   text-decoration: none;
-  padding-right: 4px;
+}
+
+/* The plate sits in the viewport's top-left corner, so the sitewide ring's
+   +4px offset would draw its top and left edges off-screen and leave a
+   keyboard visitor with half a ring. Inset instead: the plate is Paper and
+   wide enough to carry the outline inside itself. */
+.site-nav__brand.focus-ring:focus-visible {
+  outline-offset: -3px;
 }
 
 /* Brand wordmark — the same Display face and tight tracking as the footer
@@ -1539,18 +1529,13 @@ html:not(.js) .reveal {
    one consistent "Cashu" letterform rather than the quieter t-title. */
 .site-nav__wordmark {
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.25rem;
+  /* 1.125rem, the Title step. The plate wanted 1.0625rem by eye, but that
+     size is not on the ramp and a one-off step for a wordmark is not worth a
+     new entry in the scale. */
+  font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  transition: font-size var(--dur-nav) ease-in-out;
-}
-
-/* 1.125rem, not the 1.0625rem this wanted by eye: that step already exists
-   on the ramp (it is the floor of the Title clamp), and a one-off size for a
-   scroll state is not worth a new entry in the scale. */
-.site-header-shell.is-condensed .site-nav__wordmark {
-  font-size: 1.125rem;
 }
 
 /* Cashew logo — preserve the source aspect (slightly taller than wide) and
@@ -1558,79 +1543,140 @@ html:not(.js) .reveal {
    during downscale and the mascot would read as a fuzzy beige blob. */
 .site-nav__logo {
   width: auto;
-  height: 28px;
+  height: 24px;
   image-rendering: pixelated;
-  transition: height var(--dur-nav) ease-in-out;
 }
 
-.site-header-shell.is-condensed .site-nav__logo {
-  height: 24px;
+/*
+ * The UTC clock (nav-clock.tsx). Set well in from the plate — that indent is
+ * what stops the lead segment reading as a header row and starts it reading
+ * as a masthead.
+ *
+ * min-width reserves the slot at its final size before the client has a time
+ * to put in it, so the fill after hydration costs no layout shift. 9ch is
+ * exact rather than approximate: `ch` is the advance of "0", and in a
+ * monospace face every glyph shares it, so "16:42 UTC" is 9ch to the pixel.
+ */
+.site-nav__clock {
+  flex: none;
+  margin-inline-start: clamp(18px, 4vw, 56px);
+  min-width: 9ch;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--nav-fg-quiet);
+  opacity: 0;
+  transition: opacity var(--dur-reveal) var(--ease-out-quart);
+}
+
+.site-nav__clock.is-live {
+  opacity: 1;
 }
 
 .site-nav__list {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(20px, 3vw, 40px);
+  /* Tight: the hover plate is what separates one item from the next, and at
+     the old 20–40px the plates read as four unrelated buttons rather than as
+     one strip being scrubbed. */
+  gap: clamp(2px, 0.5vw, 8px);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+/*
+ * THE WIPE (user-directed 2026-08-16). A Paper plate crosses the link from
+ * left to right and takes the word with it.
+ *
+ * Two stacked copies of the label, not a background sliding under one: the
+ * plate carries its own ink-on-Paper text and is clipped to zero width at
+ * rest, so the travelling edge passes *through* the letterforms and each one
+ * flips as the edge reaches it. The single-label version cannot do this — the
+ * colour has to flip for the whole word at once, which leaves the uncovered
+ * half of it invisible for the length of the animation.
+ *
+ * clip-path, not transform: scaleX would squash the plate's own text. The
+ * wipe enters and leaves from the same edge; a pass-through exit would need
+ * two elements or a keyframe, and the rewind at 460ms of quart-out is not
+ * what anyone notices about this.
+ */
 .site-nav__link {
+  position: relative;
+  display: block;
+  padding: 5px 10px;
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.9375rem;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1.25;
   letter-spacing: 0;
-  color: var(--body);
+  color: var(--nav-fg-quiet);
   text-decoration: none;
-  transition: color var(--dur-base) var(--ease-out-quart);
+  white-space: nowrap;
 }
 
-.site-nav__link:hover,
-.site-nav__link:focus-visible {
-  color: var(--edge);
+/* inset: 0 resolves against the link's padding box, so the plate covers the
+   padding too — the tight rectangle the reference draws. `padding: inherit`
+   then lands the plate's text on exactly the same baseline and left edge as
+   the label underneath it; the two must register to the pixel or the wipe
+   shows a seam. */
+.site-nav__plate {
+  position: absolute;
+  inset: 0;
+  padding: inherit;
+  background-color: var(--nav-plate);
+  color: var(--nav-plate-fg);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--dur-nav-wipe) var(--ease-out-quart);
+  pointer-events: none;
 }
 
-/* Current route: full Ink, one weight step up. The link the visitor is
-   already on stops reading as an invitation. Weight carries it as well as
-   colour so the state survives at any contrast. */
-.site-nav__link.is-current,
+.site-nav__link:hover .site-nav__plate,
+.site-nav__link:focus-visible .site-nav__plate {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Current route: the plate stays down. The link the visitor is already on
+   stops reading as an invitation, and holding the same plate the hover draws
+   says "you are here" in the bar's own vocabulary rather than in a second one
+   invented for the purpose. */
+.site-nav__link.is-current .site-nav__plate {
+  clip-path: inset(0 0 0 0);
+}
+
 .site-nav-panel__link.is-current {
-  color: var(--edge);
+  color: var(--nav-fg);
   font-weight: 600;
 }
 
-/* Right-side cluster: theme toggle + CTA on desktop; theme toggle +
-   hamburger below lg. One grid cell, so the bar's 3-column (or mobile
-   2-column) template is unchanged. */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav__plate,
+  .site-nav__clock {
+    transition: none;
+  }
+}
+
+/* Right-side cluster: theme toggle + GitHub mark on desktop; theme toggle +
+   hamburger below lg. */
 .site-nav__actions {
   display: inline-flex;
   align-items: center;
-  gap: clamp(6px, 1vw, 12px);
+  gap: 2px;
 }
 
 /*
- * GitHub mark — a bare glyph in the right cluster, in every scroll state
- * (user-directed 2026-08-16).
+ * GitHub mark — a bare glyph in the right cluster (user-directed 2026-08-16).
+ * The octocat names GitHub more directly than a label would, and the control
+ * is secondary by doctrine: GitHub is not one of the two primary jobs (get a
+ * wallet, read the spec; the Two-CTA Rule, DESIGN.md §1).
  *
- * This was a labelled slab at rest that collapsed into the mark once the bar
- * condensed. The swap animated the cluster's width on every scroll past the
- * threshold and bought nothing legible: the octocat already names GitHub
- * more directly than the sentence did, and the moving control drew the eye
- * to the chrome at the exact moment the reader was leaving it.
- *
- * What is left is the theme toggle's treatment verbatim — no ground, no rim,
- * Body ink, Wash on hover — because it is the same class of thing: a bare
- * mark in a cluster of bare marks. It carries no .btn-* class, so the base
- * button rule ("no icons inside buttons") is not in play, and the hover
- * cipher never attaches: that pass blanks currentColor, which would erase a
- * glyph rather than scramble a label.
- *
- * It sizes in lockstep with .theme-toggle — 40px at rest, 34px condensed —
- * so the pair never reads as two sizes; both clear the 24px AA pointer
- * target. `aria-label` on the anchor is what names it.
+ * It is the theme toggle's treatment verbatim — no ground, no rim, quiet nav
+ * ink, a white wash on hover — because it is the same class of thing: a bare
+ * mark in a cluster of bare marks. Keep the two sized in lockstep at 40px;
+ * they sit side by side and must read as one pair, not two sizes.
  */
 .site-nav__cta {
   display: inline-flex;
@@ -1641,42 +1687,22 @@ html:not(.js) .reveal {
   padding: 0;
   border: 0;
   background-color: transparent;
-  color: var(--body);
+  color: var(--nav-fg-quiet);
   transition:
     background-color var(--dur-fast) var(--ease-out-quart),
-    color var(--dur-fast) var(--ease-out-quart),
-    width var(--dur-nav) ease-in-out,
-    height var(--dur-nav) ease-in-out;
+    color var(--dur-fast) var(--ease-out-quart);
 }
 
 .site-nav__cta:hover,
 .site-nav__cta:focus-visible {
-  background-color: var(--wash);
-  color: var(--edge);
+  background-color: var(--nav-wash);
+  color: var(--nav-fg);
 }
 
 .site-nav__cta-icon {
-  /* 18px, the theme toggle's glyph size — the two sit side by side and must
-     read as one pair, not two sizes. */
   width: 18px;
   height: 18px;
   flex: none;
-}
-
-.site-header-shell.is-condensed .site-nav__cta {
-  width: 34px;
-  height: 34px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-nav,
-  .site-nav__logo,
-  .site-nav__wordmark,
-  .theme-toggle,
-  .site-nav__cta,
-  .site-nav__cta-icon {
-    transition: none;
-  }
 }
 
 /*
@@ -1684,6 +1710,10 @@ html:not(.js) .reveal {
  * CSS from the same cascade that flips the tokens (media query + data-theme
  * override), so server markup never depends on client theme state: sun in
  * dark (click → light), moon in light.
+ *
+ * Sized in lockstep with .site-nav__cta. 40px clears the 24px AA pointer
+ * target with room to spare and sets the row height (--nav-row) together with
+ * the row's 8px of padding.
  */
 .theme-toggle {
   display: inline-flex;
@@ -1695,28 +1725,17 @@ html:not(.js) .reveal {
   margin: 0;
   border: 0;
   background-color: transparent;
-  color: var(--body);
+  color: var(--nav-fg-quiet);
   cursor: pointer;
   transition:
     background-color var(--dur-fast) var(--ease-out-quart),
-    color var(--dur-fast) var(--ease-out-quart),
-    width var(--dur-nav) ease-in-out,
-    height var(--dur-nav) ease-in-out;
-}
-
-/* The toggle sets the row height (the brand is 28px; the GitHub mark tracks
-   the toggle exactly), so the bar cannot shrink unless this comes down too.
-   34px keeps the pointer target at the 24px AA minimum with room to spare —
-   keep it in step with `.is-condensed .site-nav__cta`. */
-.site-header-shell.is-condensed .theme-toggle {
-  width: 34px;
-  height: 34px;
+    color var(--dur-fast) var(--ease-out-quart);
 }
 
 .theme-toggle:hover,
 .theme-toggle:focus-visible {
-  background-color: var(--wash);
-  color: var(--edge);
+  background-color: var(--nav-wash);
+  color: var(--nav-fg);
 }
 
 .theme-toggle svg {
@@ -1745,7 +1764,7 @@ html:not(.js) .reveal {
   display: none;
 }
 
-/* Toggle button is hidden on desktop; nav list + CTA carry the bar. */
+/* Toggle button is hidden on desktop; nav list + mark carry the bar. */
 .site-nav__toggle {
   display: none;
 }
@@ -1795,16 +1814,16 @@ html:not(.js) .reveal {
 }
 
 /*
- * Mobile dropdown panel. The bar's glass ground (on the shell) already
- * spans the open panel, so the panel itself is transparent — it drops the
- * links into the same square, full-width sheet as the bar, flush beneath
- * the row. Animates with the grid-template-rows 0fr→1fr trick — clean
- * reveal to auto height with no JS measurement. Pointer-events disabled
+ * Mobile dropdown panel. Full-bleed ink, flush under the bar and above the
+ * dither strip, so an open menu is the bar getting taller rather than a sheet
+ * arriving over it. Animates with the grid-template-rows 0fr→1fr trick —
+ * clean reveal to auto height with no JS measurement. Pointer-events disabled
  * when closed so links beneath stay clickable.
  */
 .site-nav-panel {
   display: grid;
   grid-template-rows: 0fr;
+  background-color: var(--nav-bg);
   opacity: 0;
   transition:
     grid-template-rows var(--dur-base) var(--ease-out-quart),
@@ -1823,10 +1842,9 @@ html:not(.js) .reveal {
    (and therefore --nav-h) below lg.
    It is not transitioned. The grid-template-rows 0fr→1fr animation already
    carries the height reveal, and this element is clipped for the whole of
-   it, so 20px of padding appearing on the first frame inside a box that is
-   still growing is invisible — while animating `padding` costs a layout
-   pass per frame on every open and close. Snap the padding, animate the
-   row. */
+   it, so padding appearing on the first frame inside a box that is still
+   growing is invisible — while animating `padding` costs a layout pass per
+   frame on every open and close. Snap the padding, animate the row. */
 .site-nav-panel__inner {
   overflow: hidden;
   padding: 0;
@@ -1849,13 +1867,13 @@ html:not(.js) .reveal {
 
 .site-nav-panel__link {
   display: block;
-  padding: 14px 16px;
+  padding: 14px clamp(14px, 4vw, 22px);
   font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0;
-  color: var(--ink);
+  color: var(--nav-fg-quiet);
   text-decoration: none;
   transition:
     background-color var(--dur-fast) var(--ease-out-quart),
@@ -1864,30 +1882,34 @@ html:not(.js) .reveal {
 
 .site-nav-panel__link:hover,
 .site-nav-panel__link:focus-visible {
-  background-color: var(--wash);
-  color: var(--edge);
+  background-color: var(--nav-wash);
+  color: var(--nav-fg);
 }
 
-/* CTA inside the panel: square per doctrine, stretched to the sheet width
-   and set off from the link rhythm with a small top margin. */
+/* CTA inside the panel: the bar's Paper plate at full sheet width, square
+   per doctrine, set off from the link rhythm with a small top margin. It
+   carries no .btn-* class — the bar has its own two-value palette and
+   .btn-primary would drag the page's Ink/Paper pair onto an ink ground where
+   the fill would vanish. */
 .site-nav-panel__cta {
-  margin-top: 8px;
-  align-self: stretch;
+  margin: 8px clamp(14px, 4vw, 22px) 0;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  font-size: 0.78125rem;
+  padding: 12px 16px;
+  background-color: var(--nav-plate);
+  color: var(--nav-plate-fg);
+  font-family: var(--font-gt), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
 }
 
 /* Nav-link visibility aligned to Tailwind's lg (1024px). Below lg the
-   four labels + brand + CTA can crowd the bar; collapsing the labels keeps
-   the brand and CTA confidently sized at small-laptop and tablet widths. */
+   four labels + brand can crowd the bar; collapsing the labels keeps the
+   brand and clock confidently sized at small-laptop and tablet widths. */
 @media (max-width: 1023.98px) {
-  .site-nav {
-    /* Two slots: brand | toggle, with the toggle pushed to the right.
-       List/CTA are display:none, so they don't occupy grid cells. The row
-       aligns to the page-shell gutters like the rest of the page. */
-    grid-template-columns: auto auto;
-    justify-content: space-between;
-  }
   .site-nav__list,
   .site-nav__cta {
     display: none;
@@ -1902,7 +1924,7 @@ html:not(.js) .reveal {
     margin: 0;
     border: 0;
     background-color: transparent;
-    color: var(--ink);
+    color: var(--nav-fg-quiet);
     cursor: pointer;
     transition:
       background-color var(--dur-fast) var(--ease-out-quart),
@@ -1910,7 +1932,16 @@ html:not(.js) .reveal {
   }
   .site-nav__toggle:hover,
   .site-nav__toggle:focus-visible {
-    background-color: var(--wash-strong);
+    background-color: var(--nav-wash);
+    color: var(--nav-fg);
+  }
+}
+
+/* The clock is the first thing to go: below this the plate and the toggle
+   need the width more than the masthead needs its timestamp. */
+@media (max-width: 479.98px) {
+  .site-nav__clock {
+    display: none;
   }
 }
 
@@ -2520,6 +2551,16 @@ html:not(.js) .reveal {
     transition: none;
     transform: none;
   }
+}
+
+/* The implementations Card is an always-light surface — see the note in
+   reference-implementations.tsx for why it cannot follow the scheme — so its
+   focus ring has to be a literal Ink. The sitewide ring paints --edge, which
+   is #ffffff in dark: a white outline on a white card, i.e. no focus
+   indicator at all for a keyboard visitor on half the site's users' machines.
+   Same class of bug as the on-ink ring, opposite ground. */
+.impl-card .focus-ring:focus-visible {
+  outline-color: #18181b;
 }
 
 .implementations-intro {
