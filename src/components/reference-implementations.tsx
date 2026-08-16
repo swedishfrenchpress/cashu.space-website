@@ -210,7 +210,17 @@ function Spec() {
           id is shown whole (it really is 16 hex characters), and the 33-byte
           signature and DLEQ proof keep an elision because they genuinely
           don't fit — but a wider one, since the pane had ~125px going spare. */}
-      <pre className="spec-pane t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pr-10 overflow-x-auto leading-7">
+      {/* The pane scrolls horizontally on a phone (clientWidth 340 vs
+          scrollWidth 485 at 390px), which makes it a focusable scroll region
+          in Chrome — it takes a real tab stop. A focusable region with no
+          accessible name announces as nothing, so it is named and given a
+          role rather than left as an anonymous stop in the order. */}
+      <pre
+        role="region"
+        aria-label="NUT-00 token, CBOR encoding"
+        tabIndex={0}
+        className="spec-pane t-mono text-zinc-100 px-6 py-7 lg:py-9 lg:pr-10 overflow-x-auto leading-7"
+      >
         <span className="text-zinc-400">{`// Cashu Token v4, CBOR encoding`}</span>{"\n\n"}
         {`{\n  "t": [{\n`}
         <span className="spec-code">

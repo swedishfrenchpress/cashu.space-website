@@ -30,3 +30,22 @@ confirms zero broken images on the homepage.
 DESIGN.md §6 makes the disclaimer the deliberate exception to the prose
 measure: it spans the full footer grid so the composition closes on the same
 edges as the rows above it.
+
+## Tap-target size on `.footer-social` and `.footer-ai__link`
+
+Reported 2026-08-16 as 32×32 and 14×14, measured from
+`getBoundingClientRect()`. That reads the element box and misses the
+`::before` expanders both rules carry (with comments explaining them).
+Hit-tested with `elementFromPoint` at 390px the real targets are **44×44
+and 28×44**, and both clear WCAG 2.5.8. Measure hit areas by probing, not
+by reading rects, before reporting a target as undersized.
+
+## `broken-image` / "stray white dot" on `/press/forbes.jpg`
+
+Reported 2026-08-16 as a stray dot that "reads as a pagination dot on a
+black ground". Cropped and inspected at full resolution: it is a physical
+white fixture mounted on the window frame below the neon sign, complete
+with bracket and shadow. It is a real object in a press photograph, not a
+rendering artifact, and the band is no longer on a black ground anyway.
+Not to be retouched — altering journalism to tidy a layout is out of scope
+for design work here.

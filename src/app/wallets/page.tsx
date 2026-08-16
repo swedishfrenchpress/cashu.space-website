@@ -167,7 +167,7 @@ export default function WalletsPage() {
                 href="https://github.com/cashubtc/nuts#optional"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="prose-link"
+                className="prose-link focus-ring"
               >
                 spec repo
                 <NewTabHint />

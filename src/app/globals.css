@@ -87,11 +87,16 @@
 
   /*
    * Masthead ramp. The bar itself is an always-dark surface like the footer
-   * and the protocol-parts column, so --nav-bg and its foreground steps are
-   * declared once and deliberately NOT repeated in the dark blocks: they are
-   * values on an ink ground that never flips, and a dark override would be
-   * the same number written twice. #18181b is Ink in light and a clear step
-   * above the #0a0a0b page in dark, so one value carries both schemes.
+   * and the protocol-parts column. Its FOREGROUND steps are declared once
+   * here and not repeated in the dark blocks — those are values on ink that
+   * reads the same either way.
+   *
+   * --nav-bg is the exception and it is repeated (2026-08-16). This comment
+   * used to claim one value carried both schemes; it did not. The plate is
+   * --paper by doctrine, and --paper is #0a0a0b at night, so against a
+   * #18181b bar the brand cell and the current-route marker both measured
+   * 1.14:1 — invisible. The dark blocks lift the bar to #3f3f46 (1.89:1) so
+   * the plate stays exactly the page and the bar moves instead.
    *
    * THE PLATE FOLLOWS THE THEME (user-directed 2026-08-16, second pass). It
    * is the page's own ground and the page's own ink, punched through the bar
@@ -686,8 +691,14 @@ html:not(.js) .reveal {
      gives it a ground turns it into a visible one. Contrast extensions do
      exactly that: Dark Reader assigns backgrounds by computed value and
      blanks every button label, which an explicit `transparent` does not
-     prevent. Existing only during the pass removes the hazard rather than
-     negotiating with it. */
+     prevent.
+
+     It is HIDDEN between passes, not removed: button-cipher.tsx re-runs on
+     every hover, so it creates the overlay once at enhance time and clears
+     it on unmount. `display: none` is what closes the hazard here — a
+     display:none element has no ground to assign. hero-cipher.tsx runs once
+     and does remove its overlay; the two differ on purpose. Don't unify
+     them, and don't "fix" this to a permanent transparent background. */
   display: none;
   background-color: transparent;
   align-items: center;
@@ -1075,11 +1086,22 @@ html:not(.js) .reveal {
      closing sentence dissolved into the light it was printed on. Measured
      against the rendered gradient: Fog bottoms out at 2.63:1 on a phone
      (six wrapped lines, the last one sitting on the anchor) and 4.36:1 on
-     a wide screen. Hair holds 5.32:1 at the same worst point, stays inside
-     the grey ramp, and still reads a full step quieter than the Paper
-     wordmark above it. Any future value here must be checked against the
-     bloom, not against #000 — the section's background-color lies. */
-  color: #e4e4e7;
+     a wide screen.
+
+     Hair was recorded here as holding "5.32:1 at the same worst point".
+     Re-measured 2026-08-16 by hiding every glyph and sampling the rendered
+     ground across the paragraph's own box at 390px: the bloom's hotspot
+     under the last lines reaches rgb(104,105,113), where Hair is 4.29:1 —
+     under AA for 16px text. The old figure sampled the modal ground, not
+     the worst one. Chalk (#f4f4f5) measures 4.96:1 against that same peak
+     and 13.9:1 against the paragraph's typical ground, stays inside the
+     grey ramp, and still reads quieter than the Paper wordmark above it.
+
+     Any future value here must be checked against the *bloom*, at the
+     *narrowest* viewport, at the paragraph's brightest pixel — not against
+     #000, and not against the average. The section's background-color
+     lies, and so does the mode. */
+  color: #f4f4f5;
   text-wrap: pretty;
 }
 
@@ -1207,8 +1229,16 @@ html:not(.js) .reveal {
    * sticky masthead once the viewport is short enough that the auto margins
    * have collapsed to zero.
    */
-  padding-top: clamp(72px, 9vw, 144px);
-  padding-bottom: clamp(104px, 12vw, 200px);
+  /* Height-aware, not width-only (2026-08-16). Both terms used to be pure
+     vw clamps, which at 1366px wide resolved to 123px + 164px = 287px of
+     padding inside a 665px fold — 43% of it — and the paired CTAs, the only
+     two jobs the Two-CTA Rule sanctions, were sliced by the viewport edge on
+     arrival. Measured: 1366x665 ctaBottom 685 (clipped), 1280x600 CTA row
+     entirely below the fold. The min() lets the shorter of the two axes
+     govern, so wide-but-short laptops stop paying width-sized air. It is a
+     no-op at 1440x900 and above, where the vw term already fits. */
+  padding-top: clamp(48px, min(9vw, 10svh), 144px);
+  padding-bottom: clamp(56px, min(12vw, 14svh), 200px);
 }
 
 /*
@@ -2571,6 +2601,17 @@ html:not(.js) .reveal {
 }
 
 .press-card {
+  /* Containing block for the .sr-only new-tab hint inside each card.
+     Without it the hint is position:absolute against the initial containing
+     block, keeps its static x inside the wide flex row (~1084px at a 768px
+     viewport), and drags documentElement.scrollWidth out past
+     .press-track's overflow-x:auto clip — the whole homepage then pans
+     400-900px sideways into blank page at every width from 320 to 1023,
+     which html{overflow-x:clip} does not contain. Measured at 640: 899px of
+     stray scroll before, 0 after. It is also a WCAG 2.2 SC 1.4.10 (Reflow)
+     failure at 400% zoom, where the effective viewport lands in that band.
+     Any .sr-only inside an overflow container needs a positioned parent. */
+  position: relative;
   flex: 0 0 86%;
   scroll-snap-align: start;
   display: flex;
