@@ -46,8 +46,38 @@ export default function Home() {
           <div className="hero-spec__inner page-shell">
             <div className="hero-spec__content">
               <Reveal immediate delay={120}>
+                {/* The break is authored, not left to the wrapper. DESIGN.md
+                    §3: the line break in Display copy is part of the
+                    composition, not an accident of viewport — and it was an
+                    accident of viewport, because `text-wrap: balance` picked
+                    it. Balance equalises line lengths, so it stranded FOR at
+                    the end of line two: OPEN SOURCE / ECASH FOR / BITCOIN.
+
+                    THREE LINES IS THE COMPOSITION, and the two-line break
+                    §3 used to claim is arithmetically impossible. Measured at
+                    the top of the Display clamp (144px) against the 1440px
+                    cap: OPEN SOURCE ECASH is 1513px and ECASH FOR BITCOIN. is
+                    1446px, so both halves of both possible splits overflow —
+                    one of them by 6px. Nothing here can fix that. Widening
+                    the cap does not help at 1600, where the viewport binds
+                    before the cap does; and shrinking the type would
+                    reintroduce the bespoke homepage display step §3 retired
+                    on 2026-08-14 for letting a secondary route out-shout the
+                    front door. The only lever left is the copy, which is the
+                    user's, not ours — §3 says as much ("if the hero copy
+                    grows too long for Display, shorten the copy").
+
+                    So the rag is deliberate: long, short, medium, centred,
+                    reading as three phrases. `ecash` takes the short line
+                    because it is the word HeroCipher resolves out of hex on
+                    arrival — the one thing in the hero that moves is now the
+                    line the composition centres on. */}
                 <h1 className="hero-spec__headline">
-                  Open source <HeroCipher>ecash</HeroCipher> for bitcoin.
+                  <span className="hero-spec__line">Open source</span>{" "}
+                  <span className="hero-spec__line">
+                    <HeroCipher>ecash</HeroCipher>
+                  </span>{" "}
+                  <span className="hero-spec__line">for bitcoin.</span>
                 </h1>
               </Reveal>
               {/* The deck stands alone. The body sentence explaining the

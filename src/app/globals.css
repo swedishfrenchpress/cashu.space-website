@@ -1331,10 +1331,43 @@ html:not(.js) .reveal {
    * running to the edges. The lead and CTA stay in the shell; a headline
    * spanning wider than its supporting copy is the point of a centred
    * composition, not a misalignment.
+   *
+   * The escape was necessary and it was not sufficient. The headline is
+   * THREE lines, not the two this comment used to promise: measured at 144px
+   * against this 1440px box, "OPEN SOURCE ECASH" is 1513px and "ECASH FOR
+   * BITCOIN." is 1446px, so both halves of both possible two-line splits
+   * overflow. The old "~1283px to break cleanly in two" figure was wrong.
+   * Raising the cap does not rescue it either — at 1600 the viewport binds
+   * first (1440px of box at 144px type) and the shorter split still misses
+   * by 6px. See page.tsx for why the type size and the copy are both off
+   * the table.
    */
   width: min(calc(100vw - 2 * var(--page-x)), 1440px);
   max-width: none;
+}
+
+/*
+ * The rag is authored in the markup (.hero-spec__line) rather than balanced.
+ * `text-wrap: balance` equalises line *lengths*, which is what stranded the
+ * preposition — OPEN SOURCE / ECASH FOR / BITCOIN. It stays on below 640,
+ * where the spans go back to being inline: at the 3.75rem floor "OPEN
+ * SOURCE" alone is 418px and a 390px phone has 342px of box, so a forced
+ * break would wrap again and cost a fourth line. Balance earns its place
+ * there, evening a rag it cannot shorten.
+ */
+.hero-spec__headline {
   text-wrap: balance;
+}
+
+@media (min-width: 640px) {
+  .hero-spec__headline {
+    /* Authored from here up; balancing would re-split the lines. */
+    text-wrap: initial;
+  }
+
+  .hero-spec__line {
+    display: block;
+  }
 }
 
 /*
