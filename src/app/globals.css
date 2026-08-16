@@ -147,6 +147,13 @@
      flicker instead of a slide. */
   --dur-nav-wipe: 460ms;
 
+  /* A line drawing itself. Two consumers: .draw-on (SVG line art, via
+     stroke-dashoffset) and the hero's closing hairline (via clip-path). Both
+     are the same gesture at different scales, so they share the duration —
+     .draw-on hardcoded 1100ms until 2026-08-16. Named in
+     .impeccable/design.json as `draw-on`. */
+  --dur-draw-on: 1100ms;
+
   /*
    * Ceiling on the viewport-filling hero. The hero's fixed parts top out
    * (headline caps at 6.5rem, terrain band at 320px), so past this height the
@@ -549,7 +556,7 @@ html:not(.js) .reveal {
  * Honest-Network: the line being drawn IS the structure being described.
  */
 .draw-on {
-  transition: stroke-dashoffset 1100ms var(--ease-out-quart);
+  transition: stroke-dashoffset var(--dur-draw-on) var(--ease-out-quart);
   transition-delay: var(--draw-delay, 0ms);
 }
 
@@ -1099,50 +1106,126 @@ html:not(.js) .reveal {
 }
 
 /*
- * Hero — "Spec opener". Single-column layout on Paper: Display headline
- * (GT-Standard per CLAUDE.md), lead paragraph, and paired CTAs, centred on
- * purpose (the Centred-Hero Exception, DESIGN.md §4), over a full-bleed
- * ASCII field whose mask keeps the copy column quiet. A single hairline
- * closes the section, cropping the field like an RFC figure rule — the
- * page reads like the cover of a published specification, not a marketing
- * splash.
+ * Hero — "Spec title page". Single column on Paper: Display headline
+ * (GT-Standard per CLAUDE.md), deck, and paired CTAs, centred on purpose
+ * (the Centred-Hero Exception, DESIGN.md §4). A single hairline closes the
+ * section on the fold. The page reads like the cover of a published
+ * specification, not a marketing splash.
  *
- * The section fills one viewport height (less the sticky bar, capped at
- * --hero-max), so that closing hairline resolves ON the fold rather than
- * floating above it with dead ground below. Title at the top, horizon at
- * the bottom: a spec cover, not a stripe adrift mid-page.
+ * NO GROUND, as of 2026-08-16 (user-directed; the Set-Once Rule, DESIGN.md
+ * §4). The section carried a full-bleed figure for months — an ASCII field,
+ * then a wide dot figure from thinking-orbs — and .hero-spec__field,
+ * .hero-orb and .hero-orb__canvas all lived here with it. The dot figure was
+ * deleted for reading as generic: a blob (PRODUCT.md's second
+ * anti-reference), depicting nothing, looping forever with no cause. Its
+ * mask went with it, and so did the hand-coupling between the mask's
+ * `transparent 9%` stop and MASK_DEAD_TOP in the renderer.
+ *
+ * The section still fills one viewport height (less the sticky bar, capped
+ * at --hero-max), so the closing hairline resolves ON the fold. What changed
+ * is how: the Fold-Line Rule used to read "title at the top, horizon at the
+ * bottom", with the figure supplying the horizon. With no figure, holding
+ * the copy at the top would leave ~40% of the fold as pooled void — the
+ * exact "dead ground below" the rule was written against. So the title block
+ * centres in the section instead (see .hero-spec__inner), the air
+ * distributes, and the hairline IS the horizon. That is a change to the
+ * rule's substance, not just its mechanism; DESIGN.md §4 records it as such.
  */
 .hero-spec {
   position: relative;
-  isolation: isolate;
   display: flex;
   flex-direction: column;
   background-color: var(--paper);
   color: var(--ink);
+  /* The headline sizes off the viewport rather than the page shell, so this
+     clip is what stops it opening a horizontal scrollbar. Not decorative —
+     it outlived the figure it used to crop. */
   overflow: hidden;
   /*
    * svh, not vh or dvh: vh overflows behind the mobile URL bar, and dvh
-   * reflows every time that bar collapses — which would retrigger the
-   * band's ResizeObserver and redraw the canvas on every scroll. svh holds
-   * still. The vh line below is the fallback for pre-2022 engines and is
-   * overwritten wherever svh parses.
+   * reflows every time that bar collapses. svh holds still. The vh line
+   * below is the fallback for pre-2022 engines and is overwritten wherever
+   * svh parses.
    *
    * min-height, not height: on short viewports the hero grows past the fold
-   * and scrolls like any section, instead of crushing the headline into the
-   * terrain.
+   * and scrolls like any section, instead of crushing the headline.
    */
   min-height: min(calc(100vh - var(--nav-h)), var(--hero-max));
   min-height: min(calc(100svh - var(--nav-h)), var(--hero-max));
-  /* Clears the sticky masthead and lets the headline breathe below it. */
+  /*
+   * Asymmetric on purpose. These are the floors the auto margins centre
+   * against, and the larger bottom value seats the title block a few percent
+   * ABOVE true centre — a block centred mathematically reads low. The lift
+   * is done with padding rather than a transform: a transform here would
+   * establish a containing block and can land display type on fractional
+   * pixels.
+   *
+   * The top value is also load-bearing on its own: it is what clears the
+   * sticky masthead once the viewport is short enough that the auto margins
+   * have collapsed to zero.
+   */
   padding-top: clamp(72px, 9vw, 144px);
-  /* The terrain band runs flush to the closing hairline. */
-  padding-bottom: 0;
-  border-bottom: 1px solid var(--hair);
+  padding-bottom: clamp(104px, 12vw, 200px);
 }
 
+/*
+ * The closing hairline, as a pseudo-element rather than a border-bottom so
+ * it can be wiped on arrival. Same clip-path device as the masthead's hover
+ * plate — the site has one way of drawing a travelling edge and this is it.
+ */
+.hero-spec::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--hair);
+}
+
+/* Gated on html.js for the same reason .draw-on is: without scripting the
+   animation never runs, and an un-run `both`-filled animation would leave
+   the rule clipped to nothing. No JS means the hairline is simply there. */
+:where(html.js) .hero-spec::after {
+  animation: hero-rule-draw var(--dur-draw-on) var(--ease-out-quart) both;
+}
+
+@keyframes hero-rule-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/*
+ * Immediately after the rule it cancels, not up with the other reduced-motion
+ * resets near .reveal. `:where(html.js)` contributes no specificity, so that
+ * rule and this one are both (0,1,1) and source order decides — an override
+ * 600 lines earlier silently loses, which is exactly what happened first try.
+ *
+ * hero-cipher.tsx bails on its own under the same setting, so between them the
+ * hero has no motion at all: the hairline is simply there and the word never
+ * scrambles.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .hero-spec::after {
+    animation: none;
+  }
+}
+
+/*
+ * margin-block: auto in a flex column splits the free space above and below
+ * the single child, which is what centres the title block. When the content
+ * outgrows min-height the free space is zero, the auto margins collapse, and
+ * the padding above does the work — so the short-viewport behaviour is
+ * unchanged from when the copy was pinned to the top.
+ *
+ * The z-index that used to sit here went with the figure: there is nothing
+ * left to stack above.
+ */
 .hero-spec__inner {
   position: relative;
-  z-index: 1;
+  margin-block: auto;
 }
 
 .hero-spec__content {
@@ -1276,118 +1359,56 @@ html:not(.js) .reveal {
 }
 
 /*
- * The hero's ground. A wide dot figure filling the whole section, with the
- * Bitcoin mark surfacing out of it and receding on a 72s cycle (see
- * src/components/hero-orb.tsx). Replaced the live ASCII field 2026-08-16.
+ * The cipher pass on one word of the headline (hero-cipher.tsx). This and
+ * the closing hairline's draw-on are the hero's entire motion.
  *
- * The Reveal wrapper carries the positioning, not .hero-orb itself: while
- * unrevealed, .reveal holds `will-change: transform`, which establishes a
- * containing block: an absolutely positioned child inside it would resolve
- * inset:0 against a zero-height box and paint nothing until the reveal
- * landed. Positioning the wrapper instead resolves against .hero-spec, which
- * is already `position: relative; isolation: isolate`.
+ * What used to occupy this part of the stylesheet was the figure:
+ * .hero-spec__field, .hero-orb with its two mask gradients and its narrow
+ * override, and .hero-orb__canvas. All deleted 2026-08-16 on the user's
+ * direction — see the Set-Once Rule, DESIGN.md §4, before adding a ground
+ * back here.
  *
- * z-index 0 keeps it under .hero-spec__inner's z-index 1 without leaving the
- * hero's stacking context.
+ * inline-block so `inset: 0` on the overlay resolves against a well-defined
+ * box rather than against the fragments of an inline. The word never wraps
+ * inside itself, so this costs the balanced headline nothing.
  */
-.hero-spec__field {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+.hero-cipher {
+  position: relative;
+  display: inline-block;
 }
 
-.hero-orb {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  user-select: none;
-  /* No font-family here. The canvas draws arcs and nothing else — the one
-     consumer was the Bitcoin mark's offscreen raster, removed 2026-08-16
-     along with btc-glyph.ts. */
-  /*
-   * Readability mask, rebuilt 2026-08-16 with the figure it masks
-   * (user-directed; see the Fold-Line Rule, DESIGN.md §4).
-   *
-   * ONE gradient now, not two intersected. The elliptical quiet zone that
-   * used to be the second pass was written for an EVEN texture: a full-bleed
-   * glyph grid has no density of its own, so the mask had to supply the
-   * quiet around the centred copy. The dot figure has density of its own —
-   * its ring stack crowds at the top and bottom of the ellipse and opens out
-   * at the equator — so a centre-dim would quiet the figure's most open
-   * region and, worse, sit exactly on the stage where the mark resolves.
-   * Retired, and mask-composite with it: there is nothing left to compose.
-   *
-   * The flat transparent run to 9% is load-bearing twice over, unchanged: it
-   * stops the field competing with the masthead, and the renderer culls every
-   * mark above it (MASK_DEAD_TOP in hero-orb.tsx — keep the two numbers in
-   * sync or the field visibly clips).
-   *
-   * The stops follow the figure, which is a band across the bottom third
-   * rather than a full-height ground: its top arc lands around 65%, so the
-   * ramp is placed to meet it there and give the band a soft upper edge
-   * instead of a hard one, then releases to full by 86% where the mass sits
-   * and where the horizon has to run unbroken into the closing hairline.
-   * The copy is on open paper now and the mask no longer has to defend it.
-   *
-   * The ramp's lower half was also protecting the Bitcoin mark's stage from
-   * being crushed; the mark went 2026-08-16 and the stops are unchanged
-   * anyway, because the figure's own mass sits in the same band.
-   */
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 9%,
-    rgb(0 0 0 / 0.1) 46%,
-    rgb(0 0 0 / 0.42) 68%,
-    #000 86%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 9%,
-    rgb(0 0 0 / 0.1) 46%,
-    rgb(0 0 0 / 0.42) 68%,
-    #000 86%
-  );
+/* The real word goes transparent and the overlay paints on top, so the line
+   never reflows: the source text keeps holding its own space and the h1's
+   accessible name is untouched throughout. */
+.hero-ciphering {
+  color: transparent;
 }
 
 /*
- * Narrow: the copy occupies proportionally more of the hero — the headline
- * runs to three lines and the CTAs stack — so the ramp starts lower and lands
- * later. Same single gradient; the ellipse that widened to 68% here went with
- * the radial.
+ * No font-family: the overlay inherits GT-Standard from the headline. The
+ * button pass switches to mono, which is right for a 13px label and wrong
+ * here — a second typeface appearing inside the page peak for 760ms, at
+ * completely different metrics.
+ *
+ * Centred rather than left-aligned. GT-Standard is proportional, so five hex
+ * glyphs are not the width of "ECASH"; centring splits that difference
+ * either side of the word's own box instead of pushing all of it into the
+ * space before " FOR". nowrap because a scrambled string must never find a
+ * break opportunity the real word does not have.
+ *
+ * Like the button overlay, this element exists only while the pass runs
+ * (hero-cipher.tsx appends and removes it) rather than sitting permanently
+ * invisible over the headline — contrast extensions assign backgrounds by
+ * computed value and would turn a permanent fixture into a visible plate.
  */
-@media (max-width: 767px) {
-  .hero-orb {
-    -webkit-mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 9%,
-      rgb(0 0 0 / 0.08) 52%,
-      rgb(0 0 0 / 0.34) 72%,
-      #000 90%
-    );
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 9%,
-      rgb(0 0 0 / 0.08) 52%,
-      rgb(0 0 0 / 0.34) 72%,
-      #000 90%
-    );
-  }
-}
-
-/* Absolutely positioned so the bitmap size can never feed back into the
-   wrapper's layout size (prevents a ResizeObserver loop). */
-.hero-orb__canvas {
+.hero-cipher__label {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
+  background-color: transparent;
+  color: var(--ink);
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /*

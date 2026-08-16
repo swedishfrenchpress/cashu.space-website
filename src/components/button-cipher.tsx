@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { cipherText } from "@/lib/cipher";
 
 const BUTTON_SELECTOR = [
   ".btn-primary",
@@ -9,36 +10,12 @@ const BUTTON_SELECTOR = [
   ".btn-secondary--on-ink",
 ].join(", ");
 
-const CIPHER_GLYPHS = "0123456789abcdef";
-const ENCRYPT_END = 0.34;
 const DURATION = 460;
 
 type CipherState = {
   frame?: number;
   label: HTMLSpanElement;
 };
-
-function encryptedGlyph(index: number, frame: number) {
-  return CIPHER_GLYPHS[(index * 7 + frame * 11) % CIPHER_GLYPHS.length];
-}
-
-function cipherText(source: string, progress: number, frame: number) {
-  const chars = Array.from(source);
-  const last = Math.max(chars.length - 1, 1);
-  const encrypting = progress < ENCRYPT_END;
-  const sweep = encrypting
-    ? progress / ENCRYPT_END
-    : (progress - ENCRYPT_END) / (1 - ENCRYPT_END);
-
-  return chars
-    .map((char, index) => {
-      if (/\s/.test(char)) return char;
-      const passed = index / last <= sweep;
-      const encrypted = encrypting ? passed : !passed;
-      return encrypted ? encryptedGlyph(index, frame) : char;
-    })
-    .join("");
-}
 
 /**
  * Keeps the cipher effect at one small client boundary: the server still

@@ -2,8 +2,10 @@
 
 /**
  * ThemeToggle — flips the site between light and dark by writing
- * data-theme on <html>, which every consumer already watches: the CSS
- * tokens and the hero HeroOrb.
+ * data-theme on <html>, which every consumer already watches. That is the
+ * CSS tokens and nothing else now: the hero's canvas figure was the one
+ * component that had to track the attribute in JS, and it was deleted
+ * 2026-08-16 (the Set-Once Rule, DESIGN.md §4).
  *
  * Choosing the scheme the OS already prefers clears the override
  * entirely, so the site returns to following the OS setting live. The
