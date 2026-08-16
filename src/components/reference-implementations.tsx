@@ -169,7 +169,13 @@ function LangMark({ lang }: { lang: string }) {
    protocol artefacts (mint id, sat amount) per DESIGN.md §3. */
 function Spec() {
   return (
-    <div className="bg-[#18181b] w-full">
+    /* The rim is --panel-hair, which is the one token that draws exactly
+       when this pane needs it: #000 in light, where it matches the pane's
+       own near-black fill and is invisible against a Paper page that
+       already carries a 16:1 step; Slate in dark, where the pane measures
+       1.12:1 against the page and the composition — a bright Card floating
+       over a dark listing — has nothing left to stand on without it. */
+    <div className="bg-[#18181b] w-full border border-[color:var(--panel-hair)]">
       {/* Header strip — slim, two-cell: file path left, spec metadata right.
          Earns the strip space by carrying information instead of leaving the
          right half blank like a browser tab.

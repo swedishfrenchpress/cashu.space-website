@@ -18,6 +18,14 @@
  *   always light  The implementations Card, which floats over that pane and
  *                 has to stay the bright plate in both schemes.
  *
+ * "Always dark" means never light — not one literal. The masthead and the
+ * protocol-parts boundary each carry a dark-scheme step, because both sit
+ * against --paper and --paper is itself near-black at night: a value picked
+ * to contrast with #ffffff contrasts with nothing at #0a0a0b. They do not
+ * flip; they stay dark and move to the dark that still reads. Anything else
+ * on this list that gains a scheme override needs the same justification
+ * written down, or it is drift.
+ *
  * The implementations band's own *ground* used to be on this list and is not
  * any more (user-directed 2026-08-16): a whole section stuck in dark mode
  * while the page around it changed read as a bug, so it is Paper-and-Ink now.
@@ -214,8 +222,22 @@
     --edge: #ffffff;
 
     --panel: #131316;
-    --panel-hair: #27272a;
+    /* Slate, not Hair. Two near-blacks cannot separate by ground: --panel
+       on --paper measures 1.07:1 and no value in this range beats ~1.4, so
+       the 1px line IS the boundary and it has to clear a real threshold —
+       the Legible-Rim Rule's reasoning, applied to a column edge instead of
+       a control. At #27272a the line was 1.33:1 against the page, fainter
+       than the entry rules inside the column it was supposed to bound. */
+    --panel-hair: #3f3f46;
     --panel-fg: #f4f4f5;
+
+    /* The masthead lifts off the page at night. --nav-plate is --paper by
+       doctrine (the page punched through the bar) and --paper is #0a0a0b
+       here, so against the light-mode bar the plate measured 1.14:1 —
+       invisible, taking the current-route marker and the hover wipe with
+       it. The bar moves, not the plate: the plate stays exactly the page in
+       both schemes, and the bar stays the value that contrasts with it. */
+    --nav-bg: #3f3f46;
 
     --wash: rgba(255, 255, 255, 0.08);
     --wash-strong: rgba(255, 255, 255, 0.12);
@@ -241,8 +263,11 @@
   --edge: #ffffff;
 
   --panel: #131316;
-  --panel-hair: #27272a;
+  /* See the note in the media-query block above; keep both identical. */
+  --panel-hair: #3f3f46;
   --panel-fg: #f4f4f5;
+
+  --nav-bg: #3f3f46;
 
   --wash: rgba(255, 255, 255, 0.08);
   --wash-strong: rgba(255, 255, 255, 0.12);
