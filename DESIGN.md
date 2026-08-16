@@ -24,6 +24,10 @@ typography:
     fontWeight: 600
     lineHeight: 0.95
     letterSpacing: "-0.02em"
+    # Set as text-transform, never retyped markup, so the source string stays
+    # sentence case for screen readers and search. User-directed 2026-08-15;
+    # recorded here 2026-08-16, having lived only in a CSS comment until then.
+    textTransform: "uppercase"
   footerDisplay:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(3.75rem, 6vw, 5rem)"
@@ -66,6 +70,8 @@ typography:
     fontWeight: 500
     lineHeight: 1.15
     letterSpacing: "-0.015em"
+    # Same treatment as the headline it sits under; recorded 2026-08-16.
+    textTransform: "uppercase"
   label:
     fontFamily: "GT-Standard, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.875rem"
@@ -248,6 +254,8 @@ If a future surface wants this green, the answer is no: the exception is a scope
 
 **Character:** GT-Standard is a contemporary grotesque with narrow apertures and a clean editorial bearing. It feels like a magazine commissioned a custom face. Geist Mono and Geist Pixel Square introduce machine-coded specificity where the protocol's own notation appears in copy — quiet contrasts, never decorative.
 
+**The homepage hero is set in caps — headline and deck both.** *(User-directed 2026-08-15; recorded here 2026-08-16, having lived until then only in a comment in `globals.css`, which is how a treatment on the site's largest type went two days undocumented.)* It is applied as `text-transform`, never as retyped markup, so the source string stays sentence case for screen readers, for search, and for the cipher pass that reads the label. This is the hero and only the hero: section headlines, entry titles, body and leads elsewhere all stay sentence case. Button labels are separately and independently caps (§5), which is a component rule, not this one.
+
 ### Hierarchy
 
 - **Display** (weight 600, `clamp(3.75rem, 9vw, 9rem)`, line-height 0.95, letter-spacing −0.02em): Short page-peak copy — the closing-CTA slogan, the H1 on dedicated routes (`/wallets`, future `/docs`, `/blog`). Sized to be monumental. The line break in Display copy is part of the composition, not an accident of viewport. The homepage hero runs at this scale too — see below.
@@ -262,11 +270,11 @@ If a future surface wants this green, the answer is no: the exception is a scope
   **So three lines is the composition, and it is authored rather than wrapped.** `text-wrap: balance` was picking the break, and because balance equalises line *lengths* it stranded the preposition — `OPEN SOURCE / ECASH FOR / BITCOIN.` The rag is now set in the markup as three `.hero-spec__line` spans, long / short / medium, with **`ecash` alone on the short line**: it is the word `hero-cipher.tsx` resolves out of hex on arrival, so the only thing in the hero that moves is the line the centred composition turns on. Blocks from 640px up, where every line clears its box at every step of the clamp; inline below, where `OPEN SOURCE` alone sets 418px against a 390px phone's 342px of box and a forced break would only wrap again. Measured 320–2560: three lines from 640 up, four at 390, five at 360 and below, no horizontal overflow anywhere.
 - **Footer Display** (weight 600, `clamp(3.75rem, 6vw, 5rem)`, line-height 0.95, letter-spacing −0.02em): The compact closing wordmark.
 - **Headline** (weight 600, `clamp(2rem, 4vw, 3rem)`, line-height 1.05, letter-spacing −0.015em): Section openings ("What is ecash?", "Wallets", "Mints").
-- **Panel Display** (weight 600, `clamp(2.25rem, 3.6vw, 4rem)`, line-height 0.98, letter-spacing −0.02em, uppercase): *Added 2026-08-16.* The protocol-parts left column, and only it. A step between Headline and Display, for a headline that has a full-height sticky panel to itself and holds the top of it while four entries scroll past. At Headline it read as a caption for the column beside it; at Display it would be the second page-peak on the homepage, which §3's own note on the retired Homepage Display step already establishes is a fight the hero has to win. At 1440 it breaks in three lines, which is the composition. Carries the optical-left correction (−0.058em) because it is left-aligned against a real margin — see the Centred-Hero Exception in §4, item 1.
+- **Panel Display** (weight 600, `clamp(2.25rem, 3.6vw, 4rem)`, line-height 0.98, letter-spacing −0.02em, uppercase): *Added 2026-08-16.* The protocol-parts left column, and only it. A step between Headline and Display, for a headline that has a full-height sticky panel to itself and holds the top of it while four entries scroll past. At Headline it read as a caption for the column beside it; at Display it would be the second page-peak on the homepage, which §3's own note on the retired Homepage Display step already establishes is a fight the hero has to win. At 1440 it breaks in **two** lines — `THE PROTOCOL,` / `IN FOUR PARTS.` — which is the composition. *(This entry said three until 2026-08-16; it was never three at 1440, and the claim went in unmeasured alongside the hero's identical one in §3. If a line count appears in this document, measure it before you write it down.)* Carries the optical-left correction (−0.058em) because it is left-aligned against a real margin — see the Centred-Hero Exception in §4, item 1.
 - **Entry Title** (weight 600, `clamp(1.5rem, 2.2vw, 2.125rem)`, line-height 1.1, letter-spacing −0.015em): *Added 2026-08-16.* The four protocol-parts entry titles, capped at `18ch` so they break in two the way the reference sets them. One step below Headline: the panel headline is the section's only full heading and these are chapters under it. This is the same job the retired `.feature-block__title` did for the section this one replaced, at the same rank and for the same reason.
 - **Title** (weight 600, `1.125rem`, line-height 1.3): Subheaders, card titles, anything ranked above body but below a section opening.
 - **Body** (weight 400, `1rem`, line-height 1.5, max line length 65–75ch): All reading copy. Width is enforced; no body paragraph crosses 75ch.
-- **Hero Lead** (weight 400, `clamp(1.125rem, 1.6vw, 1.5rem)`, line-height 1.5, letter-spacing −0.005em): The homepage hero’s supporting statement. Capped at `46ch` and centred on the page axis, with `text-wrap: pretty` keeping each rendered line readable. It no longer shares the headline’s width: the headline escapes the page shell and the lead stays inside it, which is the point of a centred composition rather than a misalignment.
+- **Hero Lead** — *retired 2026-08-16.* This documented a `.hero-spec__lead` at weight 400, `clamp(1.125rem, 1.6vw, 1.5rem)`, capped at `46ch` with `text-wrap: pretty`, as "the homepage hero's supporting statement." **It has had no consumer since 2026-08-14**, when the hero's body sentence was cut on the user's direction and `.hero-spec__lead` / `.hero-spec__body` went with it (the note survives in `globals.css`). The entry outlived the element by two days and this document went on describing a rule for it. The hero is headline, deck, CTAs — nothing else. If supporting prose ever returns to the hero, read the note in `page.tsx` first: the standing direction is that the gap it would fill wants a figure, not a paragraph.
 - **Label** (weight 500, `0.875rem`): Navigation, captions, the disclaimer.
 - **Button** (weight 500, `0.8125rem`, uppercase, letter-spacing 0.06em, line-height 1.2): Button labels only — one step below Label so the all-caps slab reads as an object, not a line of text. Codified here so the type ramp and the component spec agree on the same number.
 - **Mono** (weight 400, `0.875rem`): Inline code, addresses, transaction ids — anywhere a literal copy-pasteable string appears in copy.

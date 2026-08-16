@@ -1,6 +1,7 @@
 import Link from "next/link";
 import HeroCipher from "@/components/hero-cipher";
 import InThePress from "@/components/in-the-press";
+import NewTabHint from "@/components/new-tab-hint";
 import ProtocolParts from "@/components/protocol-parts";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
@@ -108,6 +109,7 @@ export default function Home() {
                     className="btn-secondary"
                   >
                     <span>Read the spec</span>
+                    <NewTabHint />
                   </a>
                 </div>
               </Reveal>

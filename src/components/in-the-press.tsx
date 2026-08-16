@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import NewTabHint from "./new-tab-hint";
 import Reveal from "./reveal";
 
 /**
- * In the press — a dark closing band of press mentions, modeled on the
- * Griffin "stories" layout: a 3-up row of cards, each a grayscale story
- * photo over a headline with the publication's wordmark beneath. Sits on
- * Ink (like the reference-implementations section it follows) so the
- * grayscale imagery and white marks read as one monochrome surface.
+ * In the press — the closing band of press mentions, modeled on the Griffin
+ * "stories" layout: a 3-up row of cards, each a grayscale story photo over a
+ * headline with the publication's wordmark beneath. The grayscale imagery
+ * and the flattened marks read as one monochrome surface on either ground.
  *
  * Three cards show at desktop width; a prev/next pager (top-right, where
  * a "view all" link would sit) scrolls the snap-track to reach the rest.
@@ -204,6 +204,7 @@ export default function InThePress() {
                   className={`press-logo${story.logoClass ? ` ${story.logoClass}` : ""}`}
                   loading="lazy"
                 />
+                <NewTabHint />
               </a>
             ))}
           </div>

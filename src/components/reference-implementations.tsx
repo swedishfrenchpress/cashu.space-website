@@ -1,3 +1,4 @@
+import NewTabHint from "./new-tab-hint";
 import Reveal from "./reveal";
 
 type Repo = {
@@ -315,6 +316,7 @@ function Card() {
             <span className="t-title truncate">{repo.name}</span>
           </span>
           <span className="t-label text-zinc-500 whitespace-nowrap">{repo.tag}</span>
+          <NewTabHint />
         </a>
       ))}
       {/* Non-interactive metadata, not a text-arrow link — the section's
@@ -393,6 +395,7 @@ export default function ReferenceImplementations() {
               className="btn-secondary"
             >
               View on GitHub
+              <NewTabHint />
             </a>
           </div>
         </Reveal>

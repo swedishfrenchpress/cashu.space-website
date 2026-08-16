@@ -2863,10 +2863,17 @@ html:not(.js) .reveal {
   align-self: center;
 }
 
-/* Open chip — a real button, sized down a touch from the page CTA so a
-   column of them stays quiet. */
+/* Open chip — a real button, at the one site-wide button size.
+
+   It used to carry `padding: 10px 20px`, a --small modifier by another name:
+   DESIGN.md §5 says "site-wide there is one size" and that the Hero-Scale
+   Exception "is not a `--large` modifier", which rules a shrink out on the
+   same grounds. The stated reason was to keep a column of them quiet, but
+   the box is not what was making them loud — thirteen identical slabs is,
+   and that is an IA problem the size cannot fix. Dropping the override also
+   takes the row's only control from 37.6px to 41.6px tall, which is the
+   right direction for the thirteen tap targets on a phone. */
 .wallet-open {
-  padding: 10px 20px;
   justify-content: center;
 }
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import NavClock from "./nav-clock";
+import NewTabHint from "./new-tab-hint";
 import Reveal from "./reveal";
 import ThemeToggle from "./theme-toggle";
 
@@ -164,6 +165,7 @@ export default function SiteHeader() {
                       className="site-nav__link focus-ring--on-ink"
                     >
                       <NavLabel label={item.label} />
+                      <NewTabHint />
                     </a>
                   ) : (
                     <Link
@@ -199,7 +201,7 @@ export default function SiteHeader() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="site-nav__cta focus-ring--on-ink"
-                aria-label="View on GitHub"
+                aria-label="View on GitHub (opens in a new tab)"
               >
                 <svg
                   className="site-nav__cta-icon"
@@ -256,6 +258,7 @@ export default function SiteHeader() {
                     tabIndex={isOpen ? 0 : -1}
                   >
                     {item.label}
+                    <NewTabHint />
                   </a>
                 ) : (
                   <Link
@@ -282,6 +285,7 @@ export default function SiteHeader() {
             onClick={() => setIsOpen(false)}
           >
             View on GitHub
+            <NewTabHint />
           </a>
         </div>
       </div>

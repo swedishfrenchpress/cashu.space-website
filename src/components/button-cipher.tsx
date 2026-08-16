@@ -28,9 +28,30 @@ export default function ButtonCipher() {
 
     const cleanup = new Map<HTMLElement, () => void>();
 
+    /* Visible text only. `textContent` would sweep up screen-reader-only
+       content — a CTA carrying <NewTabHint /> would have painted "READ THE
+       SPEC (OPENS IN A NEW TAB)" in scrambled hex across a button whose
+       visible label is three words. It also skips any overlay left by a
+       previous pass, so a re-enter can never cipher its own output. */
+    const visibleText = (node: HTMLElement): string => {
+      let out = "";
+      node.childNodes.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          out += child.textContent ?? "";
+        } else if (
+          child instanceof HTMLElement &&
+          !child.classList.contains("sr-only") &&
+          !child.classList.contains("button-cipher__label")
+        ) {
+          out += visibleText(child);
+        }
+      });
+      return out;
+    };
+
     const enhance = (button: HTMLElement) => {
       if (cleanup.has(button)) return;
-      const source = button.textContent?.replace(/\s+/g, " ").trim();
+      const source = visibleText(button).replace(/\s+/g, " ").trim();
       if (!source) return;
 
       const label = document.createElement("span");

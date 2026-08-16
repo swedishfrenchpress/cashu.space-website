@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NewTabHint from "@/components/new-tab-hint";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
@@ -50,6 +51,7 @@ export default function NotFound() {
                 rel="noopener noreferrer"
               >
                 Browse the repo
+                <NewTabHint />
               </a>
             </div>
           </Reveal>

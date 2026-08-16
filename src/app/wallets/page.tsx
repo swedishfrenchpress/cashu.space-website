@@ -7,9 +7,20 @@ import SiteHeader from "@/components/site-header";
    block into every route, so without this the share card for /wallets
    carried the homepage's title and pointed its url at https://cashu.space —
    a link to the directory previewing as the landing page. */
-const TITLE = "Cashu Wallets";
+/* The page is a directory, not a wallet list, and it says so now. The nav
+   label, the title, the H1 and the lead all said "wallets" over four groups,
+   two of which — Libraries and Tools — are explicitly not wallets: a reader
+   scanning for something to install could not tell which 8 of the 13 rows
+   they could install without reading four scope lines first.
+
+   Wallets still lead, in the reading order and in the group order, because
+   routing to one is the outcome PRODUCT.md elevates. What changed is that
+   the page no longer claims to be only that. The route stays /wallets and
+   the nav label stays "Wallets" — that is the job people arrive for, and the
+   first thing under the H1 is still a wallet group. */
+const TITLE = "Cashu Directory";
 const DESCRIPTION =
-  "A non-exhaustive directory of Cashu wallets. Any client that implements the protocol is conformant.";
+  "A non-exhaustive directory of Cashu wallets, libraries, and mint tooling. Any client that implements the protocol is conformant.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -56,8 +67,8 @@ const STATUS_FACTS = new Set(["Beta"]);
 // are alphabetical within a group; implementations lead with the reference.
 const DIRECTORY_GROUPS: DirectoryGroup[] = [
   {
-    heading: "Mobile",
-    scope: "Ecash in your pocket. Wallets for your phone.",
+    heading: "Mobile wallets",
+    scope: "Ecash in your pocket. Hold bearer tokens on your phone.",
     entries: [
       { name: "Cashu.me",  href: "https://cashu.me",           facts: ["iOS, Android, and PWA", "Beta"] },
       { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android"] },
@@ -68,7 +79,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     ],
   },
   {
-    heading: "Web",
+    heading: "Web wallets",
     scope: "Runs in any browser. Nothing to install, portable anywhere.",
     entries: [
       { name: "AGI Cash", href: "https://agi.cash/home", facts: ["Beta"] },
@@ -90,7 +101,9 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
   },
   {
     heading: "Tools",
-    scope: "Not a wallet. Software for running and managing your own mint.",
+    /* "Not a wallet" is no longer the first thing this line has to say: the
+       page is a directory and the two wallet groups name themselves. */
+    scope: "Software for running and managing your own mint.",
     entries: [
       { name: "Orchard", href: "https://orchard.space", facts: ["Self-hosted"] },
     ],
@@ -123,11 +136,12 @@ export default function WalletsPage() {
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
         <Reveal immediate as="header">
           <div id="main-content" tabIndex={-1} className="flex flex-col gap-6 max-w-[60ch]">
-            <h1 className="t-display">Wallets.</h1>
+            <h1 className="t-display">Directory.</h1>
             <p className="t-body-lead text-body">
-              Any client that implements the Cashu protocol is conformant. The
-              list below is non-exhaustive, a snapshot of wallets people use
-              today, not an endorsement.
+              Wallets first, then the libraries and mint tooling built on the
+              same spec. Any client that implements the Cashu protocol is
+              conformant. This list is non-exhaustive, a snapshot of what
+              people use today, not an endorsement.
             </p>
           </div>
         </Reveal>
