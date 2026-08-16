@@ -56,6 +56,9 @@
   --panel-hair: #000000;
   --panel-fg: #ffffff;
 
+  /* Press wordmarks flatten to the scheme's ink end. See .press-logo. */
+  --press-mark: brightness(0);
+
   /* The always-dark column's own ramp (protocol-parts.tsx). Declared once,
      in :root, and deliberately NOT repeated in the two dark blocks: these
      are values on an ink ground that never flips, so a dark override would
@@ -231,6 +234,8 @@
     --panel-hair: #3f3f46;
     --panel-fg: #f4f4f5;
 
+    --press-mark: brightness(0) invert(1);
+
     /* The masthead lifts off the page at night. --nav-plate is --paper by
        doctrine (the page punched through the bar) and --paper is #0a0a0b
        here, so against the light-mode bar the plate measured 1.14:1 —
@@ -266,6 +271,8 @@
   /* See the note in the media-query block above; keep both identical. */
   --panel-hair: #3f3f46;
   --panel-fg: #f4f4f5;
+
+  --press-mark: brightness(0) invert(1);
 
   --nav-bg: #3f3f46;
 
@@ -1103,6 +1110,17 @@ html:not(.js) .reveal {
   transform: translateY(0);
   outline: 2px solid #ffffff;
   outline-offset: 2px;
+}
+
+/* The skip target carries tabindex="-1" so assistive tech actually moves
+   with the link — without it Chrome advances the sequential-focus point but
+   AT focus stays in the bar. It is a region, not a control, so it takes no
+   ring: the sitewide 2px would draw a rectangle around the whole document.
+   The cue is the link the visitor just activated and the region they land
+   in, both of which are announced. */
+#main-content:focus,
+#main-content:focus-visible {
+  outline: none;
 }
 
 .sr-only {
@@ -2431,14 +2449,19 @@ html:not(.js) .reveal {
 
 
 /*
- * In the press — dark closing band of press cards (see in-the-press.tsx).
+ * In the press — the closing band of press cards (see in-the-press.tsx).
  * A horizontal snap-track shows three cards at lg; the top-right pager
  * scrolls it. Photos are the site's only rasters, held to the No-Colour
- * Rule by grayscale(); wordmarks are forced to Paper like the footer marks.
- * A hairline top rule separates it from the black section it follows.
+ * Rule by grayscale(); wordmarks flatten to whichever end of the ramp the
+ * scheme is on. The ground follows the scheme — see the note in the
+ * component for why it stopped being an always-dark slab.
+ *
+ * The top rule is the Hairline Rule's ordinary 1px in --hair. It used to be
+ * rgba(255,255,255,0.08), which only ever meant anything against the black
+ * section that no longer sits above it.
  */
 .press {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--hair);
 }
 
 .press-nav {
@@ -2451,15 +2474,21 @@ html:not(.js) .reveal {
    system the 1px rim is the whole control. The old rgba(255,255,255,0.25)
    composites to #404040 on the Ink ground — 2.03:1, under WCAG 2.2 SC 1.4.11's
    3:1 for a control's identifying boundary, the same failure .btn-secondary
-   was corrected for. Mist (#71717a) is 4.30:1 and hovers to Fog, which is
-   exactly what .btn-secondary--on-ink does. Same rule, same two tones. */
+   was corrected for.
+
+   Mist stays a literal now that the band follows the scheme, because it is
+   the one grey that clears the rule on both grounds: 4.83:1 on Paper and
+   4.30:1 on Ink. The hover moves to --ink instead of Fog — Fog strengthened
+   the rim on a dark ground and *weakened* it to 1.91:1 on Paper, i.e. the
+   hover ran backwards in light. Strengthening to Ink is what .btn-secondary
+   already does. */
 .press-arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  color: #ffffff;
+  color: var(--ink);
   border: 1px solid #71717a;
   background: transparent;
   cursor: pointer;
@@ -2469,7 +2498,7 @@ html:not(.js) .reveal {
 }
 
 .press-arrow:hover:not(:disabled) {
-  border-color: #a1a1aa;
+  border-color: var(--ink);
 }
 
 .press-arrow:disabled {
@@ -2500,7 +2529,7 @@ html:not(.js) .reveal {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  color: #ffffff;
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -2521,8 +2550,12 @@ html:not(.js) .reveal {
   width: 100%;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  background-color: #18181b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* The plate behind the raster, seen only while it loads, plus the keyline
+     that holds the photo's edge against the page. Both follow the scheme
+     now; they were #18181b and a white alpha, which on Paper would have
+     been a dark rectangle with an invisible border. */
+  background-color: var(--chalk);
+  border: 1px solid var(--hair);
 }
 
 .press-media__img {
@@ -2553,8 +2586,13 @@ html:not(.js) .reveal {
   max-width: 160px;
   object-fit: contain;
   object-position: left center;
-  /* Force any brand colour to Paper on the Ink ground. */
-  filter: brightness(0) invert(1);
+  /* Flatten any brand colour to the end of the ramp the scheme is on:
+     brightness(0) crushes the mark to black, and the dark blocks add
+     invert(1) to lift it back to Paper. Third-party marks keeping their
+     brand colour is the Depicted-World Exception, and §2 explicitly does
+     not extend it here — editorial photography and its wordmarks report
+     rather than depict, so they desaturate with the rest of the band. */
+  filter: var(--press-mark);
   opacity: 0.82;
   transition: opacity var(--dur-base) var(--ease-out-quart);
 }

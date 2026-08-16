@@ -47,11 +47,16 @@ const MAX_DPR = 2;
 
 type OrbFigureProps = {
   state: OrbState;
-  /** Describes the figure, not the animation: this is a plate, not a spinner. */
+  /**
+   * An authoring note describing what the chosen mode actually renders, kept
+   * beside each entry in protocol-parts.tsx so the four plates can be
+   * compared without running them. It is deliberately NOT an accessible
+   * name — the canvas is aria-hidden; see the note at the render site.
+   */
   label: string;
 };
 
-export default function OrbFigure({ state, label }: OrbFigureProps) {
+export default function OrbFigure({ state }: OrbFigureProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -149,7 +154,16 @@ export default function OrbFigure({ state, label }: OrbFigureProps) {
           spinner: a dotted crop box the orb deliberately overruns, the same
           move the reference makes with its wireframe globe. */}
       <span className="orb-plate__crop" aria-hidden />
-      <canvas ref={canvasRef} className="orb-plate__canvas" role="img" aria-label={label} />
+      {/* aria-hidden, not role="img" with a description. DESIGN.md §4 admits
+          these plates precisely because they "depict nothing about Cashu" and
+          are material rather than a claim — so narrating "a dotted band
+          undulating around a sphere" four times down the column spends a
+          screen-reader visitor's attention on decoration the design system
+          itself says carries no information. The 7px --signal square beside
+          them is already aria-hidden for the same reason; the site was
+          hiding a 7px decoration and announcing a 320px one. `label` is kept
+          as an authoring note on the mode chosen for each entry. */}
+      <canvas ref={canvasRef} className="orb-plate__canvas" aria-hidden />
     </div>
   );
 }

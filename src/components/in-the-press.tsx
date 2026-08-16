@@ -15,8 +15,19 @@ import Reveal from "./reveal";
  * a "view all" link would sit) scrolls the snap-track to reach the rest.
  * Editorial photography reports rather than depicts, so it sits outside
  * the Depicted-World Exception: photos are desaturated by CSS to hold the
- * No-Colour Rule, and publication wordmarks are forced to Paper via the
- * same brightness(0) invert(1) treatment the footer uses on marks.
+ * No-Colour Rule, and publication wordmarks are flattened to whichever end
+ * of the ramp the scheme is on (--press-mark in globals.css).
+ *
+ * The ground follows the scheme. It was `bg-black text-white` on the
+ * reasoning that it "sits on Ink like the reference-implementations section
+ * it follows" — and that section stopped sitting on Ink on 2026-08-16, when
+ * a whole band stuck in dark mode was rejected for reading as a bug rather
+ * than a decision. This band was the same defect one section later: in light
+ * the page ran white document, hard black slab, black footer, and the
+ * `rgba(255,255,255,0.08)` top hairline it used to separate itself from the
+ * black section above had nothing left to do. It is not on the fixed-value
+ * list in globals.css, and DESIGN.md §5 reserves the Twilight Stack for the
+ * closing CTA and footer, so the dark run starts at the footer and not here.
  */
 
 type Story = {
@@ -130,7 +141,7 @@ export default function InThePress() {
 
   return (
     <section
-      className="bg-black text-white section-y-default press"
+      className="bg-paper text-ink section-y-default press"
       aria-labelledby="press-heading"
     >
       <div className="page-shell flex flex-col gap-10 lg:gap-14">
@@ -142,7 +153,7 @@ export default function InThePress() {
             <div className="press-nav" aria-hidden={!canPrev && !canNext}>
               <button
                 type="button"
-                className="press-arrow focus-ring--on-ink"
+                className="press-arrow focus-ring"
                 onClick={() => step(-1)}
                 disabled={!canPrev}
                 aria-label="Previous stories"
@@ -151,7 +162,7 @@ export default function InThePress() {
               </button>
               <button
                 type="button"
-                className="press-arrow focus-ring--on-ink"
+                className="press-arrow focus-ring"
                 onClick={() => step(1)}
                 disabled={!canNext}
                 aria-label="Next stories"
@@ -171,7 +182,7 @@ export default function InThePress() {
                 href={story.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="press-card focus-ring--on-ink"
+                className="press-card focus-ring"
               >
                 <div className="press-media">
                   <Image
@@ -184,8 +195,8 @@ export default function InThePress() {
                 </div>
                 <h3 className="t-title press-card__title">{story.title}</h3>
                 {/* Static SVG wordmark as a plain <img> so Next's optimizer
-                    (which blocks SVG) stays out of the path; forced to Paper
-                    by CSS. */}
+                    (which blocks SVG) stays out of the path; flattened to Ink
+                    or Paper by CSS, whichever the scheme is on. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={story.logo}

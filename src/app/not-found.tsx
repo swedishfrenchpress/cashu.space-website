@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/reveal";
+import SiteFooter from "@/components/site-footer";
+import SiteHeader from "@/components/site-header";
 
 export const metadata = {
   title: "Cashu: Not specified",
@@ -8,28 +9,20 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <main className="flex flex-col flex-1 bg-paper text-ink">
-      <header className="page-shell pt-6 lg:pt-8 flex items-center">
-        <Reveal immediate variant="fade">
-          {/* Same brand row as the site header — the mascot and Display-face
-              wordmark — so the one page without the full bar still opens on
-              the canonical letterform, with the sitewide focus ring. */}
-          <Link href="/" className="site-nav__brand focus-ring">
-            <Image
-              src="/cashu-no-bg.png"
-              alt=""
-              width={32}
-              height={32}
-              priority
-              className="site-nav__logo"
-            />
-            <span className="site-nav__wordmark">Cashu</span>
-          </Link>
-        </Reveal>
-      </header>
+    /* The 404 carries the full chrome. It used to ship a bespoke brand row
+       and nothing else — no nav, no footer — which made the highest-abandon
+       surface on the site the one place a lost visitor had no routes: a
+       stale /mints or /docs link landed them on two links, with no wallets,
+       no spec CTA and no disclaimer. It also contradicted the note in
+       wallets/page.tsx that the twilight stack closes *every* page. The bar
+       marks nothing as current here, which is correct — no nav item owns
+       this route. */
+    <div className="flex flex-col flex-1 bg-paper text-ink">
+      <SiteHeader />
 
-      <section
+      <main
         id="main-content"
+        tabIndex={-1}
         className="page-shell flex-1 flex items-center pt-16 lg:pt-24 pb-24 lg:pb-32"
       >
         <div className="flex flex-col gap-8 lg:gap-10 max-w-[60ch]">
@@ -61,7 +54,9 @@ export default function NotFound() {
             </div>
           </Reveal>
         </div>
-      </section>
-    </main>
+      </main>
+
+      <SiteFooter />
+    </div>
   );
 }

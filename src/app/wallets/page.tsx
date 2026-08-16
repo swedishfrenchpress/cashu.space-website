@@ -122,7 +122,7 @@ export default function WalletsPage() {
 
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
         <Reveal immediate as="header">
-          <div id="main-content" className="flex flex-col gap-6 max-w-[60ch]">
+          <div id="main-content" tabIndex={-1} className="flex flex-col gap-6 max-w-[60ch]">
             <h1 className="t-display">Wallets.</h1>
             <p className="t-body-lead text-body">
               Any client that implements the Cashu protocol is conformant. The
