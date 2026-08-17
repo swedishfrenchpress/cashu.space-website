@@ -35,7 +35,9 @@
  * ranges below are deliberately a little wider than what renders today for
  * exactly that reason; read the note on each.
  *
- * Requires fonttools:  pipx install fonttools  (or pip install fonttools brotli)
+ * Requires fonttools *with brotli* — woff2 compression is not in the base
+ * install, and without it the subset step fails at the last moment:
+ *   pipx install "fonttools[woff]"   (or: pip install fonttools brotli)
  * Run from the repo root:  node scripts/subset-fonts.mjs
  */
 
@@ -139,7 +141,9 @@ function run(cmd, args) {
   } catch (error) {
     if (error.code === "ENOENT") {
       console.error(
-        `\n${cmd} not found. Install fonttools first:\n  pipx install fonttools\n`,
+        `\n${cmd} not found. Install fonttools with brotli first — the woff2\n` +
+          `flavour needs it and the base install does not carry it:\n` +
+          `  pipx install "fonttools[woff]"    (or: pip install fonttools brotli)\n`,
       );
       process.exit(1);
     }
