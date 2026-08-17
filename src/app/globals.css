@@ -1,36 +1,28 @@
 @import "tailwindcss";
 
 /*
- * Tonal ramp — the site's entire palette, light and dark. Dark is the
- * zinc scale mirrored about its middle (greys shift by lightness, never
- * hue — the No-Colour Rule holds in both schemes). The scheme follows
- * the OS setting via prefers-color-scheme; a `data-theme="dark|light"`
- * attribute on <html> overrides it (the Tailwind/shadcn convention) —
- * useful for testing and any future
- * manual toggle.
+ * Tonal ramp — the site's entire palette. **Light only.** Dark mode and its
+ * toggle were removed 2026-08-17 on the user's direction: there is no
+ * `prefers-color-scheme` branch, no `data-theme` override, and no saved
+ * preference. `color-scheme: light` below tells the browser to keep its own
+ * form controls and scrollbars light too, so the page cannot be half-flipped
+ * by the OS.
  *
- * FIXED-VALUE SURFACES do not flip — they use literals or the --panel-*
- * tokens below. The list is short and it is not a licence to add to:
+ * ALWAYS-DARK SURFACES ARE NOT DARK MODE, and deleting one did not delete the
+ * other. The site is ink-on-paper with four deliberately dark plates:
  *
- *   always dark   The Twilight Stack (closing CTA + footer), the
- *                 protocol-parts column, the masthead, and the Spec pane in
- *                 reference-implementations.tsx.
- *   always light  The implementations Card, which floats over that pane and
- *                 has to stay the bright plate in both schemes.
+ *   The Twilight Stack (closing CTA + footer), the protocol-parts column, the
+ *   masthead, and the Spec pane in reference-implementations.tsx.
  *
- * "Always dark" means never light — not one literal. The masthead and the
- * protocol-parts boundary each carry a dark-scheme step, because both sit
- * against --paper and --paper is itself near-black at night: a value picked
- * to contrast with #ffffff contrasts with nothing at #0a0a0b. They do not
- * flip; they stay dark and move to the dark that still reads. Anything else
- * on this list that gains a scheme override needs the same justification
- * written down, or it is drift.
+ * They are fixed-value surfaces — dark by composition on a light page, not a
+ * scheme. The implementations Card is their mirror: always light, floating
+ * over that dark pane. This list is short and it is not a licence to add to.
  *
- * The implementations band's own *ground* used to be on this list and is not
- * any more (user-directed 2026-08-16): a whole section stuck in dark mode
- * while the page around it changed read as a bug, so it is Paper-and-Ink now.
- * The pane and the Card inside it still hold — the composition is a bright
- * plate over a dark listing, and flipping either end collapses it.
+ * What the removal simplified: those plates used to carry a second, dark-
+ * scheme value each, because a value picked to contrast with #ffffff
+ * contrasts with nothing at #0a0a0b. With one ground there is one value.
+ * `--panel` is #000000, `--nav-bg` is #18181b, `--signal-page` is #1b9d55,
+ * `--press-mark` is brightness(0), and none of them need a second opinion.
  */
 :root {
   color-scheme: light;
@@ -216,89 +208,6 @@
    * by measuring rendered characters, never by converting the rule's number.
    */
   --measure-lead: 48ch;
-}
-
-/* Dark ramp — declared twice because a media query and an attribute
-   selector cannot share one rule. Keep both blocks identical. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-
-    --paper: #0a0a0b;
-    --card: #18181b;
-    --band: #101012;
-    --chalk: #18181b;
-    --hair: #27272a;
-    --ghost: #3f3f46;
-    --faint: #71717a;
-    --muted: #a1a1aa;
-    --body: #d4d4d8;
-    --ink: #f4f4f5;
-    --ink-hover: #e4e4e7;
-    --on-ink: #0a0a0b;
-    --edge: #ffffff;
-
-    --panel: #343438;
-    /* Slate, not Hair. Two near-blacks cannot separate by ground: --panel
-       on --paper measures 1.07:1 and no value in this range beats ~1.4, so
-       the 1px line IS the boundary and it has to clear a real threshold —
-       the Legible-Rim Rule's reasoning, applied to a column edge instead of
-       a control. At #27272a the line was 1.33:1 against the page, fainter
-       than the entry rules inside the column it was supposed to bound. */
-    --panel-hair: #3f3f46;
-    --panel-fg: #f4f4f5;
-
-    /* On a dark page the mark needs no darkening — this is the ground the
-       value was picked against in the first place. */
-    --signal-page: var(--signal);
-
-    --press-mark: brightness(0) invert(1);
-
-    /* The masthead lifts off the page at night. --nav-plate is --paper by
-       doctrine (the page punched through the bar) and --paper is #0a0a0b
-       here, so against the light-mode bar the plate measured 1.14:1 —
-       invisible, taking the current-route marker and the hover wipe with
-       it. The bar moves, not the plate: the plate stays exactly the page in
-       both schemes, and the bar stays the value that contrasts with it. */
-    --nav-bg: #3f3f46;
-
-    --wash: rgba(255, 255, 255, 0.08);
-    --wash-strong: rgba(255, 255, 255, 0.12);
-    --backdrop: rgba(10, 10, 11, 0.85);
-  }
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-
-  --paper: #0a0a0b;
-  --card: #18181b;
-  --band: #101012;
-  --chalk: #18181b;
-  --hair: #27272a;
-  --ghost: #3f3f46;
-  --faint: #71717a;
-  --muted: #a1a1aa;
-  --body: #d4d4d8;
-  --ink: #f4f4f5;
-  --ink-hover: #e4e4e7;
-  --on-ink: #0a0a0b;
-  --edge: #ffffff;
-
-  --panel: #343438;
-  /* See the note in the media-query block above; keep both identical. */
-  --panel-hair: #3f3f46;
-  --panel-fg: #f4f4f5;
-
-  --signal-page: var(--signal);
-
-  --press-mark: brightness(0) invert(1);
-
-  --nav-bg: #3f3f46;
-
-  --wash: rgba(255, 255, 255, 0.08);
-  --wash-strong: rgba(255, 255, 255, 0.12);
-  --backdrop: rgba(10, 10, 11, 0.85);
 }
 
 /* width: 100% is load-bearing, not redundant. As a flex item the shell would
@@ -1885,65 +1794,6 @@ html:not(.js) .reveal {
   flex: none;
 }
 
-/*
- * Theme toggle — quiet icon button in the bar. Which icon renders is pure
- * CSS from the same cascade that flips the tokens (media query + data-theme
- * override), so server markup never depends on client theme state: sun in
- * dark (click → light), moon in light.
- *
- * Sized in lockstep with .site-nav__cta. 40px clears the 24px AA pointer
- * target with room to spare and sets the row height (--nav-row) together with
- * the row's 8px of padding.
- */
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  background-color: transparent;
-  color: var(--nav-fg-quiet);
-  cursor: pointer;
-  transition:
-    background-color var(--dur-fast) var(--ease-out-quart),
-    color var(--dur-fast) var(--ease-out-quart);
-}
-
-.theme-toggle:hover,
-.theme-toggle:focus-visible {
-  background-color: var(--nav-wash);
-  color: var(--nav-fg);
-}
-
-.theme-toggle svg {
-  width: 18px;
-  height: 18px;
-}
-
-.theme-toggle__sun {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-toggle__sun {
-    display: block;
-  }
-  :root:not([data-theme="light"]) .theme-toggle__moon {
-    display: none;
-  }
-}
-
-:root[data-theme="dark"] .theme-toggle__sun {
-  display: block;
-}
-
-:root[data-theme="dark"] .theme-toggle__moon {
-  display: none;
-}
-
 /* Toggle button is hidden on desktop; nav list + mark carry the bar. */
 .site-nav__toggle {
   display: none;
@@ -2846,32 +2696,20 @@ html:not(.js) .reveal {
   max-width: 34ch;
 }
 
-/* Entry list — a top hairline opens the register; each row carries its
-   own bottom hairline. Hair (var(--hair)) keeps the 1px line at the doctrinal
-   hairline weight. */
-/*
- * Registry rules use --rule, not --hair. In dark, --hair (#27272a) sits at
- * 1.33:1 on --paper and the registry stops reading as a table at all — and
- * here the rules are not decoration, they are the row structure carrying
- * name / facts / action across three columns. --ghost restores the grouping
- * without touching the global hairline token every other section is tuned
- * against. Light is unchanged: --hair is already legible on paper.
- */
+/* Entry list — a top hairline opens the register; each row carries its own
+   bottom hairline, at the doctrinal Hair weight.
+
+   These rules used to indirect through a --rule custom property, which existed
+   for one reason: in dark, --hair (#27272a) sat at 1.33:1 on --paper and the
+   registry stopped reading as a table, so it was overridden to --ghost. With
+   the site light-only (2026-08-17) --hair is legible on paper and the
+   indirection had one value, so it is gone. If a second registry ground ever
+   appears, put the variable back rather than weakening the global token —
+   these lines are the row structure, not decoration. */
 .wallet-list {
-  --rule: var(--hair);
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--rule);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .wallet-list {
-    --rule: var(--ghost);
-  }
-}
-
-:root[data-theme="dark"] .wallet-list {
-  --rule: var(--ghost);
+  border-top: 1px solid var(--hair);
 }
 
 /* Aligned Registry Row: one line per entry. Facts get their own grid
@@ -2884,7 +2722,7 @@ html:not(.js) .reveal {
   column-gap: clamp(1.25rem, 2.5vw, 2rem);
   align-items: center;
   padding-block: clamp(1.125rem, 2.2vw, 1.625rem);
-  border-bottom: 1px solid var(--rule, var(--hair));
+  border-bottom: 1px solid var(--hair);
 }
 
 /* Name + destination host, stacked. The host is the registry's honest
@@ -2959,12 +2797,13 @@ html:not(.js) .reveal {
  *     furniture and the facts beside it were data. In the family it is a
  *     stated property, and every stated property on this site is mono.
  *   - Ink, not Body. With the Chalk ground gone there is nothing left to
- *     step down from; Ink (17.72:1 light, 18.00:1 dark) against the
- *     neighbouring facts' Muted (4.83:1) is what now marks it as the
- *     different class of fact.
+ *     step down from; Ink (17.72:1) against the neighbouring facts' Muted
+ *     (4.83:1) is what now marks it as the different class of fact.
  *
- * The square is `--signal-page`, not `--signal`: this ground flips and the
- * protocol-parts column's does not. See the token note in :root.
+ * The square is `--signal-page`, not `--signal`. Both are one value now that
+ * the site is light-only, but they stay separate tokens: `--signal` is the
+ * mint picked against the always-dark protocol-parts column, and `#6fe3a4`
+ * measures 1.59:1 on Paper — it would all but vanish here. See :root.
  *
  * Bounded, like every other exception here: STATUS_FACTS only. The square
  * marks the maturity fact and nothing else in the row — give one to every

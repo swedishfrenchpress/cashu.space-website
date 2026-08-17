@@ -52,12 +52,12 @@ const geistPixelSquare = localFont({
   fallback: ["Geist Mono", "ui-monospace", "SFMono-Regular", "monospace"],
 });
 
-/* Browser chrome follows the site scheme (see the tonal ramp in globals.css). */
+/* One value, because the site has one scheme (see the tonal ramp in
+   globals.css — dark mode was removed 2026-08-17). A prefers-color-scheme
+   pair here would tell the browser to tint its chrome dark around a page that
+   is still paper-white. */
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
-  ],
+  themeColor: "#ffffff",
 };
 
 export const metadata: Metadata = {
@@ -103,17 +103,20 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${gtStandard.variable} ${GeistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
-      /* The theme boot script (and browser extensions) may stamp attributes
-         on <html> before hydration; the mismatch is intentional. */
+      /* Browser extensions (Dark Reader and friends) stamp attributes on
+         <html> before hydration; the mismatch is theirs, not ours, and it is
+         not worth a console error. */
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        {/* Applies a manually chosen theme before first paint so a saved
-            override can't flash the OS scheme. Parser-blocking on purpose —
-            it must run before anything renders. No saved choice → no
-            attribute → the CSS follows prefers-color-scheme. Also stamps
-            html.js, the gate for every scripting-dependent hidden state
-            (.reveal, .draw-on): without it the site renders fully static.
+        {/* Stamps html.js, the gate for every scripting-dependent hidden
+            state (.reveal, .draw-on): without it the site renders fully
+            static. Parser-blocking on purpose — it must run before anything
+            renders, or the gated elements flash.
+
+            It used to also apply a saved theme before first paint. Dark mode
+            was removed 2026-08-17, so there is no preference to restore and
+            no scheme to flash.
 
             The same script arms a failsafe. html.js is stamped here, but
             only React can add `.is-revealed`, so between this line and
@@ -134,7 +137,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'document.documentElement.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}setTimeout(function(){if(!document.querySelector(".reveal.is-revealed"))document.documentElement.classList.remove("js")},1500)',
+              'document.documentElement.classList.add("js");setTimeout(function(){if(!document.querySelector(".reveal.is-revealed"))document.documentElement.classList.remove("js")},1500)',
           }}
         />
         <a href="#main-content" className="skip-link">

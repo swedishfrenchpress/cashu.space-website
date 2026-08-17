@@ -73,7 +73,6 @@ const TRAIL_LIFETIME_MS = 2200;
 
 /** Falls back to the shipped token values if a custom property is missing. */
 const REST_FALLBACK: [number, number, number] = [0.83, 0.83, 0.85];
-const PAPER_FALLBACK: [number, number, number] = [1, 1, 1];
 const WAKE_FALLBACK: [number, number, number] = [0.25, 0.25, 0.27];
 
 function parseHex(
@@ -97,22 +96,24 @@ function parseHex(
 }
 
 /**
- * Every value comes from CSS rather than being written here, so the field
- * follows the scheme the same way every other surface does — and so the
- * component introduces no colour of its own at all.
+ * Both values come from CSS rather than being written here, so the component
+ * introduces no colour of its own at all.
  *
  * `--ghost` is the resting field, one quiet step off the page ground.
  * `--body` is a disturbed cell: a clear resolve, but still a step below the
  * `--ink` the headline is set in, so the wake can never out-set the page peak.
  * Both are existing ramp values and both are monochrome. The green that used
  * to be here is back where §2 scoped it.
+ *
+ * Read once at mount and never again: with dark mode removed (2026-08-17)
+ * there is no scheme to follow, so the watchers that used to re-read these on
+ * a media-query change or a `data-theme` mutation are gone too.
  */
 function readColors(): SceneColors {
   const style = getComputedStyle(document.documentElement);
   return {
     rest: parseHex(style.getPropertyValue("--ghost"), REST_FALLBACK),
     wake: parseHex(style.getPropertyValue("--body"), WAKE_FALLBACK),
-    paper: parseHex(style.getPropertyValue("--paper"), PAPER_FALLBACK),
   };
 }
 
@@ -313,21 +314,6 @@ export default function HeroField() {
     });
     resizeObserver.observe(canvas);
 
-    /* The scheme can flip two ways — the toggle writes data-theme, the OS
-       drives the media query — and the field's two colours live in CSS, so
-       both have to reach the shader. */
-    const schemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const onScheme = () => {
-      scene.setColors(readColors());
-      scene.render();
-    };
-    schemeQuery.addEventListener("change", onScheme);
-    const themeObserver = new MutationObserver(onScheme);
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-
     /* A GPU reset or a driver eviction blanks the field silently. Without
        this the canvas would sit there empty for the rest of the visit; with
        it, the element is removed and the hero degrades to exactly the version
@@ -353,8 +339,6 @@ export default function HeroField() {
       stop();
       observer.disconnect();
       resizeObserver.disconnect();
-      themeObserver.disconnect();
-      schemeQuery.removeEventListener("change", onScheme);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerleave", onPointerOut);

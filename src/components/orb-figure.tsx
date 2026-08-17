@@ -28,10 +28,11 @@ import { MODE_DRAWS, resolvePreset, type OrbState } from "thinking-orbs";
  * - Size comes from a ResizeObserver rather than a prop, so the plate is
  *   responsive without the canvas ever being scaled by CSS.
  *
- * The substrate is pinned dark. These plates only ever sit on the
- * always-dark `--panel` column, in both site themes, so there is nothing
- * for the library's theme detection to detect and a `data-theme="light"`
- * document must not flip the ink to black-on-black.
+ * The substrate is pinned dark. These plates only ever sit on the always-dark
+ * `--panel` column, so there is nothing for the library's theme detection to
+ * detect — and on a light-only document (dark mode removed 2026-08-17) an
+ * auto-detecting library would flip the ink to black-on-black. Pinned means
+ * pinned: this is a fixed-value surface, not a scheme.
  */
 
 /* Which preset to resolve, not what to render at. 64 is the fine profile —

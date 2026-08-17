@@ -31,6 +31,16 @@ const CELL = 14;
  * than a wall of code — the Matrix reading is the failure mode here, and
  * density is what separates the two (that, and the fact that this field is
  * monochrome, static, and does not fall).
+ *
+ * MEASURE AT MORE THAN ONE VIEWPORT when changing this. The cleared zone
+ * tracks the width-capped type, so a bigger window adds field rather than
+ * clearing more of it; before the proportional floors below, the same build
+ * ran 10.4% of cells occupied at 1440x900 and 35.4% at 1920x1200. Shipped
+ * values measure 8.4% and 11.3%.
+ *
+ * It used to carry a companion per-scheme gain, because `--ghost` did not hold
+ * its contrast step across light and dark. Dark mode was removed 2026-08-17,
+ * so there is one ground, one step, and one number.
  */
 const OCCUPANCY = 0.40;
 
@@ -46,10 +56,6 @@ const OCCUPANCY = 0.40;
  * something happening *to* the ground rather than on top of it.
  */
 const WAKE_OCCUPANCY_GAIN = 0.1;
-
-/** Reference contrast the occupancy was calibrated against: --ghost on
-    --paper in light, #d4d4d8 on #ffffff. */
-const REFERENCE_STEP = 1.478;
 
 /**
  * How far the field takes to die into the section's top and bottom edges, in
@@ -103,12 +109,10 @@ const MAX_PIXELS = 5_000_000;
 const MAX_DPR = 2;
 
 export type SceneColors = {
-  /** The resting field: `--ghost`, which follows the scheme. */
+  /** The resting field: `--ghost`. */
   rest: [number, number, number];
   /** A disturbed cell: `--body`. Monochrome — see the composite's note. */
   wake: [number, number, number];
-  /** The page ground it sits on, for the per-scheme occupancy correction. */
-  paper: [number, number, number];
 };
 
 export type DitherScene = {
@@ -125,43 +129,6 @@ export type DitherScene = {
   clearTrail: () => void;
   dispose: () => void;
 };
-
-/** Relative luminance, for the per-scheme occupancy correction. */
-function luminance([r, g, b]: [number, number, number]): number {
-  const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-}
-
-/**
- * Hold the *perceived* weight of the resting field constant across the two
- * schemes by scaling the noise against the value step the scheme gives us,
- * which shifts how many cells clear the occupancy threshold.
- * `--ghost` does not hold its step: 1.478:1 in light (#d4d4d8 on #ffffff) and
- * 1.894:1 in dark (#3f3f46 on #0a0a0b), so the same threshold renders a
- * visibly heavier field at night. Excess contrast over 1.0 is the term that
- * matters: at twice the step, fewer characters. Clamped so a future token
- * change cannot drive the field to either empty or solid unnoticed.
- */
-function gainFor(rest: [number, number, number], paper: [number, number, number]): number {
-  const [lo, hi] = [luminance(rest), luminance(paper)].sort((a, b) => a - b);
-  const step = (hi + 0.05) / (lo + 0.05);
-  if (!Number.isFinite(step) || step <= 1) return 1;
-  /*
-   * DAMPED, because the straight ratio over-corrects. Gain scales the noise
-   * but what we care about is how many cells clear the threshold, and that
-   * relationship is not linear — the further into the distribution's tail the
-   * threshold sits, the more coverage a given gain removes. At the occupancy
-   * this ships with, the undamped ratio (0.535 in dark) took the dark field to
-   * 49% of light's and it read as empty rather than quiet. The square root
-   * lands it near 73%, which matches by eye.
-   *
-   * The exponent is empirical and it is the only number in this file that is.
-   * If OCCUPANCY moves materially, re-look at both schemes rather than trusting
-   * it — it is calibrated against a threshold, not derived from one.
-   */
-  const ratio = (REFERENCE_STEP - 1) / (step - 1);
-  return Math.min(1.4, Math.max(0.3, Math.sqrt(ratio)));
-}
 
 /**
  * `interactive: false` builds the ground and nothing else — no solver, no dye
@@ -196,7 +163,6 @@ export function createDitherScene(
       so its contents are never read — a sampler just has to point somewhere. */
   let blankDye: Target | null = null;
   let colors = initialColors;
-  let gain = gainFor(initialColors.rest, initialColors.paper);
   let width = 0;
   let height = 0;
   let dpr = 1;
@@ -344,7 +310,6 @@ export function createDitherScene(
     gl.uniform1f(uniform(compositeProgram, "uRestCount"), REST_COUNT);
     gl.uniform1f(uniform(compositeProgram, "uWakeCount"), WAKE_COUNT);
     gl.uniform1f(uniform(compositeProgram, "uOccupancy"), OCCUPANCY);
-    gl.uniform1f(uniform(compositeProgram, "uGain"), gain);
     gl.uniform1f(uniform(compositeProgram, "uWakeGain"), WAKE_OCCUPANCY_GAIN);
     gl.uniform1f(uniform(compositeProgram, "uTrailStrength"), fluid ? 1 : 0);
     gl.uniform3f(uniform(compositeProgram, "uRest"), ...colors.rest);
@@ -381,7 +346,6 @@ export function createDitherScene(
     loadGlyphs,
     setColors: (next) => {
       colors = next;
-      gain = gainFor(next.rest, next.paper);
     },
     splat: (x, y, dx, dy) => fluid?.splat(x, y, dx, dy),
     step: (dt) => fluid?.step(dt),

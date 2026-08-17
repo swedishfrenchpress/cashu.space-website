@@ -272,7 +272,6 @@ uniform float uWakeCount;
 uniform vec3 uRest;
 uniform vec3 uWake;
 uniform float uOccupancy;
-uniform float uGain;
 uniform float uWakeGain;
 uniform float uTrailStrength;
 /** xy = centre of the title block, zw = its half-extents, in device pixels. */
@@ -362,7 +361,7 @@ void main() {
    * thickening of the field. That is the difference between a disturbance and
    * a paste-in, and it is the whole reason the two are separate numbers.
    */
-  float density = texture(uField, cellUv).r * uGain * groundCoverage + wake * uWakeGain;
+  float density = texture(uField, cellUv).r * groundCoverage + wake * uWakeGain;
   float occupancy = step(uOccupancy, density);
 
   /*

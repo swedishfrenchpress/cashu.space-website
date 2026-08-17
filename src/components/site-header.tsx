@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import NavClock from "./nav-clock";
 import NewTabHint from "./new-tab-hint";
 import Reveal from "./reveal";
-import ThemeToggle from "./theme-toggle";
 
 type NavItem = { label: string; href: string; external?: boolean };
 
@@ -193,7 +192,6 @@ export default function SiteHeader() {
             </ul>
 
             <div className="site-nav__actions">
-              <ThemeToggle />
               {/* One state: the mark. The octocat names GitHub more directly
                   than a label would, and the control is secondary by doctrine
                   — GitHub is not one of the two primary jobs (get a wallet,
