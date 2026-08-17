@@ -11,11 +11,21 @@ import ThemeToggle from "./theme-toggle";
 
 type NavItem = { label: string; href: string; external?: boolean };
 
+/* Order is deliberate, and it is reading order rather than importance:
+   Wallets is the route people arrive for, Protocol and Implementations are the
+   two homepage sections in the order the page presents them, and Spec is last
+   because it is the only item that leaves the site.
+
+   Implementations moved ahead of Spec on 2026-08-17 (user-directed). It also
+   fixes an oddity that had gone unnoticed: the one outbound link sat mid-list
+   with two internal anchors around it, so the bar's only NewTabHint appeared in
+   the middle of the row. The internal routes now group, and the departure sits
+   at the end of the run, next to the GitHub mark that also leaves. */
 const NAV_ITEMS: NavItem[] = [
   { label: "Wallets", href: "/wallets" },
   { label: "Protocol", href: "/#why-cashu" },
-  { label: "Spec", href: "https://docs.cashu.space/", external: true },
   { label: "Implementations", href: "/#implementations" },
+  { label: "Spec", href: "https://docs.cashu.space/", external: true },
 ];
 
 /**
