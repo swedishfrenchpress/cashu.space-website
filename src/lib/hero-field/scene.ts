@@ -12,7 +12,7 @@
  */
 
 import { createFluid, type Fluid } from "./fluid";
-import { createGlyphAtlas, GLYPH_COUNT, type GlyphAtlas } from "./glyphs";
+import { createGlyphAtlas, REST_COUNT, WAKE_COUNT, type GlyphAtlas } from "./glyphs";
 import { createGLContext, type GLContext, type Target } from "./gl";
 import { COMPOSITE_FRAGMENT, FIELD_FRAGMENT } from "./shaders";
 
@@ -32,14 +32,20 @@ const CELL = 14;
  * density is what separates the two (that, and the fact that this field is
  * monochrome, static, and does not fall).
  */
-const OCCUPANCY = 0.10;
+const OCCUPANCY = 0.40;
 
 /**
- * Churn rate while a cell is inside the wake, in steps per second. 46ms is
- * the quantum `src/lib/cipher.ts` uses for both existing consumers; a fresh
- * glyph every frame is a strobe rather than a value turning over.
+ * How much the wake raises a cell's density. **Must stay below OCCUPANCY** —
+ * at or above it, every cell the wake touches clears the threshold and the
+ * disturbance renders as a solid rectangle of characters rather than as the
+ * field thickening. It shipped at 0.55 against a 0.10 threshold and did
+ * exactly that; the user's word for the result was "too many characters".
+ *
+ * At 0.10 against 0.20 the wake roughly doubles local density and leaves the
+ * field's own clustering visible through it, which is what makes it read as
+ * something happening *to* the ground rather than on top of it.
  */
-const CHURN_HZ = 1000 / 46;
+const WAKE_OCCUPANCY_GAIN = 0.1;
 
 /** Reference contrast the occupancy was calibrated against: --ghost on
     --paper in light, #d4d4d8 on #ffffff. */
@@ -62,8 +68,33 @@ const EDGE_FADE_BOTTOM = 96;
  */
 const SAFE_PADDING_X = 56;
 const SAFE_PADDING_Y = 28;
-const SAFE_FEATHER = 120;
 const TRAIL_INSET = 26;
+
+/**
+ * The ground's falloff, as a FRACTION of the gap between the safe box's edge
+ * and the canvas edge — not a pixel distance. See the note in
+ * COMPOSITE_FRAGMENT: the safe box tracks the type, the type is width-capped,
+ * so an absolute feather makes the field three and a half times denser on a
+ * 1920x1200 display than on a 1440x900 one. This is what keeps it looking the
+ * same on every screen.
+ */
+const SAFE_FEATHER = 0.62;
+
+/**
+ * Floor on the cleared zone, as a fraction of the canvas half-extent.
+ *
+ * The safe box tracks the type, and the type is width-capped and fixed in
+ * height — so on a large display it covers a much smaller *fraction* of the
+ * hero and the field gets proportionally more room. Measured: the cleared zone
+ * was 52% of the hero at 1440x900 and 33% at 1920x1200, which no amount of
+ * threshold tuning equalises because it is an area problem, not a density one.
+ *
+ * These floors hold the cleared zone near 58% on both. They also happen to be
+ * the right composition: a big screen should give the title block more air, not
+ * the same air with more field around it.
+ */
+const MIN_SAFE_FRAC_X = 0.42;
+const MIN_SAFE_FRAC_Y = 0.34;
 
 /** Hard ceiling on backing-store pixels, and on device pixel ratio. The type
     wants a real dpr — unlike the dot lattice this replaced, which was pinned
@@ -115,7 +146,21 @@ function gainFor(rest: [number, number, number], paper: [number, number, number]
   const [lo, hi] = [luminance(rest), luminance(paper)].sort((a, b) => a - b);
   const step = (hi + 0.05) / (lo + 0.05);
   if (!Number.isFinite(step) || step <= 1) return 1;
-  return Math.min(1.4, Math.max(0.3, (REFERENCE_STEP - 1) / (step - 1)));
+  /*
+   * DAMPED, because the straight ratio over-corrects. Gain scales the noise
+   * but what we care about is how many cells clear the threshold, and that
+   * relationship is not linear — the further into the distribution's tail the
+   * threshold sits, the more coverage a given gain removes. At the occupancy
+   * this ships with, the undamped ratio (0.535 in dark) took the dark field to
+   * 49% of light's and it read as empty rather than quiet. The square root
+   * lands it near 73%, which matches by eye.
+   *
+   * The exponent is empirical and it is the only number in this file that is.
+   * If OCCUPANCY moves materially, re-look at both schemes rather than trusting
+   * it — it is calibrated against a threshold, not derived from one.
+   */
+  const ratio = (REFERENCE_STEP - 1) / (step - 1);
+  return Math.min(1.4, Math.max(0.3, Math.sqrt(ratio)));
 }
 
 /**
@@ -152,7 +197,6 @@ export function createDitherScene(
   let blankDye: Target | null = null;
   let colors = initialColors;
   let gain = gainFor(initialColors.rest, initialColors.paper);
-  let churn = 0;
   let width = 0;
   let height = 0;
   let dpr = 1;
@@ -160,7 +204,6 @@ export function createDitherScene(
   let safeBox: [number, number, number, number] = [0, 0, 0, 0];
   /** Falloff distances in device pixels. Derived on resize, never in the draw
       loop — every value the composite needs is resolved before a frame starts. */
-  let safeFeather = SAFE_FEATHER;
   let trailInset = TRAIL_INSET;
   let edgeFade: [number, number] = [EDGE_FADE_TOP, EDGE_FADE_BOTTOM];
 
@@ -169,7 +212,6 @@ export function createDitherScene(
     const canvasRect = canvas.getBoundingClientRect();
     if (canvasRect.height === 0) return;
     const scale = height / canvasRect.height;
-    safeFeather = SAFE_FEATHER * scale;
     trailInset = TRAIL_INSET * scale;
     edgeFade = [EDGE_FADE_TOP * scale, EDGE_FADE_BOTTOM * scale];
 
@@ -210,8 +252,8 @@ export function createDitherScene(
     safeBox = [
       centreX * scale,
       centreY * scale,
-      ((right - left) / 2 + SAFE_PADDING_X) * scale,
-      ((bottom - top) / 2 + SAFE_PADDING_Y) * scale,
+      Math.max(((right - left) / 2 + SAFE_PADDING_X) * scale, width * MIN_SAFE_FRAC_X),
+      Math.max(((bottom - top) / 2 + SAFE_PADDING_Y) * scale, height * MIN_SAFE_FRAC_Y),
     ];
   };
 
@@ -299,15 +341,16 @@ export function createDitherScene(
     gl.useProgram(compositeProgram);
     gl.uniform2f(uniform(compositeProgram, "uResolution"), width, height);
     gl.uniform1f(uniform(compositeProgram, "uCell"), CELL * dpr);
-    gl.uniform1f(uniform(compositeProgram, "uGlyphCount"), GLYPH_COUNT);
+    gl.uniform1f(uniform(compositeProgram, "uRestCount"), REST_COUNT);
+    gl.uniform1f(uniform(compositeProgram, "uWakeCount"), WAKE_COUNT);
     gl.uniform1f(uniform(compositeProgram, "uOccupancy"), OCCUPANCY);
     gl.uniform1f(uniform(compositeProgram, "uGain"), gain);
+    gl.uniform1f(uniform(compositeProgram, "uWakeGain"), WAKE_OCCUPANCY_GAIN);
     gl.uniform1f(uniform(compositeProgram, "uTrailStrength"), fluid ? 1 : 0);
-    gl.uniform1f(uniform(compositeProgram, "uChurn"), churn);
     gl.uniform3f(uniform(compositeProgram, "uRest"), ...colors.rest);
     gl.uniform3f(uniform(compositeProgram, "uWake"), ...colors.wake);
     gl.uniform4f(uniform(compositeProgram, "uSafeBox"), ...safeBox);
-    gl.uniform1f(uniform(compositeProgram, "uSafeFeather"), safeFeather);
+    gl.uniform1f(uniform(compositeProgram, "uSafeFeather"), SAFE_FEATHER);
     gl.uniform1f(uniform(compositeProgram, "uTrailInset"), trailInset);
     gl.uniform2f(uniform(compositeProgram, "uEdgeFade"), ...edgeFade);
 
@@ -341,15 +384,9 @@ export function createDitherScene(
       gain = gainFor(next.rest, next.paper);
     },
     splat: (x, y, dx, dy) => fluid?.splat(x, y, dx, dy),
-    step: (dt) => {
-      fluid?.step(dt);
-      churn += dt * CHURN_HZ;
-    },
+    step: (dt) => fluid?.step(dt),
     render,
-    clearTrail: () => {
-      fluid?.clear();
-      churn = 0;
-    },
+    clearTrail: () => fluid?.clear(),
     dispose: () => {
       fluid?.dispose();
       glyphs?.dispose();

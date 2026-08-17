@@ -267,17 +267,19 @@ uniform sampler2D uDye;
 uniform sampler2D uGlyphs;
 uniform vec2 uResolution;
 uniform float uCell;
-uniform float uGlyphCount;
+uniform float uRestCount;
+uniform float uWakeCount;
 uniform vec3 uRest;
 uniform vec3 uWake;
 uniform float uOccupancy;
 uniform float uGain;
+uniform float uWakeGain;
 uniform float uTrailStrength;
-/** Quantised churn step. Advances only while the loop runs; 0 at rest. */
-uniform float uChurn;
 /** xy = centre of the title block, zw = its half-extents, in device pixels. */
 uniform vec4 uSafeBox;
+/** Ground falloff, as a FRACTION of the box-edge-to-canvas-edge gap. */
 uniform float uSafeFeather;
+/** Trail falloff, in device pixels — see the note in main(). */
 uniform float uTrailInset;
 /** Distance over which the field dies into the section's top/bottom edges. */
 uniform vec2 uEdgeFade;
@@ -320,7 +322,29 @@ void main() {
    * doing, and one that stops dead short of the headline reads as broken — so
    * it runs right up to the letters and only dies inside them.
    */
-  float groundCoverage = smoothstep(0.0, uSafeFeather, boxDist) * edgeFade;
+  /*
+   * THE GROUND'S FALLOFF IS MEASURED IN FRACTIONS OF THE AVAILABLE GAP, not in
+   * pixels, and that is not a refinement — it is the difference between the
+   * field looking the same on every display and not.
+   *
+   * The safe box is the size of the type, and the type is width-capped, so a
+   * wider or taller viewport does not enlarge the cleared zone: it just adds
+   * uncleared field around it. With an absolute feather the same build measured
+   * 10.4% of cells occupied at 1440x900 and 35.4% at 1920x1200 — three and a
+   * half times denser on the bigger screen, which is where the "still seems
+   * like a lot" came from. Normalising by the gap between the box edge and the
+   * canvas edge makes the density scale-invariant.
+   *
+   * The trail keeps an absolute inset: it should hug the letterforms at the
+   * same distance whatever the viewport, because it is about the type, not
+   * about the section.
+   */
+  vec2 gap = max(vec2(1.0),
+                 vec2(min(uSafeBox.x, uResolution.x - uSafeBox.x),
+                      min(uSafeBox.y, uResolution.y - uSafeBox.y)) - uSafeBox.zw);
+  float spread = length(max(q, 0.0) / gap);
+
+  float groundCoverage = smoothstep(0.0, uSafeFeather, spread) * edgeFade;
   float trailCoverage = smoothstep(-uTrailInset, uTrailInset, boxDist) * edgeFade;
 
   float wake = smoothstep(0.02, 0.26, texture(uDye, cellUv).r * uTrailStrength * trailCoverage);
@@ -333,21 +357,32 @@ void main() {
    * field turns into a smudge, exactly as a partial mix destroys a dither.
    * The wake raises occupancy as well as contrast, so disturbing the field
    * makes more of it surface rather than merely darkening what was there.
+   * uWakeGain must stay BELOW uOccupancy or every cell it touches clears the
+   * threshold and the wake becomes a solid block of characters instead of a
+   * thickening of the field. That is the difference between a disturbance and
+   * a paste-in, and it is the whole reason the two are separate numbers.
    */
-  float density = texture(uField, cellUv).r * uGain * groundCoverage + wake * 0.55;
+  float density = texture(uField, cellUv).r * uGain * groundCoverage + wake * uWakeGain;
   float occupancy = step(uOccupancy, density);
 
   /*
-   * Glyph choice. At rest it is a pure hash of the cell: the same character
-   * forever, which is what lets the resting frame be bit-identical across the
-   * whole visit. Inside the wake a quantised churn step is added, so the cell
-   * cycles the alphabet while it is disturbed and drops back to its resting
-   * character the moment the dye falls away.
+   * Glyph choice — the whole idea of the field in four lines.
+   *
+   * Both layers are pure hashes of the cell, so each cell has ONE resting hex
+   * digit and ONE currency mark, forever. Nothing cycles: the event is the
+   * substitution, not a flicker. That is deliberate. Churning the money layer
+   * was tried and reads as a slot machine — and it tells the wrong story,
+   * because the denomination is not being rolled, it is being *revealed*. The
+   * ciphertext IS the money; the pointer only resolves which one you are
+   * looking at. It also means the resting frame is bit-identical across the
+   * whole visit, since glyph choice depends on nothing but the cell.
    */
-  float churn = floor(uChurn) * step(0.25, wake);
-  float glyph = floor(mod(hash21(cell) * 977.0 + churn, uGlyphCount));
+  float restGlyph = floor(mod(hash21(cell) * 977.0, uRestCount));
+  float wakeGlyph = uRestCount + floor(mod(hash21(cell + 17.0) * 613.0, uWakeCount));
+  float glyph = mix(restGlyph, wakeGlyph, step(0.25, wake));
 
-  float ink = texture(uGlyphs, vec2((glyph + local.x) / uGlyphCount, local.y)).a;
+  float total = uRestCount + uWakeCount;
+  float ink = texture(uGlyphs, vec2((glyph + local.x) / total, local.y)).a;
 
   fragColor = vec4(mix(uRest, uWake, wake), ink * occupancy);
 }`;

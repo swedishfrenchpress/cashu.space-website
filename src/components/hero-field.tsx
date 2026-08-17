@@ -5,7 +5,17 @@ import { createDitherScene, type DitherScene, type SceneColors } from "@/lib/her
 
 /**
  * HeroField — the hero's ground: a frozen field of Geist Mono hex, and a wake
- * the pointer stirs through it.
+ * the pointer resolves into currency marks.
+ *
+ * THE FIELD HAS TWO LAYERS AND THE POINTER PICKS WHICH ONE YOU SEE. At rest
+ * every cell is a hex digit — entropy, which is what a Cashu secret is. Inside
+ * the wake the same cell shows a currency mark instead (₿ weighted heavily,
+ * then $ € ¥ ₩ £ ₹ ₽ ¢ ₱ ₴). Behind the wake it re-encrypts. Nothing cycles:
+ * each cell has one resting digit and one denomination, both pure hashes of
+ * its coordinates, so the event is a *revelation* rather than a flicker. A
+ * blinded token is money that looks like noise until something resolves it —
+ * see `glyphs.ts`, which also documents which of those marks the face does not
+ * actually contain.
  *
  * WHAT THIS IS NOT, ANY MORE. The first build of this was an ordered Bayer
  * dither with a mint-green fluid plume — which is aspensearch.com's hero, and
@@ -17,7 +27,7 @@ import { createDitherScene, type DitherScene, type SceneColors } from "@/lib/her
  * The gesture that was worth keeping is the one that survives: a ground the
  * reader disturbs, shaped by a real fluid solver so the wake curls and settles
  * instead of following the cursor like a spotlight. What it modulates is now
- * which character a cell shows and how hard it is set.
+ * which alphabet a cell is drawn from and how hard it is set.
  *
  * THE SET-ONCE RULE STILL HOLDS, and this is the amendment that keeps it
  * (DESIGN.md §4, user-directed 2026-08-16, after aspensearch.com). The rule's
