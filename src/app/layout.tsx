@@ -1,32 +1,65 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { GeistMono } from "geist/font/mono";
 import ConsoleSignature from "@/components/console-signature";
 import ButtonCipher from "@/components/button-cipher";
 import Keymap from "@/components/keymap";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
+/* All four faces on this page are subsets, cut by scripts/subset-fonts.mjs.
+   The fonts were 133KB of a 376KB homepage, the largest category on the wire,
+   and were the thing `document.fonts.ready` — and therefore the hero field's
+   first render — was waiting on. Subsetting took them to 40KB.
+
+   RE-RUN THAT SCRIPT WHEN THE CHARACTER SET CHANGES. That means a keymap
+   chord label, a NUT id, the hero field's alphabets, or copy carrying a
+   character outside Latin-1. The script's header says which range covers
+   which, and each range is drawn wider than today's text on purpose. */
 const gtStandard = localFont({
   src: [
     {
-      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Regular-Trial.woff2",
+      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Regular-Trial.subset.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Medium-Trial.woff2",
+      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Medium-Trial.subset.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Semibold-Trial.woff2",
+      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Semibold-Trial.subset.woff2",
       weight: "600",
       style: "normal",
     },
   ],
   variable: "--font-gt",
   display: "swap",
+});
+
+/* Declared here rather than imported from `geist/font/mono`, which serves the
+   full variable face: 1159 glyphs, 889 codepoints and an entire weight axis,
+   71KB, to set a face this site only ever renders at 400. `.t-mono` is 400,
+   the two other mono rules in globals.css are 400, and glyphs.ts sets
+   `ctx.font` with no weight at all, so the axis had exactly no consumer. A
+   static instance at wght=400, subset to the characters that render, is 5KB.
+
+   `weight: "400"` is therefore the honest declaration and not an oversight.
+   The one place something asks for another weight is `.t-pixel`, which is 500
+   and lists this face as its *fallback* — so a 500 only ever reaches it if the
+   pixel face fails to load, and the browser resolves that to this face
+   unsynthesised. If mono ever genuinely needs a second weight, take the
+   variable subset from subset-fonts.mjs (13KB) rather than adding a face.
+
+   The variable name is unchanged, so globals.css's `--font-mono` indirection
+   does not move. */
+const geistMono = localFont({
+  src: "../../public/fonts/geist-mono/GeistMono-400.subset.woff2",
+  weight: "400",
+  style: "normal",
+  variable: "--font-geist-mono",
+  display: "swap",
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
 });
 
 /* Declared here rather than imported from `geist/font/pixel`, which is not
@@ -41,9 +74,10 @@ const gtStandard = localFont({
    `.t-pixel` chords into the DOM at load, so the face still resolves on
    first paint; what changes is that it stops occupying a preload slot
    ahead of the three GT-Standard faces the hero is actually waiting on.
-   Updating `geist` means re-copying the woff2 into public/fonts/. */
+   Updating `geist` means re-copying the woff2 into public/fonts/ and
+   re-running scripts/subset-fonts.mjs over it. */
 const geistPixelSquare = localFont({
-  src: "../../public/fonts/geist-pixel/GeistPixel-Square.woff2",
+  src: "../../public/fonts/geist-pixel/GeistPixel-Square.subset.woff2",
   weight: "500",
   variable: "--font-geist-pixel-square",
   display: "swap",
@@ -102,7 +136,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${gtStandard.variable} ${GeistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
+      className={`${gtStandard.variable} ${geistMono.variable} ${geistPixelSquare.variable} h-full antialiased`}
       /* Browser extensions (Dark Reader and friends) stamp attributes on
          <html> before hydration; the mismatch is theirs, not ours, and it is
          not worth a console error. */
@@ -124,9 +158,20 @@ export default function RootLayout({
             handled; scripting-*slow* and scripting-*broken* were not, and
             those fail worse — they never resolve.
 
+            What it rescues narrowed on 2026-08-17: the `immediate` reveals
+            now paint from a CSS animation at parse time
+            (`.reveal--arrival`), so the masthead and the hero no longer
+            depend on this at all. What still does is every scroll-triggered
+            reveal below the fold, which genuinely cannot resolve without
+            React. Dropping html.js remains the right recovery for those, and
+            it also cancels the arrival animation cleanly, since that is
+            scoped to html.js too and its elements are already at opacity 1.
+
             The test is the outcome, not a proxy: after 1.5s, has *any*
             .reveal actually revealed? Every page opens with `immediate`
-            reveals, so on a healthy page at least one has. Asking React to
+            reveals, and React still marks those `.is-revealed` even though
+            the animation no longer waits for it — that is the signal this
+            probes, and why that class was kept. Asking React to
             report its own readiness instead would miss the case that
             actually bites — a backgrounded tab, where hydration completes
             but requestAnimationFrame is paused, so the flag says ready

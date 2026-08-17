@@ -46,6 +46,32 @@ const STATIC_T = 0.6;
 
 const MAX_DPR = 2;
 
+/*
+ * Draw at 30fps, not at display rate.
+ *
+ * Measured 2026-08-17: a single visible plate spent 870ms of script and
+ * 1153ms of task time per three seconds at 4x CPU throttle — 29% and 38% of
+ * one main thread, continuously, for a figure the design system itself calls
+ * material rather than a claim. It was by a wide margin the most expensive
+ * thing on the page at runtime; the hero's WebGL field costs about a fifth of
+ * it during an actual pointer sweep.
+ *
+ * DEVICE PIXEL RATIO IS NOT THE LEVER, so don't reach for it. Halving the
+ * backing store (576px square down to 288px) moved script time from 870ms to
+ * 878ms — i.e. not at all. The cost is the per-frame path work the library
+ * does, hundreds of arcs and fills, so the only real lever is how often a
+ * frame is asked for. On the 120Hz panel this was measured on, the loop was
+ * drawing a slow, organic dot field 120 times a second.
+ *
+ * 30 was chosen against the motion, not as a round number: these presets
+ * breathe and orbit over seconds, and the fastest of them (`connecting`,
+ * pinned to the Mints entry) still reads as continuous here. Because `now()`
+ * is derived from performance.now() rather than accumulated, dropping frames
+ * costs nothing in phase — a plate that skips stays in step with its
+ * neighbours, exactly as one that pauses offscreen does.
+ */
+const MIN_FRAME_MS = 1000 / 30;
+
 type OrbFigureProps = {
   state: OrbState;
   /**
@@ -89,8 +115,13 @@ export default function OrbFigure({ state }: OrbFigureProps) {
        them by however long it sat still. */
     const now = () => (performance.now() / 1000) * speed;
 
-    const frame = () => {
-      paint(now());
+    let lastPaintAt = -Infinity;
+
+    const frame = (at: number) => {
+      if (at - lastPaintAt >= MIN_FRAME_MS) {
+        paint(now());
+        lastPaintAt = at;
+      }
       if (running) raf = requestAnimationFrame(frame);
     };
 
@@ -102,6 +133,9 @@ export default function OrbFigure({ state }: OrbFigureProps) {
     const start = () => {
       if (running || mqReduce.matches) return;
       running = true;
+      // Scrolling a plate back into view should paint on the next frame, not
+      // up to a cap-length later.
+      lastPaintAt = -Infinity;
       raf = requestAnimationFrame(frame);
     };
 

@@ -148,7 +148,13 @@ export default function SiteHeader() {
               hard against the viewport edge — the one place the bar breaks
               its ink, and the only part of it that follows the scheme. */}
           <div className="site-nav__lead">
-            <Link href="/" className="site-nav__brand focus-ring">
+            {/* prefetch={false} because this link sits on every route, and on
+                the homepage — where most visitors land — it points at the
+                document they are already reading. Next was fetching three
+                `/?_rsc=` payloads at about 2.1s to cache a route already in
+                the tab. The brand plate is a way back, not a way onward, so
+                nothing here is worth prefetching from anywhere. */}
+            <Link href="/" prefetch={false} className="site-nav__brand focus-ring">
               <Image
                 src="/cashu-no-bg.png"
                 alt=""

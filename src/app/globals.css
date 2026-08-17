@@ -158,7 +158,6 @@
    * right edge, and it meets the page on a clean line.
    */
   --nav-row: 56px;
-  --dur-nav: 300ms;
   /* The hover plate's wipe. Deliberately slower than --dur-base: it is a
      travelling edge across a whole word, and at feedback speed it reads as a
      flicker instead of a slide. */
@@ -442,6 +441,12 @@ html {
  * a quart-ease over var(--dur-reveal). Triggered by Reveal client wrapper
  * either on mount (above-the-fold) or via IntersectionObserver (below).
  *
+ * READ THE ARRIVAL BLOCK FURTHER DOWN BEFORE CHANGING ANYTHING HERE. The
+ * `immediate` half of that sentence is no longer true: entrances that
+ * always play run as a CSS animation from parse time (`.reveal--arrival`)
+ * and never wait for React. What is described here now governs the
+ * scroll-triggered half only.
+ *
  * The translate is intentionally small. Editorial pacing reads as a
  * settle, not an arrival animation.
  *
@@ -511,6 +516,85 @@ html:not(.js) .reveal {
 }
 
 /*
+ * ARRIVAL REVEALS DO NOT WAIT FOR REACT.
+ *
+ * Everything above this is a transition, and a transition needs someone to
+ * change a value — which here means `.is-revealed`, which means hydration.
+ * That is right for the scroll-triggered reveals, whose trigger genuinely is
+ * a runtime fact. It was ruinous for the ones that always play. The masthead
+ * and every hero open with `immediate` reveals, so until React landed there
+ * was nothing on screen at all: not the headline, not the nav, not the ink
+ * bar. Measured 2026-08-17 on a throttled phone (Slow 4G, 4x CPU), the
+ * stylesheet was parsed and the document complete at 613ms and the first
+ * legible pixel arrived at 2551ms. LCP was 2280ms against a 764ms FCP.
+ *
+ * An `immediate` reveal takes no runtime input, so it can be an animation
+ * instead — and an animation runs from the stylesheet, at parse time, over
+ * server-rendered markup. Nothing about the gesture changes: same
+ * var(--dur-reveal), same quart ease, same 8px rise, same authored stagger.
+ * React still writes --reveal-delay, but it writes it during SSR, so the
+ * value is in the markup before this rule is ever applied — which is also
+ * why the delay must stay stable across hydration. A --reveal-delay that
+ * changed value on the client would re-resolve animation-delay mid-flight
+ * and throw the element back into its delay phase, which measured as no
+ * improvement at all. Reveal's `instant` state never applies to `immediate`,
+ * so the value is stable today; keep it that way.
+ *
+ * Measured after: LCP 776ms, first legible pixel 1172ms, CLS still zero.
+ * The precedent is `.hero-spec::after`, which has always drawn its hairline
+ * exactly this way.
+ *
+ * THE FLOOR IS 0.02 AND IT IS NOT COSMETIC. Chrome refuses an element as an
+ * LCP candidate when its only main-thread paint has opacity exactly 0, and a
+ * composited opacity animation never repaints on the main thread — so a
+ * headline animating 0 to 1 stays invisible to the metric until something
+ * else forces a repaint, which in practice is hydration, which is the very
+ * thing this is escaping. Starting two hundredths of a step up is
+ * imperceptible against Paper and is the entire difference between LCP 776ms
+ * and LCP 2280ms. It was measured both ways. Do not tidy it back to 0.
+ *
+ * React still adds `.is-revealed` to these, deliberately: it is what the
+ * failsafe in layout.tsx probes for. The class lands on an element the
+ * animation has already carried to 1, so there is nothing left for it to do.
+ */
+@keyframes reveal-arrival {
+  from {
+    opacity: 0.02;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-arrival-fade {
+  from {
+    opacity: 0.02;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:where(html.js) .reveal--arrival {
+  animation: reveal-arrival var(--dur-reveal) var(--ease-out-quart)
+    var(--reveal-delay, 0ms) both;
+  /* The transition underneath is otherwise still armed, and a late
+     `.is-revealed` would run a second, redundant pass over values the
+     animation has already filled. */
+  transition: none;
+}
+
+:where(html.js) .reveal--arrival.reveal--fade {
+  animation-name: reveal-arrival-fade;
+}
+
+:where(html.js) .reveal--arrival.reveal--slow {
+  animation-duration: var(--dur-reveal-slow);
+}
+
+/*
  * Draw-on — SVG line art animates from invisible to fully drawn. Uses
  * stroke-dasharray + stroke-dashoffset on a per-shape basis with
  * pathLength="1" so authors don't need to compute path length manually.
@@ -548,10 +632,20 @@ html:not(.js) .reveal {
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .reveal.is-revealed {
+  .reveal.is-revealed,
+  /* The arrival selectors are repeated verbatim rather than folded into
+     `.reveal`, because they must cancel at their own specificity. The
+     compound ones are (0,2,0) and would otherwise outrank a bare `.reveal`
+     here and keep animating. Listed like this they tie, and this block is
+     later in the file, so it wins — the same trap documented beside
+     .hero-spec::after, which lost it once already. */
+  .reveal--arrival,
+  .reveal--arrival.reveal--fade,
+  .reveal--arrival.reveal--slow {
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
   }
   .draw-on,
   .draw-on--filled {

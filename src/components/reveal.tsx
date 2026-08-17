@@ -104,8 +104,16 @@ function scheduleReveal(run: () => void) {
 
 /**
  * Reveal — the unified entrance wrapper. Above-the-fold elements pass
- * `immediate` so they animate on mount (post-paint); below-the-fold use the
- * default IntersectionObserver trigger.
+ * `immediate`; below-the-fold use the default IntersectionObserver trigger.
+ *
+ * `immediate` NO LONGER MEANS "on mount" (2026-08-17). It means the entrance
+ * has no runtime input, and an entrance with no runtime input is a CSS
+ * animation that starts when the stylesheet parses — see `.reveal--arrival`
+ * in globals.css, which is where the reasoning and the measurements live.
+ * The effect below still runs for these, because `.is-revealed` is what the
+ * failsafe in layout.tsx probes; it just no longer decides when they appear.
+ * Anything that makes an `immediate` reveal's --reveal-delay differ between
+ * server and client will undo the whole gain, so keep that value stable.
  *
  * Always wraps children in an element (default: div, override via `as`).
  * Honour prefers-reduced-motion — the CSS already short-circuits, but we
@@ -191,6 +199,12 @@ export default function Reveal({
     "reveal",
     variant === "fade" ? "reveal--fade" : "",
     slow ? "reveal--slow" : "",
+    /* Server-rendered, and the whole point: `.reveal--arrival` carries a CSS
+       animation that plays from parse time, so an entrance with no runtime
+       input stops being gated on hydration. See the arrival block in
+       globals.css for the measurements. Everything below still runs — React
+       adding `.is-revealed` afterwards is what layout.tsx's failsafe reads. */
+    immediate ? "reveal--arrival" : "",
     instant ? "reveal--instant" : "",
     revealed ? "is-revealed" : "",
     className,

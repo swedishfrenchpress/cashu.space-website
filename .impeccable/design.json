@@ -258,6 +258,12 @@
       "heroDeck": {
         "displayName": "Hero Deck",
         "purpose": "The standfirst under the hero headline: the page's claim in one line, sitting between Display and heroLead. Separated from the body on size, weight and tone at once so the two roles stay distinct at phone widths."
+      },
+      "faceSubsetting": {
+        "summary": "All four faces are subset by scripts/subset-fonts.mjs: 134,904 bytes to 39,924. Geist Mono is a static wght=400 instance (5,188 bytes) rather than the full variable face (71,248).",
+        "constraint": "A character outside the subset ranges does not tofu. It falls through the fallback chain to a system font and still looks correct, which is the defect that survives review. Verify by rasterising with the fallback chain stripped.",
+        "reRunWhen": "geist is updated, a trial face is replaced, or the rendered character set changes: a keymap chord label, a NUT id, the hero field's alphabets, or copy outside Latin-1.",
+        "note": "Ranges are deliberately wider than today's text. Per-face reasoning is in the script header. The hero field's atlas characters cannot be derived from the DOM because glyphs.ts draws them straight to a canvas."
       }
     },
     "shadows": [],
@@ -290,7 +296,12 @@
       {
         "name": "dur-reveal",
         "value": "620ms",
-        "purpose": "The standard entrance settle: opacity plus an 8px rise."
+        "purpose": "The standard entrance settle: opacity plus an 8px rise. Scroll-triggered reveals run it as a transition gated on .is-revealed; unconditional ones run it as the reveal-arrival keyframe animation from parse time (see reveal-arrival below)."
+      },
+      {
+        "name": "reveal-arrival",
+        "value": "620ms ease-out-quart, from opacity 0.02",
+        "purpose": "Entrances that always play (.reveal--arrival) as a CSS animation starting when the stylesheet parses, not on hydration. Same duration, easing, rise and stagger as the transition form. The 0.02 floor is load-bearing, not cosmetic: Chrome will not accept an element as an LCP candidate if its only main-thread paint has opacity exactly 0, and a composited opacity animation never repaints on the main thread, so from 0 the element stays invisible to the metric until hydration forces a repaint. Measured: LCP 2280ms before, 2244ms from 0, 648ms from 0.02. See the Set-Once Rule's second amendment in DESIGN.md section 4."
       },
       {
         "name": "dur-reveal-slow",
@@ -298,9 +309,9 @@
         "purpose": "The slow entrance for large media and figure panels."
       },
       {
-        "name": "dur-nav",
-        "value": "300ms",
-        "purpose": "The Onyx condense, ease-in-out rather than quart: the reference's own timing."
+        "name": "dur-nav-wipe",
+        "value": "460ms",
+        "purpose": "The masthead hover plate's clip-path wipe travelling across a nav label. Deliberately slower than dur-base: at feedback speed a travelling edge across a whole word reads as a flicker rather than a slide. (Replaces dur-nav/300ms, which documented the retired Onyx condense and had no consumers left; the dead token was removed from globals.css 2026-08-17.)"
       },
       {
         "name": "cipher-pass",
@@ -530,6 +541,6 @@
       "Don't ship Chalk placeholder surfaces in final layouts. They are scaffolding only."
     ]
   },
-  "handPatchedAt": "2026-08-16T20:20:00Z",
-  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately."
+  "handPatchedAt": "2026-08-17T20:10:00Z",
+  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, and dur-nav replaced by the wipe it should always have named."
 }

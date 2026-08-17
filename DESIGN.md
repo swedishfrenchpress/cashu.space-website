@@ -275,6 +275,17 @@ The mark is exempt because it *is* the identity the rest of the system is expres
 
 **Character:** GT-Standard is a contemporary grotesque with narrow apertures and a clean editorial bearing. It feels like a magazine commissioned a custom face. Geist Mono and Geist Pixel Square introduce machine-coded specificity where the protocol's own notation appears in copy — quiet contrasts, never decorative.
 
+**All four faces are subset, and that is a constraint on what can be typed.** *Added 2026-08-17.* The faces were 133KB of a 376KB homepage — the largest category on the wire — and almost none of it was reachable. Geist Mono was shipping the full variable face (1159 glyphs, 889 codepoints, an entire weight axis) for a font this site renders at 400 and nothing else; Geist Pixel Square cost 28.6KB to set about twenty characters. `scripts/subset-fonts.mjs` cuts all four to what is actually drawn: **134,904 bytes to 39,924**, with Geist Mono alone going 71,248 to 5,188 as a static `wght=400` instance.
+
+What this means for anyone writing copy or notation:
+
+- **Geist Mono is one weight now, 400, honestly declared.** The axis had no consumer — `.t-mono` is 400, the other two mono rules in `globals.css` are 400, and `glyphs.ts` sets `ctx.font` with no weight at all. If mono ever genuinely needs a second weight, take the variable subset the script can also emit (13,300 bytes); do not add a face.
+- **The ranges are drawn wider than today's text on purpose.** Geist Pixel keeps full alphanumerics rather than the twenty characters it sets, because everything it sets is a string literal in the source and a tight subset would turn a one-word copy edit into silent tofu. GT-Standard keeps all of Latin-1 and the punctuation block, because the wallet directory and the press band carry names written by other people, and a face that tofus on the first accented one is a bad trade for 1.1KB.
+- **The hero field is the reason this cannot be checked from the DOM.** `glyphs.ts` draws `REST_ALPHABET` and `WAKE_SLOTS` straight onto a 2D canvas, so those characters appear in no element a walker could find. The mono range carries them explicitly. `₿` and `₩` need no codepoints because they are synthesised from `B` and `W` — see §5, The Hero Field.
+- **A missing glyph does not fail loudly.** Every face has a fallback chain, so a character outside the subset renders in the system font and still *looks* fine, which is the defect that survives review. The subsets were verified by rasterising 82 characters per face **with the fallback chain stripped**, so a gap could only come back as tofu. Re-run that check, not just the script, when a range changes.
+
+Re-run `scripts/subset-fonts.mjs` when `geist` is updated, when a trial face is replaced, or when the rendered character set changes.
+
 **The homepage hero is set in caps — headline and deck both.** *(User-directed 2026-08-15; recorded here 2026-08-16, having lived until then only in a comment in `globals.css`, which is how a treatment on the site's largest type went two days undocumented.)* It is applied as `text-transform`, never as retyped markup, so the source string stays sentence case for screen readers, for search, and for the cipher pass that reads the label. This is the hero and only the hero: section headlines, entry titles, body and leads elsewhere all stay sentence case. Button labels are separately and independently caps (§5), which is a component rule, not this one.
 
 ### Hierarchy
@@ -419,9 +430,9 @@ Three things separate it from the figure that was cut, and none of them is a cla
 
 **The open item is unaffected and the bar has not moved.** If anything is ever drawn in the hero that has a shape — a mark, a diagram, a subject — the first branch still governs it, and the blind-signature round trip is still what should fill that slot. Do not read this amendment as licence for a *figure* made of noise.
 
-**The Set-Once Rule.** *Added 2026-08-16, on the user's direction, with the deletion of the hero's ground. **Amended later the same day, also on the user's direction, when a ground came back** — see the amendment below, which is the operative version.*
+**The Set-Once Rule.** *Added 2026-08-16, on the user's direction, with the deletion of the hero's ground. **Amended later the same day, also on the user's direction, when a ground came back**, and again on 2026-08-17 when the arrival was measured and found not to be arriving — see both amendments below, the second of which is the operative version.*
 
-**The hero sets once and then holds.** Its entire motion is the arrival — the closing hairline draws across the fold (`hero-rule-draw`, 1100ms), one word of the headline resolves out of hex (`hero-cipher.tsx`, 760ms), and the headline, deck and CTAs settle on the staged reveal. By roughly 1.1 seconds nothing in the hero is moving, and nothing moves again for the length of the visit. There is no cycle, no clock, no idle loop and no hover response.
+**The hero sets once and then holds.** Its entire motion is the arrival — the closing hairline draws across the fold (`hero-rule-draw`, 1100ms), one word of the headline resolves out of hex (`hero-cipher.tsx`, 760ms), and the headline, deck and CTAs settle on the staged reveal. By roughly 1.1 seconds nothing in the hero is moving, and nothing moves again for the length of the visit. There is no cycle, no clock, no idle loop and no hover response. *(The 1.1s claim was measured on 2026-08-17 and was false on a phone by more than a second — see the second amendment, which repairs it rather than restating it.)*
 
 This is doctrine, not a temporary state while a better figure is found. The site's whole motion vocabulary is one-shot, typographic and *caused*: the masthead's clip-path wipe answers a pointer, the button cipher answers a hover, the reveals answer a scroll. An ambient loop answers nothing, which is why it read as a screensaver and why "confident through silence" — PRODUCT.md's own phrase for this brand — is contradicted by a hero that will not stop moving.
 
@@ -446,6 +457,25 @@ The rule's closing sentence already anticipated the shape of this: *"it should a
 **Still forbidden, unchanged:** ambient background animation, idle cycles, timers, parallax, scroll-linked figure motion that runs past its trigger, and any hero figure that moves without the reader moving it. If the field is ever found drifting, cycling, or holding a rAF at rest, it is in breach of this rule and not an exception to it.
 
 **What the ground is, honestly:** Perlin noise deciding which cells of a hex field are occupied. It clears the Honest-Network Rule's *second* branch only — see that rule's own accounting below, which this amendment does not improve.
+
+#### The Set-Once Rule, second amendment: the arrival does not wait for hydration
+
+*2026-08-17. Not a change of intent — a repair. **The rule's central promise was false on a phone and had been since it was written**, and nobody had measured it.*
+
+The rule says "by roughly 1.1 seconds nothing in the hero is moving." On a throttled phone (Slow 4G, 4x CPU) the truth was that **nothing in the hero had appeared** by 1.1 seconds. `globals.css` held every entrance at `opacity: 0` behind `:where(html.js) .reveal`, and only React could add `.is-revealed`. The masthead was inside a Reveal too, so the page was not "quiet at 1.1s" — it was blank white paper, masthead included, until hydration landed near 1.9s, and the settle did not finish until **2551ms**. LCP was 2280ms against a 764ms FCP. The document had been complete and styled since 613ms.
+
+**An entrance that always plays takes no runtime input, so it does not need a runtime.** The `immediate` reveals are now `.reveal--arrival`, a CSS keyframe animation that runs from the stylesheet, at parse time, over server-rendered markup. Measured after: **LCP 648ms, legible 1178ms, CLS still 0.00.** The precedent was already in the file — `.hero-spec::after` has always drawn the closing hairline exactly this way, which is why the hairline was the one part of the arrival that was honest.
+
+**Nothing about the gesture moved:** same `--dur-reveal`, same `--ease-out-quart`, same 8px rise, same authored stagger. The rule's promise is now true, and true about 1.4 seconds sooner.
+
+**Two things are load-bearing and will both look like mistakes:**
+
+- **The animation starts at `opacity: 0.02`, not 0.** Chrome refuses an element as an LCP candidate when its only main-thread paint has opacity exactly zero, and a composited opacity animation never repaints on the main thread — so a headline animating 0 → 1 stays invisible to the metric until something *else* forces a repaint, which in practice is the hydration this was escaping. Measured both ways: from 0 the change bought nothing at all (LCP 2244ms); from 0.02, 1.5 seconds. Two hundredths of a step is imperceptible on Paper. **Do not tidy it back to 0.**
+- **React still adds `.is-revealed`, on purpose.** It is the signal the 1.5s failsafe in `layout.tsx` probes for. The class now lands on an element the animation has already carried to 1, so it changes nothing it can see, and removing it would silently disarm the failsafe that protects every scroll-triggered reveal below the fold.
+
+**The cipher pass had to be brought under the rule, and this is the part that is genuinely a motion decision rather than a delivery one.** `hero-cipher.tsx` started 120ms after hydration — safe only while the headline was invisible until then. With the hero painting at 648ms and hydration landing near 1900ms, the word would have settled, been read for a full second, and *then* scrambled itself into hex. That is not an arrival; it is the ambient motion this rule exists to forbid, made worse by impersonating an entrance. The pass now reads the reveal's own animation clock: **it joins the arrival if the reveal is still running, and is skipped entirely if the reveal has finished.** A wall-clock threshold was rejected — it would need a constant nobody could derive and would drift the moment `--dur-reveal` or the stagger changed.
+
+**The general rule this leaves behind, for any entrance added later:** if a settle plays unconditionally, it belongs in the stylesheet. JavaScript is for entrances that answer something — a scroll position, a pointer, a route change. Gating unconditional motion on hydration does not make the page calmer; it makes it *absent*, and then moves everything at once when the reader has stopped waiting.
 
 ## 5. Components
 
