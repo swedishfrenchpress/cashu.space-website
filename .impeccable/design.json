@@ -263,7 +263,8 @@
         "summary": "All four faces are subset by scripts/subset-fonts.mjs: 134,904 bytes to 39,924. Geist Mono is a static wght=400 instance (5,188 bytes) rather than the full variable face (71,248).",
         "constraint": "A character outside the subset ranges does not tofu. It falls through the fallback chain to a system font and still looks correct, which is the defect that survives review. Verify by rasterising with the fallback chain stripped.",
         "reRunWhen": "geist is updated, a trial face is replaced, or the rendered character set changes: a keymap chord label, a NUT id, the hero field's alphabets, or copy outside Latin-1.",
-        "note": "Ranges are deliberately wider than today's text. Per-face reasoning is in the script header. The hero field's atlas characters cannot be derived from the DOM because glyphs.ts draws them straight to a canvas."
+        "note": "Ranges are deliberately wider than today's text. Per-face reasoning is in the script header. The hero field's atlas characters cannot be derived from the DOM because glyphs.ts draws them straight to a canvas.",
+        "location": "assets/fonts/ holds the licensed masters and is never served. src/fonts/ holds the generated subsets, the only fonts a browser receives, since next/font/local copies them into _next/static/media/ with a content hash. Neither belongs under public/, which previously served all 13 masters at stable URLs nothing linked to and served each subset twice."
       }
     },
     "shadows": [],
@@ -542,5 +543,5 @@
     ]
   },
   "handPatchedAt": "2026-08-17T20:10:00Z",
-  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, and dur-nav replaced by the wipe it should always have named."
+  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, dur-nav replaced by the wipe it should always have named, and the font masters moved out of public/."
 }

@@ -1,7 +1,21 @@
 #!/usr/bin/env node
 /**
- * subset-fonts — cut the shipped woff2 faces down to the glyphs this site
- * actually sets, and write the results into public/fonts/.
+ * subset-fonts — cut the licensed woff2 masters down to the glyphs this site
+ * actually sets.
+ *
+ * WHERE THE FILES LIVE, AND WHY IT IS TWO PLACES.
+ *
+ *   assets/fonts/  masters. The full trial family (all 12 GT-Standard faces,
+ *                  of which the site sets 3) and the complete pixel face.
+ *                  Read only by this script. Never shipped, never served.
+ *   src/fonts/     what this script writes, and the only fonts that reach a
+ *                  browser. next/font/local copies them into
+ *                  _next/static/media/ with a content hash, so they do not
+ *                  need to be — and must not be — in public/.
+ *
+ * Both directories used to be public/fonts/, which served every master at a
+ * stable unhashed URL nothing linked to, and served the subsets twice. Putting
+ * a master back under public/ would undo that; put new ones in assets/fonts/.
  *
  * WHY THIS EXISTS. The fonts were 133KB of the homepage's 376KB, the single
  * largest category on the wire, and almost none of it was used. Geist Mono
@@ -96,21 +110,21 @@ const jobs = [
     /* Subsetting reads the ttf (fonttools cannot instance a woff2), but the
        size this replaces is the woff2 the geist package used to serve. */
     ships: "node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2",
-    dest: "public/fonts/geist-mono/GeistMono-400.subset.woff2",
+    dest: "src/fonts/geist-mono/GeistMono-400.subset.woff2",
     unicodes: MONO_UNICODES,
     features: "",
   },
   {
     label: "Geist Pixel Square",
-    src: "public/fonts/geist-pixel/GeistPixel-Square.woff2",
-    dest: "public/fonts/geist-pixel/GeistPixel-Square.subset.woff2",
+    src: "assets/fonts/geist-pixel/GeistPixel-Square.woff2",
+    dest: "src/fonts/geist-pixel/GeistPixel-Square.subset.woff2",
     unicodes: PIXEL_UNICODES,
     features: "",
   },
   ...GT_FACES.map((w) => ({
     label: `GT-Standard ${w}`,
-    src: `public/fonts/gt-standard/GT-Standard-M-Standard-${w}-Trial.woff2`,
-    dest: `public/fonts/gt-standard/GT-Standard-M-Standard-${w}-Trial.subset.woff2`,
+    src: `assets/fonts/gt-standard/GT-Standard-M-Standard-${w}-Trial.woff2`,
+    dest: `src/fonts/gt-standard/GT-Standard-M-Standard-${w}-Trial.subset.woff2`,
     unicodes: GT_UNICODES,
     /* Kerning and the default ligature/contextual sets are what make the
        display sizes look drawn rather than spaced. Mono and pixel drop them:

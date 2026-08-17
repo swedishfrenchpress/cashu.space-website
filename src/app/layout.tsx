@@ -6,7 +6,9 @@ import Keymap from "@/components/keymap";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
-/* All four faces on this page are subsets, cut by scripts/subset-fonts.mjs.
+/* All four faces on this page are subsets, cut by scripts/subset-fonts.mjs
+   from the masters in assets/fonts/ (which are never served — see that
+   script's header for the split, and don't move a face back under public/).
    The fonts were 133KB of a 376KB homepage, the largest category on the wire,
    and were the thing `document.fonts.ready` — and therefore the hero field's
    first render — was waiting on. Subsetting took them to 40KB.
@@ -18,17 +20,17 @@ import "./globals.css";
 const gtStandard = localFont({
   src: [
     {
-      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Regular-Trial.subset.woff2",
+      path: "../fonts/gt-standard/GT-Standard-M-Standard-Regular-Trial.subset.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Medium-Trial.subset.woff2",
+      path: "../fonts/gt-standard/GT-Standard-M-Standard-Medium-Trial.subset.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../../public/fonts/gt-standard/GT-Standard-M-Standard-Semibold-Trial.subset.woff2",
+      path: "../fonts/gt-standard/GT-Standard-M-Standard-Semibold-Trial.subset.woff2",
       weight: "600",
       style: "normal",
     },
@@ -54,7 +56,7 @@ const gtStandard = localFont({
    The variable name is unchanged, so globals.css's `--font-mono` indirection
    does not move. */
 const geistMono = localFont({
-  src: "../../public/fonts/geist-mono/GeistMono-400.subset.woff2",
+  src: "../fonts/geist-mono/GeistMono-400.subset.woff2",
   weight: "400",
   style: "normal",
   variable: "--font-geist-mono",
@@ -74,10 +76,10 @@ const geistMono = localFont({
    `.t-pixel` chords into the DOM at load, so the face still resolves on
    first paint; what changes is that it stops occupying a preload slot
    ahead of the three GT-Standard faces the hero is actually waiting on.
-   Updating `geist` means re-copying the woff2 into public/fonts/ and
+   Updating `geist` means re-copying the woff2 into assets/fonts/ and
    re-running scripts/subset-fonts.mjs over it. */
 const geistPixelSquare = localFont({
-  src: "../../public/fonts/geist-pixel/GeistPixel-Square.subset.woff2",
+  src: "../fonts/geist-pixel/GeistPixel-Square.subset.woff2",
   weight: "500",
   variable: "--font-geist-pixel-square",
   display: "swap",
