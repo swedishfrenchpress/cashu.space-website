@@ -10,7 +10,6 @@ type Part = {
   body: string;
   orb: OrbState;
   orbLabel: string;
-  points: string[];
 };
 
 /*
@@ -50,28 +49,6 @@ const PARTS: Part[] = [
     body: "Independent, open source, and free. Run a Cashu wallet on iOS, Android, or in the browser, and hold bearer tokens the way you hold cash.",
     orb: "composing",
     orbLabel: "A dotted band undulating around a sphere.",
-    /* "THE TOKEN IS THE MONEY" replaced "SELF-CUSTODIAL BY DEFAULT"
-       (user-directed 2026-08-16). The old line was false, and false in the
-       one way this site cannot afford: ecash is NOT self-custody. The mint
-       holds the bitcoin; what you hold is a bearer claim on it. Entry 02
-       says exactly that two columns away — "Ecash is a claim on its mint,
-       not a deposit" — so the page was contradicting itself, and the
-       footer's "balances held with a mint are a claim on that mint" a third
-       time. Borrowing bitcoin's strongest word for a custodial-backed
-       instrument is the kind of claim PRODUCT.md's whole voice exists to
-       avoid.
-
-       The replacement states the property that IS true of a wallet here:
-       the token is a bearer string, so holding the data is holding the
-       money — which is also what makes losing it final. Distinct from
-       entry 04's "BEARER STRINGS OF BITCOIN", which describes the token;
-       this describes what holding one means. */
-    points: [
-      "IOS, ANDROID, AND BROWSER",
-      "THE TOKEN IS THE MONEY",
-      "NO ACCOUNTS, NO SIGNUP",
-      "OPEN SOURCE, INDEPENDENTLY BUILT",
-    ],
   },
   {
     id: "mints",
@@ -80,12 +57,6 @@ const PARTS: Part[] = [
     body: "Mints bridge Lightning and ecash. A blind signature lets a mint issue a token without learning who ends up holding it. Ecash is a claim on its mint, not a deposit.",
     orb: "connecting",
     orbLabel: "A constellation of dots wiring itself together, with marks travelling the edges.",
-    points: [
-      "LIGHTNING IN, ECASH OUT",
-      "ANYONE CAN RUN ONE",
-      "BLIND SIGNATURES, NO USER LEDGER",
-      "A CLAIM ON ITS MINT",
-    ],
   },
   {
     id: "spec",
@@ -94,12 +65,6 @@ const PARTS: Part[] = [
     body: "Cashu is documented in version-controlled NUTs. Read them, implement them, fork them, propose your own. Nothing about the protocol is held back.",
     orb: "working",
     orbLabel: "Particles running tilted orbits around a sphere.",
-    points: [
-      "VERSION-CONTROLLED NUTS",
-      "MANDATORY AND OPTIONAL SETS",
-      "FREE AND OPEN SOURCE",
-      "OPEN TO PROPOSALS",
-    ],
   },
   {
     id: "tokens",
@@ -108,27 +73,25 @@ const PARTS: Part[] = [
     body: "Tokens are bearer strings of bitcoin. Instant, final, and small enough to fit anywhere text goes: a chat, a QR, an email, an HTTP header.",
     orb: "shaping",
     orbLabel: "A dotted outline shifting between a circle, a triangle, and a square.",
-    points: [
-      "BEARER STRINGS OF BITCOIN",
-      "INSTANT AND FINAL, LIKE CASH",
-      "FITS A QR, A CHAT, A URL",
-      "UNLINKABLE FROM THE MINT",
-    ],
   },
 ];
 
 /**
  * ProtocolParts — the split spec sheet. A sticky Paper column on the left
  * carries the section's whole argument; an always-dark column on the right
- * scrolls four numbered entries past it, each one a title, a description, an
- * animated plate, and a list of the properties it carries.
+ * scrolls four numbered entries past it, each one a title, a description and
+ * an animated plate.
  *
  * This replaced the sticky-tab-list feature scroller and the properties
  * bento in one move (2026-08-16, user-directed, after a reference layout).
- * The two sections were both four-item lists about the same four things
- * separated by a video band; folding the bento's properties into these
- * point lists says it once, at the point where each property is about
- * something the reader is already looking at.
+ * Each entry carried a fourth element until 2026-08-18: a list of four
+ * uppercase Mono properties, which is where the deleted bento's cards went.
+ * The user cut those lists, so the entry is now copy and figure only. What
+ * they stated is not lost — the bodies already carry it (open source and
+ * every platform in 01, the Lightning bridge and the claim-not-deposit line
+ * in 02, the NUTs in 03, bearer strings and where they fit in 04) and the
+ * aside's lead carries unlinkability. Don't restate it as a list again; if
+ * a property is worth making, make it in the sentence.
  *
  * The whole thing is a server component apart from the plates: the layout
  * is static, the scroll behaviour is `position: sticky`, and no observer is
@@ -175,17 +138,6 @@ export default function ProtocolParts() {
 
             <Reveal variant="fade" slow delay={180} className="protocol-part__plate">
               <OrbFigure state={part.orb} label={part.orbLabel} />
-            </Reveal>
-
-            <Reveal delay={240} className="protocol-part__points">
-              <ul>
-                {part.points.map((point) => (
-                  <li key={point}>
-                    <span className="protocol-part__mark" aria-hidden />
-                    {point}
-                  </li>
-                ))}
-              </ul>
             </Reveal>
           </article>
         ))}

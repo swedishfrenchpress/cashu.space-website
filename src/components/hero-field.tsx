@@ -21,8 +21,9 @@ import { createDitherScene, type DitherScene, type SceneColors } from "@/lib/her
  * dither with a mint-green fluid plume — which is aspensearch.com's hero, and
  * was a straight port of it down to the solver constants. Both borrowed
  * elements are gone on the user's direction: the halftone is now a grid of the
- * site's own monospace face, and the wake is monochrome. `--signal` went back
- * to the 7px property squares and the directory status tag, where it started.
+ * site's own monospace face, and the wake is monochrome. The green went back
+ * to the 7px squares it started on — the directory status tag is the only one
+ * of those left since the property lists were cut.
  *
  * The gesture that was worth keeping is the one that survives: a ground the
  * reader disturbs, shaped by a real fluid solver so the wake curls and settles

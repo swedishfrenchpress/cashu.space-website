@@ -65,20 +65,23 @@
   --panel-muted: rgba(255, 255, 255, 0.68);
 
   /* Signal — the system's one chromatic value, user-directed 2026-08-16.
-     It fills the 7px square that opens a stated property: the protocol-parts
-     property lists, and (widened the same day, on the user's direction) the
-     wallet-directory status tag. See the Signal-Green Exception, DESIGN.md
-     §2. The No-Colour Rule still governs every other surface. Never used for
-     type, for a state, or as a brand accent.
+     It fills the 7px square that opens a stated property, and since
+     2026-08-18 there is exactly one of those left on the site: the
+     wallet-directory status tag (.wallet-row__fact--tag). See the
+     Signal-Green Exception, DESIGN.md §2. The No-Colour Rule still governs
+     every other surface. Never used for type, for a state, or as a brand
+     accent.
 
-     TWO VALUES, ONE MARK. --signal is the value picked against the
-     always-dark --panel column, and it does not flip because that ground
-     never does. --signal-page is the same mark on the page ground, which
-     DOES flip, so it has to: #6fe3a4 measures 1.59:1 on Paper — the square
-     all but disappears in light mode. The light value is the same hue
-     (147°) taken down to 3.5:1. Both are declared in :root; the dark blocks
-     collapse --signal-page back onto --signal. */
-  --signal: #6fe3a4;
+     ONE CONSUMER, THEREFORE ONE TOKEN. There used to be a second, --signal
+     (#6fe3a4), for the same square on the protocol-parts column; that
+     column's property lists were cut and the token went with them rather
+     than sit here unused, which is how a bounded exception widens by
+     accident. The -page suffix is kept on purpose: this value is picked
+     against Paper, and it is not interchangeable with the mint it replaced
+     — #6fe3a4 measures 1.59:1 here and all but disappears. This is the
+     same hue (147°) taken down to 3.5:1. Anything new opening a stated
+     property uses this; a fixed dark ground would need its own value
+     measured against that ground, not this one reused. */
   --signal-page: #1b9d55;
 
   /* Interaction washes. */
@@ -2163,9 +2166,11 @@ html:not(.js) .reveal {
  * Full-bleed two-column band: a sticky Paper column on the left holding
  * the section's whole argument, an always-dark column on the right
  * scrolling four numbered entries past it. Each entry is a hanging index,
- * a title, a description, an animated plate, and the properties it
- * carries. Replaced the sticky-tab feature scroller, its demo panels, the
- * video band, and the properties bento in one move, 2026-08-16.
+ * a title, a description and an animated plate. Replaced the sticky-tab
+ * feature scroller, its demo panels, the video band, and the properties
+ * bento in one move, 2026-08-16; the property lists that inherited the
+ * bento's cards were cut on 2026-08-18, user-directed, and with them the
+ * Signal-Green Exception's first consumer.
  *
  * This band does not sit in the page shell. It is full-bleed on purpose:
  * a 1280px-capped composition cannot hold the three-column entry row (the
@@ -2303,13 +2308,14 @@ html:not(.js) .reveal {
  *
  * Below 1024 everything stacks in document order.
  *
- * 1024–1439: the hanging index appears and the plate and the property
- * list pair up beneath, but the title and description still stack across
+ * 1024–1439: the hanging index appears and the plate sits beneath in the
+ * first content column, but the title and description still stack across
  * the full entry width — at these widths a third column puts the
  * description under 250px and it stops being prose.
  *
  * 1440+: the reference arrangement. Description moves up beside the title,
- * plate under the title, list under the description. */
+ * plate under the title. The third column carried a property list until
+ * 2026-08-18; the row is now copy over figure. */
 @media (min-width: 1024px) {
   .protocol-part {
     grid-template-columns: 2.75rem minmax(0, 1fr) minmax(0, 1fr);
@@ -2332,19 +2338,16 @@ html:not(.js) .reveal {
     grid-column: 2 / 4;
   }
 
-  /* The plate carries the entry's internal break. It sets the row height,
-     so the property list bottom-aligns to the same enlarged row without
-     needing a margin of its own. */
+  /* The plate carries the entry's internal break, which is why it keeps a
+     margin the other rows do not. It sat beside a property list until
+     2026-08-18 and now holds column 2 alone; the empty column 3 beside it
+     is deliberate. The plate is sized in its own clamp rather than by its
+     column, so widening it to the full row would not fill the space, it
+     would just enlarge a figure the library's dot radii are tuned against
+     (see .orb-plate). */
   .protocol-part__plate {
     grid-column: 2;
     margin-top: clamp(1.5rem, 3vw, 3rem);
-  }
-
-  /* Bottom-aligned with the plate: the list is the entry's floor, the way
-     the reference sets it. */
-  .protocol-part__points {
-    grid-column: 3;
-    align-self: end;
   }
 }
 
@@ -2370,10 +2373,6 @@ html:not(.js) .reveal {
   }
 
   .protocol-part__plate {
-    grid-row: 2;
-  }
-
-  .protocol-part__points {
     grid-row: 2;
   }
 }
@@ -2493,42 +2492,6 @@ html:not(.js) .reveal {
     left bottom, left bottom,
     right bottom, right bottom;
 }
-
-/* --- the property list -------------------------------------------- */
-
-.protocol-part__points ul {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.protocol-part__points li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
-  font-size: 0.75rem;
-  line-height: 1.4;
-  letter-spacing: 0.06em;
-  color: var(--panel-note);
-}
-
-/* Sharp, flat, 7px. Square because every other mark in the system is —
-   the buttons, the segmented control, the plates. The one place the
-   Signal-Green Exception applies. */
-.protocol-part__mark {
-  flex: none;
-  width: 7px;
-  height: 7px;
-  /* Optically centred on the first line rather than on the whole item, so
-     a wrapping property keeps its mark beside its first word. */
-  margin-top: 0.32em;
-  background-color: var(--signal);
-}
-
 
 /*
  * In the press — the closing band of press cards (see in-the-press.tsx).
@@ -2873,9 +2836,12 @@ html:not(.js) .reveal {
  * Soft-Capsule Exception of 2026-08-14 — Chalk fill, `border-radius: 999px`,
  * GT-Standard sentence case — which is deleted, and with it the site's last
  * rounded surface and its last grey plate. The directive was to put the tag
- * in the same family as the 7px `--signal` square that opens each property
- * in the protocol-parts column, so it now uses that column's exact recipe:
- * a sharp green square, then 12px Geist Mono uppercase tracked 0.06em.
+ * in the same family as the 7px square that opened each property in the
+ * protocol-parts column, so it took that column's exact recipe: a sharp
+ * green square, then 12px Geist Mono uppercase tracked 0.06em. Those lists
+ * are gone (2026-08-18, user-directed) and this is now the only square of
+ * its kind on the site, which makes it the whole Signal-Green Exception
+ * rather than half of it.
  *
  * Which retires an argument this comment used to make. The capsule existed
  * because the *first* attempt — hairline-outlined box, uppercase, tracked —
@@ -2888,16 +2854,16 @@ html:not(.js) .reveal {
  *   - No fill, no border, no padding. The square and the spacing do the
  *     separating, the same way they do in the column.
  *   - Mono, not GT-Standard. The old note argued the tag was interface
- *     furniture and the facts beside it were data. In the family it is a
- *     stated property, and every stated property on this site is mono.
+ *     furniture and the facts beside it were data. It is a stated
+ *     property, and stated properties on this site are mono.
  *   - Ink, not Body. With the Chalk ground gone there is nothing left to
  *     step down from; Ink (17.72:1) against the neighbouring facts' Muted
  *     (4.83:1) is what now marks it as the different class of fact.
  *
- * The square is `--signal-page`, not `--signal`. Both are one value now that
- * the site is light-only, but they stay separate tokens: `--signal` is the
- * mint picked against the always-dark protocol-parts column, and `#6fe3a4`
- * measures 1.59:1 on Paper — it would all but vanish here. See :root.
+ * The square is `--signal-page`. The mint it descends from was picked
+ * against the always-dark column and measures 1.59:1 on Paper — it would
+ * all but vanish here, which is why the two were ever separate values and
+ * why this one is not "the green" reused. See :root.
  *
  * Bounded, like every other exception here: STATUS_FACTS only. The square
  * marks the maturity fact and nothing else in the row — give one to every
@@ -2911,8 +2877,8 @@ html:not(.js) .reveal {
   white-space: nowrap;
 }
 
-/* Sharp, flat, 7px — .protocol-part__mark's twin. Inline-block rather than
-   a flex child so the tag keeps a text baseline and sits on the facts row
+/* Sharp, flat, 7px. Inline-block rather than a plain block so the tag
+   keeps a text baseline and sits on the facts row
    with its mono siblings; an empty inline-block's baseline is its bottom
    edge, so the square lands on the baseline and the 1px lift centres it
    against the 12px cap height. */
@@ -2928,7 +2894,16 @@ html:not(.js) .reveal {
 
 /* The site's one inline prose link. Nearly every destination here is a
    button or a nav item; this is for the rare sentence that has to cite a
-   source rather than restate it. Plain underline, no colour, no glyph — §6
+   source rather than restate it.
+
+   NO CONSUMER TODAY (2026-08-18). Its only one was the wallets page's
+   NUT-support citation, which the user cut. Kept anyway, unlike the
+   --signal token cut the same day: that was a chromatic exception, where a
+   token left in :root is a standing invitation to widen a rule the system
+   depends on being narrow. This is a monochrome text style that invites
+   nothing, and the next prose citation written without it is a blue link or
+   a `Visit →`, which is the outcome the rule exists to prevent. Delete it
+   only alongside the §5 entry that documents it. Plain underline, no colour, no glyph — §6
    rules out `Visit →` pseudo-links and arrows, and a blue link would open
    the palette the No-Colour Rule closes. The rule is Ink text with a Muted
    underline that strengthens to Ink on hover: the word carries the meaning,

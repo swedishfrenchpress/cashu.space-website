@@ -255,9 +255,9 @@ void main() {
  * to: there is no message under the field. It is entropy being disturbed and
  * re-settling, which is what a bearer secret actually is.
  *
- * NO GREEN HERE. --signal stays on the 7px property squares and the directory
- * status tag. The hero is monochrome (user-directed), which is also what puts
- * the largest chromatic event on the page back at 7px where it started.
+ * NO GREEN HERE. The one chromatic mark left on the site is the 7px square on
+ * the wallet-directory status tag. The hero is monochrome (user-directed),
+ * which is what puts the largest chromatic event on the page at 7px.
  */
 export const COMPOSITE_FRAGMENT = `#version 300 es
 precision highp float;

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import NewTabHint from "@/components/new-tab-hint";
 import Reveal from "@/components/reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
@@ -8,18 +7,21 @@ import SiteHeader from "@/components/site-header";
    block into every route, so without this the share card for /wallets
    carried the homepage's title and pointed its url at https://cashu.space —
    a link to the directory previewing as the landing page. */
-/* The page is a directory, not a wallet list, and it says so now. The nav
-   label, the title, the H1 and the lead all said "wallets" over four groups,
-   two of which — Libraries and Tools — are explicitly not wallets: a reader
-   scanning for something to install could not tell which 8 of the 13 rows
-   they could install without reading four scope lines first.
+/* The H1 is "Wallets." again (user-directed 2026-08-18). It read
+   "Directory." for two days, and the problem that change was solving is
+   real and is still solved — this page carries four groups, two of which
+   (Libraries and Tools) are explicitly not wallets, so a reader scanning
+   for something to install must be able to tell which rows they can. What
+   fixed it was never the H1 word: it is the lead's first sentence, "Wallets
+   first, then the libraries and mint tooling built on the same spec," which
+   states the scope in the place a reader actually reads it. Don't drop that
+   sentence, and don't retitle the page to solve a scope problem the copy
+   under it is already solving.
 
-   Wallets still lead, in the reading order and in the group order, because
-   routing to one is the outcome PRODUCT.md elevates. What changed is that
-   the page no longer claims to be only that. The route stays /wallets and
-   the nav label stays "Wallets" — that is the job people arrive for, and the
-   first thing under the H1 is still a wallet group. */
-const TITLE = "Cashu Directory";
+   Wallets lead in the reading order and in the group order because routing
+   to one is the outcome PRODUCT.md elevates. Route, nav label, H1 and share
+   title now all say the same word, which is what people arrive for. */
+const TITLE = "Cashu Wallets";
 const DESCRIPTION =
   "A non-exhaustive directory of Cashu wallets, libraries, and mint tooling. Any client that implements the protocol is conformant.";
 
@@ -63,18 +65,25 @@ type DirectoryGroup = {
 };
 
 /* Facts that describe a project's *maturity* rather than its surface. These
-   render opened by a 7px --signal square and set in tracked uppercase, in
-   the protocol-parts property family (user-directed 2026-08-16, replacing
-   the grey capsule) — because they answer a different question from "iOS
-   and Android": one tells you where it runs, the other tells you how much
-   to trust it yet. Keep this set small: the square only distinguishes the
-   maturity fact for as long as it is the only fact that carries one. */
+   render opened by a 7px --signal-page square and set in tracked uppercase
+   (user-directed 2026-08-16, replacing the grey capsule) — because they
+   answer a different question from "iOS and Android": one tells you where
+   it runs, the other tells you how much to trust it yet. The recipe came
+   from the protocol-parts property lists, which were cut on 2026-08-18, so
+   this is now the site's only chromatic mark. Keep this set small: the
+   square only distinguishes the maturity fact for as long as it is the only
+   fact that carries one. */
 const STATUS_FACTS = new Set(["Beta"]);
 
 // Grouped by surface. Wallets come first (Mobile, then Web), then the
 // developer implementations, then operator tooling. Each non-wallet category
 // gets its own labelled band so nothing is mislabelled as a wallet. Wallets
-// are alphabetical within a group; implementations lead with the reference.
+// are alphabetical within a group; Libraries lead with Nutshell, which is
+// an ordering decision only — it carried a "Reference implementation" fact
+// until 2026-08-18 and the user cut it. Every other fact in this registry
+// is a checkable property (language, platform, maturity); that one was a
+// standing about a project relative to its peers, which is a different kind
+// of claim and the only one here the site was making on its own authority.
 const DIRECTORY_GROUPS: DirectoryGroup[] = [
   {
     heading: "Mobile wallets",
@@ -103,7 +112,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Libraries",
     scope: "Libraries and SDKs for building on the Cashu protocol.",
     entries: [
-      { name: "Nutshell", href: "https://github.com/cashubtc/nutshell", facts: ["Python", "Reference implementation"] },
+      { name: "Nutshell", href: "https://github.com/cashubtc/nutshell", facts: ["Python"] },
       { name: "CDK",      href: "https://github.com/cashubtc/cdk",      facts: ["Rust"] },
       { name: "Cashu TS", href: "https://github.com/cashubtc/cashu-ts", facts: ["TypeScript"] },
       { name: "Coco",     href: "https://github.com/cashubtc/coco",     facts: ["TypeScript"] },
@@ -112,7 +121,8 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
   {
     heading: "Tools",
     /* "Not a wallet" is no longer the first thing this line has to say: the
-       page is a directory and the two wallet groups name themselves. */
+       lead states the page's scope and the two wallet groups name
+       themselves. */
     scope: "Software for running and managing your own mint.",
     entries: [
       { name: "Orchard", href: "https://orchard.space", facts: ["Self-hosted"] },
@@ -146,42 +156,12 @@ export default function WalletsPage() {
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
         <Reveal immediate as="header">
           <div id="main-content" tabIndex={-1} className="flex flex-col gap-6 max-w-[60ch]">
-            <h1 className="t-display">Directory.</h1>
+            <h1 className="t-display">Wallets.</h1>
             <p className="t-body-lead text-body">
               Wallets first, then the libraries and mint tooling built on the
               same spec. Any client that implements the Cashu protocol is
               conformant. This list is non-exhaustive, a snapshot of what
               people use today, not an endorsement.
-            </p>
-            {/* The decision fact, cited rather than restated.
-
-                A directory of thirteen rows with one identical OPEN slab
-                each gives a chooser almost nothing to choose on: platform,
-                and "Beta" on four of them. The fact that would actually
-                separate these wallets for this audience is which optional
-                NUTs each one implements — and cashubtc/nuts already keeps
-                that table, maintained by the people who write the specs.
-
-                So it is linked, not copied. Duplicating it here would be a
-                second source of truth that goes stale the first time a
-                wallet ships a NUT, on the page whose lead promises a
-                snapshot and whose footer says to read the spec before
-                trusting anyone, including us. The wording stays hedged on
-                purpose: the table covers seven implementations, not all
-                thirteen rows below, so it must not read as a complete
-                per-wallet matrix. */}
-            <p className="t-body text-muted">
-              Optional NUT support varies between wallets. The{" "}
-              <a
-                href="https://github.com/cashubtc/nuts#optional"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="prose-link focus-ring"
-              >
-                spec repo
-                <NewTabHint />
-              </a>{" "}
-              tracks which implementations support what.
             </p>
           </div>
         </Reveal>

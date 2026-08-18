@@ -194,10 +194,11 @@ export default function OrbFigure({ state }: OrbFigureProps) {
           are material rather than a claim — so narrating "a dotted band
           undulating around a sphere" four times down the column spends a
           screen-reader visitor's attention on decoration the design system
-          itself says carries no information. The 7px --signal square beside
-          them is already aria-hidden for the same reason; the site was
-          hiding a 7px decoration and announcing a 320px one. `label` is kept
-          as an authoring note on the mode chosen for each entry. */}
+          itself says carries no information. The site's other decorative
+          mark, the 7px signal square on the wallet directory, is hidden for
+          the same reason; announcing a 320px decoration while hiding a 7px
+          one was the inconsistency. `label` is kept as an authoring note on
+          the mode chosen for each entry. */}
       <canvas ref={canvasRef} className="orb-plate__canvas" aria-hidden />
     </div>
   );
