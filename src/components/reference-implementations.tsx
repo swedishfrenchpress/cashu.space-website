@@ -11,7 +11,47 @@ type Repo = {
 /* Canonical repo list for the cashubtc org. Star/fork counts intentionally
    omitted — the site is "a directory and manifesto, not a product page"
    (PRODUCT.md). The tag carries the "what is this" signal; the language
-   mark carries the "real X, real Y" signal. Both age well. */
+   mark carries the "real X, real Y" signal. Both age well.
+ *
+ * THE COUNT IN THE HEADLINE IS DERIVED FROM THIS LIST, SO THE LIST IS THE
+ * CLAIM. It said Six until 2026-08-18, and Six was wrong: the list was
+ * hand-written and never revisited while the org kept shipping. Checked
+ * against the GitHub API that day — 34 public repos, of which these are the
+ * ones that count under the line drawn below.
+ *
+ * WHAT COUNTS: a repo in the cashubtc org that is itself a wallet, a mint,
+ * or a library for building either. Nothing else on this page can be said
+ * honestly without a line that specific, because "implementation" stretches
+ * over most of the org otherwise.
+ *
+ * WHAT IS DELIBERATELY OUT, and none of it is an oversight:
+ *   - Catalogue and prose: `nuts` and `awesome-cashu` are in this array
+ *     because the section shows the spec, but they are filtered out of the
+ *     count below. `docs.cashu.space`, `orchard-docs`, `dev-calls` and
+ *     `npubcash-website` are not implementations at all.
+ *   - CDK language bindings: `cdk-kotlin`, `cdk-swift`, `cdk-go`,
+ *     `cdk-dart`, `cdk-python` (and archived `cdk-flutter`). They are one
+ *     implementation reached from six languages, and counting them as six
+ *     is the padding this section exists to refuse.
+ *   - Integrations and services: `orchard` (mint management, listed under
+ *     Tools on /wallets), `BTCNutServer`, `cashu-for-woocommerce`,
+ *     `npubcash-server`, `cdk-payment-processors`, `cashu-skill`,
+ *     `cashu-redeem`. Real software built ON the protocol rather than an
+ *     implementation OF it.
+ *   - Archived or long stale: `cdk-flutter`, `lnbits-cashu` (archived);
+ *     `cashu-feni`, `xcashu`, `cashu-ui`, `cashu-crypto-ts`, `cashurpc`,
+ *     `nut-november` (no push in over a year).
+ *
+ * `eNuts` stays despite a quiet stretch (last push 2026-05-08): it is
+ * unarchived, shipped, and listed on /wallets, and dropping a working wallet
+ * for being quiet is an editorial judgement this list should not be making.
+ *
+ * A WIDER LINE IS AVAILABLE AND WAS NOT TAKEN. Everything unarchived that
+ * ships protocol code and was pushed inside a year comes to roughly twenty.
+ * That number is defensible too, and it is not the one on the page, because
+ * a reader who clicks through should find what the headline promised at the
+ * top of the org rather than after sorting past six sets of bindings. If the
+ * line moves, move this comment with it. */
 const REPOS: Repo[] = [
   { name: "nutshell",      url: "https://github.com/cashubtc/nutshell",      tag: "Wallet & mint",   lang: "Python"     },
   { name: "nuts",          url: "https://github.com/cashubtc/nuts",          tag: "Spec",            lang: "—"          },
@@ -21,6 +61,8 @@ const REPOS: Repo[] = [
   { name: "cashu-ts",      url: "https://github.com/cashubtc/cashu-ts",      tag: "Wallet library",  lang: "TypeScript" },
   { name: "awesome-cashu", url: "https://github.com/cashubtc/awesome-cashu", tag: "Resources",       lang: "—"          },
   { name: "coco",          url: "https://github.com/cashubtc/coco",          tag: "Wallet toolkit",  lang: "TypeScript" },
+  { name: "wallet",        url: "https://github.com/cashubtc/wallet",        tag: "Mobile wallet",   lang: "Kotlin"     },
+  { name: "Numo",          url: "https://github.com/cashubtc/Numo",          tag: "Point of sale",   lang: "Kotlin"     },
 ];
 
 /* Language marks — full-color brand glyphs. This is a deliberate, scoped
@@ -258,8 +300,12 @@ function Spec() {
 /* Card — the floating implementations directory. Flat, no shadow (the lift
    comes from z-index and overlap, not elevation). Three featured rows + a
    quiet link to the rest. Featured repos are picked by language coverage
-   (Python/Rust/TypeScript) so the card mirrors the lead's "Active across
-   Python, Rust, and TypeScript" claim. Each row carries the language mark on
+   (Python/Rust/TypeScript), which used to mirror the lead exactly and now
+   samples it: the lead names Kotlin too as of 2026-08-18, and the card does
+   not, because LangMark can only draw three marks and a featured row with
+   no mark would sit misaligned against the two that have one. Drawing a
+   Kotlin mark is a Depicted-World Exception decision (DESIGN.md §2), not a
+   drive-by addition — take it deliberately or leave the card at three. Each row carries the language mark on
    the left and the project's role on the right — name in the middle. No
    stars: the visitor isn't choosing between nutshell and cdk by GitHub vanity
    counts.
@@ -330,7 +376,15 @@ function Card() {
         </a>
       ))}
       {/* Non-interactive metadata, not a text-arrow link — the section's
-          single GitHub action is the CTA below the panel. */}
+          single GitHub action is the CTA below the panel.
+
+          The noun stays implicit. "+ N more implementations in the cashubtc
+          org" was tried on 2026-08-18 to tie the number to the same
+          denominator as the headline, and it wraps at the card's 340px,
+          leaving "org" alone on a second line. It is not needed: the card's
+          own header says IMPLEMENTATIONS directly above three of them, so
+          "more" has one available referent. The stale count was the bug
+          here, not the wording. */}
       <div className="px-5 py-4">
         <span className="t-label text-zinc-500">
           + {REMAINING} more in the cashubtc org
@@ -370,10 +424,14 @@ export default function ReferenceImplementations() {
                 unlayered and Tailwind utilities live in @layer utilities, so
                 the layer loses no matter the specificity. The cap reads as
                 authored and rendered at 89 characters. */}
+            {/* Kotlin was added 2026-08-18, with the count. Two of the
+                eight are Kotlin (cashubtc/wallet, Numo), and a sentence
+                characterising the eight cannot enumerate three of their
+                four languages. */}
             <p className="t-body-lead text-muted">
-              Active across Python, Rust, and TypeScript. The cashubtc
-              organization hosts the spec, the SDKs, and the reference
-              wallets.
+              Active across Python, Rust, TypeScript, and Kotlin. The
+              cashubtc organization hosts the spec, the SDKs, and the
+              reference wallets.
             </p>
           </Reveal>
         </div>
