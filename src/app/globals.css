@@ -400,7 +400,7 @@ html {
   /* Fraction of the settle that the blur is given. The focus pull finishes
      first and the rise lands under an already-sharp word; blur and position
      resolving together is one soft mush, and in the hero it would also leave
-     hero-cipher.tsx scrambling behind a lens for most of its pass. */
+     the word wipe running behind a lens for the whole of its pass. */
   --reveal-focus-span: 0.55;
 
   /*
@@ -1009,9 +1009,12 @@ html:not(.js) .reveal-group .reveal-item {
      It is HIDDEN between passes, not removed: button-cipher.tsx re-runs on
      every hover, so it creates the overlay once at enhance time and clears
      it on unmount. `display: none` is what closes the hazard here — a
-     display:none element has no ground to assign. hero-cipher.tsx runs once
-     and does remove its overlay; the two differ on purpose. Don't unify
-     them, and don't "fix" this to a permanent transparent background. */
+     display:none element has no ground to assign. The hero's cipher pass was
+     the other consumer and did remove its overlay, the two differing on
+     purpose; it was cut 2026-08-19 for a clip-path wipe (see .hero-wipe), so
+     this is the pattern's only consumer now. That is not a licence to
+     simplify it — a permanently transparent overlay left in the DOM is
+     exactly what a contrast extension turns into a visible plate. */
   display: none;
   background-color: transparent;
   align-items: center;
@@ -1589,9 +1592,9 @@ html:not(.js) .reveal-group .reveal-item {
  * rule and this one are both (0,1,1) and source order decides — an override
  * 600 lines earlier silently loses, which is exactly what happened first try.
  *
- * hero-cipher.tsx bails on its own under the same setting, so between them the
- * hero has no motion at all: the hairline is simply there and the word never
- * scrambles.
+ * .hero-wipe cancels itself under the same setting a few hundred lines down,
+ * so between them the hero has no motion at all: the hairline is simply there
+ * and the word is simply uncovered.
  */
 @media (prefers-reduced-motion: reduce) {
   .hero-spec::after {
@@ -1838,56 +1841,93 @@ html:not(.js) .reveal-group .reveal-item {
 }
 
 /*
- * The cipher pass on one word of the headline (hero-cipher.tsx). This and
- * the closing hairline's draw-on are the hero's entire motion.
+ * THE WORD WIPE — one word of the headline is uncovered left to right on
+ * arrival. This and the closing hairline's draw-on are the hero's entire
+ * motion, and they are now the same gesture at two scales.
  *
- * What used to occupy this part of the stylesheet was the figure:
- * .hero-spec__field, .hero-orb with its two mask gradients and its narrow
- * override, and .hero-orb__canvas. All deleted 2026-08-16 on the user's
- * direction — see the Set-Once Rule, DESIGN.md §4, before adding a ground
- * back here.
+ * WHAT THIS REPLACED, AND WHY (2026-08-19, user-directed). Until now the word
+ * resolved out of hex: `hero-cipher.tsx` ran the shared cipher pass
+ * decrypt-only over "ecash" for 760ms. The user cut it as corny and too on the
+ * nose — a word about untraceable money spelling itself out of ciphertext is
+ * the site explaining its own pun at 9rem. The judgement is theirs and the
+ * reasoning is sound: it was the one piece of hero motion that made an
+ * argument rather than staging one.
  *
- * inline-block so `inset: 0` on the overlay resolves against a well-defined
- * box rather than against the fragments of an inline. The word never wraps
- * inside itself, so this costs the balanced headline nothing.
+ * WHAT REPLACED IT IS ALREADY IN THE VOCABULARY. `clip-path` uncovering type
+ * left to right is what the masthead does under a hovered link and what
+ * `hero-rule-draw` does to the closing hairline, and it runs on the masthead's
+ * own `--dur-nav-wipe`. The hero now rhymes with the two surfaces either side
+ * of it instead of introducing a third idea.
+ *
+ * IT COSTS NOTHING TO RUN AND NOTHING TO SHIP. `hero-cipher.tsx` was a client
+ * component, an effect, a `getAnimations()` probe against the reveal's clock,
+ * a 46ms churn timer and a `requestAnimationFrame` loop, all to move one word.
+ * This is four declarations. The word is a plain `<span>` in a server
+ * component, so the hero has no client component left in it apart from the
+ * field's canvas.
+ *
+ * IT ALSO DELETES A WHOLE CLASS OF PROBLEM. The cipher had to *find* the
+ * arrival — the headline paints from the stylesheet at parse time but the
+ * effect ran at hydration, so on a slow connection the word would have
+ * scrambled a second after the hero went quiet, which is the ambient motion
+ * the Set-Once Rule forbids. `joinArrival()` existed entirely to detect that
+ * and skip the pass. An animation declared in the same stylesheet cannot be
+ * late: it starts when the headline starts, on the same `--reveal-delay` the
+ * headline inherits it from, because that value is written during SSR and is
+ * in the markup before either rule is applied. There is nothing to
+ * synchronise and nothing to bail out of.
+ *
+ * THE VERTICAL INSETS ARE NEGATIVE AND THAT IS NOT A TYPO. `.hero-wipe` is an
+ * inline-block, so its box is the line box — and the headline's line-height is
+ * 0.95, which is *shorter* than the type it sets. Clipping at `0` top and
+ * bottom shaves the caps (measured: the E and H lose their top ~6px at the
+ * 144px end of the clamp). The clip is pulled out of the box by a quarter of
+ * its height on both edges so the wipe is purely horizontal.
+ *
+ * The word never wraps inside itself, so inline-block costs the balanced
+ * headline nothing.
  */
-.hero-cipher {
-  position: relative;
+.hero-wipe {
   display: inline-block;
+  /* Inherits --reveal-delay from the headline's own Reveal wrapper, so the
+     word is uncovered *as* the line rises rather than after it has landed —
+     one gesture, not two. Ends at 580ms against the hairline's 1100ms, so the
+     hero is still completely still by ~1.1s. */
+  /* `backwards`, not `both`, and it is the focus pull's first mechanical term
+     applied to a different property: an entrance must end on the absence of
+     the thing it animated, not on a neutral value of it. `both` would leave
+     `clip-path: inset(-25% 0 -25% 0)` on the element for the life of the
+     page — visually identical, but a clip-path other than `none` is a
+     permanent stacking context and a standing compositing hint. `backwards`
+     fills the delay phase with the `from` value, which is the half that
+     matters, and hands back to the element's own `none` when the animation
+     ends. The handoff is invisible because both edges of it clip nothing. */
+  animation: hero-word-wipe var(--dur-nav-wipe) var(--ease-out-quart)
+    var(--reveal-delay, 0ms) backwards;
 }
 
-/* The real word goes transparent and the overlay paints on top, so the line
-   never reflows: the source text keeps holding its own space and the h1's
-   accessible name is untouched throughout. */
-.hero-ciphering {
-  color: transparent;
+@keyframes hero-word-wipe {
+  from {
+    clip-path: inset(-25% 100% -25% 0);
+  }
+  to {
+    clip-path: inset(-25% 0 -25% 0);
+  }
 }
 
 /*
- * No font-family: the overlay inherits GT-Standard from the headline. The
- * button pass switches to mono, which is right for a 13px label and wrong
- * here — a second typeface appearing inside the page peak for 760ms, at
- * completely different metrics.
- *
- * Centred rather than left-aligned. GT-Standard is proportional, so five hex
- * glyphs are not the width of "ECASH"; centring splits that difference
- * either side of the word's own box instead of pushing all of it into the
- * space before " FOR". nowrap because a scrambled string must never find a
- * break opportunity the real word does not have.
- *
- * Like the button overlay, this element exists only while the pass runs
- * (hero-cipher.tsx appends and removes it) rather than sitting permanently
- * invisible over the headline — contrast extensions assign backgrounds by
- * computed value and would turn a permanent fixture into a visible plate.
+ * Immediately after the rule it cancels, for the same reason the hairline's
+ * reset sits next to the hairline: these are (0,1,0) and (0,1,0), so source
+ * order decides and an override parked up with the other reduced-motion resets
+ * would silently lose. Without motion the word is simply there — no clip at
+ * all rather than a clip held at its end value, so the element keeps no
+ * clipping context.
  */
-.hero-cipher__label {
-  position: absolute;
-  inset: 0;
-  background-color: transparent;
-  color: var(--ink);
-  text-align: center;
-  white-space: nowrap;
-  pointer-events: none;
+@media (prefers-reduced-motion: reduce) {
+  .hero-wipe {
+    animation: none;
+    clip-path: none;
+  }
 }
 
 /*

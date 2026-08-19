@@ -1,5 +1,4 @@
 import Link from "next/link";
-import HeroCipher from "@/components/hero-cipher";
 import HeroField from "@/components/hero-field";
 import InThePress from "@/components/in-the-press";
 import NewTabHint from "@/components/new-tab-hint";
@@ -79,11 +78,15 @@ export default function Home() {
                     reading as three phrases. `ecash` takes the short line
                     because it is the word HeroCipher resolves out of hex on
                     arrival — the one thing in the hero that moves is now the
-                    line the composition centres on. */}
+                    line the composition centres on. (It resolved out of hex
+                    until 2026-08-19; the user cut that as too on the nose and
+                    it is a clip-path wipe now — see .hero-wipe in
+                    globals.css. A plain span, so this is a server component
+                    all the way down.) */}
                 <h1 className="hero-spec__headline">
                   <span className="hero-spec__line">Open source</span>{" "}
                   <span className="hero-spec__line">
-                    <HeroCipher>ecash</HeroCipher>
+                    <span className="hero-wipe">ecash</span>
                   </span>{" "}
                   <span className="hero-spec__line">for bitcoin.</span>
                 </h1>

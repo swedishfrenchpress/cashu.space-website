@@ -330,9 +330,14 @@
         "purpose": "The masthead hover plate's clip-path wipe travelling across a nav label. Deliberately slower than dur-base: at feedback speed a travelling edge across a whole word reads as a flicker rather than a slide. (Replaces dur-nav/300ms, which documented the retired Onyx condense and had no consumers left; the dead token was removed from globals.css 2026-08-17.)"
       },
       {
+        "name": "hero-word-wipe",
+        "value": "460ms (dur-nav-wipe) ease-out-quart, clip-path inset, fill backwards",
+        "purpose": "One word of the hero headline uncovered left to right on arrival (.hero-wipe). Added 2026-08-19 on the user's direction, replacing the cipher pass that used to resolve it out of hex. Deliberately the masthead's own wipe at another scale: clip-path uncovering type is what the nav does under a hovered link and what hero-rule-draw does to the closing hairline, so the hero rhymes with the surfaces either side of it instead of introducing a third idea. It inherits --reveal-delay from the headline's Reveal wrapper, so it starts when the headline starts and ends at 580ms, inside the hairline's 1100ms. Two terms are load-bearing. It fills backwards rather than both — an entrance ends on the absence of what it animated, and both would leave a clip-path on the word for the life of the page: visually identical, and a permanent stacking context. The vertical insets are negative because the headline's line-height is 0.95, so the inline-block box is shorter than the type it sets and clipping at 0 shaves the caps. No JavaScript: a rule in the same stylesheet as the headline cannot arrive after the headline has, which is the entire problem hero-cipher.tsx existed to guard against."
+      },
+      {
         "name": "cipher-pass",
         "value": "460ms",
-        "purpose": "The button label's encrypt-to-decrypt sweep. Pointer only, never focus. Removed entirely under prefers-reduced-motion."
+        "purpose": "The button label's encrypt-to-decrypt sweep. Pointer only, never focus. Removed entirely under prefers-reduced-motion. ONE consumer as of 2026-08-19: the hero ran the same primitive decrypt-only over one word of the headline until the user cut it as corny and too on the nose. See hero-word-wipe below and the Set-Once Rule's third amendment in DESIGN.md section 4."
       },
       {
         "name": "draw-on",
@@ -558,5 +563,5 @@
     ]
   },
   "handPatchedAt": "2026-08-17T20:10:00Z",
-  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, dur-nav replaced by the wipe it should always have named, and the font masters moved out of public/. 2026-08-19: added the focus pull (reveal-focus, reveal-blur) and the section rise (reveal-rise-section) alongside the group-reveal refactor; see the Focus-Pull and Section-Gesture rules in DESIGN.md section 4."
+  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, dur-nav replaced by the wipe it should always have named, and the font masters moved out of public/. 2026-08-19: added the focus pull (reveal-focus, reveal-blur) and the section rise (reveal-rise-section) alongside the group-reveal refactor; see the Focus-Pull and Section-Gesture rules in DESIGN.md section 4. Same day: the hero cipher pass was cut for .hero-wipe (hero-word-wipe); cipher-pass is down to one consumer."
 }

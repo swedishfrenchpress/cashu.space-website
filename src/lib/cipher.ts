@@ -1,11 +1,18 @@
 /**
  * The cipher pass — the site's one typographic motion primitive.
  *
- * Pure string maths, no DOM. Two consumers, deliberately sharing one
- * algorithm rather than two copies of it:
+ * Pure string maths, no DOM. ONE consumer as of 2026-08-19:
  *
  *   button-cipher.tsx  encrypt -> decrypt round trip, on pointer hover
- *   hero-cipher.tsx    decrypt only, once, on arrival
+ *
+ * The second was `hero-cipher.tsx`, which ran the sweep decrypt-only over one
+ * word of the hero headline on arrival. The user cut it as corny and too on
+ * the nose, and it is a clip-path wipe now (`.hero-wipe` in globals.css). The
+ * split between `cipherText` and `decryptText` was there to serve two callers
+ * with one algorithm; with one caller left, `decryptText` and
+ * `encryptedGlyph` are no longer exported. They stay separate functions
+ * because the round trip genuinely is two legs of one sweep and reads better
+ * named, not because anything outside this file needs them.
  *
  * The glyph pool is hex because the thing being obscured on this site is
  * always a value or a key, and hex is what those look like when you can see
@@ -16,7 +23,7 @@ const CIPHER_GLYPHS = "0123456789abcdef";
 
 /** Deterministic per (index, frame) so a character does not flicker between
  *  two glyphs on consecutive frames — it walks the pool instead. */
-export function encryptedGlyph(index: number, frame: number) {
+function encryptedGlyph(index: number, frame: number) {
   return CIPHER_GLYPHS[(index * 7 + frame * 11) % CIPHER_GLYPHS.length];
 }
 
@@ -27,7 +34,7 @@ export function encryptedGlyph(index: number, frame: number) {
  * resolved to the source text, everything after is still scrambled.
  * Whitespace is never touched, so word shapes survive the pass.
  */
-export function decryptText(source: string, sweep: number, frame: number) {
+function decryptText(source: string, sweep: number, frame: number) {
   const chars = Array.from(source);
   const last = Math.max(chars.length - 1, 1);
 
@@ -46,7 +53,7 @@ export function decryptText(source: string, sweep: number, frame: number) {
  * halves — the encrypt leg is deliberately the shorter of the two, so the
  * label spends most of the pass returning rather than leaving.
  */
-export const ENCRYPT_END = 0.34;
+const ENCRYPT_END = 0.34;
 
 export function cipherText(source: string, progress: number, frame: number) {
   const encrypting = progress < ENCRYPT_END;
