@@ -154,7 +154,7 @@ export default function WalletsPage() {
       <main className="flex-1 pb-24 lg:pb-32">
 
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
-        <Reveal immediate as="header">
+        <Reveal immediate focus as="header">
           <div id="main-content" tabIndex={-1} className="flex flex-col gap-6 max-w-[60ch]">
             <h1 className="t-display">Wallets.</h1>
             <p className="t-body-lead text-body">

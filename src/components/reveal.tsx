@@ -17,6 +17,7 @@ type RevealProps = {
   variant?: RevealVariant;
   slow?: boolean;
   immediate?: boolean;
+  focus?: boolean;
   className?: string;
   as?: ElementType;
   style?: CSSProperties;
@@ -46,7 +47,7 @@ let lastY = 0;
 let lastT = 0;
 let lastVelocity = 0;
 
-function ensureTracker() {
+export function ensureTracker() {
   if (trackerReady || typeof window === "undefined") return;
   trackerReady = true;
   lastY = window.scrollY;
@@ -75,7 +76,7 @@ function ensureTracker() {
   });
 }
 
-function isJumpArrival() {
+export function isJumpArrival() {
   const now = performance.now();
   if (now < jumpUntil) return true;
   if (now - lastT > VELOCITY_STALE_MS) return false;
@@ -87,7 +88,7 @@ function isJumpArrival() {
  * bounded so the last element of a group can never lag a jump arrival by
  * half a second on top of the transition itself.
  */
-const MAX_DELAY_MS = 360;
+export const MAX_DELAY_MS = 360;
 
 /*
  * Defer a reveal by a timeout, never by requestAnimationFrame. A tab opened
@@ -98,7 +99,7 @@ const MAX_DELAY_MS = 360;
  * whether or not anyone is watching yet. One frame of delay is all this
  * needs; it exists to keep setState out of the effect body.
  */
-function scheduleReveal(run: () => void) {
+export function scheduleReveal(run: () => void) {
   return window.setTimeout(run, 0);
 }
 
@@ -130,6 +131,7 @@ export default function Reveal({
   variant = "rise",
   slow = false,
   immediate = false,
+  focus = false,
   className = "",
   as,
   style,
@@ -199,6 +201,11 @@ export default function Reveal({
     "reveal",
     variant === "fade" ? "reveal--fade" : "",
     slow ? "reveal--slow" : "",
+    /* Focus pull — the element resolves out of a short blur as it settles.
+       Opt-in, never the default: see the four mechanical points in the
+       focus-pull block in globals.css, of which the third is why the masthead
+       must not carry this. */
+    focus ? "reveal--focus" : "",
     /* Server-rendered, and the whole point: `.reveal--arrival` carries a CSS
        animation that plays from parse time, so an entrance with no runtime
        input stops being gated on hydration. See the arrival block in

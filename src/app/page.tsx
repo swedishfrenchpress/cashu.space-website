@@ -53,7 +53,7 @@ export default function Home() {
           <HeroField />
           <div className="hero-spec__inner page-shell">
             <div className="hero-spec__content">
-              <Reveal immediate delay={120}>
+              <Reveal immediate focus delay={120}>
                 {/* The break is authored, not left to the wrapper. DESIGN.md
                     §3: the line break in Display copy is part of the
                     composition, not an accident of viewport — and it was an
@@ -101,10 +101,10 @@ export default function Home() {
                   should come back as a figure (DESIGN.md §4, the Honest-Network
                   Rule), not as a paragraph bolted in here. Don't refill this
                   slot with prose. */}
-              <Reveal immediate delay={240}>
+              <Reveal immediate focus delay={240}>
                 <p className="hero-spec__deck">Instant, bearer, peer-to-peer.</p>
               </Reveal>
-              <Reveal immediate delay={360}>
+              <Reveal immediate focus delay={360}>
                 <div className="hero-spec__cta">
                   <Link href="/wallets" className="btn-primary">
                     <span>Get a wallet</span>

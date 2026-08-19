@@ -386,6 +386,30 @@ html {
   --dur-base: 220ms;
   --dur-reveal: 620ms;
   --dur-reveal-slow: 880ms;
+
+  /*
+   * The focus pull (2026-08-19, user-directed). Blur radii are per-consumer
+   * rather than global, because a radius is only meaningful against the type
+   * it softens: 18px reads as a hair of softness under a 9rem headline and as
+   * an illegible smear under a 13px button label. The defaults below are the
+   * fallback for a consumer that states nothing; the hero states all three.
+   * See the focus-pull block further down for the mechanics.
+   */
+  --reveal-blur: 10px;
+  --reveal-blur-section: 6px;
+  /* Fraction of the settle that the blur is given. The focus pull finishes
+     first and the rise lands under an already-sharp word; blur and position
+     resolving together is one soft mush, and in the hero it would also leave
+     hero-cipher.tsx scrambling behind a lens for most of its pass. */
+  --reveal-focus-span: 0.55;
+
+  /*
+   * Section rise. Deliberately larger than the arrival's 8px: under editorial
+   * type at this scale 8px reads as a twitch rather than a settle, which was
+   * the whole of the complaint that produced this block. Transform-only
+   * movement does not contribute to CLS, so the amplitude costs nothing.
+   */
+  --reveal-rise-section: 20px;
 }
 
 /*
@@ -490,7 +514,8 @@ html {
  * the page transparent indefinitely. The recovery must be a cut, not a fade.
  * Specificity (0,1,1) intentionally beats .reveal--slow / .reveal--instant.
  */
-html:not(.js) .reveal {
+html:not(.js) .reveal,
+html:not(.js) .reveal-group .reveal-item {
   transition: none;
 }
 
@@ -598,6 +623,254 @@ html:not(.js) .reveal {
 }
 
 /*
+ * THE FOCUS PULL — `.reveal--focus`, added 2026-08-19 on the user's
+ * direction. Type arrives fractionally out of focus and resolves.
+ *
+ * THIS IS THE FIRST BLUR ON THE SITE SINCE THE NAVBAR'S GLASS WENT, and
+ * DESIGN.md §4 currently forbids blur without remainder. Read the Focus-Pull
+ * Rule there before extending it. The short of it: what that clause forbids is
+ * blur as *depth* — a standing surface pretending to sit above another one,
+ * which is the glass this site spent a day deleting. A focus pull holds no
+ * state, describes no plane, and there is no frame at which two surfaces
+ * coexist. It is a property of the entrance and it is gone when the entrance
+ * is. That is the whole of the licence and it reaches no resting surface.
+ *
+ * FOUR MECHANICAL POINTS, ALL LOAD-BEARING.
+ *
+ * 1. IT ENDS ON `filter: none`, NEVER ON `blur(0px)`. A settled `blur(0)`
+ *    keeps the element in a filter context for the life of the page: a
+ *    compositor layer that is never released, and grayscale antialiasing on
+ *    type the platform would otherwise render itself. Under a 9rem
+ *    GT-Standard headline that is a permanent downgrade bought for no effect.
+ *    The transition path gets this free — its hidden state is a `:not()` gate,
+ *    so the settled element simply has no filter declared rather than a zeroed
+ *    one. The keyframes have to say it out loud, and do.
+ *
+ * 2. THE BLUR CLEARS AT --reveal-focus-span, NOT AT THE END. See the token.
+ *
+ * 3. `filter` IS COMPOSITED IN CHROMIUM, but its shader runs over the whole
+ *    layer every frame, so the cost scales with the element's *area* and the
+ *    square of the radius. That is why blur is a modifier on `.reveal` rather
+ *    than its default: the masthead sits in a Reveal (site-header.tsx) and
+ *    must never blur, and nothing should wrap a live canvas in a filter for
+ *    longer than the canvas's own entrance.
+ *
+ * 4. `filter` MAKES AN ELEMENT A CONTAINING BLOCK for absolutely positioned
+ *    descendants, and a stacking context besides. Every consumer today has
+ *    its own `position: relative` child sitting between it and anything
+ *    absolute — the implementations Card resolves against the `.relative`
+ *    *inside* its reveal, not against the reveal — which is why nothing moved.
+ *    Check that before putting one further up a tree.
+ */
+@keyframes reveal-arrival-focus {
+  from {
+    opacity: 0.02;
+    transform: translateY(8px);
+    filter: blur(var(--reveal-blur));
+  }
+  /* Authored as a percentage rather than derived from --reveal-focus-span,
+     because keyframe offsets cannot read a custom property. The two are the
+     same number and must be changed together. */
+  55% {
+    filter: none;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes reveal-arrival-fade-focus {
+  from {
+    opacity: 0.02;
+    filter: blur(var(--reveal-blur));
+  }
+  55% {
+    filter: none;
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+/* Transition path — `focus` without `immediate`. Nothing uses this today
+   (the hero is the only consumer and it is an arrival), but a modifier that
+   silently does nothing on two thirds of the component's API is a trap. */
+:where(html.js) .reveal--focus:not(.is-revealed) {
+  filter: blur(var(--reveal-blur));
+}
+
+.reveal--focus {
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-quart),
+    transform var(--dur-reveal) var(--ease-out-quart),
+    filter calc(var(--dur-reveal) * var(--reveal-focus-span))
+      var(--ease-out-quart);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* (0,2,0), and both must sit after the (0,2,0) fade/slow rules above so
+   source order lands the right animation on a compound modifier. */
+:where(html.js) .reveal--arrival.reveal--focus {
+  animation-name: reveal-arrival-focus;
+}
+
+:where(html.js) .reveal--arrival.reveal--fade.reveal--focus {
+  animation-name: reveal-arrival-fade-focus;
+}
+
+/*
+ * Hero radii. Stated per element because a blur radius is only meaningful
+ * against the type it softens — see the token comment. `:has()` rather than a
+ * marker class or an inline style: the value belongs in the stylesheet next to
+ * its reasoning, and the elements it keys off are the ones the composition is
+ * already named after.
+ *
+ * The headline's 18px is roughly a tenth of its cap height at the top of the
+ * clamp. It has to be this large to register at all: the entrance eases on
+ * --ease-out-quart, which carries opacity past 90% inside the first 45% of the
+ * duration, so the blur is only *visible* for the first few frames and a
+ * radius picked by eye at rest disappears entirely in motion.
+ */
+.reveal--focus:has(> .hero-spec__headline) {
+  --reveal-blur: 18px;
+}
+
+.reveal--focus:has(> .hero-spec__deck) {
+  --reveal-blur: 9px;
+}
+
+.reveal--focus:has(> .hero-spec__cta) {
+  --reveal-blur: 4px;
+}
+
+/*
+ * Route headers (/wallets). One reveal wraps display type and a lead
+ * paragraph together, so this radius is a compromise between the two rather
+ * than a value picked for either: 18px would smear the lead, and the 10px
+ * default all but vanishes under a 9rem H1. The rest of that page — the group
+ * headings and the thirteen directory rows — deliberately takes no focus
+ * pull. It is a listing, not a statement, and thirteen simultaneous blurred
+ * layers is the case point 3 above is about.
+ */
+.reveal--focus:has(.t-display) {
+  --reveal-blur: 12px;
+}
+
+/*
+ * GROUP REVEALS — `.reveal-group` / `.reveal-item`. One observer per section,
+ * not one per element. Added 2026-08-19 with the focus pull, and the other
+ * half of the same complaint: the page did fade, but it faded as sixteen
+ * unrelated 8px twitches that happened to be near each other.
+ * `.protocol-parts` alone ran eighteen IntersectionObservers, one per
+ * `<Reveal>`, each deciding on its own when its own element had arrived.
+ *
+ * A `.reveal-group` is observed once (reveal-group.tsx) and stamps
+ * `.is-revealed` on itself. Its `.reveal-item` descendants are plain
+ * server-rendered elements — no client component, no effect, no observer of
+ * their own — that settle off the group's class with the same authored
+ * `--reveal-delay` stagger they carried before. Eighteen observers became
+ * five, four client components became one, and the section now arrives as one
+ * gesture instead of as a sequence of unrelated ones.
+ *
+ * The hidden state is a `:not(.is-revealed)` gate rather than a hidden/shown
+ * pair, so the settled state is the element's own: no opacity, no transform,
+ * no filter, nothing left applied when it lands. That is also what gives the
+ * blur its `filter: none` ending for free (point 1 above).
+ *
+ * Gated on html.js for the reason `.reveal` is, and rescued by the same
+ * failsafe: layout.tsx probes for `.reveal.is-revealed`, which every route
+ * still produces from its arrival reveals, and drops html.js if nothing
+ * revealed — which un-hides these too.
+ */
+:where(html.js) .reveal-group:not(.is-revealed) .reveal-item {
+  opacity: 0;
+  transform: translateY(var(--reveal-rise-section));
+  filter: blur(var(--reveal-blur-section));
+  /* Compositor hint only while it can still pay for itself, as on .reveal.
+     The filter promotes the element on its own, so this is really about the
+     frames before the transition starts. */
+  will-change: opacity, transform, filter;
+}
+
+.reveal-item {
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-quart),
+    transform var(--dur-reveal) var(--ease-out-quart),
+    filter calc(var(--dur-reveal) * var(--reveal-focus-span))
+      var(--ease-out-quart);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* Section headings carry the group's weight and take a radius to match, on
+   the same reasoning as the hero's. */
+.reveal-item:has(> .t-headline),
+.reveal-item:has(> .protocol-part__title),
+.reveal-item:has(> .protocol-parts__title) {
+  --reveal-blur-section: 10px;
+}
+
+/*
+ * Jump arrivals, matching `.reveal--instant`: the visitor is already looking
+ * at the destination, so the settle would read as a dead page. No rise, no
+ * blur, no stagger, one brisk fade. (0,2,0), which is under the hidden rule's
+ * (0,3,0) — that is fine, because a group is only ever `--instant` at the
+ * same moment it is `.is-revealed`, so the hidden rule has stopped matching.)
+ */
+.reveal-group--instant .reveal-item {
+  transform: none;
+  filter: none;
+  transition-duration: var(--dur-fast);
+  transition-delay: 0ms;
+}
+
+/*
+ * The authored stagger, in one table rather than scattered across four
+ * components as inline `delay={}` props. These are the same rhythms the
+ * per-element reveals carried, pulled tighter: a group is meant to read as
+ * one gesture with internal order, so the tail of a section now lands inside
+ * 300ms of its head instead of trailing it by 360ms plus a 620ms settle.
+ *
+ * Nothing here exceeds the 360ms ceiling `MAX_DELAY_MS` used to enforce in
+ * reveal.tsx, so no cap is reimplemented. Jump arrivals drop every delay to
+ * zero through .reveal-group--instant above, which is the case the ceiling
+ * existed for.
+ */
+.protocol-parts__aside-inner .reveal-item + .reveal-item {
+  --reveal-delay: 80ms;
+}
+
+.protocol-part__head {
+  --reveal-delay: 70ms;
+}
+
+.protocol-part__body {
+  --reveal-delay: 140ms;
+}
+
+.protocol-part__plate {
+  --reveal-delay: 210ms;
+}
+
+.implementations-intro .reveal-item + .reveal-item {
+  --reveal-delay: 100ms;
+}
+
+.implementations-spec {
+  --reveal-delay: 200ms;
+}
+
+.implementations-cta {
+  --reveal-delay: 300ms;
+}
+
+.press-rail {
+  --reveal-delay: 100ms;
+}
+
+/*
  * Draw-on — SVG line art animates from invisible to fully drawn. Uses
  * stroke-dasharray + stroke-dashoffset on a per-shape basis with
  * pathLength="1" so authors don't need to compute path length manually.
@@ -644,11 +917,30 @@ html:not(.js) .reveal {
      .hero-spec::after, which lost it once already. */
   .reveal--arrival,
   .reveal--arrival.reveal--fade,
-  .reveal--arrival.reveal--slow {
+  .reveal--arrival.reveal--slow,
+  /* Same trap, one level deeper: the focus modifier's hidden state is
+     `:where(html.js) .reveal--focus:not(.is-revealed)`, which is (0,2,0), and
+     its arrival compound is (0,2,0) too. Both are repeated here at their own
+     weight so they tie and lose to source order. A bare `.reveal` would not
+     cancel either of them, and the page would keep a lens on its headline for
+     someone who asked for less motion. */
+  .reveal--focus,
+  .reveal--focus:not(.is-revealed),
+  .reveal--arrival.reveal--focus,
+  .reveal--arrival.reveal--fade.reveal--focus {
     opacity: 1;
     transform: none;
+    filter: none;
     transition: none;
     animation: none;
+  }
+  /* (0,3,0), tying the group's hidden rule and winning on source order. */
+  .reveal-group:not(.is-revealed) .reveal-item,
+  .reveal-item {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
   }
   .draw-on,
   .draw-on--filled {

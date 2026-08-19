@@ -310,6 +310,21 @@
         "purpose": "The slow entrance for large media and figure panels."
       },
       {
+        "name": "reveal-focus",
+        "value": "blur(var(--reveal-blur)) to filter:none, cleared at 55% of the settle",
+        "purpose": "The focus pull (.reveal--focus): type arrives fractionally out of focus and resolves. Opt-in, never the default. Added 2026-08-19 on the user's direction; it is the site's only sanctioned blur and the only one that will ever be sanctioned, because it is a property of an entrance rather than a surface. Three terms are load-bearing. It ends on filter:none and never on blur(0px) — a settled blur(0) keeps a compositor layer and grayscale antialiasing on 9rem type for the life of the page. It clears at 55% so the rise lands under an already-sharp word and hero-cipher.tsx gets a sharp surface for the tail of its 760ms pass. It is a modifier because the masthead sits in a Reveal and a live canvas must not be wrapped in a filter. LCP measured either way on a throttled phone: 612/632ms with, 636/624ms without, same LCP element, CLS 0 — blur does not disqualify an LCP candidate the way opacity:0 does. See the Focus-Pull Rule in DESIGN.md section 4."
+      },
+      {
+        "name": "reveal-blur",
+        "value": "10px default; 18px hero headline, 12px route header, 9px hero deck, 6px section item, 4px hero CTA row",
+        "purpose": "Focus-pull radius, stated per consumer rather than globally. A radius is only meaningful against the type it softens: 18px is a hair of softness under a 9rem headline and an illegible smear under a 13px button label. Authored in globals.css with :has() against the composition's own class names, so the value sits next to its reasoning rather than inline in JSX."
+      },
+      {
+        "name": "reveal-rise-section",
+        "value": "20px",
+        "purpose": "The below-the-fold rise, against the arrival's 8px. Under editorial type at this scale 8px reads as a twitch rather than a settle, which was the complaint that produced the group reveals. Transform-only movement contributes nothing to CLS, so the amplitude is free. See the Section-Gesture Rule in DESIGN.md section 4."
+      },
+      {
         "name": "dur-nav-wipe",
         "value": "460ms",
         "purpose": "The masthead hover plate's clip-path wipe travelling across a nav label. Deliberately slower than dur-base: at feedback speed a travelling edge across a whole word reads as a flicker rather than a slide. (Replaces dur-nav/300ms, which documented the retired Onyx condense and had no consumers left; the dead token was removed from globals.css 2026-08-17.)"
@@ -543,5 +558,5 @@
     ]
   },
   "handPatchedAt": "2026-08-17T20:10:00Z",
-  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, dur-nav replaced by the wipe it should always have named, and the font masters moved out of public/."
+  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, dur-nav replaced by the wipe it should always have named, and the font masters moved out of public/. 2026-08-19: added the focus pull (reveal-focus, reveal-blur) and the section rise (reveal-rise-section) alongside the group-reveal refactor; see the Focus-Pull and Section-Gesture rules in DESIGN.md section 4."
 }
