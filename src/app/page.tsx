@@ -50,7 +50,7 @@ export default function Home() {
             it. */}
         <section className="hero-spec">
           <HeroField />
-          <div className="hero-spec__inner page-shell">
+          <div className="hero-spec__inner">
             <div className="hero-spec__content">
               <Reveal immediate focus delay={120}>
                 {/* The break is authored, not left to the wrapper. DESIGN.md
@@ -85,10 +85,12 @@ export default function Home() {
                     all the way down.) */}
                 <h1 className="hero-spec__headline">
                   <span className="hero-spec__line">Open source</span>{" "}
-                  <span className="hero-spec__line">
+                  <span className="hero-spec__line hero-spec__line--flat">
                     <span className="hero-wipe">ecash</span>
                   </span>{" "}
-                  <span className="hero-spec__line">for bitcoin.</span>
+                  <span className="hero-spec__line hero-spec__line--flat">
+                    for bitcoin.
+                  </span>
                 </h1>
               </Reveal>
               {/* The deck stands alone. The body sentence explaining the

@@ -274,9 +274,13 @@ uniform vec3 uWake;
 uniform float uOccupancy;
 uniform float uWakeGain;
 uniform float uTrailStrength;
-/** xy = centre of the title block, zw = its half-extents, in device pixels. */
+/** xy = centre of the cleared zone, zw = its half-extents, in device pixels. */
 uniform vec4 uSafeBox;
-/** Ground falloff, as a FRACTION of the box-edge-to-canvas-edge gap. */
+/** Distance from the box's edge to the canvas edge the ground falls off
+    across, per axis, in device pixels. Supplied by the CPU rather than derived
+    here — see the note in main(). */
+uniform vec2 uSafeGap;
+/** Ground falloff, as a FRACTION of uSafeGap. */
 uniform float uSafeFeather;
 /** Trail falloff, in device pixels — see the note in main(). */
 uniform float uTrailInset;
@@ -337,11 +341,17 @@ void main() {
    * The trail keeps an absolute inset: it should hug the letterforms at the
    * same distance whatever the viewport, because it is about the type, not
    * about the section.
+   *
+   * THE GAP ITSELF IS COMPUTED ON THE CPU (2026-08-20). It used to be derived
+   * here as the box's distance to the NEARER canvas edge, which is only right
+   * for a box sitting near the middle. The hero is left-aligned now, and for an
+   * off-centre box that term collapses: the near side runs out first, the
+   * subtraction goes negative, the max() clamps it to one pixel, and the spread term
+   * saturates the instant it leaves the box — the feather becomes a hard edge
+   * on the side where there is actually the most room. The CPU knows which run
+   * matters and says so; this shader should not be guessing at layout.
    */
-  vec2 gap = max(vec2(1.0),
-                 vec2(min(uSafeBox.x, uResolution.x - uSafeBox.x),
-                      min(uSafeBox.y, uResolution.y - uSafeBox.y)) - uSafeBox.zw);
-  float spread = length(max(q, 0.0) / gap);
+  float spread = length(max(q, 0.0) / uSafeGap);
 
   float groundCoverage = smoothstep(0.0, uSafeFeather, spread) * edgeFade;
   float trailCoverage = smoothstep(-uTrailInset, uTrailInset, boxDist) * edgeFade;

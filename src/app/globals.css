@@ -174,13 +174,29 @@
   --dur-draw-on: 1100ms;
 
   /*
-   * Ceiling on the viewport-filling hero. The hero's fixed parts top out
-   * (headline caps at 6.5rem, terrain band at 320px), so past this height the
-   * surplus above the band stops reading as air and starts reading as a void.
-   * Beyond the cap the hero simply stops chasing the viewport and the next
-   * section peeks in — the pre-viewport-fill behaviour, never worse.
+   * Ceiling on the viewport-filling hero. The hero's fixed parts top out (the
+   * headline caps at 9rem and the title block is optically centred against the
+   * closing hairline), so past this height the surplus stops reading as air and
+   * starts reading as a void. Beyond the cap the hero simply stops chasing the
+   * viewport and the next section peeks in — the pre-viewport-fill behaviour,
+   * never worse.
+   *
+   * Corrected 2026-08-20: this comment cited "headline caps at 6.5rem, terrain
+   * band at 320px". The bespoke 6.5rem step was retired 2026-08-14 and the
+   * terrain band 2026-08-16; the bound itself never changed.
    */
   --hero-max: 1200px;
+
+  /*
+   * Horizontal counterpart to --hero-max, added 2026-08-20 with the split
+   * hero. The hero is full-bleed (it has to be — see .hero-spec__headline),
+   * so without a bound the title block would pin to the far left edge of an
+   * ultrawide display while every other section stays centred on --page-max.
+   * Past this width the block centres against this measure instead and the
+   * field takes the surplus, which is what §5 asks for: a large screen should
+   * give the title block more air, not the same air with more field around it.
+   */
+  --hero-column-max: 1600px;
 
   /*
    * Section cadence — DESIGN.md Principle 4 (Editorial pacing). Sections
@@ -1690,17 +1706,51 @@ html:not(.js) .reveal-group .reveal-item {
  * so nothing is drawn behind the headline in the first place. Both, because
  * the stacking is structural and the mask is compositional.
  */
+/*
+ * The hero is full-bleed as of 2026-08-20 — it no longer carries .page-shell.
+ *
+ * DESIGN.md §5 licenses the shell break in exactly two places, the split spec
+ * sheet and the hero, and the standard is a measured column-width failure.
+ * This is one. The widest authored headline line, OPEN SOURCE, sets 1003px at
+ * the top of the Display clamp; the shell caps content at 1088px from 1600px
+ * viewport up, so a second column gets 80px at 1920 and there is no split to
+ * build. Shrinking the type is closed by name (§3: no homepage-only Display
+ * step — that is what let /wallets out-shout the front door), and shortening
+ * the copy does not rescue it either, since FOR BITCOIN. alone sets 936px.
+ *
+ * The inset is asymmetric on purpose. Start is the ordinary gutter until the
+ * viewport passes --hero-column-max, then the block centres against that
+ * measure; end stays the gutter because nothing is aligned to it — the field
+ * runs under it and off the edge.
+ */
 .hero-spec__inner {
   position: relative;
   z-index: 1;
   margin-block: auto;
+  width: 100%;
+  padding-inline-start: max(
+    var(--page-x),
+    calc((100vw - var(--hero-column-max)) / 2)
+  );
+  padding-inline-end: var(--page-x);
 }
 
+/*
+ * Left-aligned as of 2026-08-20, on the user's direction. This retires the
+ * Centred-Hero Exception (DESIGN.md §4) and the hero now sets flush left like
+ * every other surface on the site.
+ *
+ * align-items is flex-start and NOT stretch, and that is load-bearing twice:
+ * it is what left-aligns the block, and it is what keeps each <Reveal> wrapper
+ * shrink-to-fit. The field's mask measures the union of this element's
+ * children, so stretched wrappers would report the full section width and the
+ * boundary would land off the right edge of the canvas.
+ */
 .hero-spec__content {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
@@ -1735,12 +1785,13 @@ html:not(.js) .reveal-group .reveal-item {
      retyped markup, so the source string stays sentence case for screen
      readers and search engines. */
   text-transform: uppercase;
-  /* No optical-left correction: the hero is centred, so there is no left
-     margin for glyph side bearing to sit against. The corrections that used
-     to live here (headline 0.058em, deck and body 0.095em) were removed with
-     the switch to centred — reinstate them together if it ever goes back to
-     left-aligned, or the ink staggers by up to 8px at large sizes. */
-  margin: 0;
+  /* Optical-left correction, reinstated 2026-08-20 with the left-aligned
+     hero — the note that used to sit here said to bring these back together
+     with the alignment, and this is that. Glyph side bearing has to be
+     cancelled against a left margin or the inked edge staggers by up to 8px at
+     Display size. Measured for GT-Standard 600: 0.058em for the round cap
+     "O" that opens line one. In em, so it tracks the clamp. */
+  margin: 0 0 0 -0.058em;
   color: var(--ink);
   /*
    * The headline is the one element allowed out of the page shell.
@@ -1757,8 +1808,7 @@ html:not(.js) .reveal-group .reveal-item {
    * spanning wider than its supporting copy is the point of a centred
    * composition, not a misalignment.
    *
-   * RETIRED 2026-08-16. All of the above is history: the headline is back on
-   * the page shell's own measure, the same one the deck and the CTAs use.
+   * RETIRED 2026-08-16, then REPLACED 2026-08-20. Both are history now.
    *
    * The escape was necessary and it was not sufficient. The headline is
    * THREE lines, not the two this comment used to promise: measured at 144px
@@ -1767,21 +1817,33 @@ html:not(.js) .reveal-group .reveal-item {
    * splits overflowed. The old "~1283px to break cleanly in two" figure was
    * wrong. Once the rag was authored in the markup instead of balanced (see
    * page.tsx), the widest line became "OPEN SOURCE" at 1003px — which the
-   * shell's 1088px already holds, so the extra 352px bought nothing.
+   * shell's 1088px already held, so the extra 352px bought nothing and the
+   * escape was retired as a visual no-op.
    *
-   * Measured at 768/1024/1280/1440/1600/1920/2560 before and after: three
-   * lines at every width either way, identical. The lines are centred and
-   * none of them fills either box, so retiring it is a visual no-op.
+   * The split hero re-opened the question and answered it a third way: the
+   * measure is neither the viewport nor the shell, it is the TYPE'S OWN.
    *
-   * The property stays rather than being deleted: .hero-spec__content is
-   * `align-items: center`, so with no width the h1 shrinks to max-content and
-   * .hero-spec's `overflow: hidden` clips it on narrow viewports. An explicit
-   * width is load-bearing; only its value changed.
+   * 1003px at 144px is 6.97em, and font-size is clamp(3.75rem, 9vw, 9rem), so
+   * a width stated in em tracks the clamp exactly — the box is as wide as the
+   * longest line needs at every step, and no wider. That is also what makes
+   * the split resolve at all: the column is 6.97/9ths of a vw-sized headline,
+   * i.e. ~63% of viewport width while the clamp is in its 9vw regime, leaving
+   * the field a consistent ~31% from 1024 to 1600 and more above.
+   *
+   * 7em, not 6.97em: the measured figure is the ink, and rounding down would
+   * put the box inside it.
+   *
+   * The viewport term is still the other half of the min(). Below 640px the
+   * spans go back to inline and balance re-rags the line; there 7em overflows
+   * a phone and the gutter measure is what holds.
+   *
+   * The property stays rather than being deleted, for the same reason as
+   * before: .hero-spec__content is not `stretch`, so with no width the h1
+   * shrinks to max-content and .hero-spec's `overflow: hidden` clips it on
+   * narrow viewports. An explicit width is load-bearing; only its value has
+   * changed, twice.
    */
-  width: min(
-    calc(100vw - 2 * var(--page-x)),
-    calc(var(--page-max) - 2 * var(--page-x))
-  );
+  width: min(7em, calc(100vw - 2 * var(--page-x)));
   max-width: none;
 }
 
@@ -1807,6 +1869,31 @@ html:not(.js) .reveal-group .reveal-item {
   .hero-spec__line {
     display: block;
   }
+
+  /*
+   * Per-line optical left, measured 2026-08-20 at 1440 (129.6px type).
+   *
+   * The h1's own -0.058em is the correction for the ROUND cap that opens line
+   * one, and it lands that line's ink 0.6px off the intended margin and within
+   * 1px of the deck's. It cannot also be right for lines opening on a flat cap:
+   * measured, "OPEN SOURCE" inked at 87px while "ECASH" and "FOR BITCOIN." both
+   * inked at 91px — a 4px stagger, with the flat caps sitting inside the margin
+   * rather than on it.
+   *
+   * 4px at 129.6px is 0.031em, which puts the flat-cap lines at 0.089em total.
+   * DESIGN.md's independently measured flat-cap value is 0.095em — the same
+   * number the deck carries. So this is not a new constant: it is the second of
+   * the two documented values, applied where it belongs. This span carries the
+   * difference between them, because the block already supplies the first.
+   *
+   * Scoped to this breakpoint on purpose. Below 640px the spans go back to
+   * being inline and the rag re-wraps, so which glyph opens a visual line is no
+   * longer a markup fact — there the h1's single correction is all that applies,
+   * and it is the right one, because the wrapped first line still starts on "O".
+   */
+  .hero-spec__line--flat {
+    margin-left: -0.037em;
+  }
 }
 
 /*
@@ -1823,7 +1910,12 @@ html:not(.js) .reveal-group .reveal-item {
   line-height: 1.15;
   letter-spacing: -0.015em;
   color: var(--ink);
-  margin: 0;
+  /* Optical-left correction, reinstated 2026-08-20 with the alignment. The
+     deck opens on a flat cap ("I"), which carries more side bearing than the
+     headline's round "O" — measured 0.095em for GT-Standard against the
+     headline's 0.058em. Two different values because they are two different
+     glyphs, not because one of them is a guess. */
+  margin: 0 0 0 -0.095em;
   text-wrap: balance;
   text-transform: uppercase;
 }
@@ -1834,7 +1926,7 @@ html:not(.js) .reveal-group .reveal-item {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: clamp(0.75rem, 1.5vw, 1rem);
 }
 
