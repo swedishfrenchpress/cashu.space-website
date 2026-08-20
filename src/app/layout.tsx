@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import ConsoleSignature from "@/components/console-signature";
 import ButtonCipher from "@/components/button-cipher";
 import Keymap from "@/components/keymap";
+import MotionUITheme from "@/components/motion-ui/theme-provider";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
@@ -201,7 +202,7 @@ export default function RootLayout({
         <ConsoleSignature />
         <ButtonCipher />
         <Keymap />
-        {children}
+        <MotionUITheme>{children}</MotionUITheme>
       </body>
     </html>
   );
