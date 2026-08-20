@@ -272,17 +272,7 @@
       {
         "name": "ease-out-quart",
         "value": "cubic-bezier(0.25, 1, 0.5, 1)",
-        "purpose": "The system default. Every state transition, entrance, and draw-on uses it unless noted."
-      },
-      {
-        "name": "ease-out-quint",
-        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Held for longer editorial settles."
-      },
-      {
-        "name": "ease-out-expo",
-        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Held for the sharpest deceleration. Used sparingly."
+        "purpose": "The system's ONLY curve as of 2026-08-20. Every state transition, entrance, draw and wipe on the site uses it. ease-out-quint (0.22, 1, 0.36, 1) and ease-out-expo (0.16, 1, 0.3, 1) sat beside it from the first motion pass and never acquired a consumer; they were deleted on the reasoning DESIGN.md section 2 used for --signal, since a token standing with no consumer is an invitation to reach for it without re-arguing the choice. A softer landing than quart should arrive with the surface that needs it and an argument for it."
       },
       {
         "name": "dur-fast",
@@ -297,7 +287,7 @@
       {
         "name": "dur-reveal",
         "value": "620ms",
-        "purpose": "The standard entrance settle: opacity plus an 8px rise. Scroll-triggered reveals run it as a transition gated on .is-revealed; unconditional ones run it as the reveal-arrival keyframe animation from parse time (see reveal-arrival below)."
+        "purpose": "The standard entrance settle: opacity plus an 8px rise. Scroll-triggered reveals run it as a transition gated on .is-revealed; unconditional ones run it as the reveal-arrival keyframe animation from parse time (see reveal-arrival below). As of 2026-08-20 the settled state is `transform: none`, not `translateY(0)`: the Focus-Pull Rule's first term applied to a third property — an entrance ends on the absence of what it animated, not on a neutral value of it — since translateY(0) left every settled reveal holding a containing block and a compositing hint. .reveal--fade and .reveal--instant already said none."
       },
       {
         "name": "reveal-arrival",
@@ -340,9 +330,29 @@
         "purpose": "The button label's encrypt-to-decrypt sweep. Pointer only, never focus. Removed entirely under prefers-reduced-motion. ONE consumer as of 2026-08-19: the hero ran the same primitive decrypt-only over one word of the headline until the user cut it as corny and too on the nose. See hero-word-wipe below and the Set-Once Rule's third amendment in DESIGN.md section 4."
       },
       {
-        "name": "draw-on",
+        "name": "dur-draw-on",
         "value": "1100ms",
-        "purpose": "SVG line art tracing itself via stroke-dashoffset, staggered per shape. Honest-Network: the line being drawn is the structure being described."
+        "purpose": "A line drawing itself. ONE consumer as of 2026-08-20: the hero's closing hairline, via clip-path. The second was .draw-on, SVG line art via stroke-dashoffset, which shared this duration because it was the same gesture at another scale; that rule set was deleted with the figures that used it (the ASCII field and the demo panel, both gone since 2026-08-16), and it took the stylesheet's only untokenized duration, a raw 480ms, with it. The token stays on its own consumer's account."
+      },
+      {
+        "name": "reveal-group-wallets",
+        "value": "rail 0ms, rows 60/100/140/180/220/260ms",
+        "purpose": "The wallets registry stagger (2026-08-20), applying the Section-Gesture Rule to the route the 2026-08-19 pass had skipped. Authored in globals.css keyed on .reveal-group .wallet-row:nth-child(), not as delay props — and that is the point rather than a preference: the props this replaced were 280 + gi*60 + i*50, which MAX_DELAY_MS clamped to a flat 360ms from the third row on, so the ladder was written, committed and silently thrown away. A delay expressed as a prop passes through a clamp it cannot see. 40ms a step, shorter than the arrival's, because a registry row is one line of type and the beat between two of them is shorter than the beat between a headline and a paragraph. The rows also take --reveal-blur-section 4px against the section default's 6px, on the same per-consumer reasoning as reveal-blur. The first group stays an arrival: its rail is above the fold at every viewport and a group is observer-gated, therefore hydration-gated. Net 21 client components and 21 observers to 6 and 3."
+      },
+      {
+        "name": "sheet-open",
+        "value": "220ms in (dur-base), 150ms out (dur-fast), ease-out-quart, clip-path inset top to bottom",
+        "purpose": "The ? help sheet opening and closing (2026-08-20). It was the only state change on the site with no transition at all. The material is the site's own travelling edge — the same clip-path uncovering the masthead plate, hero-rule-draw and .hero-wipe use — but it runs top to bottom rather than left to right, because left to right is how this site uncovers a WORD and this is a PANEL: the reference is the mobile nav sheet growing out of the bar, and a sideways wipe across a six-row table would uncover it column by column. The backdrop only fades; ground has no edge. The exit is the fast one in both properties, since a transition takes the duration of the state it is going to, so the base rule governs the close and [open] governs the open. display and overlay transition with allow-discrete, which is the whole reason an exit exists; @starting-style supplies the from-values for the open, since an element entering the top layer has no previous style. ONE COST, RECORDED: the settled [open] state holds clip-path inset(0 0 0 0), a standing clipping context — bounded to the time the sheet is open rather than the life of the page, and unavoidable for a wipe because inset() does not interpolate to none. Under reduced motion the wipe is cancelled and the fade kept."
+      },
+      {
+        "name": "press-feedback",
+        "value": "scale(0.985) at 150ms on :active; hover treatments paired onto :focus-visible",
+        "purpose": "Feedback parity, 2026-08-20. .press-arrow was the only real <button> on the site with no pressed state; it takes the compression the .btn-* slabs already use, so no new value enters the system. The press cards lifted their photograph and wordmark on :hover and did nothing on :focus-visible, so the keyboard path got an outline and a photograph that did not answer — paired the way .site-nav__link already pairs the two. The hamburger is deliberately excluded: its icon already morphs to an X on activation, which is the same acknowledgement by other means."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "substitute, never kill",
+        "purpose": "Every animation on the site has a prefers-reduced-motion path, and the pattern is the button block's: remove the spatial movement, keep the colour, opacity and state change that carries the meaning. Three motions escaped it until 2026-08-20 — the skip link's translateY, the hamburger bars' rotate-and-move, and the mobile panel's grid-template-rows height animation — plus two JS counterparts: the g i chord's smooth scrollIntoView, and button-cipher.tsx, which read the query once at mount instead of live-tracking it as hero-field.tsx and orb-figure.tsx do. Each CSS cancel sits immediately after the rules it cancels, because the ties are decided on source order."
       }
     ],
     "breakpoints": [
@@ -562,6 +572,6 @@
       "Don't ship Chalk placeholder surfaces in final layouts. They are scaffolding only."
     ]
   },
-  "handPatchedAt": "2026-08-17T20:10:00Z",
-  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, dur-nav replaced by the wipe it should always have named, and the font masters moved out of public/. 2026-08-19: added the focus pull (reveal-focus, reveal-blur) and the section rise (reveal-rise-section) alongside the group-reveal refactor; see the Focus-Pull and Section-Gesture rules in DESIGN.md section 4. Same day: the hero cipher pass was cut for .hero-wipe (hero-word-wipe); cipher-pass is down to one consumer."
+  "handPatchedAt": "2026-08-20",
+  "handPatchNote": "Hand-patched, not regenerated. 2026-08-20: motion extensions updated for the /impeccable animate pass — removed ease-out-quint, ease-out-expo and draw-on (all deleted from globals.css with their consumers), added reveal-group-wallets, sheet-open, press-feedback and reduced-motion, and amended ease-out-quart, dur-draw-on and dur-reveal. See DESIGN.md section 4."
 }

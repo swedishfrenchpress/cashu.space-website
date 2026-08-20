@@ -166,10 +166,12 @@
      flicker instead of a slide. */
   --dur-nav-wipe: 460ms;
 
-  /* A line drawing itself. Two consumers: .draw-on (SVG line art, via
-     stroke-dashoffset) and the hero's closing hairline (via clip-path). Both
-     are the same gesture at different scales, so they share the duration —
-     .draw-on hardcoded 1100ms until 2026-08-16. Named in
+  /* A line drawing itself. ONE consumer as of 2026-08-20: the hero's closing
+     hairline, via clip-path. The second was `.draw-on` — SVG line art via
+     stroke-dashoffset — which shared this duration because it was the same
+     gesture at another scale; that rule set was deleted with the figures that
+     used it (see the note where it lived, below `.reveal-item`). The token
+     stays on its own consumer's account, not as a shared one. Named in
      .impeccable/design.json as `draw-on`. */
   --dur-draw-on: 1100ms;
 
@@ -395,9 +397,16 @@ html {
  * entrances are deliberate (520–720ms), feedback is brisk (150–200ms).
  */
 :root {
+  /* ONE CURVE, AND THE VOCABULARY NOW SAYS SO (2026-08-20). --ease-out-quint
+     (0.22, 1, 0.36, 1) and --ease-out-expo (0.16, 1, 0.3, 1) sat here from the
+     first motion pass and never acquired a consumer: every transition,
+     keyframe and draw on the site runs on quart. Deleted on the reasoning §2
+     used for --signal — a token standing with no consumer is an invitation to
+     reach for it without re-arguing the choice, and "which of our three curves"
+     is exactly the decision that should cost something. If a settle ever needs
+     a softer landing than quart, add the curve with the surface that needs it
+     and say why. */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 150ms;
   --dur-base: 220ms;
   --dur-reveal: 620ms;
@@ -476,6 +485,25 @@ html {
   --spec-card-offset: 176px;
 }
 
+/*
+ * The pane is a real tab stop (see the note above the <pre> in
+ * reference-implementations.tsx) and had no focus style at all, so it fell to
+ * the UA default — the one browser surface on this page still shipping
+ * somebody else's design.
+ *
+ * The ring is white and INSET, on the same reasoning as .site-nav__brand and
+ * .keymap-help: the sitewide ring paints --edge at +4px, which would draw an
+ * Ink line on the Paper *around* a dark pane, partly under the Card that
+ * overlaps its corner, and outlines contribute to scrollable overflow on a
+ * pane that is already the widest thing on a phone. Drawn just inside its own
+ * ground it is white on #18181b and costs no geometry. Paper on ink is the
+ * value .focus-ring--on-ink already uses; only the offset is local.
+ */
+.spec-pane:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -3px;
+}
+
 @media (min-width: 1024px) {
   .spec-pane {
     padding-left: var(--spec-card-offset);
@@ -501,11 +529,6 @@ html {
 .spec-code {
   display: inline-block;
   width: 32ch;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 /*
@@ -565,9 +588,16 @@ html:not(.js) .reveal-group .reveal-item {
   transition: none;
 }
 
+/* `none`, not `translateY(0)` — the same term the focus pull states for filter
+   and .hero-wipe for clip-path: an entrance ends on the ABSENCE of what it
+   animated, not on a neutral value of it. `translateY(0)` is visually identical
+   and interpolates identically from the 8px start, but it leaves every settled
+   reveal holding a transform, which is a containing block for anything
+   positioned inside it and a standing compositing hint. `.reveal--fade` and
+   `.reveal--instant` both already say `none` here; this is the third. */
 .reveal.is-revealed {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 .reveal--fade {
@@ -920,40 +950,81 @@ html:not(.js) .reveal-group .reveal-item {
 }
 
 /*
- * Draw-on — SVG line art animates from invisible to fully drawn. Uses
- * stroke-dasharray + stroke-dashoffset on a per-shape basis with
- * pathLength="1" so authors don't need to compute path length manually.
- * Honest-Network: the line being drawn IS the structure being described.
+ * The wallets registry (2026-08-20). Groups two and up are RevealGroups; the
+ * rail leads at 0 and the entries follow it down the list, so the group reads
+ * as a label finding its entries rather than as a rail and a block.
+ *
+ * The ladder these replaced was a `delay=` prop on every row,
+ * `280 + gi * 60 + i * 50`, and it never rendered: MAX_DELAY_MS clamped it to a
+ * flat 360ms from the third row of the first group onward, so rows 3-6 arrived
+ * simultaneously and the Tools list tied with its own single row. Authored here
+ * the ceiling is a property of the table rather than a clamp applied after the
+ * fact, and the tail lands 260ms behind the head — inside the ~300ms this table
+ * holds itself to above.
+ *
+ * 40ms a step, not the arrival's 50-60: a registry row is one line of type, and
+ * the beat between two of them is shorter than the beat between a headline and
+ * a paragraph. Six steps covers the longest group (Mobile wallets); anything
+ * past that pins, so a seventh entry lengthens the list without lengthening the
+ * gesture.
+ *
+ * Scoped under `.reveal-group` rather than left bare: the first group is an
+ * arrival and its rows are not items, so an unscoped ladder would set a custom
+ * property on six elements that have no rule to consume it. Inert, but it would
+ * read as a stagger that had stopped working.
  */
-.draw-on {
-  transition: stroke-dashoffset var(--dur-draw-on) var(--ease-out-quart);
-  transition-delay: var(--draw-delay, 0ms);
+.reveal-group .wallet-row:nth-child(1) {
+  --reveal-delay: 60ms;
 }
 
-/* Undrawn state gated on html.js for the same no-script reason as .reveal. */
-:where(html.js) .draw-on {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+.reveal-group .wallet-row:nth-child(2) {
+  --reveal-delay: 100ms;
 }
 
-.draw-on--filled {
-  transition: opacity 480ms var(--ease-out-quart);
-  transition-delay: var(--draw-delay, 0ms);
+.reveal-group .wallet-row:nth-child(3) {
+  --reveal-delay: 140ms;
 }
 
-:where(html.js) .draw-on--filled {
-  opacity: 0;
+.reveal-group .wallet-row:nth-child(4) {
+  --reveal-delay: 180ms;
 }
 
-.is-revealed .draw-on,
-.draw-on.is-revealed {
-  stroke-dashoffset: 0;
+.reveal-group .wallet-row:nth-child(5) {
+  --reveal-delay: 220ms;
 }
 
-.is-revealed .draw-on--filled,
-.draw-on--filled.is-revealed {
-  opacity: 1;
+.reveal-group .wallet-row:nth-child(n + 6) {
+  --reveal-delay: 260ms;
 }
+
+/*
+ * A smaller focus-pull radius than the section default, on the token's own
+ * reasoning: a radius is only meaningful against the type it softens. 6px was
+ * picked against homepage body copy running several lines; a registry row is a
+ * 1.125rem wordmark and 13px mono facts on a single line, where the same radius
+ * reads as a smear rather than as type resolving.
+ */
+.reveal-group .wallet-row {
+  --reveal-blur-section: 4px;
+}
+
+/*
+ * DRAW-ON IS DELETED (2026-08-20). It was `.draw-on` / `.draw-on--filled`: SVG
+ * line art tracing itself through stroke-dashoffset off `.is-revealed`, with a
+ * `--draw-delay` stagger. Its consumers were the ASCII field and the demo
+ * panel's figures, both deleted in 2026-08-16's clear-out, and nothing has
+ * carried the class since — so the site shipped a hidden state, an html.js
+ * gate, a reduced-motion cancel and the stylesheet's only untokenized duration
+ * (480ms) for a gesture with nothing to draw.
+ *
+ * `--dur-draw-on` survives because the hero's closing hairline is its other
+ * consumer. The recipe does not survive with it, and that is deliberate: unlike
+ * .prose-link, which is kept as the recipe for a citation because the
+ * alternative is a blue link, this one has no wrong version to prevent — the
+ * next thing that wants to draw itself will be a specific figure with its own
+ * geometry, and it should be written against that rather than inherited from a
+ * shape nobody remembers.
+ */
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
@@ -989,12 +1060,6 @@ html:not(.js) .reveal-group .reveal-item {
     opacity: 1;
     transform: none;
     filter: none;
-    transition: none;
-  }
-  .draw-on,
-  .draw-on--filled {
-    stroke-dashoffset: 0;
-    opacity: 1;
     transition: none;
   }
 }
@@ -1499,6 +1564,21 @@ html:not(.js) .reveal-group .reveal-item {
   outline-offset: 2px;
 }
 
+/*
+ * Immediately after the rules it cancels, not up with the reveal resets: both
+ * are (0,1,0) and source order decides, which is the trap documented beside
+ * .hero-spec::after.
+ *
+ * The link still appears and still takes the ring — the movement goes, not the
+ * feedback. It is the first thing a keyboard visitor reaches on every page, so
+ * this is the one skipped reduced-motion cancel that mattered most.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
+
 /* The skip target carries tabindex="-1" so assistive tech actually moves
    with the link — without it Chrome advances the sequential-focus point but
    AT focus stays in the bar. It is a region, not a control, so it takes no
@@ -1619,9 +1699,10 @@ html:not(.js) .reveal-group .reveal-item {
   background: var(--hair);
 }
 
-/* Gated on html.js for the same reason .draw-on is: without scripting the
-   animation never runs, and an un-run `both`-filled animation would leave
-   the rule clipped to nothing. No JS means the hairline is simply there. */
+/* Gated on html.js for the same reason `.reveal`'s hidden state is: without
+   scripting the animation never runs, and an un-run `both`-filled animation
+   would leave the rule clipped to nothing. No JS means the hairline is simply
+   there. (`.draw-on` used to be the reference for this; it is deleted.) */
 :where(html.js) .hero-spec::after {
   animation: hero-rule-draw var(--dur-draw-on) var(--ease-out-quart) both;
 }
@@ -2490,6 +2571,28 @@ html:not(.js) .reveal-group .reveal-item {
   text-decoration: none;
 }
 
+/*
+ * The two geometric motions in the bar, cancelled after the rules that declare
+ * them — the reduced-motion block up at .site-nav__plate sits several hundred
+ * lines earlier and would silently lose the tie.
+ *
+ * Substitute rather than kill, the pattern the button block sets. The bars snap
+ * to the X instead of rotating through it, and the panel opens at its height
+ * instead of growing to it — but the 150ms opacity fade stays on both, so the
+ * open and the close are still legible as a change of state rather than as the
+ * page cutting between two of them. Padding was already un-transitioned, so
+ * nothing else in the panel moves.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav__toggle-icon > span {
+    transition: none;
+  }
+
+  .site-nav-panel {
+    transition: opacity var(--dur-fast) linear;
+  }
+}
+
 /* Nav-link visibility aligned to Tailwind's lg (1024px). Below lg the
    four labels + brand can crowd the bar; collapsing the labels keeps the
    brand and clock confidently sized at small-laptop and tablet widths. */
@@ -2560,6 +2663,46 @@ html:not(.js) .reveal-group .reveal-item {
   opacity: 1;
 }
 
+/*
+ * The help sheet opens and closes (2026-08-20). It used to do neither: the
+ * dialog and its backdrop were the one state change on the site with no
+ * transition at all, while everything else that opens has one — the mobile
+ * panel over --dur-base, the toast over --dur-fast, the nav plate over
+ * --dur-nav-wipe.
+ *
+ * THE MATERIAL IS ALREADY IN THE VOCABULARY. The sheet is uncovered by a
+ * clip-path inset, which is what the masthead does under a hovered link, what
+ * hero-rule-draw does to the closing hairline, and what .hero-wipe does to the
+ * hero's one word. A travelling edge is the site's way of putting something on
+ * the page, and this is that gesture on the one surface that never got it. The
+ * backdrop only fades: it is ground, and ground does not have an edge.
+ *
+ * It runs top to bottom while every other wipe on the site runs left to right,
+ * and that is a choice rather than a slip. Left to right is how this site
+ * uncovers a WORD — a nav label, the hero's `ecash`, a 1px rule — because that
+ * is the direction the thing is read in. This is a panel, and the site already
+ * has a gesture for a panel opening: the masthead's mobile sheet growing
+ * downward out of the bar. A sideways wipe across a six-row table would uncover
+ * it column by column, which is not the order anybody reads it.
+ *
+ * THE TIMINGS ARE THE PAIR THE SITE ALREADY USES FOR A PANEL OPENING — 220ms
+ * on the sheet and 150ms on the wash, the same two .site-nav-panel runs. The
+ * exit is the fast one in both directions: a transition takes the duration of
+ * the state it is going TO, so the base rule below governs the close and the
+ * [open] rule governs the open. 220ms in, 150ms out.
+ *
+ * `display` and `overlay` are transitioned with allow-discrete, which is the
+ * whole reason there is an exit at all — without it close() drops the element
+ * out of the top layer on the same frame and only the opening would animate.
+ *
+ * ONE COST, RECORDED RATHER THAN HIDDEN. The settled [open] state holds
+ * `clip-path: inset(0 0 0 0)`, which is a standing clipping context — the thing
+ * .hero-wipe's `backwards`-not-`both` rule exists to avoid. It is bounded here
+ * in a way that one was not: it lives only while the sheet is open, not for the
+ * life of the page, and `inset(...)` does not interpolate to `none`, so a wipe
+ * cannot end on the absence of itself. If that trade is ever unwanted the
+ * alternative is opacity plus an 8px translate, which costs the rhyme.
+ */
 .keymap-help {
   border: 1px solid var(--hair);
   background: var(--card);
@@ -2568,10 +2711,52 @@ html:not(.js) .reveal-group .reveal-item {
   width: min(360px, calc(100% - 48px));
   max-width: none;
   margin: auto;
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  transition:
+    opacity var(--dur-fast) var(--ease-out-quart),
+    clip-path var(--dur-fast) var(--ease-out-quart),
+    display var(--dur-fast) allow-discrete,
+    overlay var(--dur-fast) allow-discrete;
+}
+
+.keymap-help[open] {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  transition:
+    opacity var(--dur-fast) var(--ease-out-quart),
+    clip-path var(--dur-base) var(--ease-out-quart),
+    display var(--dur-base) allow-discrete,
+    overlay var(--dur-base) allow-discrete;
+}
+
+/* The from-values for the open direction. An element entering the top layer has
+   no previous style to transition from, so without this the sheet would cut in
+   and only the close would animate. */
+@starting-style {
+  .keymap-help[open] {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
 }
 
 .keymap-help::backdrop {
   background: var(--backdrop);
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast) var(--ease-out-quart),
+    display var(--dur-fast) allow-discrete,
+    overlay var(--dur-fast) allow-discrete;
+}
+
+.keymap-help[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .keymap-help[open]::backdrop {
+    opacity: 0;
+  }
 }
 
 /* showModal() focuses the dialog itself, and Chrome answers with its default
@@ -2614,6 +2799,25 @@ html:not(.js) .reveal-group .reveal-item {
 @media (prefers-reduced-motion: reduce) {
   .keymap-toast {
     transition: none;
+  }
+
+  /* Substitute, don't kill — the pattern the button block sets. The wipe is
+     spatial and goes; the fade stays, so the sheet still reads as arriving and
+     leaving rather than as the page teleporting between two states. The
+     discrete legs stay too, or the exit stops existing again. */
+  .keymap-help,
+  .keymap-help[open] {
+    clip-path: none;
+    transition:
+      opacity var(--dur-fast) linear,
+      display var(--dur-fast) allow-discrete,
+      overlay var(--dur-fast) allow-discrete;
+  }
+
+  @starting-style {
+    .keymap-help[open] {
+      clip-path: none;
+    }
   }
 }
 
@@ -2996,11 +3200,23 @@ html:not(.js) .reveal-group .reveal-item {
   cursor: pointer;
   transition:
     border-color var(--dur-base) var(--ease-out-quart),
-    opacity var(--dur-base) var(--ease-out-quart);
+    opacity var(--dur-base) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart);
 }
 
 .press-arrow:hover:not(:disabled) {
   border-color: var(--ink);
+}
+
+/* The same 0.985 the cipher slabs compress to, at the same 150ms — no new
+   value enters the system. Until now this was the only real <button> on the
+   site with no pressed state at all, on a control whose whole job is to move
+   the rail: it changed a border on hover and then acknowledged the click with
+   nothing. The hamburger is deliberately not given one — its icon already
+   morphs to an X on activation, which is the same acknowledgement by other
+   means. */
+.press-arrow:active:not(:disabled) {
+  transform: scale(0.985);
 }
 
 .press-arrow:disabled {
@@ -3079,7 +3295,13 @@ html:not(.js) .reveal-group .reveal-item {
     filter var(--dur-base) var(--ease-out-quart);
 }
 
-.press-card:hover .press-media__img {
+/* :focus-visible carries the same treatment as :hover, paired in one rule the
+   way .site-nav__link pairs them. It was pointer-only, so a keyboard visitor
+   tabbing the rail got an outline and a photograph that did not answer — the
+   card is a link to somebody else's site, and the lift is most of what says
+   so. */
+.press-card:hover .press-media__img,
+.press-card:focus-visible .press-media__img {
   transform: scale(1.04);
   filter: grayscale(1) contrast(1.08) brightness(1.08);
 }
@@ -3110,7 +3332,8 @@ html:not(.js) .reveal-group .reveal-item {
   transition: opacity var(--dur-base) var(--ease-out-quart);
 }
 
-.press-card:hover .press-logo {
+.press-card:hover .press-logo,
+.press-card:focus-visible .press-logo {
   opacity: 1;
 }
 
@@ -3122,8 +3345,21 @@ html:not(.js) .reveal-group .reveal-item {
   /* The pager's scrollTo already drops to behavior:auto under reduced
      motion (checked in in-the-press.tsx). */
   .press-media__img,
-  .press-card:hover .press-media__img {
+  .press-card:hover .press-media__img,
+  .press-card:focus-visible .press-media__img {
     transition: none;
+    transform: none;
+  }
+
+  /* Matching the button block: the compression goes, the border change stays,
+     so the control still answers a click without moving. */
+  .press-arrow {
+    transition:
+      border-color var(--dur-fast) linear,
+      opacity var(--dur-fast) linear;
+  }
+
+  .press-arrow:active:not(:disabled) {
     transform: none;
   }
 }

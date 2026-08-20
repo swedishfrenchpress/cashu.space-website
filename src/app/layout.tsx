@@ -146,8 +146,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         {/* Stamps html.js, the gate for every scripting-dependent hidden
-            state (.reveal, .draw-on): without it the site renders fully
-            static. Parser-blocking on purpose — it must run before anything
+            state (.reveal, .reveal-group's items, the hero hairline's draw):
+            without it the site renders fully static. Parser-blocking on purpose — it must run before anything
             renders, or the gated elements flash.
 
             It used to also apply a saved theme before first paint. Dark mode

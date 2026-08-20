@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { cipherText } from "@/lib/cipher";
 
 const BUTTON_SELECTOR = [
@@ -23,8 +23,35 @@ type CipherState = {
  * encrypt → decrypt pass only when the visitor interacts with a CTA.
  */
 export default function ButtonCipher() {
+  /* LIVE-TRACKED, NOT READ ONCE. hero-field.tsx and orb-figure.tsx both
+     subscribe to this query; this enhancer read it a single time on mount and
+     never again, so a visitor who turned the setting on mid-session kept the
+     cipher pass on every CTA until a full reload — and this is the one piece of
+     motion on the site that makes a label unreadable while it runs.
+
+     The initialiser is guarded rather than defaulted to false so a
+     reduced-motion visitor never enhances and immediately tears down. There is
+     no hydration mismatch to weigh against that: this component renders null on
+     both sides, so the two passes agree on their output whatever the query
+     says. */
+  const [reduced, setReduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduced(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    /* Turning this on tears the effect down, which disposes every overlay
+       through the cleanup map below rather than leaving orphans in the DOM. */
+    if (reduced) return;
 
     const cleanup = new Map<HTMLElement, () => void>();
 
@@ -140,7 +167,7 @@ export default function ButtonCipher() {
       observer.disconnect();
       cleanup.forEach((dispose) => dispose());
     };
-  }, []);
+  }, [reduced]);
 
   return null;
 }

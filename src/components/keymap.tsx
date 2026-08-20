@@ -117,7 +117,18 @@ export default function Keymap() {
           // rather than swallowing the chord.
           const el = document.getElementById("implementations");
           if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            // Same check in-the-press.tsx makes before its pager scrolls, for
+            // the same reason: a smooth scroll is a whole-viewport movement,
+            // and it is the largest piece of motion left on the site that
+            // someone can ask not to see. Read per invocation rather than
+            // cached, so a mid-session change is honoured.
+            const reduced = window.matchMedia(
+              "(prefers-reduced-motion: reduce)",
+            ).matches;
+            el.scrollIntoView({
+              behavior: reduced ? "auto" : "smooth",
+              block: "start",
+            });
           } else {
             router.push("/#implementations");
           }
