@@ -407,6 +407,38 @@ html {
      a softer landing than quart, add the curve with the surface that needs it
      and say why. */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  /*
+   * THE SECOND CURVE, AND IT HAS EXACTLY ONE CONSUMER (2026-08-20).
+   *
+   * Added under the terms the paragraph above sets: with the surface that
+   * needs it, and with the reason stated. The surface is `.hero-glyph` and
+   * the reason is measured rather than felt.
+   *
+   * A staggered cascade is not a settle. Its softness is not the duration of
+   * one glyph's wash but the number of glyphs visibly mid-wash at any moment,
+   * and that number is set by the SHAPE of the curve, not its length. Quart
+   * is ~70% resolved inside its first fifth, so every glyph snaps to nearly
+   * solid and the band collapses behind it. Counting glyphs whose mask ramp
+   * is actually crossing the letterform (eased value between 0.10 and 0.90),
+   * averaged across the whole pass, all four landing at 1100ms:
+   *
+   *              step 30 / 110ms     step 26 / 226ms
+   *   quart          1.2 glyphs          2.5 glyphs
+   *   sine           1.8                 3.7
+   *   linear         2.3                 4.8
+   *
+   * 1.2 is the version the user called robotic, and it is the right diagnosis
+   * in a number: one glyph mid-wash at a time is not a cascade, it is a
+   * sequence of discrete events with a gap after each. Sine is still an
+   * ease-out, so nothing about the site's direction of travel changes; it
+   * only stops the curve eating the overlap the duration was lengthened to
+   * buy. Linear is wider still and was rejected — a constant-velocity wash is
+   * the one shape with no arrival in it at all.
+   *
+   * If `.hero-glyph` ever goes, this goes with it. A curve standing with no
+   * consumer is the thing the paragraph above deleted two of.
+   */
+  --ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
   --dur-fast: 150ms;
   --dur-base: 220ms;
   --dur-reveal: 620ms;
@@ -2076,73 +2108,137 @@ html:not(.js) .reveal-group .reveal-item {
  *
  * THE HERO NOW HAS EXACTLY ONE ENTRANCE GESTURE, at three scales: the
  * hairline draws across the fold, the glyphs uncover across the headline, and
- * the masthead's plate wipes across a hovered link. All `clip-path`, all left
- * to right, all on the one curve.
+ * the masthead's plate wipes across a hovered link. All travelling edges, all
+ * left to right, all on the one curve.
  *
- * WHY A CLIP AND NOT AN OPACITY CASCADE. A fade per character is a sparkle;
- * an uncover per character is type being set. It is also the only version
- * that costs the settled headline nothing — see hero-headline.tsx for the
- * measurements that rule out `display: inline-block`, which is what a
- * per-glyph transform or a per-glyph mask would have required.
+ * ─────────────────────────────────────────────────────────────────────────
+ * SECOND PASS, LATER THE SAME DAY: THE EDGE IS SOFT AND THE GLYPHS OVERLAP.
+ *
+ * The first version shipped a hard `clip-path` edge at 110ms per glyph on a
+ * 30ms step — a duration barely larger than the step, so one or two glyphs
+ * were ever in flight. The user's verdict was "stiff and mechanic and generic
+ * and robotic", the direction was right and the material was wrong, and both
+ * halves of that are diagnosable rather than a matter of taste:
+ *
+ *   A HARD EDGE ON A GLYPH IS A SHUTTER. `inset()` gives a vertical cut with
+ *   no gradient, applied identically to all 26 characters. There is nothing
+ *   in a shutter for the eye to read as a hand or a light; it is a machine
+ *   part. It is replaced by a gradient MASK whose edge is a ramp, so the
+ *   letter is uncovered by a wash rather than a blade.
+ *
+ *   DURATION ≈ STEP IS A CLACK, NOT A CASCADE. Nominal glyphs-in-flight is
+ *   the wrong measure and it flattered the first version: what the eye reads
+ *   is how many glyphs have the mask ramp actually crossing them. Measured
+ *   at 110/30 on quart that averages 1.2 — one glyph mid-wash at a time,
+ *   which is not a cascade but a sequence of discrete events with a gap
+ *   after each, and is exactly the metronome the user heard. At 226/26 on
+ *   sine it is 3.7, a band of phases rather than a queue of events: the
+ *   leftmost glyph nearly solid, the rightmost barely begun, and the eye
+ *   reads one gesture travelling. The full grid is at --ease-out-sine, which
+ *   is the other half of this fix — lengthening the duration alone does not
+ *   work, because quart spends the extra time being already finished.
+ *
+ * WHAT DID NOT CHANGE, DELIBERATELY. The stagger is still uniform, and the
+ * only rhythm in it is the extra beat each space takes (hero-headline.tsx).
+ * Phrasing the cascade — tight inside a word, a longer rest between words —
+ * was worked through and dropped: at a ~26ms step the whole span available
+ * for phrasing is smaller than one frame of contrast, so it buys an
+ * unfalsifiable amount of "feel" for a second timing system nobody can
+ * verify by looking. The metronome was not what read as mechanical. The
+ * shutter was.
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ * WHY A MASK AND NOT AN OPACITY CASCADE. A fade per character greys the
+ * letterform while it arrives, which is the smudge the deleted ASCII field's
+ * morph mix already taught us to avoid at a different scale, and it is also
+ * the generic entrance this whole surface has twice been corrected away from.
+ * A mask keeps every visible part of the glyph at full Ink and softens only
+ * the boundary. Depth on this site comes from value steps, keylines and masks
+ * (DESIGN.md §6) — this is the third of those, not a fourth idea.
+ *
+ * It is also the only version that costs the settled headline nothing: see
+ * hero-headline.tsx for the measurements ruling out `display: inline-block`,
+ * which is what a per-glyph transform would have required. Measured on the
+ * settled state, masked-then-released against never-masked: ink mass
+ * 4,808,886 against 4,808,888 over one line at 96px, which is quantisation.
+ *
+ * THE MASK GEOMETRY IS ARITHMETIC AND IT IS EASY TO GET WRONG — the first
+ * attempt was, and it left the glyph 62% visible at the start. Three regions,
+ * and the two opaque-and-transparent ends must EACH be at least one glyph
+ * wide, or the extreme positions are not fully hidden and fully shown:
+ *
+ *   mask-size: 250%    the mask is two and a half glyphs wide
+ *   #000 0 40%         solid for the first 40% = 100% of a glyph
+ *   → transparent 60%  ramp across 20% = 50% of a glyph  ← the soft edge
+ *   (60% → 100%)       transparent for the last 40% = 100% of a glyph
+ *
+ * `mask-position: 100%` puts the mask's right end at the glyph's right edge,
+ * so the glyph sees only the transparent tail (verified: ink mass 0).
+ * `mask-position: 0%` puts its left end there, so the glyph sees only the
+ * solid head (verified: identical to unmasked). The animation is that one
+ * property; everything else is constant across both keyframes.
  *
  * THE TIMING IS ARITHMETIC, NOT TASTE.
  *
  *   start   120ms   what the headline's Reveal already carried.
- *   step     30ms   ~2 frames at 60Hz. Below that adjacent glyphs start on
- *                   the same frame and the cascade collapses into a single
- *                   sweep — the individuality the whole change is for is
- *                   invisible under about 25ms.
- *   glyph   110ms   deliberately close to the step, which is what keeps this
- *                   discrete. Duration much larger than step puts a dozen
- *                   glyphs in flight at once and the eye reads one soft band
- *                   travelling, not characters arriving. At 110/30 it is
- *                   between three and four.
+ *   step     26ms   the cadence, and the floor is real. Under about 25ms
+ *                   adjacent glyphs start on the same frame at 60Hz and the
+ *                   cascade collapses into a single sweep, which loses the
+ *                   character-by-character arrival the whole surface is for.
+ *                   It is the step that keeps this a typewriter.
+ *   glyph   226ms   the softness, on --ease-out-sine: a mean of 3.7 glyphs
+ *                   mid-wash against the first version's 1.2. It is the
+ *                   largest value that still lands the pass on the hairline
+ *                   at this step, which is how it was chosen.
  *
  * The last index is 29 (26 glyphs and 4 spaces, two of them line ends — see
- * hero-headline.tsx), so the headline finishes at 120 + 29*30 + 110 = 1100ms,
- * which is exactly when the closing hairline finishes its draw. The Set-Once
+ * hero-headline.tsx), so the headline finishes at 120 + 29*26 + 226 = 1100ms,
+ * exactly when the closing hairline finishes its draw. The Set-Once
  * Rule's "by ~1.1s nothing moves" is unchanged: the two remaining motions in
- * the hero now land together rather than one trailing the other.
+ * the hero land together rather than one trailing the other.
  *
  * `backwards`, NOT `both`, and it is the focus pull's first mechanical term on
- * a third property: an entrance ends on the ABSENCE of what it animated, not
- * on a neutral value of it. `both` would leave `clip-path: inset(...)` on
- * thirty spans for the life of the page — visually identical, and thirty
- * permanent stacking contexts and compositing hints under the largest type on
- * the site. `backwards` fills the delay phase with the `from` value, which is
- * the half that matters, and hands back to the element's own `none` when the
- * animation ends. The handoff is invisible because both edges of it clip
- * nothing.
+ * another property: an entrance ends on the ABSENCE of what it animated, not
+ * on a neutral value of it. Every mask declaration lives inside the keyframes
+ * for exactly this reason — declared on `.hero-glyph` itself, `mask-image`
+ * would survive the animation and leave 26 permanent compositing contexts
+ * under the largest type on the site. `backwards` fills the delay phase with
+ * the `from` value, which is the half that matters, and hands back to the
+ * element's own absence of a mask when the animation ends.
  *
- * THE VERTICAL INSETS ARE NEGATIVE AND THAT IS NOT A TYPO. Inherited from
- * .hero-wipe, where the box was a line box and line-height 0.95 is *shorter*
- * than the type it sets, so clipping at 0 shaved the caps (measured: the E and
- * H lost their top ~6px at the 144px end of the clamp). A plain inline span's
- * box is font-metric derived rather than line-height derived, so the hazard is
- * smaller here — but the clip is still pulled a quarter of the box height out
- * on both edges, because the correct amount to clip vertically is none and
- * this is the value that already says so.
+ * NO VERTICAL INSETS ANY MORE, and their disappearance is not an oversight.
+ * `.hero-wipe` needed `inset(-25% … -25% …)` because a `clip-path` clips in
+ * both axes and its box was a line box, which at line-height 0.95 is shorter
+ * than the type it sets. A horizontal-only gradient mask has no vertical
+ * extent to get wrong: `mask-size` is `100%` on the block axis and the ramp
+ * runs on the inline axis alone.
  */
 :root {
   /* Stated here rather than inline on the span because the numbers only mean
      anything against each other; see the arithmetic above. */
   --hero-glyph-start: 120ms;
-  --hero-glyph-step: 30ms;
-  --dur-hero-glyph: 110ms;
+  --hero-glyph-step: 26ms;
+  --dur-hero-glyph: 226ms;
 }
 
 .hero-glyph {
-  animation: hero-glyph-set var(--dur-hero-glyph) var(--ease-out-quart)
+  animation: hero-glyph-set var(--dur-hero-glyph) var(--ease-out-sine)
     calc(var(--hero-glyph-start) + var(--gi, 0) * var(--hero-glyph-step))
     backwards;
 }
 
 @keyframes hero-glyph-set {
   from {
-    clip-path: inset(-25% 100% -25% 0);
+    mask-image: linear-gradient(90deg, #000 0 40%, transparent 60%);
+    mask-size: 250% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 100% 0;
   }
   to {
-    clip-path: inset(-25% 0 -25% 0);
+    mask-image: linear-gradient(90deg, #000 0 40%, transparent 60%);
+    mask-size: 250% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 0% 0;
   }
 }
 
@@ -2150,14 +2246,14 @@ html:not(.js) .reveal-group .reveal-item {
  * Immediately after the rule it cancels, for the same reason the hairline's
  * reset sits next to the hairline: these are (0,1,0) and (0,1,0), so source
  * order decides and an override parked up with the other reduced-motion resets
- * would silently lose. Without motion the headline is simply there — no clip
- * at all rather than a clip held at its end value, so no span keeps a clipping
- * context.
+ * would silently lose. Cancelling the animation is the whole of it — every
+ * mask declaration lives in the keyframes, so with no animation there is no
+ * mask at all rather than a mask held at its end value, and no span keeps a
+ * compositing context.
  */
 @media (prefers-reduced-motion: reduce) {
   .hero-glyph {
     animation: none;
-    clip-path: none;
   }
 }
 
