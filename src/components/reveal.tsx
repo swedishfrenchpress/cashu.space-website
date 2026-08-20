@@ -38,7 +38,27 @@ type RevealProps = {
  */
 const JUMP_WINDOW_MS = 900;
 const TELEPORT_WINDOW_MS = 400;
-const FAST_SCROLL_PX_PER_MS = 2.5;
+/*
+ * 2.5 px/ms was under macOS momentum scrolling and stole the settle at
+ * random (raised to 5 on 2026-08-20).
+ *
+ * The hash and teleport branches above are discrete events and were never in
+ * doubt; this one is a guess about intent read off a continuous signal, and
+ * it was guessing wrong. A trackpad flick decays through 3-6 px/ms while the
+ * reader is still reading, so an ordinary scroll down the page was tripping
+ * the jump gate — and only sometimes, because what matters is the
+ * instantaneous velocity at the moment an observer callback happens to fire,
+ * not the peak. Measured over a scripted 4200px scroll at 1440x900: a
+ * momentum flick sent 2 of the homepage's 7 groups down the `--instant` path
+ * (no blur, no rise, no stagger, one 150ms fade) while a *faster* run sent
+ * none. Intermittency was the whole tell — the same section arriving two
+ * different ways on two visits reads as a glitch rather than as a rhythm.
+ *
+ * 5 px/ms still catches a genuine flick-to-the-bottom, which is what this
+ * branch is for, and leaves reading-pace momentum alone. Anchor navigation
+ * and hash-on-load are unaffected: they never reached this branch.
+ */
+const FAST_SCROLL_PX_PER_MS = 5;
 const VELOCITY_STALE_MS = 160;
 
 let trackerReady = false;

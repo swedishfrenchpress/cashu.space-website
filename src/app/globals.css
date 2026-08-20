@@ -402,6 +402,36 @@ html {
      resolving together is one soft mush, and in the hero it would also leave
      the word wipe running behind a lens for the whole of its pass. */
   --reveal-focus-span: 0.55;
+  /*
+   * SECTIONS GET THE WHOLE SETTLE, and the hero does not (2026-08-20).
+   *
+   * 0.55 is a hero term. It exists so `.hero-wipe` gets a sharp surface for
+   * the tail of its pass, and the arrival has a wipe to protect. A section
+   * has no wipe, and inheriting the hero's number here made the focus pull
+   * invisible rather than subtle.
+   *
+   * WHY, measured on the implementations head (10px start, 620ms settle,
+   * both properties on --ease-out-quart). Blur remaining at the moment
+   * opacity crosses each milestone:
+   *
+   *            op .30   op .50   op .70   op .85   op .95
+   *   0.55     4.66px   2.45px   0.72px   0.10px   0.00px
+   *   1.00     6.74px   4.90px   2.81px   1.39px   0.45px
+   *
+   * At 0.55 the blur is under a pixel by the time the type is 70% opaque, so
+   * the whole focus pull is spent while the element is still too transparent
+   * to read. Nobody sees type resolve; they see type appear, already sharp.
+   * The cause is multiplicative rather than either term alone — a hard
+   * front-loaded ease (quart is ~70% resolved in its first 20%) running on a
+   * duration that is itself 55% of the opacity's.
+   *
+   * 1.0 keeps --ease-out-quart, so no new curve enters the vocabulary; it
+   * only stops the blur racing the opacity it is supposed to accompany.
+   * Slower curves were measured and rejected as the smudge the ASCII field
+   * already taught us to avoid: `linear` over the same span leaves 6.11px at
+   * 85% opacity, and ease-in-out leaves 9.22px at 50%.
+   */
+  --reveal-focus-span-section: 1;
 
   /*
    * Section rise. Deliberately larger than the arrival's 8px: under editorial
@@ -799,7 +829,10 @@ html:not(.js) .reveal-group .reveal-item {
   transition:
     opacity var(--dur-reveal) var(--ease-out-quart),
     transform var(--dur-reveal) var(--ease-out-quart),
-    filter calc(var(--dur-reveal) * var(--reveal-focus-span))
+    /* --reveal-focus-span-section, NOT --reveal-focus-span: the hero's 0.55
+       protects a wipe this has none of, and it made the pull invisible here.
+       Measurements are on the token. */
+      filter calc(var(--dur-reveal) * var(--reveal-focus-span-section))
       var(--ease-out-quart);
   transition-delay: var(--reveal-delay, 0ms);
 }
