@@ -7,12 +7,13 @@
  *
  * The second was `hero-cipher.tsx`, which ran the sweep decrypt-only over one
  * word of the hero headline on arrival. The user cut it as corny and too on
- * the nose, and it is a clip-path wipe now (`.hero-wipe` in globals.css). The
- * split between `cipherText` and `decryptText` was there to serve two callers
- * with one algorithm; with one caller left, `decryptText` and
- * `encryptedGlyph` are no longer exported. They stay separate functions
- * because the round trip genuinely is two legs of one sweep and reads better
- * named, not because anything outside this file needs them.
+ * the nose; the whole headline is a per-glyph clip-path cascade now
+ * (`.hero-glyph` in globals.css). The split between `cipherText` and
+ * `decryptText` was there to serve two callers with one algorithm; with one
+ * caller left, `decryptText` and `encryptedGlyph` are no longer exported.
+ * They stay separate functions because the round trip genuinely is two legs
+ * of one sweep and reads better named, not because anything outside this file
+ * needs them.
  *
  * The glyph pool is hex because the thing being obscured on this site is
  * always a value or a key, and hex is what those look like when you can see

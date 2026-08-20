@@ -423,17 +423,30 @@ html {
   --reveal-blur: 10px;
   --reveal-blur-section: 6px;
   /* Fraction of the settle that the blur is given. The focus pull finishes
-     first and the rise lands under an already-sharp word; blur and position
-     resolving together is one soft mush, and in the hero it would also leave
-     the word wipe running behind a lens for the whole of its pass. */
+     first and the rise lands under already-sharp type; blur and position
+     resolving together is one soft mush.
+
+     0.55 WAS A HERO TERM AND THE HERO IS GONE (2026-08-20). It was picked so
+     the blur would clear before `.hero-wipe` finished its pass, i.e. so one
+     entrance would stop running a lens over the other — which was the tell
+     that the two should never have been on the same element. The hero now
+     takes no focus pull at all, so the only surface left on this number is
+     the /wallets route header, and by the measured table below 0.55 makes
+     that pull very nearly invisible. Left at 0.55 deliberately rather than
+     quietly raised: raising it makes a blur-in on a 9rem H1 *more* visible,
+     and that entrance is the one the user has just called unelegant. The
+     open question is whether /wallets should keep a focus pull, not what
+     number it should run at. */
   --reveal-focus-span: 0.55;
   /*
-   * SECTIONS GET THE WHOLE SETTLE, and the hero does not (2026-08-20).
+   * SECTIONS GET THE WHOLE SETTLE (2026-08-20).
    *
-   * 0.55 is a hero term. It exists so `.hero-wipe` gets a sharp surface for
-   * the tail of its pass, and the arrival has a wipe to protect. A section
-   * has no wipe, and inheriting the hero's number here made the focus pull
-   * invisible rather than subtle.
+   * 0.55 was a hero term: it existed so `.hero-wipe` got a sharp surface for
+   * the tail of its pass, and the hero's arrival had a wipe to protect. A
+   * section has no wipe, and inheriting that number here made the focus pull
+   * invisible rather than subtle. The hero took no focus pull at all later
+   * the same day (see `.hero-glyph`), which leaves 0.55 above holding a
+   * surface it was never argued for — recorded in the note on that token.
    *
    * WHY, measured on the implementations head (10px start, 620ms settle,
    * both properties on --ease-out-quart). Blur remaining at the moment
@@ -589,7 +602,7 @@ html:not(.js) .reveal-group .reveal-item {
 }
 
 /* `none`, not `translateY(0)` — the same term the focus pull states for filter
-   and .hero-wipe for clip-path: an entrance ends on the ABSENCE of what it
+   and .hero-glyph for clip-path: an entrance ends on the ABSENCE of what it
    animated, not on a neutral value of it. `translateY(0)` is visually identical
    and interpolates identically from the 8px start, but it leaves every settled
    reveal holding a transform, which is a containing block for anything
@@ -798,31 +811,24 @@ html:not(.js) .reveal-group .reveal-item {
 }
 
 /*
- * Hero radii. Stated per element because a blur radius is only meaningful
- * against the type it softens — see the token comment. `:has()` rather than a
- * marker class or an inline style: the value belongs in the stylesheet next to
- * its reasoning, and the elements it keys off are the ones the composition is
- * already named after.
+ * Per-consumer radii. Stated per element because a blur radius is only
+ * meaningful against the type it softens — see the token comment. `:has()`
+ * rather than a marker class or an inline style: the value belongs in the
+ * stylesheet next to its reasoning, and the elements it keys off are the ones
+ * the composition is already named after.
  *
- * The headline's 18px is roughly a tenth of its cap height at the top of the
- * clamp. It has to be this large to register at all: the entrance eases on
- * --ease-out-quart, which carries opacity past 90% inside the first 45% of the
- * duration, so the blur is only *visible* for the first few frames and a
- * radius picked by eye at rest disappears entirely in motion.
- */
-.reveal--focus:has(> .hero-spec__headline) {
-  --reveal-blur: 18px;
-}
-
-.reveal--focus:has(> .hero-spec__deck) {
-  --reveal-blur: 9px;
-}
-
-.reveal--focus:has(> .hero-spec__cta) {
-  --reveal-blur: 4px;
-}
-
-/*
+ * THE HERO IS NO LONGER ONE OF THEM (2026-08-20, user-directed). Three rules
+ * lived here — 18px under the headline, 9px under the deck, 4px under the
+ * CTAs — and went with the focus pull when the hero's entrance became the
+ * per-glyph uncover (see `.hero-glyph`). They are not commented out or left
+ * standing unused: a radius with no consumer is an invitation to re-add the
+ * blur without re-arguing it, which is the reasoning §2 uses for --signal.
+ * The 18px figure is the one worth keeping in the record — it had to be
+ * roughly a tenth of the cap height to register at all, because quart carries
+ * opacity past 90% inside the first 45% of the duration, so the blur was only
+ * *visible* for a few frames. A radius that large on type that large is
+ * precisely what read as sloppy.
+ *
  * Route headers (/wallets). One reveal wraps display type and a lead
  * paragraph together, so this radius is a compromise between the two rather
  * than a value picked for either: 18px would smear the lead, and the 10px
@@ -1125,7 +1131,8 @@ html:not(.js) .reveal-group .reveal-item {
      it on unmount. `display: none` is what closes the hazard here — a
      display:none element has no ground to assign. The hero's cipher pass was
      the other consumer and did remove its overlay, the two differing on
-     purpose; it was cut 2026-08-19 for a clip-path wipe (see .hero-wipe), so
+     purpose; it was cut 2026-08-19 for a clip-path wipe (now the per-glyph
+     .hero-glyph cascade), so
      this is the pattern's only consumer now. That is not a licence to
      simplify it — a permanently transparent overlay left in the DOM is
      exactly what a contrast extension turns into a visible plate. */
@@ -1722,9 +1729,9 @@ html:not(.js) .reveal-group .reveal-item {
  * rule and this one are both (0,1,1) and source order decides — an override
  * 600 lines earlier silently loses, which is exactly what happened first try.
  *
- * .hero-wipe cancels itself under the same setting a few hundred lines down,
+ * .hero-glyph cancels itself under the same setting a few hundred lines down,
  * so between them the hero has no motion at all: the hairline is simply there
- * and the word is simply uncovered.
+ * and the headline is simply set.
  */
 @media (prefers-reduced-motion: reduce) {
   .hero-spec::after {
@@ -2047,72 +2054,90 @@ html:not(.js) .reveal-group .reveal-item {
 }
 
 /*
- * THE WORD WIPE — one word of the headline is uncovered left to right on
- * arrival. This and the closing hairline's draw-on are the hero's entire
- * motion, and they are now the same gesture at two scales.
+ * THE HEADLINE SETS ITSELF, ONE GLYPH AT A TIME — `.hero-glyph`, user-directed
+ * 2026-08-20. Each character of the h1 is uncovered left to right, on a short
+ * stagger, and the pass runs through all three lines as one sweep.
  *
- * WHAT THIS REPLACED, AND WHY (2026-08-19, user-directed). Until now the word
- * resolved out of hex: `hero-cipher.tsx` ran the shared cipher pass
- * decrypt-only over "ecash" for 760ms. The user cut it as corny and too on the
- * nose — a word about untraceable money spelling itself out of ciphertext is
- * the site explaining its own pun at 9rem. The judgement is theirs and the
- * reasoning is sound: it was the one piece of hero motion that made an
- * argument rather than staging one.
+ * WHAT IT REPLACED, AND WHY. Two things, and they were fighting each other:
  *
- * WHAT REPLACED IT IS ALREADY IN THE VOCABULARY. `clip-path` uncovering type
- * left to right is what the masthead does under a hovered link and what
- * `hero-rule-draw` does to the closing hairline, and it runs on the masthead's
- * own `--dur-nav-wipe`. The hero now rhymes with the two surfaces either side
- * of it instead of introducing a third idea.
+ *   .hero-wipe        one `clip-path` sweep across the single word "ecash"
+ *                     (2026-08-19), which replaced hero-cipher.tsx's
+ *                     decrypt-out-of-hex the same week.
+ *   .reveal--focus    the whole h1 fading and rising out of an 18px blur.
  *
- * IT COSTS NOTHING TO RUN AND NOTHING TO SHIP. `hero-cipher.tsx` was a client
- * component, an effect, a `getAnimations()` probe against the reveal's clock,
- * a 46ms churn timer and a `requestAnimationFrame` loop, all to move one word.
- * This is four declarations. The word is a plain `<span>` in a server
- * component, so the hero has no client component left in it apart from the
- * field's canvas.
+ * The user called the result sloppy. The stylesheet already conceded the
+ * point: --reveal-focus-span exists at 0.55 *specifically* so the blur would
+ * clear before the word wipe finished, i.e. one entrance had to be cut short
+ * to stop it running a lens over the other. DESIGN.md §4 also carries the
+ * recorded objection to the focus pull on display type — that a blur-in is
+ * the most copied entrance on the web and the rest of this site's motion is
+ * hard-edged and geometric — with a per-line mask as the declined
+ * alternative. This is that objection settled, one granularity finer.
  *
- * IT ALSO DELETES A WHOLE CLASS OF PROBLEM. The cipher had to *find* the
- * arrival — the headline paints from the stylesheet at parse time but the
- * effect ran at hydration, so on a slow connection the word would have
- * scrambled a second after the hero went quiet, which is the ambient motion
- * the Set-Once Rule forbids. `joinArrival()` existed entirely to detect that
- * and skip the pass. An animation declared in the same stylesheet cannot be
- * late: it starts when the headline starts, on the same `--reveal-delay` the
- * headline inherits it from, because that value is written during SSR and is
- * in the markup before either rule is applied. There is nothing to
- * synchronise and nothing to bail out of.
+ * THE HERO NOW HAS EXACTLY ONE ENTRANCE GESTURE, at three scales: the
+ * hairline draws across the fold, the glyphs uncover across the headline, and
+ * the masthead's plate wipes across a hovered link. All `clip-path`, all left
+ * to right, all on the one curve.
  *
- * THE VERTICAL INSETS ARE NEGATIVE AND THAT IS NOT A TYPO. `.hero-wipe` is an
- * inline-block, so its box is the line box — and the headline's line-height is
- * 0.95, which is *shorter* than the type it sets. Clipping at `0` top and
- * bottom shaves the caps (measured: the E and H lose their top ~6px at the
- * 144px end of the clamp). The clip is pulled out of the box by a quarter of
- * its height on both edges so the wipe is purely horizontal.
+ * WHY A CLIP AND NOT AN OPACITY CASCADE. A fade per character is a sparkle;
+ * an uncover per character is type being set. It is also the only version
+ * that costs the settled headline nothing — see hero-headline.tsx for the
+ * measurements that rule out `display: inline-block`, which is what a
+ * per-glyph transform or a per-glyph mask would have required.
  *
- * The word never wraps inside itself, so inline-block costs the balanced
- * headline nothing.
+ * THE TIMING IS ARITHMETIC, NOT TASTE.
+ *
+ *   start   120ms   what the headline's Reveal already carried.
+ *   step     30ms   ~2 frames at 60Hz. Below that adjacent glyphs start on
+ *                   the same frame and the cascade collapses into a single
+ *                   sweep — the individuality the whole change is for is
+ *                   invisible under about 25ms.
+ *   glyph   110ms   deliberately close to the step, which is what keeps this
+ *                   discrete. Duration much larger than step puts a dozen
+ *                   glyphs in flight at once and the eye reads one soft band
+ *                   travelling, not characters arriving. At 110/30 it is
+ *                   between three and four.
+ *
+ * The last index is 29 (26 glyphs and 4 spaces, two of them line ends — see
+ * hero-headline.tsx), so the headline finishes at 120 + 29*30 + 110 = 1100ms,
+ * which is exactly when the closing hairline finishes its draw. The Set-Once
+ * Rule's "by ~1.1s nothing moves" is unchanged: the two remaining motions in
+ * the hero now land together rather than one trailing the other.
+ *
+ * `backwards`, NOT `both`, and it is the focus pull's first mechanical term on
+ * a third property: an entrance ends on the ABSENCE of what it animated, not
+ * on a neutral value of it. `both` would leave `clip-path: inset(...)` on
+ * thirty spans for the life of the page — visually identical, and thirty
+ * permanent stacking contexts and compositing hints under the largest type on
+ * the site. `backwards` fills the delay phase with the `from` value, which is
+ * the half that matters, and hands back to the element's own `none` when the
+ * animation ends. The handoff is invisible because both edges of it clip
+ * nothing.
+ *
+ * THE VERTICAL INSETS ARE NEGATIVE AND THAT IS NOT A TYPO. Inherited from
+ * .hero-wipe, where the box was a line box and line-height 0.95 is *shorter*
+ * than the type it sets, so clipping at 0 shaved the caps (measured: the E and
+ * H lost their top ~6px at the 144px end of the clamp). A plain inline span's
+ * box is font-metric derived rather than line-height derived, so the hazard is
+ * smaller here — but the clip is still pulled a quarter of the box height out
+ * on both edges, because the correct amount to clip vertically is none and
+ * this is the value that already says so.
  */
-.hero-wipe {
-  display: inline-block;
-  /* Inherits --reveal-delay from the headline's own Reveal wrapper, so the
-     word is uncovered *as* the line rises rather than after it has landed —
-     one gesture, not two. Ends at 580ms against the hairline's 1100ms, so the
-     hero is still completely still by ~1.1s. */
-  /* `backwards`, not `both`, and it is the focus pull's first mechanical term
-     applied to a different property: an entrance must end on the absence of
-     the thing it animated, not on a neutral value of it. `both` would leave
-     `clip-path: inset(-25% 0 -25% 0)` on the element for the life of the
-     page — visually identical, but a clip-path other than `none` is a
-     permanent stacking context and a standing compositing hint. `backwards`
-     fills the delay phase with the `from` value, which is the half that
-     matters, and hands back to the element's own `none` when the animation
-     ends. The handoff is invisible because both edges of it clip nothing. */
-  animation: hero-word-wipe var(--dur-nav-wipe) var(--ease-out-quart)
-    var(--reveal-delay, 0ms) backwards;
+:root {
+  /* Stated here rather than inline on the span because the numbers only mean
+     anything against each other; see the arithmetic above. */
+  --hero-glyph-start: 120ms;
+  --hero-glyph-step: 30ms;
+  --dur-hero-glyph: 110ms;
 }
 
-@keyframes hero-word-wipe {
+.hero-glyph {
+  animation: hero-glyph-set var(--dur-hero-glyph) var(--ease-out-quart)
+    calc(var(--hero-glyph-start) + var(--gi, 0) * var(--hero-glyph-step))
+    backwards;
+}
+
+@keyframes hero-glyph-set {
   from {
     clip-path: inset(-25% 100% -25% 0);
   }
@@ -2125,12 +2150,12 @@ html:not(.js) .reveal-group .reveal-item {
  * Immediately after the rule it cancels, for the same reason the hairline's
  * reset sits next to the hairline: these are (0,1,0) and (0,1,0), so source
  * order decides and an override parked up with the other reduced-motion resets
- * would silently lose. Without motion the word is simply there — no clip at
- * all rather than a clip held at its end value, so the element keeps no
- * clipping context.
+ * would silently lose. Without motion the headline is simply there — no clip
+ * at all rather than a clip held at its end value, so no span keeps a clipping
+ * context.
  */
 @media (prefers-reduced-motion: reduce) {
-  .hero-wipe {
+  .hero-glyph {
     animation: none;
     clip-path: none;
   }
@@ -2672,14 +2697,14 @@ html:not(.js) .reveal-group .reveal-item {
  *
  * THE MATERIAL IS ALREADY IN THE VOCABULARY. The sheet is uncovered by a
  * clip-path inset, which is what the masthead does under a hovered link, what
- * hero-rule-draw does to the closing hairline, and what .hero-wipe does to the
- * hero's one word. A travelling edge is the site's way of putting something on
+ * hero-rule-draw does to the closing hairline, and what .hero-glyph does to
+ * every character of the hero headline. A travelling edge is the site's way of putting something on
  * the page, and this is that gesture on the one surface that never got it. The
  * backdrop only fades: it is ground, and ground does not have an edge.
  *
  * It runs top to bottom while every other wipe on the site runs left to right,
  * and that is a choice rather than a slip. Left to right is how this site
- * uncovers a WORD — a nav label, the hero's `ecash`, a 1px rule — because that
+ * uncovers TYPE — a nav label, a headline glyph, a 1px rule — because that
  * is the direction the thing is read in. This is a panel, and the site already
  * has a gesture for a panel opening: the masthead's mobile sheet growing
  * downward out of the bar. A sideways wipe across a six-row table would uncover
@@ -2697,7 +2722,7 @@ html:not(.js) .reveal-group .reveal-item {
  *
  * ONE COST, RECORDED RATHER THAN HIDDEN. The settled [open] state holds
  * `clip-path: inset(0 0 0 0)`, which is a standing clipping context — the thing
- * .hero-wipe's `backwards`-not-`both` rule exists to avoid. It is bounded here
+ * .hero-glyph's `backwards`-not-`both` rule exists to avoid. It is bounded here
  * in a way that one was not: it lives only while the sheet is open, not for the
  * life of the page, and `inset(...)` does not interpolate to `none`, so a wipe
  * cannot end on the absence of itself. If that trade is ever unwanted the
