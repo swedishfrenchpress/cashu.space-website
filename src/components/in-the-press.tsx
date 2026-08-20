@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import NewTabHint from "./new-tab-hint";
-import Reveal from "./reveal";
+import RevealGroup from "./reveal-group";
 
 /**
  * In the press — the closing band of press mentions, modeled on the Griffin
@@ -144,8 +144,11 @@ export default function InThePress() {
       className="bg-paper text-ink section-y-default press"
       aria-labelledby="press-heading"
     >
-      <div className="page-shell flex flex-col gap-10 lg:gap-14">
-        <Reveal>
+      {/* One group: the heading, its arrows and the rail are one band, and
+          the rail is the only part of it anyone scrolls. Staggered in
+          globals.css against the class names below. */}
+      <RevealGroup className="page-shell flex flex-col gap-10 lg:gap-14">
+        <div className="reveal-item press-head">
           <div className="flex items-end justify-between gap-6">
             <h2 id="press-heading" className="t-headline">
               In the press
@@ -171,9 +174,9 @@ export default function InThePress() {
               </button>
             </div>
           </div>
-        </Reveal>
+        </div>
 
-        <Reveal delay={120}>
+        <div className="reveal-item press-rail">
           <div ref={trackRef} className="press-track scrollbar-none">
             {STORIES.map((story) => (
               <a
@@ -208,8 +211,8 @@ export default function InThePress() {
               </a>
             ))}
           </div>
-        </Reveal>
-      </div>
+        </div>
+      </RevealGroup>
     </section>
   );
 }

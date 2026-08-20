@@ -272,17 +272,7 @@
       {
         "name": "ease-out-quart",
         "value": "cubic-bezier(0.25, 1, 0.5, 1)",
-        "purpose": "The system default. Every state transition, entrance, and draw-on uses it unless noted."
-      },
-      {
-        "name": "ease-out-quint",
-        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Held for longer editorial settles."
-      },
-      {
-        "name": "ease-out-expo",
-        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Held for the sharpest deceleration. Used sparingly."
+        "purpose": "The system's ONLY curve as of 2026-08-20. Every state transition, entrance, draw and wipe on the site uses it. ease-out-quint (0.22, 1, 0.36, 1) and ease-out-expo (0.16, 1, 0.3, 1) sat beside it from the first motion pass and never acquired a consumer; they were deleted on the reasoning DESIGN.md section 2 used for --signal, since a token standing with no consumer is an invitation to reach for it without re-arguing the choice. A softer landing than quart should arrive with the surface that needs it and an argument for it."
       },
       {
         "name": "dur-fast",
@@ -297,7 +287,7 @@
       {
         "name": "dur-reveal",
         "value": "620ms",
-        "purpose": "The standard entrance settle: opacity plus an 8px rise. Scroll-triggered reveals run it as a transition gated on .is-revealed; unconditional ones run it as the reveal-arrival keyframe animation from parse time (see reveal-arrival below)."
+        "purpose": "The standard entrance settle: opacity plus an 8px rise. Scroll-triggered reveals run it as a transition gated on .is-revealed; unconditional ones run it as the reveal-arrival keyframe animation from parse time (see reveal-arrival below). As of 2026-08-20 the settled state is `transform: none`, not `translateY(0)`: the Focus-Pull Rule's first term applied to a third property — an entrance ends on the absence of what it animated, not on a neutral value of it — since translateY(0) left every settled reveal holding a containing block and a compositing hint. .reveal--fade and .reveal--instant already said none."
       },
       {
         "name": "reveal-arrival",
@@ -310,19 +300,59 @@
         "purpose": "The slow entrance for large media and figure panels."
       },
       {
+        "name": "reveal-focus",
+        "value": "blur(var(--reveal-blur)) to filter:none, cleared at 55% of the settle (100% for section groups)",
+        "purpose": "The focus pull (.reveal--focus): type arrives fractionally out of focus and resolves. Opt-in, never the default. Added 2026-08-19 on the user's direction; it is the site's only sanctioned blur and the only one that will ever be sanctioned, because it is a property of an entrance rather than a surface. NARROWED 2026-08-20, also user-directed: THE HERO NO LONGER TAKES IT. The recorded objection to a blur-in on display type came back from the user as unelegant and sloppy, and the hero's entrance is geometric now (hero-glyph-set). The three hero radii — 18px headline, 9px deck, 4px CTA — were deleted with it rather than left standing unused. What remains is the /wallets route header and the section groups. Three terms are load-bearing. It ends on filter:none and never on blur(0px) — a settled blur(0) keeps a compositor layer and grayscale antialiasing on 9rem type for the life of the page. It is a modifier because the masthead sits in a Reveal and a live canvas must not be wrapped in a filter. And the 55% figure existed only so the hero's word wipe got a sharp surface for the tail of its pass; with the hero gone it governs the /wallets header alone, where by the measured table in globals.css it makes the pull very nearly invisible — left at 55% deliberately, because raising it makes a blur-in on a 9rem H1 more visible on the day it was called unelegant. The open question there is whether that header should keep a focus pull at all. LCP measured either way on a throttled phone: 612/632ms with, 636/624ms without, same LCP element, CLS 0 — blur does not disqualify an LCP candidate the way opacity:0 does. See the Focus-Pull Rule in DESIGN.md section 4."
+      },
+      {
+        "name": "reveal-blur",
+        "value": "10px default; 18px hero headline, 12px route header, 9px hero deck, 6px section item, 4px hero CTA row",
+        "purpose": "Focus-pull radius, stated per consumer rather than globally. A radius is only meaningful against the type it softens: 18px is a hair of softness under a 9rem headline and an illegible smear under a 13px button label. Authored in globals.css with :has() against the composition's own class names, so the value sits next to its reasoning rather than inline in JSX."
+      },
+      {
+        "name": "reveal-rise-section",
+        "value": "20px",
+        "purpose": "The below-the-fold rise, against the arrival's 8px. Under editorial type at this scale 8px reads as a twitch rather than a settle, which was the complaint that produced the group reveals. Transform-only movement contributes nothing to CLS, so the amplitude is free. See the Section-Gesture Rule in DESIGN.md section 4."
+      },
+      {
         "name": "dur-nav-wipe",
         "value": "460ms",
         "purpose": "The masthead hover plate's clip-path wipe travelling across a nav label. Deliberately slower than dur-base: at feedback speed a travelling edge across a whole word reads as a flicker rather than a slide. (Replaces dur-nav/300ms, which documented the retired Onyx condense and had no consumers left; the dead token was removed from globals.css 2026-08-17.)"
       },
       {
-        "name": "cipher-pass",
-        "value": "460ms",
-        "purpose": "The button label's encrypt-to-decrypt sweep. Pointer only, never focus. Removed entirely under prefers-reduced-motion."
+        "name": "hero-glyph-set",
+        "value": "226ms (--dur-hero-glyph) ease-out-sine per glyph, staggered 26ms (--hero-glyph-step) from 120ms (--hero-glyph-start), animated mask-position on a gradient mask, fill backwards",
+        "purpose": "Every character of the hero headline uncovered left to right on arrival (.hero-glyph), one glyph at a time, the pass running through all three lines as one sweep. Added 2026-08-20 on the user's direction, replacing BOTH the single-word .hero-wipe of 2026-08-19 and the hero's focus pull: the h1 was fading and rising out of an 18px blur while one word wiped inside it, two entrances on one element that were timed around each other rather than composed, and the user called the result unelegant and sloppy. SECOND PASS THE SAME DAY, also user-directed: the first version shipped a hard clip-path edge at 110ms per glyph on a 30ms step and read as stiff, mechanical and robotic. Two things were wrong and both are diagnosable. A hard edge on a glyph is a shutter — no gradient, applied identically to 26 characters — so it is a gradient MASK now, ramp half a glyph wide, and the letter is uncovered by a wash rather than a blade. And duration close to step is a clack rather than a cascade: what the eye reads is glyphs with the ramp actually crossing them (eased value 0.10 to 0.90), averaged across the pass, which measured 1.2 at 30/110 on quart against 3.7 at 26/226 on sine. 1.2 is one glyph mid-wash at a time, which is a sequence of discrete events, not a cascade. Lengthening the duration alone does not fix it because quart is ~70% resolved in its first fifth and spends the extra time already finished — hence --ease-out-sine, the site's second curve, with one consumer. Linear measured wider still (4.8) and was rejected: a constant-velocity wash has no arrival in it. NOT AN OPACITY CASCADE: a fade per character greys the letterform while it arrives, and depth here comes from value steps, keylines and masks. The stagger stays uniform on purpose — phrasing it by word buys an unverifiable amount of feel at a 26ms step; the metronome was not what read as mechanical, the shutter was. MASK GEOMETRY IS ARITHMETIC AND EASY TO GET WRONG (the first attempt left the glyph 62% visible at the start): the solid end and the transparent end must EACH be at least one glyph wide. mask-size 250% with linear-gradient(90deg, #000 0 40%, transparent 60%) gives solid = 100% of a glyph, ramp = 50%, transparent = 100%. Verified: mask-position 100% measures ink mass 0, mask-position 0% is identical to unmasked (4,808,886 against 4,808,888 at 96px). EVERY GLYPH IS A PLAIN INLINE SPAN AND NEVER AN INLINE-BLOCK. Measured at 144px against the shipped GT-Standard Semibold subset: OPEN SOURCE sets 1003.250px plain, 1003.313px as inline spans, 1004.047px as inline-blocks. Chrome shapes the whole inline formatting context as one run and splits at box boundaries, so kerning survives an inline span; an inline-block rounds every advance independently and also flattens badly in the accessibility tree. Every mask declaration lives inside the keyframes and the fill is backwards, not both — an entrance ends on the absence of what it animated, and a mask-image on the rule itself would survive the animation as 26 permanent compositing contexts under the largest type on the site (verified settled: 0 of 26 glyphs hold a mask, clip-path, filter or will-change). No vertical insets any more: a horizontal gradient mask has no vertical extent to get wrong, which is the whole reason .hero-wipe needed -25%. No JavaScript, and the markup is a server component (hero-headline.tsx) because the index the cascade is keyed on has to be in the document before the stylesheet is applied. Measured (Slow 4G, 4x CPU, 412x915 DPR2, three runs): LCP 620/624/624ms shipped, 644/648/656ms on the hard-clip pass, 648/656/664ms before any of it, CLS 0. The LCP element moved from H1 to P — a fully masked headline is not an LCP candidate, so the deck takes over at the same millisecond. See the Set-Once Rule's fourth amendment in DESIGN.md section 4."
       },
       {
-        "name": "draw-on",
+        "name": "cipher-pass",
+        "value": "460ms",
+        "purpose": "The button label's encrypt-to-decrypt sweep. Pointer only, never focus. Removed entirely under prefers-reduced-motion. ONE consumer as of 2026-08-19: the hero ran the same primitive decrypt-only over one word of the headline until the user cut it as corny and too on the nose. See hero-word-wipe below and the Set-Once Rule's third amendment in DESIGN.md section 4."
+      },
+      {
+        "name": "dur-draw-on",
         "value": "1100ms",
-        "purpose": "SVG line art tracing itself via stroke-dashoffset, staggered per shape. Honest-Network: the line being drawn is the structure being described."
+        "purpose": "A line drawing itself. ONE consumer as of 2026-08-20: the hero's closing hairline, via clip-path. The second was .draw-on, SVG line art via stroke-dashoffset, which shared this duration because it was the same gesture at another scale; that rule set was deleted with the figures that used it (the ASCII field and the demo panel, both gone since 2026-08-16), and it took the stylesheet's only untokenized duration, a raw 480ms, with it. The token stays on its own consumer's account."
+      },
+      {
+        "name": "reveal-group-wallets",
+        "value": "rail 0ms, rows 60/100/140/180/220/260ms",
+        "purpose": "The wallets registry stagger (2026-08-20), applying the Section-Gesture Rule to the route the 2026-08-19 pass had skipped. Authored in globals.css keyed on .reveal-group .wallet-row:nth-child(), not as delay props — and that is the point rather than a preference: the props this replaced were 280 + gi*60 + i*50, which MAX_DELAY_MS clamped to a flat 360ms from the third row on, so the ladder was written, committed and silently thrown away. A delay expressed as a prop passes through a clamp it cannot see. 40ms a step, shorter than the arrival's, because a registry row is one line of type and the beat between two of them is shorter than the beat between a headline and a paragraph. The rows also take --reveal-blur-section 4px against the section default's 6px, on the same per-consumer reasoning as reveal-blur. The first group stays an arrival: its rail is above the fold at every viewport and a group is observer-gated, therefore hydration-gated. Net 21 client components and 21 observers to 6 and 3."
+      },
+      {
+        "name": "sheet-open",
+        "value": "220ms in (dur-base), 150ms out (dur-fast), ease-out-quart, clip-path inset top to bottom",
+        "purpose": "The ? help sheet opening and closing (2026-08-20). It was the only state change on the site with no transition at all. The material is the site's own travelling edge — the same clip-path uncovering the masthead plate, hero-rule-draw and .hero-wipe use — but it runs top to bottom rather than left to right, because left to right is how this site uncovers a WORD and this is a PANEL: the reference is the mobile nav sheet growing out of the bar, and a sideways wipe across a six-row table would uncover it column by column. The backdrop only fades; ground has no edge. The exit is the fast one in both properties, since a transition takes the duration of the state it is going to, so the base rule governs the close and [open] governs the open. display and overlay transition with allow-discrete, which is the whole reason an exit exists; @starting-style supplies the from-values for the open, since an element entering the top layer has no previous style. ONE COST, RECORDED: the settled [open] state holds clip-path inset(0 0 0 0), a standing clipping context — bounded to the time the sheet is open rather than the life of the page, and unavoidable for a wipe because inset() does not interpolate to none. Under reduced motion the wipe is cancelled and the fade kept."
+      },
+      {
+        "name": "press-feedback",
+        "value": "scale(0.985) at 150ms on :active; hover treatments paired onto :focus-visible",
+        "purpose": "Feedback parity, 2026-08-20. .press-arrow was the only real <button> on the site with no pressed state; it takes the compression the .btn-* slabs already use, so no new value enters the system. The press cards lifted their photograph and wordmark on :hover and did nothing on :focus-visible, so the keyboard path got an outline and a photograph that did not answer — paired the way .site-nav__link already pairs the two. The hamburger is deliberately excluded: its icon already morphs to an X on activation, which is the same acknowledgement by other means."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "substitute, never kill",
+        "purpose": "Every animation on the site has a prefers-reduced-motion path, and the pattern is the button block's: remove the spatial movement, keep the colour, opacity and state change that carries the meaning. Three motions escaped it until 2026-08-20 — the skip link's translateY, the hamburger bars' rotate-and-move, and the mobile panel's grid-template-rows height animation — plus two JS counterparts: the g i chord's smooth scrollIntoView, and button-cipher.tsx, which read the query once at mount instead of live-tracking it as hero-field.tsx and orb-figure.tsx do. Each CSS cancel sits immediately after the rules it cancels, because the ties are decided on source order."
       }
     ],
     "breakpoints": [
@@ -542,6 +572,6 @@
       "Don't ship Chalk placeholder surfaces in final layouts. They are scaffolding only."
     ]
   },
-  "handPatchedAt": "2026-08-17T20:10:00Z",
-  "handPatchNote": "Patched by hand, not regenerated. DESIGN.md here is a curated document carrying its own decision history; running the generator over it would flatten that. Keep doing it this way, or reconcile the two deliberately. Last patch 2026-08-17: the arrival entrance (reveal-arrival), face subsetting, dur-nav replaced by the wipe it should always have named, and the font masters moved out of public/."
+  "handPatchedAt": "2026-08-20",
+  "handPatchNote": "Hand-patched, not regenerated. 2026-08-20: motion extensions updated for the /impeccable animate pass — removed ease-out-quint, ease-out-expo and draw-on (all deleted from globals.css with their consumers), added reveal-group-wallets, sheet-open, press-feedback and reduced-motion, and amended ease-out-quart, dur-draw-on and dur-reveal. See DESIGN.md section 4."
 }

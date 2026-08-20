@@ -166,21 +166,39 @@
      flicker instead of a slide. */
   --dur-nav-wipe: 460ms;
 
-  /* A line drawing itself. Two consumers: .draw-on (SVG line art, via
-     stroke-dashoffset) and the hero's closing hairline (via clip-path). Both
-     are the same gesture at different scales, so they share the duration —
-     .draw-on hardcoded 1100ms until 2026-08-16. Named in
+  /* A line drawing itself. ONE consumer as of 2026-08-20: the hero's closing
+     hairline, via clip-path. The second was `.draw-on` — SVG line art via
+     stroke-dashoffset — which shared this duration because it was the same
+     gesture at another scale; that rule set was deleted with the figures that
+     used it (see the note where it lived, below `.reveal-item`). The token
+     stays on its own consumer's account, not as a shared one. Named in
      .impeccable/design.json as `draw-on`. */
   --dur-draw-on: 1100ms;
 
   /*
-   * Ceiling on the viewport-filling hero. The hero's fixed parts top out
-   * (headline caps at 6.5rem, terrain band at 320px), so past this height the
-   * surplus above the band stops reading as air and starts reading as a void.
-   * Beyond the cap the hero simply stops chasing the viewport and the next
-   * section peeks in — the pre-viewport-fill behaviour, never worse.
+   * Ceiling on the viewport-filling hero. The hero's fixed parts top out (the
+   * headline caps at 9rem and the title block is optically centred against the
+   * closing hairline), so past this height the surplus stops reading as air and
+   * starts reading as a void. Beyond the cap the hero simply stops chasing the
+   * viewport and the next section peeks in — the pre-viewport-fill behaviour,
+   * never worse.
+   *
+   * Corrected 2026-08-20: this comment cited "headline caps at 6.5rem, terrain
+   * band at 320px". The bespoke 6.5rem step was retired 2026-08-14 and the
+   * terrain band 2026-08-16; the bound itself never changed.
    */
   --hero-max: 1200px;
+
+  /*
+   * Horizontal counterpart to --hero-max, added 2026-08-20 with the split
+   * hero. The hero is full-bleed (it has to be — see .hero-spec__headline),
+   * so without a bound the title block would pin to the far left edge of an
+   * ultrawide display while every other section stays centred on --page-max.
+   * Past this width the block centres against this measure instead and the
+   * field takes the surplus, which is what §5 asks for: a large screen should
+   * give the title block more air, not the same air with more field around it.
+   */
+  --hero-column-max: 1600px;
 
   /*
    * Section cadence — DESIGN.md Principle 4 (Editorial pacing). Sections
@@ -379,13 +397,119 @@ html {
  * entrances are deliberate (520–720ms), feedback is brisk (150–200ms).
  */
 :root {
+  /* ONE CURVE, AND THE VOCABULARY NOW SAYS SO (2026-08-20). --ease-out-quint
+     (0.22, 1, 0.36, 1) and --ease-out-expo (0.16, 1, 0.3, 1) sat here from the
+     first motion pass and never acquired a consumer: every transition,
+     keyframe and draw on the site runs on quart. Deleted on the reasoning §2
+     used for --signal — a token standing with no consumer is an invitation to
+     reach for it without re-arguing the choice, and "which of our three curves"
+     is exactly the decision that should cost something. If a settle ever needs
+     a softer landing than quart, add the curve with the surface that needs it
+     and say why. */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /*
+   * THE SECOND CURVE, AND IT HAS EXACTLY ONE CONSUMER (2026-08-20).
+   *
+   * Added under the terms the paragraph above sets: with the surface that
+   * needs it, and with the reason stated. The surface is `.hero-glyph` and
+   * the reason is measured rather than felt.
+   *
+   * A staggered cascade is not a settle. Its softness is not the duration of
+   * one glyph's wash but the number of glyphs visibly mid-wash at any moment,
+   * and that number is set by the SHAPE of the curve, not its length. Quart
+   * is ~70% resolved inside its first fifth, so every glyph snaps to nearly
+   * solid and the band collapses behind it. Counting glyphs whose mask ramp
+   * is actually crossing the letterform (eased value between 0.10 and 0.90),
+   * averaged across the whole pass, all four landing at 1100ms:
+   *
+   *              step 30 / 110ms     step 26 / 226ms
+   *   quart          1.2 glyphs          2.5 glyphs
+   *   sine           1.8                 3.7
+   *   linear         2.3                 4.8
+   *
+   * 1.2 is the version the user called robotic, and it is the right diagnosis
+   * in a number: one glyph mid-wash at a time is not a cascade, it is a
+   * sequence of discrete events with a gap after each. Sine is still an
+   * ease-out, so nothing about the site's direction of travel changes; it
+   * only stops the curve eating the overlap the duration was lengthened to
+   * buy. Linear is wider still and was rejected — a constant-velocity wash is
+   * the one shape with no arrival in it at all.
+   *
+   * If `.hero-glyph` ever goes, this goes with it. A curve standing with no
+   * consumer is the thing the paragraph above deleted two of.
+   */
+  --ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
   --dur-fast: 150ms;
   --dur-base: 220ms;
   --dur-reveal: 620ms;
   --dur-reveal-slow: 880ms;
+
+  /*
+   * The focus pull (2026-08-19, user-directed). Blur radii are per-consumer
+   * rather than global, because a radius is only meaningful against the type
+   * it softens: 18px reads as a hair of softness under a 9rem headline and as
+   * an illegible smear under a 13px button label. The defaults below are the
+   * fallback for a consumer that states nothing; the hero states all three.
+   * See the focus-pull block further down for the mechanics.
+   */
+  --reveal-blur: 10px;
+  --reveal-blur-section: 6px;
+  /* Fraction of the settle that the blur is given. The focus pull finishes
+     first and the rise lands under already-sharp type; blur and position
+     resolving together is one soft mush.
+
+     0.55 WAS A HERO TERM AND THE HERO IS GONE (2026-08-20). It was picked so
+     the blur would clear before `.hero-wipe` finished its pass, i.e. so one
+     entrance would stop running a lens over the other — which was the tell
+     that the two should never have been on the same element. The hero now
+     takes no focus pull at all, so the only surface left on this number is
+     the /wallets route header, and by the measured table below 0.55 makes
+     that pull very nearly invisible. Left at 0.55 deliberately rather than
+     quietly raised: raising it makes a blur-in on a 9rem H1 *more* visible,
+     and that entrance is the one the user has just called unelegant. The
+     open question is whether /wallets should keep a focus pull, not what
+     number it should run at. */
+  --reveal-focus-span: 0.55;
+  /*
+   * SECTIONS GET THE WHOLE SETTLE (2026-08-20).
+   *
+   * 0.55 was a hero term: it existed so `.hero-wipe` got a sharp surface for
+   * the tail of its pass, and the hero's arrival had a wipe to protect. A
+   * section has no wipe, and inheriting that number here made the focus pull
+   * invisible rather than subtle. The hero took no focus pull at all later
+   * the same day (see `.hero-glyph`), which leaves 0.55 above holding a
+   * surface it was never argued for — recorded in the note on that token.
+   *
+   * WHY, measured on the implementations head (10px start, 620ms settle,
+   * both properties on --ease-out-quart). Blur remaining at the moment
+   * opacity crosses each milestone:
+   *
+   *            op .30   op .50   op .70   op .85   op .95
+   *   0.55     4.66px   2.45px   0.72px   0.10px   0.00px
+   *   1.00     6.74px   4.90px   2.81px   1.39px   0.45px
+   *
+   * At 0.55 the blur is under a pixel by the time the type is 70% opaque, so
+   * the whole focus pull is spent while the element is still too transparent
+   * to read. Nobody sees type resolve; they see type appear, already sharp.
+   * The cause is multiplicative rather than either term alone — a hard
+   * front-loaded ease (quart is ~70% resolved in its first 20%) running on a
+   * duration that is itself 55% of the opacity's.
+   *
+   * 1.0 keeps --ease-out-quart, so no new curve enters the vocabulary; it
+   * only stops the blur racing the opacity it is supposed to accompany.
+   * Slower curves were measured and rejected as the smudge the ASCII field
+   * already taught us to avoid: `linear` over the same span leaves 6.11px at
+   * 85% opacity, and ease-in-out leaves 9.22px at 50%.
+   */
+  --reveal-focus-span-section: 1;
+
+  /*
+   * Section rise. Deliberately larger than the arrival's 8px: under editorial
+   * type at this scale 8px reads as a twitch rather than a settle, which was
+   * the whole of the complaint that produced this block. Transform-only
+   * movement does not contribute to CLS, so the amplitude costs nothing.
+   */
+  --reveal-rise-section: 20px;
 }
 
 /*
@@ -404,6 +528,25 @@ html {
  */
 :root {
   --spec-card-offset: 176px;
+}
+
+/*
+ * The pane is a real tab stop (see the note above the <pre> in
+ * reference-implementations.tsx) and had no focus style at all, so it fell to
+ * the UA default — the one browser surface on this page still shipping
+ * somebody else's design.
+ *
+ * The ring is white and INSET, on the same reasoning as .site-nav__brand and
+ * .keymap-help: the sitewide ring paints --edge at +4px, which would draw an
+ * Ink line on the Paper *around* a dark pane, partly under the Card that
+ * overlaps its corner, and outlines contribute to scrollable overflow on a
+ * pane that is already the widest thing on a phone. Drawn just inside its own
+ * ground it is white on #18181b and costs no geometry. Paper on ink is the
+ * value .focus-ring--on-ink already uses; only the offset is local.
+ */
+.spec-pane:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: -3px;
 }
 
 @media (min-width: 1024px) {
@@ -431,11 +574,6 @@ html {
 .spec-code {
   display: inline-block;
   width: 32ch;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 /*
@@ -490,13 +628,21 @@ html {
  * the page transparent indefinitely. The recovery must be a cut, not a fade.
  * Specificity (0,1,1) intentionally beats .reveal--slow / .reveal--instant.
  */
-html:not(.js) .reveal {
+html:not(.js) .reveal,
+html:not(.js) .reveal-group .reveal-item {
   transition: none;
 }
 
+/* `none`, not `translateY(0)` — the same term the focus pull states for filter
+   and .hero-glyph for clip-path: an entrance ends on the ABSENCE of what it
+   animated, not on a neutral value of it. `translateY(0)` is visually identical
+   and interpolates identically from the 8px start, but it leaves every settled
+   reveal holding a transform, which is a containing block for anything
+   positioned inside it and a standing compositing hint. `.reveal--fade` and
+   `.reveal--instant` both already say `none` here; this is the third. */
 .reveal.is-revealed {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 .reveal--fade {
@@ -598,40 +744,325 @@ html:not(.js) .reveal {
 }
 
 /*
- * Draw-on — SVG line art animates from invisible to fully drawn. Uses
- * stroke-dasharray + stroke-dashoffset on a per-shape basis with
- * pathLength="1" so authors don't need to compute path length manually.
- * Honest-Network: the line being drawn IS the structure being described.
+ * THE FOCUS PULL — `.reveal--focus`, added 2026-08-19 on the user's
+ * direction. Type arrives fractionally out of focus and resolves.
+ *
+ * THIS IS THE FIRST BLUR ON THE SITE SINCE THE NAVBAR'S GLASS WENT, and
+ * DESIGN.md §4 currently forbids blur without remainder. Read the Focus-Pull
+ * Rule there before extending it. The short of it: what that clause forbids is
+ * blur as *depth* — a standing surface pretending to sit above another one,
+ * which is the glass this site spent a day deleting. A focus pull holds no
+ * state, describes no plane, and there is no frame at which two surfaces
+ * coexist. It is a property of the entrance and it is gone when the entrance
+ * is. That is the whole of the licence and it reaches no resting surface.
+ *
+ * FOUR MECHANICAL POINTS, ALL LOAD-BEARING.
+ *
+ * 1. IT ENDS ON `filter: none`, NEVER ON `blur(0px)`. A settled `blur(0)`
+ *    keeps the element in a filter context for the life of the page: a
+ *    compositor layer that is never released, and grayscale antialiasing on
+ *    type the platform would otherwise render itself. Under a 9rem
+ *    GT-Standard headline that is a permanent downgrade bought for no effect.
+ *    The transition path gets this free — its hidden state is a `:not()` gate,
+ *    so the settled element simply has no filter declared rather than a zeroed
+ *    one. The keyframes have to say it out loud, and do.
+ *
+ * 2. THE BLUR CLEARS AT --reveal-focus-span, NOT AT THE END. See the token.
+ *
+ * 3. `filter` IS COMPOSITED IN CHROMIUM, but its shader runs over the whole
+ *    layer every frame, so the cost scales with the element's *area* and the
+ *    square of the radius. That is why blur is a modifier on `.reveal` rather
+ *    than its default: the masthead sits in a Reveal (site-header.tsx) and
+ *    must never blur, and nothing should wrap a live canvas in a filter for
+ *    longer than the canvas's own entrance.
+ *
+ * 4. `filter` MAKES AN ELEMENT A CONTAINING BLOCK for absolutely positioned
+ *    descendants, and a stacking context besides. Every consumer today has
+ *    its own `position: relative` child sitting between it and anything
+ *    absolute — the implementations Card resolves against the `.relative`
+ *    *inside* its reveal, not against the reveal — which is why nothing moved.
+ *    Check that before putting one further up a tree.
  */
-.draw-on {
-  transition: stroke-dashoffset var(--dur-draw-on) var(--ease-out-quart);
-  transition-delay: var(--draw-delay, 0ms);
+@keyframes reveal-arrival-focus {
+  from {
+    opacity: 0.02;
+    transform: translateY(8px);
+    filter: blur(var(--reveal-blur));
+  }
+  /* Authored as a percentage rather than derived from --reveal-focus-span,
+     because keyframe offsets cannot read a custom property. The two are the
+     same number and must be changed together. */
+  55% {
+    filter: none;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
 }
 
-/* Undrawn state gated on html.js for the same no-script reason as .reveal. */
-:where(html.js) .draw-on {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+@keyframes reveal-arrival-fade-focus {
+  from {
+    opacity: 0.02;
+    filter: blur(var(--reveal-blur));
+  }
+  55% {
+    filter: none;
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
 }
 
-.draw-on--filled {
-  transition: opacity 480ms var(--ease-out-quart);
-  transition-delay: var(--draw-delay, 0ms);
+/* Transition path — `focus` without `immediate`. Nothing uses this today
+   (the hero is the only consumer and it is an arrival), but a modifier that
+   silently does nothing on two thirds of the component's API is a trap. */
+:where(html.js) .reveal--focus:not(.is-revealed) {
+  filter: blur(var(--reveal-blur));
 }
 
-:where(html.js) .draw-on--filled {
+.reveal--focus {
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-quart),
+    transform var(--dur-reveal) var(--ease-out-quart),
+    filter calc(var(--dur-reveal) * var(--reveal-focus-span))
+      var(--ease-out-quart);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* (0,2,0), and both must sit after the (0,2,0) fade/slow rules above so
+   source order lands the right animation on a compound modifier. */
+:where(html.js) .reveal--arrival.reveal--focus {
+  animation-name: reveal-arrival-focus;
+}
+
+:where(html.js) .reveal--arrival.reveal--fade.reveal--focus {
+  animation-name: reveal-arrival-fade-focus;
+}
+
+/*
+ * Per-consumer radii. Stated per element because a blur radius is only
+ * meaningful against the type it softens — see the token comment. `:has()`
+ * rather than a marker class or an inline style: the value belongs in the
+ * stylesheet next to its reasoning, and the elements it keys off are the ones
+ * the composition is already named after.
+ *
+ * THE HERO IS NO LONGER ONE OF THEM (2026-08-20, user-directed). Three rules
+ * lived here — 18px under the headline, 9px under the deck, 4px under the
+ * CTAs — and went with the focus pull when the hero's entrance became the
+ * per-glyph uncover (see `.hero-glyph`). They are not commented out or left
+ * standing unused: a radius with no consumer is an invitation to re-add the
+ * blur without re-arguing it, which is the reasoning §2 uses for --signal.
+ * The 18px figure is the one worth keeping in the record — it had to be
+ * roughly a tenth of the cap height to register at all, because quart carries
+ * opacity past 90% inside the first 45% of the duration, so the blur was only
+ * *visible* for a few frames. A radius that large on type that large is
+ * precisely what read as sloppy.
+ *
+ * Route headers (/wallets). One reveal wraps display type and a lead
+ * paragraph together, so this radius is a compromise between the two rather
+ * than a value picked for either: 18px would smear the lead, and the 10px
+ * default all but vanishes under a 9rem H1. The rest of that page — the group
+ * headings and the thirteen directory rows — deliberately takes no focus
+ * pull. It is a listing, not a statement, and thirteen simultaneous blurred
+ * layers is the case point 3 above is about.
+ */
+.reveal--focus:has(.t-display) {
+  --reveal-blur: 12px;
+}
+
+/*
+ * GROUP REVEALS — `.reveal-group` / `.reveal-item`. One observer per section,
+ * not one per element. Added 2026-08-19 with the focus pull, and the other
+ * half of the same complaint: the page did fade, but it faded as sixteen
+ * unrelated 8px twitches that happened to be near each other.
+ * `.protocol-parts` alone ran eighteen IntersectionObservers, one per
+ * `<Reveal>`, each deciding on its own when its own element had arrived.
+ *
+ * A `.reveal-group` is observed once (reveal-group.tsx) and stamps
+ * `.is-revealed` on itself. Its `.reveal-item` descendants are plain
+ * server-rendered elements — no client component, no effect, no observer of
+ * their own — that settle off the group's class with the same authored
+ * `--reveal-delay` stagger they carried before. Eighteen observers became
+ * five, four client components became one, and the section now arrives as one
+ * gesture instead of as a sequence of unrelated ones.
+ *
+ * The hidden state is a `:not(.is-revealed)` gate rather than a hidden/shown
+ * pair, so the settled state is the element's own: no opacity, no transform,
+ * no filter, nothing left applied when it lands. That is also what gives the
+ * blur its `filter: none` ending for free (point 1 above).
+ *
+ * Gated on html.js for the reason `.reveal` is, and rescued by the same
+ * failsafe: layout.tsx probes for `.reveal.is-revealed`, which every route
+ * still produces from its arrival reveals, and drops html.js if nothing
+ * revealed — which un-hides these too.
+ */
+:where(html.js) .reveal-group:not(.is-revealed) .reveal-item {
   opacity: 0;
+  transform: translateY(var(--reveal-rise-section));
+  filter: blur(var(--reveal-blur-section));
+  /* Compositor hint only while it can still pay for itself, as on .reveal.
+     The filter promotes the element on its own, so this is really about the
+     frames before the transition starts. */
+  will-change: opacity, transform, filter;
 }
 
-.is-revealed .draw-on,
-.draw-on.is-revealed {
-  stroke-dashoffset: 0;
+.reveal-item {
+  transition:
+    opacity var(--dur-reveal) var(--ease-out-quart),
+    transform var(--dur-reveal) var(--ease-out-quart),
+    /* --reveal-focus-span-section, NOT --reveal-focus-span: the hero's 0.55
+       protects a wipe this has none of, and it made the pull invisible here.
+       Measurements are on the token. */
+      filter calc(var(--dur-reveal) * var(--reveal-focus-span-section))
+      var(--ease-out-quart);
+  transition-delay: var(--reveal-delay, 0ms);
 }
 
-.is-revealed .draw-on--filled,
-.draw-on--filled.is-revealed {
-  opacity: 1;
+/* Section headings carry the group's weight and take a radius to match, on
+   the same reasoning as the hero's. */
+.reveal-item:has(> .t-headline),
+.reveal-item:has(> .protocol-part__title),
+.reveal-item:has(> .protocol-parts__title) {
+  --reveal-blur-section: 10px;
 }
+
+/*
+ * Jump arrivals, matching `.reveal--instant`: the visitor is already looking
+ * at the destination, so the settle would read as a dead page. No rise, no
+ * blur, no stagger, one brisk fade. (0,2,0), which is under the hidden rule's
+ * (0,3,0) — that is fine, because a group is only ever `--instant` at the
+ * same moment it is `.is-revealed`, so the hidden rule has stopped matching.)
+ */
+.reveal-group--instant .reveal-item {
+  transform: none;
+  filter: none;
+  transition-duration: var(--dur-fast);
+  transition-delay: 0ms;
+}
+
+/*
+ * The authored stagger, in one table rather than scattered across four
+ * components as inline `delay={}` props. These are the same rhythms the
+ * per-element reveals carried, pulled tighter: a group is meant to read as
+ * one gesture with internal order, so the tail of a section now lands inside
+ * 300ms of its head instead of trailing it by 360ms plus a 620ms settle.
+ *
+ * Nothing here exceeds the 360ms ceiling `MAX_DELAY_MS` used to enforce in
+ * reveal.tsx, so no cap is reimplemented. Jump arrivals drop every delay to
+ * zero through .reveal-group--instant above, which is the case the ceiling
+ * existed for.
+ */
+.protocol-parts__aside-inner .reveal-item + .reveal-item {
+  --reveal-delay: 80ms;
+}
+
+.protocol-part__head {
+  --reveal-delay: 70ms;
+}
+
+.protocol-part__body {
+  --reveal-delay: 140ms;
+}
+
+.protocol-part__plate {
+  --reveal-delay: 210ms;
+}
+
+.implementations-intro .reveal-item + .reveal-item {
+  --reveal-delay: 100ms;
+}
+
+.implementations-spec {
+  --reveal-delay: 200ms;
+}
+
+.implementations-cta {
+  --reveal-delay: 300ms;
+}
+
+.press-rail {
+  --reveal-delay: 100ms;
+}
+
+/*
+ * The wallets registry (2026-08-20). Groups two and up are RevealGroups; the
+ * rail leads at 0 and the entries follow it down the list, so the group reads
+ * as a label finding its entries rather than as a rail and a block.
+ *
+ * The ladder these replaced was a `delay=` prop on every row,
+ * `280 + gi * 60 + i * 50`, and it never rendered: MAX_DELAY_MS clamped it to a
+ * flat 360ms from the third row of the first group onward, so rows 3-6 arrived
+ * simultaneously and the Tools list tied with its own single row. Authored here
+ * the ceiling is a property of the table rather than a clamp applied after the
+ * fact, and the tail lands 260ms behind the head — inside the ~300ms this table
+ * holds itself to above.
+ *
+ * 40ms a step, not the arrival's 50-60: a registry row is one line of type, and
+ * the beat between two of them is shorter than the beat between a headline and
+ * a paragraph. Six steps covers the longest group (Mobile wallets); anything
+ * past that pins, so a seventh entry lengthens the list without lengthening the
+ * gesture.
+ *
+ * Scoped under `.reveal-group` rather than left bare: the first group is an
+ * arrival and its rows are not items, so an unscoped ladder would set a custom
+ * property on six elements that have no rule to consume it. Inert, but it would
+ * read as a stagger that had stopped working.
+ */
+.reveal-group .wallet-row:nth-child(1) {
+  --reveal-delay: 60ms;
+}
+
+.reveal-group .wallet-row:nth-child(2) {
+  --reveal-delay: 100ms;
+}
+
+.reveal-group .wallet-row:nth-child(3) {
+  --reveal-delay: 140ms;
+}
+
+.reveal-group .wallet-row:nth-child(4) {
+  --reveal-delay: 180ms;
+}
+
+.reveal-group .wallet-row:nth-child(5) {
+  --reveal-delay: 220ms;
+}
+
+.reveal-group .wallet-row:nth-child(n + 6) {
+  --reveal-delay: 260ms;
+}
+
+/*
+ * A smaller focus-pull radius than the section default, on the token's own
+ * reasoning: a radius is only meaningful against the type it softens. 6px was
+ * picked against homepage body copy running several lines; a registry row is a
+ * 1.125rem wordmark and 13px mono facts on a single line, where the same radius
+ * reads as a smear rather than as type resolving.
+ */
+.reveal-group .wallet-row {
+  --reveal-blur-section: 4px;
+}
+
+/*
+ * DRAW-ON IS DELETED (2026-08-20). It was `.draw-on` / `.draw-on--filled`: SVG
+ * line art tracing itself through stroke-dashoffset off `.is-revealed`, with a
+ * `--draw-delay` stagger. Its consumers were the ASCII field and the demo
+ * panel's figures, both deleted in 2026-08-16's clear-out, and nothing has
+ * carried the class since — so the site shipped a hidden state, an html.js
+ * gate, a reduced-motion cancel and the stylesheet's only untokenized duration
+ * (480ms) for a gesture with nothing to draw.
+ *
+ * `--dur-draw-on` survives because the hero's closing hairline is its other
+ * consumer. The recipe does not survive with it, and that is deliberate: unlike
+ * .prose-link, which is kept as the recipe for a citation because the
+ * alternative is a blue link, this one has no wrong version to prevent — the
+ * next thing that wants to draw itself will be a specific figure with its own
+ * geometry, and it should be written against that rather than inherited from a
+ * shape nobody remembers.
+ */
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
@@ -644,16 +1075,29 @@ html:not(.js) .reveal {
      .hero-spec::after, which lost it once already. */
   .reveal--arrival,
   .reveal--arrival.reveal--fade,
-  .reveal--arrival.reveal--slow {
+  .reveal--arrival.reveal--slow,
+  /* Same trap, one level deeper: the focus modifier's hidden state is
+     `:where(html.js) .reveal--focus:not(.is-revealed)`, which is (0,2,0), and
+     its arrival compound is (0,2,0) too. Both are repeated here at their own
+     weight so they tie and lose to source order. A bare `.reveal` would not
+     cancel either of them, and the page would keep a lens on its headline for
+     someone who asked for less motion. */
+  .reveal--focus,
+  .reveal--focus:not(.is-revealed),
+  .reveal--arrival.reveal--focus,
+  .reveal--arrival.reveal--fade.reveal--focus {
     opacity: 1;
     transform: none;
+    filter: none;
     transition: none;
     animation: none;
   }
-  .draw-on,
-  .draw-on--filled {
-    stroke-dashoffset: 0;
+  /* (0,3,0), tying the group's hidden rule and winning on source order. */
+  .reveal-group:not(.is-revealed) .reveal-item,
+  .reveal-item {
     opacity: 1;
+    transform: none;
+    filter: none;
     transition: none;
   }
 }
@@ -717,9 +1161,13 @@ html:not(.js) .reveal {
      It is HIDDEN between passes, not removed: button-cipher.tsx re-runs on
      every hover, so it creates the overlay once at enhance time and clears
      it on unmount. `display: none` is what closes the hazard here — a
-     display:none element has no ground to assign. hero-cipher.tsx runs once
-     and does remove its overlay; the two differ on purpose. Don't unify
-     them, and don't "fix" this to a permanent transparent background. */
+     display:none element has no ground to assign. The hero's cipher pass was
+     the other consumer and did remove its overlay, the two differing on
+     purpose; it was cut 2026-08-19 for a clip-path wipe (now the per-glyph
+     .hero-glyph cascade), so
+     this is the pattern's only consumer now. That is not a licence to
+     simplify it — a permanently transparent overlay left in the DOM is
+     exactly what a contrast extension turns into a visible plate. */
   display: none;
   background-color: transparent;
   align-items: center;
@@ -1155,6 +1603,21 @@ html:not(.js) .reveal {
   outline-offset: 2px;
 }
 
+/*
+ * Immediately after the rules it cancels, not up with the reveal resets: both
+ * are (0,1,0) and source order decides, which is the trap documented beside
+ * .hero-spec::after.
+ *
+ * The link still appears and still takes the ring — the movement goes, not the
+ * feedback. It is the first thing a keyboard visitor reaches on every page, so
+ * this is the one skipped reduced-motion cancel that mattered most.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
+
 /* The skip target carries tabindex="-1" so assistive tech actually moves
    with the link — without it Chrome advances the sequential-focus point but
    AT focus stays in the bar. It is a region, not a control, so it takes no
@@ -1275,9 +1738,10 @@ html:not(.js) .reveal {
   background: var(--hair);
 }
 
-/* Gated on html.js for the same reason .draw-on is: without scripting the
-   animation never runs, and an un-run `both`-filled animation would leave
-   the rule clipped to nothing. No JS means the hairline is simply there. */
+/* Gated on html.js for the same reason `.reveal`'s hidden state is: without
+   scripting the animation never runs, and an un-run `both`-filled animation
+   would leave the rule clipped to nothing. No JS means the hairline is simply
+   there. (`.draw-on` used to be the reference for this; it is deleted.) */
 :where(html.js) .hero-spec::after {
   animation: hero-rule-draw var(--dur-draw-on) var(--ease-out-quart) both;
 }
@@ -1297,9 +1761,9 @@ html:not(.js) .reveal {
  * rule and this one are both (0,1,1) and source order decides — an override
  * 600 lines earlier silently loses, which is exactly what happened first try.
  *
- * hero-cipher.tsx bails on its own under the same setting, so between them the
- * hero has no motion at all: the hairline is simply there and the word never
- * scrambles.
+ * .hero-glyph cancels itself under the same setting a few hundred lines down,
+ * so between them the hero has no motion at all: the hairline is simply there
+ * and the headline is simply set.
  */
 @media (prefers-reduced-motion: reduce) {
   .hero-spec::after {
@@ -1362,17 +1826,51 @@ html:not(.js) .reveal {
  * so nothing is drawn behind the headline in the first place. Both, because
  * the stacking is structural and the mask is compositional.
  */
+/*
+ * The hero is full-bleed as of 2026-08-20 — it no longer carries .page-shell.
+ *
+ * DESIGN.md §5 licenses the shell break in exactly two places, the split spec
+ * sheet and the hero, and the standard is a measured column-width failure.
+ * This is one. The widest authored headline line, OPEN SOURCE, sets 1003px at
+ * the top of the Display clamp; the shell caps content at 1088px from 1600px
+ * viewport up, so a second column gets 80px at 1920 and there is no split to
+ * build. Shrinking the type is closed by name (§3: no homepage-only Display
+ * step — that is what let /wallets out-shout the front door), and shortening
+ * the copy does not rescue it either, since FOR BITCOIN. alone sets 936px.
+ *
+ * The inset is asymmetric on purpose. Start is the ordinary gutter until the
+ * viewport passes --hero-column-max, then the block centres against that
+ * measure; end stays the gutter because nothing is aligned to it — the field
+ * runs under it and off the edge.
+ */
 .hero-spec__inner {
   position: relative;
   z-index: 1;
   margin-block: auto;
+  width: 100%;
+  padding-inline-start: max(
+    var(--page-x),
+    calc((100vw - var(--hero-column-max)) / 2)
+  );
+  padding-inline-end: var(--page-x);
 }
 
+/*
+ * Left-aligned as of 2026-08-20, on the user's direction. This retires the
+ * Centred-Hero Exception (DESIGN.md §4) and the hero now sets flush left like
+ * every other surface on the site.
+ *
+ * align-items is flex-start and NOT stretch, and that is load-bearing twice:
+ * it is what left-aligns the block, and it is what keeps each <Reveal> wrapper
+ * shrink-to-fit. The field's mask measures the union of this element's
+ * children, so stretched wrappers would report the full section width and the
+ * boundary would land off the right edge of the canvas.
+ */
 .hero-spec__content {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   gap: clamp(1.25rem, 2.5vw, 2rem);
 }
 
@@ -1407,12 +1905,13 @@ html:not(.js) .reveal {
      retyped markup, so the source string stays sentence case for screen
      readers and search engines. */
   text-transform: uppercase;
-  /* No optical-left correction: the hero is centred, so there is no left
-     margin for glyph side bearing to sit against. The corrections that used
-     to live here (headline 0.058em, deck and body 0.095em) were removed with
-     the switch to centred — reinstate them together if it ever goes back to
-     left-aligned, or the ink staggers by up to 8px at large sizes. */
-  margin: 0;
+  /* Optical-left correction, reinstated 2026-08-20 with the left-aligned
+     hero — the note that used to sit here said to bring these back together
+     with the alignment, and this is that. Glyph side bearing has to be
+     cancelled against a left margin or the inked edge staggers by up to 8px at
+     Display size. Measured for GT-Standard 600: 0.058em for the round cap
+     "O" that opens line one. In em, so it tracks the clamp. */
+  margin: 0 0 0 -0.058em;
   color: var(--ink);
   /*
    * The headline is the one element allowed out of the page shell.
@@ -1429,8 +1928,7 @@ html:not(.js) .reveal {
    * spanning wider than its supporting copy is the point of a centred
    * composition, not a misalignment.
    *
-   * RETIRED 2026-08-16. All of the above is history: the headline is back on
-   * the page shell's own measure, the same one the deck and the CTAs use.
+   * RETIRED 2026-08-16, then REPLACED 2026-08-20. Both are history now.
    *
    * The escape was necessary and it was not sufficient. The headline is
    * THREE lines, not the two this comment used to promise: measured at 144px
@@ -1439,21 +1937,33 @@ html:not(.js) .reveal {
    * splits overflowed. The old "~1283px to break cleanly in two" figure was
    * wrong. Once the rag was authored in the markup instead of balanced (see
    * page.tsx), the widest line became "OPEN SOURCE" at 1003px — which the
-   * shell's 1088px already holds, so the extra 352px bought nothing.
+   * shell's 1088px already held, so the extra 352px bought nothing and the
+   * escape was retired as a visual no-op.
    *
-   * Measured at 768/1024/1280/1440/1600/1920/2560 before and after: three
-   * lines at every width either way, identical. The lines are centred and
-   * none of them fills either box, so retiring it is a visual no-op.
+   * The split hero re-opened the question and answered it a third way: the
+   * measure is neither the viewport nor the shell, it is the TYPE'S OWN.
    *
-   * The property stays rather than being deleted: .hero-spec__content is
-   * `align-items: center`, so with no width the h1 shrinks to max-content and
-   * .hero-spec's `overflow: hidden` clips it on narrow viewports. An explicit
-   * width is load-bearing; only its value changed.
+   * 1003px at 144px is 6.97em, and font-size is clamp(3.75rem, 9vw, 9rem), so
+   * a width stated in em tracks the clamp exactly — the box is as wide as the
+   * longest line needs at every step, and no wider. That is also what makes
+   * the split resolve at all: the column is 6.97/9ths of a vw-sized headline,
+   * i.e. ~63% of viewport width while the clamp is in its 9vw regime, leaving
+   * the field a consistent ~31% from 1024 to 1600 and more above.
+   *
+   * 7em, not 6.97em: the measured figure is the ink, and rounding down would
+   * put the box inside it.
+   *
+   * The viewport term is still the other half of the min(). Below 640px the
+   * spans go back to inline and balance re-rags the line; there 7em overflows
+   * a phone and the gutter measure is what holds.
+   *
+   * The property stays rather than being deleted, for the same reason as
+   * before: .hero-spec__content is not `stretch`, so with no width the h1
+   * shrinks to max-content and .hero-spec's `overflow: hidden` clips it on
+   * narrow viewports. An explicit width is load-bearing; only its value has
+   * changed, twice.
    */
-  width: min(
-    calc(100vw - 2 * var(--page-x)),
-    calc(var(--page-max) - 2 * var(--page-x))
-  );
+  width: min(7em, calc(100vw - 2 * var(--page-x)));
   max-width: none;
 }
 
@@ -1479,6 +1989,31 @@ html:not(.js) .reveal {
   .hero-spec__line {
     display: block;
   }
+
+  /*
+   * Per-line optical left, measured 2026-08-20 at 1440 (129.6px type).
+   *
+   * The h1's own -0.058em is the correction for the ROUND cap that opens line
+   * one, and it lands that line's ink 0.6px off the intended margin and within
+   * 1px of the deck's. It cannot also be right for lines opening on a flat cap:
+   * measured, "OPEN SOURCE" inked at 87px while "ECASH" and "FOR BITCOIN." both
+   * inked at 91px — a 4px stagger, with the flat caps sitting inside the margin
+   * rather than on it.
+   *
+   * 4px at 129.6px is 0.031em, which puts the flat-cap lines at 0.089em total.
+   * DESIGN.md's independently measured flat-cap value is 0.095em — the same
+   * number the deck carries. So this is not a new constant: it is the second of
+   * the two documented values, applied where it belongs. This span carries the
+   * difference between them, because the block already supplies the first.
+   *
+   * Scoped to this breakpoint on purpose. Below 640px the spans go back to
+   * being inline and the rag re-wraps, so which glyph opens a visual line is no
+   * longer a markup fact — there the h1's single correction is all that applies,
+   * and it is the right one, because the wrapped first line still starts on "O".
+   */
+  .hero-spec__line--flat {
+    margin-left: -0.037em;
+  }
 }
 
 /*
@@ -1495,7 +2030,12 @@ html:not(.js) .reveal {
   line-height: 1.15;
   letter-spacing: -0.015em;
   color: var(--ink);
-  margin: 0;
+  /* Optical-left correction, reinstated 2026-08-20 with the alignment. The
+     deck opens on a flat cap ("I"), which carries more side bearing than the
+     headline's round "O" — measured 0.095em for GT-Standard against the
+     headline's 0.058em. Two different values because they are two different
+     glyphs, not because one of them is a guess. */
+  margin: 0 0 0 -0.095em;
   text-wrap: balance;
   text-transform: uppercase;
 }
@@ -1506,7 +2046,7 @@ html:not(.js) .reveal {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: clamp(0.75rem, 1.5vw, 1rem);
 }
 
@@ -1546,56 +2086,175 @@ html:not(.js) .reveal {
 }
 
 /*
- * The cipher pass on one word of the headline (hero-cipher.tsx). This and
- * the closing hairline's draw-on are the hero's entire motion.
+ * THE HEADLINE SETS ITSELF, ONE GLYPH AT A TIME — `.hero-glyph`, user-directed
+ * 2026-08-20. Each character of the h1 is uncovered left to right, on a short
+ * stagger, and the pass runs through all three lines as one sweep.
  *
- * What used to occupy this part of the stylesheet was the figure:
- * .hero-spec__field, .hero-orb with its two mask gradients and its narrow
- * override, and .hero-orb__canvas. All deleted 2026-08-16 on the user's
- * direction — see the Set-Once Rule, DESIGN.md §4, before adding a ground
- * back here.
+ * WHAT IT REPLACED, AND WHY. Two things, and they were fighting each other:
  *
- * inline-block so `inset: 0` on the overlay resolves against a well-defined
- * box rather than against the fragments of an inline. The word never wraps
- * inside itself, so this costs the balanced headline nothing.
+ *   .hero-wipe        one `clip-path` sweep across the single word "ecash"
+ *                     (2026-08-19), which replaced hero-cipher.tsx's
+ *                     decrypt-out-of-hex the same week.
+ *   .reveal--focus    the whole h1 fading and rising out of an 18px blur.
+ *
+ * The user called the result sloppy. The stylesheet already conceded the
+ * point: --reveal-focus-span exists at 0.55 *specifically* so the blur would
+ * clear before the word wipe finished, i.e. one entrance had to be cut short
+ * to stop it running a lens over the other. DESIGN.md §4 also carries the
+ * recorded objection to the focus pull on display type — that a blur-in is
+ * the most copied entrance on the web and the rest of this site's motion is
+ * hard-edged and geometric — with a per-line mask as the declined
+ * alternative. This is that objection settled, one granularity finer.
+ *
+ * THE HERO NOW HAS EXACTLY ONE ENTRANCE GESTURE, at three scales: the
+ * hairline draws across the fold, the glyphs uncover across the headline, and
+ * the masthead's plate wipes across a hovered link. All travelling edges, all
+ * left to right, all on the one curve.
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * SECOND PASS, LATER THE SAME DAY: THE EDGE IS SOFT AND THE GLYPHS OVERLAP.
+ *
+ * The first version shipped a hard `clip-path` edge at 110ms per glyph on a
+ * 30ms step — a duration barely larger than the step, so one or two glyphs
+ * were ever in flight. The user's verdict was "stiff and mechanic and generic
+ * and robotic", the direction was right and the material was wrong, and both
+ * halves of that are diagnosable rather than a matter of taste:
+ *
+ *   A HARD EDGE ON A GLYPH IS A SHUTTER. `inset()` gives a vertical cut with
+ *   no gradient, applied identically to all 26 characters. There is nothing
+ *   in a shutter for the eye to read as a hand or a light; it is a machine
+ *   part. It is replaced by a gradient MASK whose edge is a ramp, so the
+ *   letter is uncovered by a wash rather than a blade.
+ *
+ *   DURATION ≈ STEP IS A CLACK, NOT A CASCADE. Nominal glyphs-in-flight is
+ *   the wrong measure and it flattered the first version: what the eye reads
+ *   is how many glyphs have the mask ramp actually crossing them. Measured
+ *   at 110/30 on quart that averages 1.2 — one glyph mid-wash at a time,
+ *   which is not a cascade but a sequence of discrete events with a gap
+ *   after each, and is exactly the metronome the user heard. At 226/26 on
+ *   sine it is 3.7, a band of phases rather than a queue of events: the
+ *   leftmost glyph nearly solid, the rightmost barely begun, and the eye
+ *   reads one gesture travelling. The full grid is at --ease-out-sine, which
+ *   is the other half of this fix — lengthening the duration alone does not
+ *   work, because quart spends the extra time being already finished.
+ *
+ * WHAT DID NOT CHANGE, DELIBERATELY. The stagger is still uniform, and the
+ * only rhythm in it is the extra beat each space takes (hero-headline.tsx).
+ * Phrasing the cascade — tight inside a word, a longer rest between words —
+ * was worked through and dropped: at a ~26ms step the whole span available
+ * for phrasing is smaller than one frame of contrast, so it buys an
+ * unfalsifiable amount of "feel" for a second timing system nobody can
+ * verify by looking. The metronome was not what read as mechanical. The
+ * shutter was.
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ * WHY A MASK AND NOT AN OPACITY CASCADE. A fade per character greys the
+ * letterform while it arrives, which is the smudge the deleted ASCII field's
+ * morph mix already taught us to avoid at a different scale, and it is also
+ * the generic entrance this whole surface has twice been corrected away from.
+ * A mask keeps every visible part of the glyph at full Ink and softens only
+ * the boundary. Depth on this site comes from value steps, keylines and masks
+ * (DESIGN.md §6) — this is the third of those, not a fourth idea.
+ *
+ * It is also the only version that costs the settled headline nothing: see
+ * hero-headline.tsx for the measurements ruling out `display: inline-block`,
+ * which is what a per-glyph transform would have required. Measured on the
+ * settled state, masked-then-released against never-masked: ink mass
+ * 4,808,886 against 4,808,888 over one line at 96px, which is quantisation.
+ *
+ * THE MASK GEOMETRY IS ARITHMETIC AND IT IS EASY TO GET WRONG — the first
+ * attempt was, and it left the glyph 62% visible at the start. Three regions,
+ * and the two opaque-and-transparent ends must EACH be at least one glyph
+ * wide, or the extreme positions are not fully hidden and fully shown:
+ *
+ *   mask-size: 250%    the mask is two and a half glyphs wide
+ *   #000 0 40%         solid for the first 40% = 100% of a glyph
+ *   → transparent 60%  ramp across 20% = 50% of a glyph  ← the soft edge
+ *   (60% → 100%)       transparent for the last 40% = 100% of a glyph
+ *
+ * `mask-position: 100%` puts the mask's right end at the glyph's right edge,
+ * so the glyph sees only the transparent tail (verified: ink mass 0).
+ * `mask-position: 0%` puts its left end there, so the glyph sees only the
+ * solid head (verified: identical to unmasked). The animation is that one
+ * property; everything else is constant across both keyframes.
+ *
+ * THE TIMING IS ARITHMETIC, NOT TASTE.
+ *
+ *   start   120ms   what the headline's Reveal already carried.
+ *   step     26ms   the cadence, and the floor is real. Under about 25ms
+ *                   adjacent glyphs start on the same frame at 60Hz and the
+ *                   cascade collapses into a single sweep, which loses the
+ *                   character-by-character arrival the whole surface is for.
+ *                   It is the step that keeps this a typewriter.
+ *   glyph   226ms   the softness, on --ease-out-sine: a mean of 3.7 glyphs
+ *                   mid-wash against the first version's 1.2. It is the
+ *                   largest value that still lands the pass on the hairline
+ *                   at this step, which is how it was chosen.
+ *
+ * The last index is 29 (26 glyphs and 4 spaces, two of them line ends — see
+ * hero-headline.tsx), so the headline finishes at 120 + 29*26 + 226 = 1100ms,
+ * exactly when the closing hairline finishes its draw. The Set-Once
+ * Rule's "by ~1.1s nothing moves" is unchanged: the two remaining motions in
+ * the hero land together rather than one trailing the other.
+ *
+ * `backwards`, NOT `both`, and it is the focus pull's first mechanical term on
+ * another property: an entrance ends on the ABSENCE of what it animated, not
+ * on a neutral value of it. Every mask declaration lives inside the keyframes
+ * for exactly this reason — declared on `.hero-glyph` itself, `mask-image`
+ * would survive the animation and leave 26 permanent compositing contexts
+ * under the largest type on the site. `backwards` fills the delay phase with
+ * the `from` value, which is the half that matters, and hands back to the
+ * element's own absence of a mask when the animation ends.
+ *
+ * NO VERTICAL INSETS ANY MORE, and their disappearance is not an oversight.
+ * `.hero-wipe` needed `inset(-25% … -25% …)` because a `clip-path` clips in
+ * both axes and its box was a line box, which at line-height 0.95 is shorter
+ * than the type it sets. A horizontal-only gradient mask has no vertical
+ * extent to get wrong: `mask-size` is `100%` on the block axis and the ramp
+ * runs on the inline axis alone.
  */
-.hero-cipher {
-  position: relative;
-  display: inline-block;
+:root {
+  /* Stated here rather than inline on the span because the numbers only mean
+     anything against each other; see the arithmetic above. */
+  --hero-glyph-start: 120ms;
+  --hero-glyph-step: 26ms;
+  --dur-hero-glyph: 226ms;
 }
 
-/* The real word goes transparent and the overlay paints on top, so the line
-   never reflows: the source text keeps holding its own space and the h1's
-   accessible name is untouched throughout. */
-.hero-ciphering {
-  color: transparent;
+.hero-glyph {
+  animation: hero-glyph-set var(--dur-hero-glyph) var(--ease-out-sine)
+    calc(var(--hero-glyph-start) + var(--gi, 0) * var(--hero-glyph-step))
+    backwards;
+}
+
+@keyframes hero-glyph-set {
+  from {
+    mask-image: linear-gradient(90deg, #000 0 40%, transparent 60%);
+    mask-size: 250% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 100% 0;
+  }
+  to {
+    mask-image: linear-gradient(90deg, #000 0 40%, transparent 60%);
+    mask-size: 250% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 0% 0;
+  }
 }
 
 /*
- * No font-family: the overlay inherits GT-Standard from the headline. The
- * button pass switches to mono, which is right for a 13px label and wrong
- * here — a second typeface appearing inside the page peak for 760ms, at
- * completely different metrics.
- *
- * Centred rather than left-aligned. GT-Standard is proportional, so five hex
- * glyphs are not the width of "ECASH"; centring splits that difference
- * either side of the word's own box instead of pushing all of it into the
- * space before " FOR". nowrap because a scrambled string must never find a
- * break opportunity the real word does not have.
- *
- * Like the button overlay, this element exists only while the pass runs
- * (hero-cipher.tsx appends and removes it) rather than sitting permanently
- * invisible over the headline — contrast extensions assign backgrounds by
- * computed value and would turn a permanent fixture into a visible plate.
+ * Immediately after the rule it cancels, for the same reason the hairline's
+ * reset sits next to the hairline: these are (0,1,0) and (0,1,0), so source
+ * order decides and an override parked up with the other reduced-motion resets
+ * would silently lose. Cancelling the animation is the whole of it — every
+ * mask declaration lives in the keyframes, so with no animation there is no
+ * mask at all rather than a mask held at its end value, and no span keeps a
+ * compositing context.
  */
-.hero-cipher__label {
-  position: absolute;
-  inset: 0;
-  background-color: transparent;
-  color: var(--ink);
-  text-align: center;
-  white-space: nowrap;
-  pointer-events: none;
+@media (prefers-reduced-motion: reduce) {
+  .hero-glyph {
+    animation: none;
+  }
 }
 
 /*
@@ -2033,6 +2692,28 @@ html:not(.js) .reveal {
   text-decoration: none;
 }
 
+/*
+ * The two geometric motions in the bar, cancelled after the rules that declare
+ * them — the reduced-motion block up at .site-nav__plate sits several hundred
+ * lines earlier and would silently lose the tie.
+ *
+ * Substitute rather than kill, the pattern the button block sets. The bars snap
+ * to the X instead of rotating through it, and the panel opens at its height
+ * instead of growing to it — but the 150ms opacity fade stays on both, so the
+ * open and the close are still legible as a change of state rather than as the
+ * page cutting between two of them. Padding was already un-transitioned, so
+ * nothing else in the panel moves.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav__toggle-icon > span {
+    transition: none;
+  }
+
+  .site-nav-panel {
+    transition: opacity var(--dur-fast) linear;
+  }
+}
+
 /* Nav-link visibility aligned to Tailwind's lg (1024px). Below lg the
    four labels + brand can crowd the bar; collapsing the labels keeps the
    brand and clock confidently sized at small-laptop and tablet widths. */
@@ -2103,6 +2784,46 @@ html:not(.js) .reveal {
   opacity: 1;
 }
 
+/*
+ * The help sheet opens and closes (2026-08-20). It used to do neither: the
+ * dialog and its backdrop were the one state change on the site with no
+ * transition at all, while everything else that opens has one — the mobile
+ * panel over --dur-base, the toast over --dur-fast, the nav plate over
+ * --dur-nav-wipe.
+ *
+ * THE MATERIAL IS ALREADY IN THE VOCABULARY. The sheet is uncovered by a
+ * clip-path inset, which is what the masthead does under a hovered link, what
+ * hero-rule-draw does to the closing hairline, and what .hero-glyph does to
+ * every character of the hero headline. A travelling edge is the site's way of putting something on
+ * the page, and this is that gesture on the one surface that never got it. The
+ * backdrop only fades: it is ground, and ground does not have an edge.
+ *
+ * It runs top to bottom while every other wipe on the site runs left to right,
+ * and that is a choice rather than a slip. Left to right is how this site
+ * uncovers TYPE — a nav label, a headline glyph, a 1px rule — because that
+ * is the direction the thing is read in. This is a panel, and the site already
+ * has a gesture for a panel opening: the masthead's mobile sheet growing
+ * downward out of the bar. A sideways wipe across a six-row table would uncover
+ * it column by column, which is not the order anybody reads it.
+ *
+ * THE TIMINGS ARE THE PAIR THE SITE ALREADY USES FOR A PANEL OPENING — 220ms
+ * on the sheet and 150ms on the wash, the same two .site-nav-panel runs. The
+ * exit is the fast one in both directions: a transition takes the duration of
+ * the state it is going TO, so the base rule below governs the close and the
+ * [open] rule governs the open. 220ms in, 150ms out.
+ *
+ * `display` and `overlay` are transitioned with allow-discrete, which is the
+ * whole reason there is an exit at all — without it close() drops the element
+ * out of the top layer on the same frame and only the opening would animate.
+ *
+ * ONE COST, RECORDED RATHER THAN HIDDEN. The settled [open] state holds
+ * `clip-path: inset(0 0 0 0)`, which is a standing clipping context — the thing
+ * .hero-glyph's `backwards`-not-`both` rule exists to avoid. It is bounded here
+ * in a way that one was not: it lives only while the sheet is open, not for the
+ * life of the page, and `inset(...)` does not interpolate to `none`, so a wipe
+ * cannot end on the absence of itself. If that trade is ever unwanted the
+ * alternative is opacity plus an 8px translate, which costs the rhyme.
+ */
 .keymap-help {
   border: 1px solid var(--hair);
   background: var(--card);
@@ -2111,10 +2832,52 @@ html:not(.js) .reveal {
   width: min(360px, calc(100% - 48px));
   max-width: none;
   margin: auto;
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  transition:
+    opacity var(--dur-fast) var(--ease-out-quart),
+    clip-path var(--dur-fast) var(--ease-out-quart),
+    display var(--dur-fast) allow-discrete,
+    overlay var(--dur-fast) allow-discrete;
+}
+
+.keymap-help[open] {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  transition:
+    opacity var(--dur-fast) var(--ease-out-quart),
+    clip-path var(--dur-base) var(--ease-out-quart),
+    display var(--dur-base) allow-discrete,
+    overlay var(--dur-base) allow-discrete;
+}
+
+/* The from-values for the open direction. An element entering the top layer has
+   no previous style to transition from, so without this the sheet would cut in
+   and only the close would animate. */
+@starting-style {
+  .keymap-help[open] {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
 }
 
 .keymap-help::backdrop {
   background: var(--backdrop);
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast) var(--ease-out-quart),
+    display var(--dur-fast) allow-discrete,
+    overlay var(--dur-fast) allow-discrete;
+}
+
+.keymap-help[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .keymap-help[open]::backdrop {
+    opacity: 0;
+  }
 }
 
 /* showModal() focuses the dialog itself, and Chrome answers with its default
@@ -2157,6 +2920,25 @@ html:not(.js) .reveal {
 @media (prefers-reduced-motion: reduce) {
   .keymap-toast {
     transition: none;
+  }
+
+  /* Substitute, don't kill — the pattern the button block sets. The wipe is
+     spatial and goes; the fade stays, so the sheet still reads as arriving and
+     leaving rather than as the page teleporting between two states. The
+     discrete legs stay too, or the exit stops existing again. */
+  .keymap-help,
+  .keymap-help[open] {
+    clip-path: none;
+    transition:
+      opacity var(--dur-fast) linear,
+      display var(--dur-fast) allow-discrete,
+      overlay var(--dur-fast) allow-discrete;
+  }
+
+  @starting-style {
+    .keymap-help[open] {
+      clip-path: none;
+    }
   }
 }
 
@@ -2539,11 +3321,23 @@ html:not(.js) .reveal {
   cursor: pointer;
   transition:
     border-color var(--dur-base) var(--ease-out-quart),
-    opacity var(--dur-base) var(--ease-out-quart);
+    opacity var(--dur-base) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart);
 }
 
 .press-arrow:hover:not(:disabled) {
   border-color: var(--ink);
+}
+
+/* The same 0.985 the cipher slabs compress to, at the same 150ms — no new
+   value enters the system. Until now this was the only real <button> on the
+   site with no pressed state at all, on a control whose whole job is to move
+   the rail: it changed a border on hover and then acknowledged the click with
+   nothing. The hamburger is deliberately not given one — its icon already
+   morphs to an X on activation, which is the same acknowledgement by other
+   means. */
+.press-arrow:active:not(:disabled) {
+  transform: scale(0.985);
 }
 
 .press-arrow:disabled {
@@ -2622,7 +3416,13 @@ html:not(.js) .reveal {
     filter var(--dur-base) var(--ease-out-quart);
 }
 
-.press-card:hover .press-media__img {
+/* :focus-visible carries the same treatment as :hover, paired in one rule the
+   way .site-nav__link pairs them. It was pointer-only, so a keyboard visitor
+   tabbing the rail got an outline and a photograph that did not answer — the
+   card is a link to somebody else's site, and the lift is most of what says
+   so. */
+.press-card:hover .press-media__img,
+.press-card:focus-visible .press-media__img {
   transform: scale(1.04);
   filter: grayscale(1) contrast(1.08) brightness(1.08);
 }
@@ -2653,7 +3453,8 @@ html:not(.js) .reveal {
   transition: opacity var(--dur-base) var(--ease-out-quart);
 }
 
-.press-card:hover .press-logo {
+.press-card:hover .press-logo,
+.press-card:focus-visible .press-logo {
   opacity: 1;
 }
 
@@ -2665,8 +3466,21 @@ html:not(.js) .reveal {
   /* The pager's scrollTo already drops to behavior:auto under reduced
      motion (checked in in-the-press.tsx). */
   .press-media__img,
-  .press-card:hover .press-media__img {
+  .press-card:hover .press-media__img,
+  .press-card:focus-visible .press-media__img {
     transition: none;
+    transform: none;
+  }
+
+  /* Matching the button block: the compression goes, the border change stays,
+     so the control still answers a click without moving. */
+  .press-arrow {
+    transition:
+      border-color var(--dur-fast) linear,
+      opacity var(--dur-fast) linear;
+  }
+
+  .press-arrow:active:not(:disabled) {
     transform: none;
   }
 }

@@ -1,6 +1,6 @@
 import type { OrbState } from "thinking-orbs";
 import OrbFigure from "./orb-figure";
-import Reveal from "./reveal";
+import RevealGroup from "./reveal-group";
 
 type Part = {
   id: string;
@@ -103,43 +103,55 @@ export default function ProtocolParts() {
   return (
     <section className="protocol-parts" aria-label="The protocol, in four parts">
       <div className="protocol-parts__aside">
-        <div className="protocol-parts__aside-inner">
-          <Reveal>
+        {/* The sticky inner column IS the group: it is what the observer
+            watches, so the aside arrives as one gesture rather than as a
+            heading and a paragraph that happen to be adjacent. Sticky suits
+            the job — once the section is in view the element stays in view,
+            so there is no window in which the trigger can be missed. */}
+        <RevealGroup className="protocol-parts__aside-inner">
+          <div className="reveal-item">
             <h2 className="protocol-parts__title">The protocol, in four parts.</h2>
-          </Reveal>
-          <Reveal delay={80}>
+          </div>
+          <div className="reveal-item">
             <p className="protocol-parts__lead">
               Cashu is an open protocol for Chaumian ecash on bitcoin. Mints
               issue bearer tokens against Lightning, wallets hold them, and
               blind signatures keep a mint from tying the withdrawal to the
               spend that follows it. Every part of it is specified in public.
             </p>
-          </Reveal>
-        </div>
+          </div>
+        </RevealGroup>
       </div>
 
       <div className="protocol-parts__list">
         {PARTS.map((part, i) => (
-          <article key={part.id} className="protocol-part">
-            <Reveal variant="fade" className="protocol-part__index">
+          /* One group per entry, not one per section and not one per
+             element. Per section would reveal entry four while it is still a
+             screen and a half below the fold, so nobody would ever see it
+             arrive; per element is what this replaced. Per entry, the row
+             settles as a unit at reading pace, which is the granularity the
+             layout already reads at. The stagger between the four cells is
+             authored in globals.css against these same class names. */
+          <RevealGroup key={part.id} as="article" className="protocol-part">
+            <div className="reveal-item protocol-part__index">
               <span className="protocol-part__num">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="protocol-part__name">{part.name}</span>
-            </Reveal>
+            </div>
 
-            <Reveal delay={60} className="protocol-part__head">
+            <div className="reveal-item protocol-part__head">
               <h3 className="protocol-part__title">{part.title}</h3>
-            </Reveal>
+            </div>
 
-            <Reveal delay={120} className="protocol-part__body">
+            <div className="reveal-item protocol-part__body">
               <p>{part.body}</p>
-            </Reveal>
+            </div>
 
-            <Reveal variant="fade" slow delay={180} className="protocol-part__plate">
+            <div className="reveal-item protocol-part__plate">
               <OrbFigure state={part.orb} label={part.orbLabel} />
-            </Reveal>
-          </article>
+            </div>
+          </RevealGroup>
         ))}
       </div>
     </section>

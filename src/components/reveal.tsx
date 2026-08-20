@@ -17,6 +17,7 @@ type RevealProps = {
   variant?: RevealVariant;
   slow?: boolean;
   immediate?: boolean;
+  focus?: boolean;
   className?: string;
   as?: ElementType;
   style?: CSSProperties;
@@ -37,7 +38,27 @@ type RevealProps = {
  */
 const JUMP_WINDOW_MS = 900;
 const TELEPORT_WINDOW_MS = 400;
-const FAST_SCROLL_PX_PER_MS = 2.5;
+/*
+ * 2.5 px/ms was under macOS momentum scrolling and stole the settle at
+ * random (raised to 5 on 2026-08-20).
+ *
+ * The hash and teleport branches above are discrete events and were never in
+ * doubt; this one is a guess about intent read off a continuous signal, and
+ * it was guessing wrong. A trackpad flick decays through 3-6 px/ms while the
+ * reader is still reading, so an ordinary scroll down the page was tripping
+ * the jump gate — and only sometimes, because what matters is the
+ * instantaneous velocity at the moment an observer callback happens to fire,
+ * not the peak. Measured over a scripted 4200px scroll at 1440x900: a
+ * momentum flick sent 2 of the homepage's 7 groups down the `--instant` path
+ * (no blur, no rise, no stagger, one 150ms fade) while a *faster* run sent
+ * none. Intermittency was the whole tell — the same section arriving two
+ * different ways on two visits reads as a glitch rather than as a rhythm.
+ *
+ * 5 px/ms still catches a genuine flick-to-the-bottom, which is what this
+ * branch is for, and leaves reading-pace momentum alone. Anchor navigation
+ * and hash-on-load are unaffected: they never reached this branch.
+ */
+const FAST_SCROLL_PX_PER_MS = 5;
 const VELOCITY_STALE_MS = 160;
 
 let trackerReady = false;
@@ -46,7 +67,7 @@ let lastY = 0;
 let lastT = 0;
 let lastVelocity = 0;
 
-function ensureTracker() {
+export function ensureTracker() {
   if (trackerReady || typeof window === "undefined") return;
   trackerReady = true;
   lastY = window.scrollY;
@@ -75,7 +96,7 @@ function ensureTracker() {
   });
 }
 
-function isJumpArrival() {
+export function isJumpArrival() {
   const now = performance.now();
   if (now < jumpUntil) return true;
   if (now - lastT > VELOCITY_STALE_MS) return false;
@@ -87,7 +108,7 @@ function isJumpArrival() {
  * bounded so the last element of a group can never lag a jump arrival by
  * half a second on top of the transition itself.
  */
-const MAX_DELAY_MS = 360;
+export const MAX_DELAY_MS = 360;
 
 /*
  * Defer a reveal by a timeout, never by requestAnimationFrame. A tab opened
@@ -98,7 +119,7 @@ const MAX_DELAY_MS = 360;
  * whether or not anyone is watching yet. One frame of delay is all this
  * needs; it exists to keep setState out of the effect body.
  */
-function scheduleReveal(run: () => void) {
+export function scheduleReveal(run: () => void) {
   return window.setTimeout(run, 0);
 }
 
@@ -130,6 +151,7 @@ export default function Reveal({
   variant = "rise",
   slow = false,
   immediate = false,
+  focus = false,
   className = "",
   as,
   style,
@@ -199,6 +221,11 @@ export default function Reveal({
     "reveal",
     variant === "fade" ? "reveal--fade" : "",
     slow ? "reveal--slow" : "",
+    /* Focus pull — the element resolves out of a short blur as it settles.
+       Opt-in, never the default: see the four mechanical points in the
+       focus-pull block in globals.css, of which the third is why the masthead
+       must not carry this. */
+    focus ? "reveal--focus" : "",
     /* Server-rendered, and the whole point: `.reveal--arrival` carries a CSS
        animation that plays from parse time, so an entrance with no runtime
        input stops being gated on hydration. See the arrival block in

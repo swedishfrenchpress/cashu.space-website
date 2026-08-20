@@ -1,5 +1,5 @@
 import NewTabHint from "./new-tab-hint";
-import Reveal from "./reveal";
+import RevealGroup from "./reveal-group";
 
 type Repo = {
   name: string;
@@ -410,14 +410,18 @@ function Card() {
 export default function ReferenceImplementations() {
   return (
     <section className="bg-paper text-ink section-y-default">
-      <div className="page-shell flex flex-col gap-12 lg:gap-16">
+      {/* One group for the section. The band is a heading, a lead, the Spec
+          plate and a link out — four things that are one statement, and which
+          used to arrive as four independent observations. The stagger between
+          them is authored in globals.css against the class names below. */}
+      <RevealGroup className="page-shell flex flex-col gap-12 lg:gap-16">
         <div className="implementations-intro flex flex-col gap-6">
-          <Reveal>
+          <div className="reveal-item">
             <h2 className="t-headline">
               {IMPLEMENTATIONS_WORD} implementations, one spec.
             </h2>
-          </Reveal>
-          <Reveal delay={120}>
+          </div>
+          <div className="reveal-item">
             {/* The measure is capped by .implementations-intro p in
                 globals.css (--measure-lead), not here. A max-w-[54ch] utility
                 sat on this element and never took effect: that rule is
@@ -433,7 +437,7 @@ export default function ReferenceImplementations() {
               cashubtc organization hosts the spec, the SDKs, and the
               reference wallets.
             </p>
-          </Reveal>
+          </div>
         </div>
 
         {/* The Spec is the centerpiece — full-width on mobile, capped and
@@ -443,7 +447,11 @@ export default function ReferenceImplementations() {
             the right of the white card. The Spec's pre carries enough left
             padding on lg+ that the code text starts to the right of the
             overlap zone instead of hiding behind the card. */}
-        <Reveal slow delay={240}>
+        <div className="reveal-item implementations-spec">
+          {/* The Card resolves against this `.relative`, which sits *inside*
+              the item — so the item's entrance filter, which would otherwise
+              become the Card's containing block, cannot reach it. See point 4
+              of the focus-pull block in globals.css. */}
           <div className="relative">
             <div className="mb-6 lg:mb-0 lg:absolute lg:left-0 lg:top-16 lg:w-[340px] lg:z-10">
               <Card />
@@ -452,9 +460,9 @@ export default function ReferenceImplementations() {
               <Spec />
             </div>
           </div>
-        </Reveal>
+        </div>
 
-        <Reveal delay={360}>
+        <div className="reveal-item implementations-cta">
           <div className="flex justify-start lg:justify-end">
             <a
               href="https://github.com/cashubtc"
@@ -466,8 +474,8 @@ export default function ReferenceImplementations() {
               <NewTabHint />
             </a>
           </div>
-        </Reveal>
-      </div>
+        </div>
+      </RevealGroup>
     </section>
   );
 }
