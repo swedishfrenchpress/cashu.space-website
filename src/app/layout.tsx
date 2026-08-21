@@ -146,46 +146,53 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        {/* Stamps html.js, the gate for every scripting-dependent hidden
-            state (.reveal, .reveal-group's items, the hero hairline's draw):
-            without it the site renders fully static. Parser-blocking on purpose — it must run before anything
-            renders, or the gated elements flash.
+        {/* THE NO-SCRIPT RESCUE, and it is the one place this stylesheet uses
+            `!important` — deliberately, because it is the only thing that can
+            beat an inline style.
 
-            It used to also apply a saved theme before first paint. Dark mode
-            was removed 2026-08-17, so there is no preference to restore and
-            no scheme to flash.
+            The entrance is Motion-driven now (see stagger.tsx), and Motion
+            serialises a variant's `initial` state into the SERVER-RENDERED
+            `style` attribute. So a visitor with scripting off receives markup
+            that is already `opacity: 0.02; filter: blur(4px); transform:
+            translateY(40px)` and has nothing to animate it back. No CSS
+            selector can undo that — inline wins — and the boot script below
+            cannot help either, because with scripting off it never runs.
 
-            The same script arms a failsafe. html.js is stamped here, but
-            only React can add `.is-revealed`, so between this line and
-            hydration every .reveal is transparent. Scripting-off was always
-            handled; scripting-*slow* and scripting-*broken* were not, and
-            those fail worse — they never resolve.
+            `<noscript>` is parsed only when scripting is disabled, which makes
+            it exactly the right instrument: the rule exists for those visitors
+            and for nobody else, and it costs everyone else nothing.
 
-            What it rescues narrowed on 2026-08-17: the `immediate` reveals
-            now paint from a CSS animation at parse time
-            (`.reveal--arrival`), so the masthead and the hero no longer
-            depend on this at all. What still does is every scroll-triggered
-            reveal below the fold, which genuinely cannot resolve without
-            React. Dropping html.js remains the right recovery for those, and
-            it also cancels the arrival animation cleanly, since that is
-            scoped to html.js too and its elements are already at opacity 1.
+            This is a real cost of driving the entrance from a runtime rather
+            than from the stylesheet, and it is recorded rather than hidden. */}
+        <noscript>
+          <style
+            dangerouslySetInnerHTML={{
+              __html:
+                "[data-stagger] > *{opacity:1 !important;transform:none !important;filter:none !important}",
+            }}
+          />
+        </noscript>
 
-            The test is the outcome, not a proxy: after 1.5s, has *any*
-            .reveal actually revealed? Every page opens with `immediate`
-            reveals, and React still marks those `.is-revealed` even though
-            the animation no longer waits for it — that is the signal this
-            probes, and why that class was kept. Asking React to
-            report its own readiness instead would miss the case that
-            actually bites — a backgrounded tab, where hydration completes
-            but requestAnimationFrame is paused, so the flag says ready
-            while every element is still transparent. If nothing has
-            revealed, drop html.js and the page becomes the static document
-            it already knows how to be. This lives inline, not in a chunk,
-            so a chunk that never arrives cannot take the failsafe with it. */}
+        {/* Stamps html.js, still the gate for the hero hairline's draw.
+
+            THE FAILSAFE NOW REPAIRS RATHER THAN RETREATS. It used to probe for
+            `.reveal.is-revealed` and, finding none, drop `html.js` so the
+            CSS-gated hidden states released. That system is gone; Motion's
+            hidden state is an inline style, so dropping a class cannot reach
+            it. Instead, after 1.5s, anything still sitting under an opacity of
+            0.9 inside a stagger container gets its inline opacity, transform
+            and filter cleared outright.
+
+            The case this exists for is unchanged and is the one that actually
+            bites: not scripting-off (handled above) but scripting-SLOW and
+            scripting-BROKEN — a chunk that never arrives, or a backgrounded tab
+            where hydration completes while rAF stays paused. Those never
+            resolve on their own. It lives inline, not in a chunk, so a chunk
+            that never arrives cannot take the failsafe with it. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'document.documentElement.classList.add("js");setTimeout(function(){if(!document.querySelector(".reveal.is-revealed"))document.documentElement.classList.remove("js")},1500)',
+              'document.documentElement.classList.add("js");setTimeout(function(){document.querySelectorAll("[data-stagger] > *").forEach(function(e){var o=getComputedStyle(e).opacity;if(o!==""&&parseFloat(o)<0.9){e.style.opacity="";e.style.transform="";e.style.filter=""}})},1500)',
           }}
         />
         <a href="#main-content" className="skip-link">

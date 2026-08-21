@@ -1,9 +1,11 @@
 "use client";
 
+import { animate } from "motion/react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useMotionUITheme } from "./motion-ui/ui-theme";
 import NewTabHint from "./new-tab-hint";
-import RevealGroup from "./reveal-group";
+import { Stagger, StaggerItem } from "./stagger";
 
 /**
  * In the press — the closing band of press mentions, modeled on the Griffin
@@ -90,10 +92,31 @@ function Chevron({ dir }: { dir: "prev" | "next" }) {
   );
 }
 
+/* How long the rail keeps coasting after the pointer lets go, in ms of the
+   release velocity. This is a projection distance, not a duration — the glide
+   itself is a spring. 220ms is `--dur-base`: the rail carries on for about as
+   long as a button takes to change its ground, which is enough to feel thrown
+   rather than dropped and short enough that a hard flick still lands on the
+   next card rather than three cards away. */
+const COAST_MS = 220;
+
+/* Movement past which a pointer gesture stops being a click and becomes a
+   drag. Below this the rail should not move and the card underneath must still
+   open; above it the rail moves and the click that follows is swallowed. 4px
+   is the usual browser-ish threshold and it is comfortably under the smallest
+   deliberate drag while sitting above hand tremor on a trackpad. */
+const DRAG_THRESHOLD_PX = 4;
+
 export default function InThePress() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
+  /* The first real consumer of the Motion UI theme provider mounted in
+     layout.tsx, which until now supplied a context nothing read. `ui` is the
+     theme's own name for "menus, cards, reveals" and it is the right weight for
+     a rail: verified not to overshoot (peak 1.0000 in its sampled linear()), so
+     it costs nothing against the site's no-bounce doctrine. */
+  const theme = useMotionUITheme();
 
   const update = useCallback(() => {
     const el = trackRef.current;
@@ -118,12 +141,153 @@ export default function InThePress() {
     };
   }, [update]);
 
+  /* One card plus one gap — the distance between two snap points. Shared by
+     the pager and the drag so they cannot disagree about where a card is. */
+  const unitOf = useCallback((el: HTMLElement) => {
+    const card = el.querySelector<HTMLElement>("[data-press-card]");
+    const gap = parseFloat(getComputedStyle(el).columnGap) || 24;
+    return card ? card.offsetWidth + gap : el.clientWidth * 0.8;
+  }, []);
+
+  /*
+   * DRAG THE RAIL (2026-08-21). The press rail is the one component on the site
+   * a reader manipulates directly, and it responded like a document rather than
+   * an object: native snap points, a pager, no weight.
+   *
+   * THIS IS ADDITIVE, WHICH IS THE WHOLE DESIGN. The track stays a real scroll
+   * container — touch scrolling, trackpad, keyboard, and the pager all keep
+   * working untouched, and none of them go through this code. Motion's `drag`
+   * was the obvious reach and is deliberately NOT used: it wants a transform-
+   * driven rail, and converting to one would trade native touch and keyboard
+   * scrolling for a mouse affordance. So this drives `scrollLeft` directly and
+   * only ever attaches to a fine pointer.
+   *
+   * SNAP IS SUSPENDED FOR THE LENGTH OF THE DRAG. With `scroll-snap-type: x
+   * mandatory` the browser re-snaps on every scrollLeft write, so dragging
+   * against it feels like pulling something over a ratchet. It is restored the
+   * moment the glide lands — and the glide lands ON a snap point, so restoring
+   * it is a no-op rather than a correction the reader can see. That is the same
+   * reasoning `step()` states below for using scrollTo over scrollBy.
+   */
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    /* Coarse pointers already have momentum scrolling from the platform, and it
+       is better than this. Attaching here would mean re-implementing iOS. */
+    if (!window.matchMedia("(pointer: fine)").matches) return;
+
+    let dragging = false;
+    let startX = 0;
+    let startScroll = 0;
+    let lastX = 0;
+    let lastT = 0;
+    let velocity = 0; // px/ms of scrollLeft, positive = scrolling right
+    let travelled = 0;
+    let glide: { stop: () => void } | null = null;
+
+    const restoreSnap = () => {
+      el.style.scrollSnapType = "";
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0 || event.pointerType !== "mouse") return;
+      glide?.stop();
+      glide = null;
+      dragging = true;
+      travelled = 0;
+      velocity = 0;
+      startX = lastX = event.clientX;
+      startScroll = el.scrollLeft;
+      lastT = event.timeStamp;
+      el.style.scrollSnapType = "none";
+      el.classList.add("is-dragging");
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!dragging) return;
+      const dx = event.clientX - lastX;
+      const dt = Math.max(1, event.timeStamp - lastT);
+      /* Negated because dragging the content LEFT scrolls the rail RIGHT. */
+      velocity = -dx / dt;
+      lastX = event.clientX;
+      lastT = event.timeStamp;
+      travelled += Math.abs(dx);
+      el.scrollLeft = startScroll - (event.clientX - startX);
+    };
+
+    const onPointerUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove("is-dragging");
+
+      if (travelled < DRAG_THRESHOLD_PX) {
+        restoreSnap();
+        return;
+      }
+
+      /* Project where the coast would end, round that to the nearest snap
+         point, and spring to it. Rounding before animating is what lets snap
+         come back without a visible correction. */
+      const unit = unitOf(el);
+      const max = el.scrollWidth - el.clientWidth;
+      const projected = el.scrollLeft + velocity * COAST_MS;
+      const target = Math.min(
+        max,
+        Math.max(0, Math.round(projected / unit) * unit),
+      );
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        /* Substitute, don't kill: the rail still lands on the card the throw
+           was aimed at, it just gets there without the glide. */
+        el.scrollLeft = target;
+        restoreSnap();
+        return;
+      }
+
+      glide = animate(el.scrollLeft, target, {
+        type: "spring",
+        stiffness: theme.transitions.ui.stiffness,
+        damping: theme.transitions.ui.damping,
+        onUpdate: (value) => {
+          el.scrollLeft = value;
+        },
+        onComplete: restoreSnap,
+      });
+    };
+
+    /* Swallow the click that a drag ends on. Every card is a link covering most
+       of the track, so without this a throw that happens to finish over a card
+       opens a news site. Capture phase, so it runs before the anchor's own
+       handling; the threshold is what keeps an ordinary click working. */
+    const onClickCapture = (event: MouseEvent) => {
+      if (travelled >= DRAG_THRESHOLD_PX) {
+        event.preventDefault();
+        event.stopPropagation();
+        travelled = 0;
+      }
+    };
+
+    el.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
+    el.addEventListener("click", onClickCapture, true);
+    return () => {
+      glide?.stop();
+      el.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
+      el.removeEventListener("click", onClickCapture, true);
+      restoreSnap();
+      el.classList.remove("is-dragging");
+    };
+  }, [theme, unitOf]);
+
   const step = (dir: 1 | -1) => {
     const el = trackRef.current;
     if (!el) return;
-    const card = el.querySelector<HTMLElement>("[data-press-card]");
-    const gap = parseFloat(getComputedStyle(el).columnGap) || 24;
-    const unit = card ? card.offsetWidth + gap : el.clientWidth * 0.8;
+    const unit = unitOf(el);
     // scrollTo an exact card-aligned position rather than scrollBy a delta:
     // with scroll-snap-type mandatory on the track, a smooth scrollBy gets
     // resolved back to the nearest snap point (the card it started on) and
@@ -144,11 +308,11 @@ export default function InThePress() {
       className="bg-paper text-ink section-y-default press"
       aria-labelledby="press-heading"
     >
-      {/* One group: the heading, its arrows and the rail are one band, and
-          the rail is the only part of it anyone scrolls. Staggered in
-          globals.css against the class names below. */}
-      <RevealGroup className="page-shell flex flex-col gap-10 lg:gap-14">
-        <div className="reveal-item press-head">
+      {/* One container: the heading, its arrows and the rail are one band, and
+          the rail is the only part of it anyone scrolls. The stagger between
+          the two is Motion's `staggerChildren`, not a CSS delay table. */}
+      <Stagger inView className="page-shell flex flex-col gap-10 lg:gap-14">
+        <StaggerItem className="press-head">
           <div className="flex items-end justify-between gap-6">
             <h2 id="press-heading" className="t-headline">
               In the press
@@ -174,9 +338,9 @@ export default function InThePress() {
               </button>
             </div>
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="reveal-item press-rail">
+        <StaggerItem className="press-rail">
           <div ref={trackRef} className="press-track scrollbar-none">
             {STORIES.map((story) => (
               <a
@@ -211,8 +375,8 @@ export default function InThePress() {
               </a>
             ))}
           </div>
-        </div>
-      </RevealGroup>
+        </StaggerItem>
+      </Stagger>
     </section>
   );
 }

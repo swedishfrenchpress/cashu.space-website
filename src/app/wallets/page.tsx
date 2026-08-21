@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Reveal from "@/components/reveal";
-import RevealGroup from "@/components/reveal-group";
 import FooterReveal from "@/components/footer-reveal";
+import { Stagger, StaggerItem } from "@/components/stagger";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
@@ -151,7 +150,7 @@ function targetOf(href: string): string {
 /* One registry row. Extracted so the two arrival paths below render the
    identical row and differ only in the class it carries: the first group is
    an arrival and its rows are plain, every group under the fold is a
-   RevealGroup and its rows are that group's `.reveal-item`s. */
+   Stagger container and its rows are that container's items. */
 function WalletRow({
   entry,
   className = "wallet-row",
@@ -215,17 +214,23 @@ export default function WalletsPage() {
       <main className="flex-1 pb-24 lg:pb-32">
 
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
-        <Reveal immediate focus as="header">
-          <div id="main-content" tabIndex={-1} className="flex flex-col gap-6 max-w-[60ch]">
-            <h1 className="t-display">Wallets.</h1>
-            <p className="t-body-lead text-body">
+        <header>
+          <Stagger
+            id="main-content"
+            tabIndex={-1}
+            className="flex flex-col gap-6 max-w-[60ch]"
+          >
+            <StaggerItem as="h1" className="t-display">
+              Wallets.
+            </StaggerItem>
+            <StaggerItem as="p" className="t-body-lead text-body">
               Wallets first, then the libraries and mint tooling built on the
               same spec. Any client that implements the Cashu protocol is
               conformant. This list is non-exhaustive, a snapshot of what
               people use today, not an endorsement.
-            </p>
-          </div>
-        </Reveal>
+            </StaggerItem>
+          </Stagger>
+        </header>
 
         <div className="flex flex-col gap-[clamp(4rem,8vw,6.5rem)] mt-[clamp(3.5rem,7vw,6rem)]">
           {DIRECTORY_GROUPS.map((group, gi) => {
@@ -263,16 +268,16 @@ export default function WalletsPage() {
                   aria-labelledby={headingId}
                   className="wallet-group"
                 >
-                  <Reveal immediate delay={160} className="wallet-group__rail">
+                  <div className="wallet-group__rail">
                     {rail}
-                  </Reveal>
-                  <Reveal immediate delay={220}>
+                  </div>
+                  <div>
                     <ul className="wallet-list">
                       {group.entries.map((entry) => (
                         <WalletRow key={entry.name} entry={entry} />
                       ))}
                     </ul>
-                  </Reveal>
+                  </div>
                 </section>
               );
             }
@@ -283,7 +288,7 @@ export default function WalletsPage() {
                moves onto the group, so RevealGroup's prop surface is untouched.
 
                The <ul> is a plain grid child and deliberately NOT an item —
-               a `.reveal-item` list wrapping `.reveal-item` rows would blur and
+               a stagger item wrapping stagger-item rows would blur and
                translate every row twice. Its top hairline is structure, not
                content: it holds the register open while the entries land in it.
 
@@ -294,20 +299,22 @@ export default function WalletsPage() {
                rendered. */
             return (
               <section key={group.heading} aria-labelledby={headingId}>
-                <RevealGroup className="wallet-group">
-                  <div className="reveal-item wallet-group__rail">{rail}</div>
-                  <div>
+                <Stagger inView className="wallet-group">
+                  <StaggerItem offsetY={24} className="wallet-group__rail">
+                    {rail}
+                  </StaggerItem>
+                  <StaggerItem offsetY={24}>
                     <ul className="wallet-list">
                       {group.entries.map((entry) => (
                         <WalletRow
                           key={entry.name}
                           entry={entry}
-                          className="wallet-row reveal-item"
+                          className="wallet-row"
                         />
                       ))}
                     </ul>
-                  </div>
-                </RevealGroup>
+                  </StaggerItem>
+                </Stagger>
               </section>
             );
           })}

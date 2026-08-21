@@ -1,5 +1,5 @@
 import NewTabHint from "./new-tab-hint";
-import RevealGroup from "./reveal-group";
+import { Stagger, StaggerItem } from "./stagger";
 
 type Repo = {
   name: string;
@@ -365,7 +365,7 @@ function Card() {
           href={repo.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between gap-4 px-5 py-3 transition-colors hover:bg-zinc-50 focus-ring"
+          className="flex items-center justify-between gap-4 px-5 py-3 impl-repo-row focus-ring"
         >
           <span className="flex items-center gap-3 min-w-0">
             <LangMark lang={repo.lang} />
@@ -414,14 +414,14 @@ export default function ReferenceImplementations() {
           plate and a link out — four things that are one statement, and which
           used to arrive as four independent observations. The stagger between
           them is authored in globals.css against the class names below. */}
-      <RevealGroup className="page-shell flex flex-col gap-12 lg:gap-16">
+      <Stagger inView className="page-shell flex flex-col gap-12 lg:gap-16">
         <div className="implementations-intro flex flex-col gap-6">
-          <div className="reveal-item">
+          <StaggerItem>
             <h2 className="t-headline">
               {IMPLEMENTATIONS_WORD} implementations, one spec.
             </h2>
-          </div>
-          <div className="reveal-item">
+          </StaggerItem>
+          <StaggerItem>
             {/* The measure is capped by .implementations-intro p in
                 globals.css (--measure-lead), not here. A max-w-[54ch] utility
                 sat on this element and never took effect: that rule is
@@ -437,7 +437,7 @@ export default function ReferenceImplementations() {
               cashubtc organization hosts the spec, the SDKs, and the
               reference wallets.
             </p>
-          </div>
+          </StaggerItem>
         </div>
 
         {/* The Spec is the centerpiece — full-width on mobile, capped and
@@ -445,13 +445,13 @@ export default function ReferenceImplementations() {
             on lg+ pulls into absolute position over the Spec's upper-left
             corner so the dark code surface is visible above, below, and to
             the right of the white card. The Spec's pre carries enough left
-            padding on lg+ that the code text starts to the right of the
             overlap zone instead of hiding behind the card. */}
-        <div className="reveal-item implementations-spec">
+        <StaggerItem className="implementations-spec">
           {/* The Card resolves against this `.relative`, which sits *inside*
-              the item — so the item's entrance filter, which would otherwise
-              become the Card's containing block, cannot reach it. See point 4
-              of the focus-pull block in globals.css. */}
+              the item — so the item's entrance `filter: blur()`, which would
+              otherwise become the Card's containing block, cannot reach it.
+              Motion applies that filter inline for the length of the entrance;
+              see stagger.tsx. */}
           <div className="relative">
             <div className="mb-6 lg:mb-0 lg:absolute lg:left-0 lg:top-16 lg:w-[340px] lg:z-10">
               <Card />
@@ -460,9 +460,9 @@ export default function ReferenceImplementations() {
               <Spec />
             </div>
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="reveal-item implementations-cta">
+        <StaggerItem className="implementations-cta">
           <div className="flex justify-start lg:justify-end">
             <a
               href="https://github.com/cashubtc"
@@ -474,8 +474,8 @@ export default function ReferenceImplementations() {
               <NewTabHint />
             </a>
           </div>
-        </div>
-      </RevealGroup>
+        </StaggerItem>
+      </Stagger>
     </section>
   );
 }

@@ -55,9 +55,31 @@ const OUT = fileURLToPath(new URL("../src/app/motion-theme.css", import.meta.url
  * one globals.css states where it deleted --ease-out-quint and --ease-out-expo,
  * and §2 states where it deleted --signal: a token standing with no consumer is
  * an invitation to reach for it without re-arguing the choice. Emitting the
- * whole vocabulary would put four more curves in autocomplete, one of which
- * (`lively`) overshoots to 1.31 and would spend DESIGN.md §4's no-bounce rule
- * the first time somebody reached for it because it was there.
+ * whole vocabulary would put four more curves in autocomplete.
+ *
+ * CORRECTED 2026-08-21 — THE BOUNCE ARGUMENT APPLIES TO EXACTLY ONE OF THEM.
+ * This paragraph used to say the withheld curves included one (`lively`) that
+ * "overshoots to 1.31 and would spend DESIGN.md §4's no-bounce rule", which is
+ * true, and left a reader free to infer the same about the other three. It is
+ * not true of the other three. Every spring's linear() was generated through
+ * Motion's own generator and every sample parsed:
+ *
+ *          zeta      analytic peak    peak of emitted linear()
+ *   snap    1.0029     1.0              1.0000
+ *   ui      0.9448     1.000116         1.0000
+ *   gentle  0.9535     1.000048         1.0000
+ *   lively  0.3408     1.320171         1.3196
+ *   ambient 0.9912     1.0000000001     1.0000
+ *
+ * ui, gentle and ambient are underdamped by a rounding error, and their first
+ * peaks land at 0.549s, 0.994s and 3.628s against curves that end at 0.450s,
+ * 0.750s and 1.200s — the overshoot happens after the sampler stops, and the
+ * 4-decimal rounding would erase it anyway. On the theme's largest travel token
+ * their theoretical overshoot is 0.006px, 0.002px and 3e-9px.
+ *
+ * So those three are withheld on the UNCONSUMED-TOKEN argument alone, which is
+ * the whole argument above and is sufficient. `lively` is withheld on both, and
+ * it is the only one for which the second one is a real statement.
  *
  * TO ADD ONE: put its name here, alias it in the globals.css motion token block
  * with the surface that needs it and the reason it needs it, and re-run. The
@@ -70,10 +92,14 @@ const EMIT = [
   "--motion-ui-transition-snap-spring-duration",
 ];
 
-/* `$comment` documents the JSON for a human reader; defineTheme would carry it
-   into the resolved theme as an unknown key, so it never reaches the emit. */
-const { $comment, ...themeConfig } = config;
-void $comment;
+/* `$`-prefixed keys document the JSON for a human reader; defineTheme would
+   carry them into the resolved theme as unknown keys, so they are stripped
+   before it sees the config. Stripped by prefix rather than by name so a second
+   note (there are two now: `$comment` and `$damping`) does not silently leak
+   into the runtime theme the way it would have under the old destructure. */
+const themeConfig = Object.fromEntries(
+  Object.entries(config).filter(([key]) => !key.startsWith("$")),
+);
 
 const theme = defineTheme(themeConfig);
 const all = themeToCssVars(theme);

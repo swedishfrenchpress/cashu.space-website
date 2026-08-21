@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import {
   useEffect,
   useLayoutEffect,
@@ -13,10 +8,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { scheduleReveal } from "./reveal";
+import { defer } from "@/lib/defer";
 
 /*
- * FOOTER REVEAL — the Twilight Stack is uncovered, not scrolled to.
+ * FOOTER REVEAL — the Twilight Stack is uncovered, not faded.
  *
  * Adapted from Motion's `footer-reveal` example (MotionScore S,
  * https://examples.motion.dev/react/footer-reveal), pulled through the Motion+
@@ -27,7 +22,7 @@ import { scheduleReveal } from "./reveal";
  * parent's background but before the parent's in-flow content, which is the
  * whole trick — `.footer-reveal` carries `isolation: isolate` so the plate
  * cannot escape the stacking context and fall behind the page ground, and
- * `.footer-reveal__cover` carries an opaque Paper background because `<main>`
+ * `.footer-reveal__cover` carries an opaque Paper background because <main>
  * has none and a transparent cover would show the plate through the document.
  *
  * Scroll progress is read off the COVER, not the plate: a `position: sticky`
@@ -36,46 +31,77 @@ import { scheduleReveal } from "./reveal";
  * cover's bottom edge reaches the bottom of the viewport to the moment it
  * leaves the top.
  *
- * WHAT IS DELIBERATELY NOT COPIED FROM THE EXAMPLE. It hides the scrollbar
- * (`scrollbar-width: none`) to stop a light footer showing a gutter. That is a
- * fix for a demo page's own chrome and it takes the reader's scroll position
- * indicator away on a long document, so it is not here.
+ * WHAT THIS VERSION CORRECTS, 2026-08-21, and why it is a deletion.
  *
- * TWO ADAPTATIONS THE SITE REQUIRES, AND BOTH ARE THE REPO'S OWN RULES.
+ * The first version drove `opacity 0→1`, `scale 0.94→1` and `blur 6px→0` on the
+ * plate, and its own commit message recorded the verdict: "reads as frosted
+ * glass on a floating card". Measured live at 1665x1779 it was worse than that
+ * note implies, and for a reason that is structural rather than tuning.
+ *
+ * `useScroll` with these offsets maps progress 0→1 onto one viewport height of
+ * scroll after the cover's bottom edge reaches the viewport bottom — but the
+ * scroll REMAINING at that moment is exactly the plate's height. So the highest
+ * progress a reader can ever reach is `plateHeight / viewportHeight`, which is
+ * precisely the value the old `revealAt` was set to. The scrub was calibrated
+ * to complete at document end and nowhere earlier, so the plate was mid-scrub
+ * for its entire visible life and reached its designed state at exactly one
+ * scroll position. Measured: at 116px from the bottom it still held opacity
+ * 0.847 and a 0.92px blur.
+ *
+ * On top of that, each of the three properties was wrong on its own terms.
+ * Fading Ink over Paper passes through grey, so the footer was grey for most of
+ * its life. Any scale below 1 on a full-bleed plate exposes the page ground
+ * down both edges — ~50px per side early in the scrub — which is the definition
+ * of the floating card a full-bleed surface must not be. And the blur was a
+ * SURFACE blur, not an entrance blur: the Focus-Pull Rule (DESIGN.md §4) says
+ * nothing may REST out of focus, and a reader parked mid-scrub is resting.
+ *
+ * So all three go. The plate is full-value Ink, sharp, full-bleed, the whole
+ * time — the sticky `z-index: -1` geometry already does the uncovering on its
+ * own, and the commit that introduced this called it "uncovered rather than
+ * scrolled to" while implementing a fade. This makes that title true.
+ *
+ * TWO ADAPTATIONS THE SITE STILL REQUIRES, AND BOTH ARE THE REPO'S OWN RULES.
  *
  * 1. IT MUST BE LEGIBLE WITHOUT JAVASCRIPT. Motion serialises a motion value's
- *    current value into the server-rendered `style` attribute, so a plate whose
- *    opacity starts at 0 renders as `opacity: 0` in the HTML and a visitor with
- *    no JS gets a footer that never appears. That is exactly the failure the
- *    `html.js` gate in globals.css exists to prevent. So the scrub is an
- *    ENHANCEMENT: the first client render matches the server (plain, fully
- *    visible), and the effect below swaps in the motion-driven version. Nobody
- *    sees the swap — the footer is below the fold on every route.
+ *    current value into the server-rendered `style` attribute. The argument has
+ *    changed with the gesture but not gone away: a footer sitting permanently
+ *    24px low with a standing transform is not the broken page `opacity: 0`
+ *    was, but it is still a resting state nobody authored. So the scrub stays
+ *    an ENHANCEMENT — the first client render matches the server (plain, no
+ *    `style` attribute at all), and the effect below swaps in the driven
+ *    version. Nobody sees the swap; the footer is below the fold on every
+ *    route. This is the same "ends on the absence of what it animated" term the
+ *    rest of the file holds itself to.
  *
  * 2. REDUCED MOTION SUBSTITUTES, IT DOES NOT KILL. Under the query the plate is
- *    simply there: opaque, unscaled, sharp. The example ships no reduced-motion
- *    branch at all.
+ *    simply there and its contents are simply in place. Handled here in JS
+ *    rather than in CSS on purpose: a `@media (prefers-reduced-motion)` rule
+ *    would have to beat an inline style and would therefore need `!important`,
+ *    which this stylesheet does not use anywhere. `useReducedMotion` resolves
+ *    during render, so there is no first-frame window where `enhanced` gets set
+ *    and then has to be unset — do not refactor it into useState + effect.
  */
 
-/* The plate's resting state before the scrub. `scale` is softened from the
-   example's 0.9: this footer is full-bleed and its ground is Ink, so at 0.9 a
-   1440px viewport exposes 72px of Paper down each side mid-scrub and the plate
-   reads as a floating card — which is the one thing a full-bleed surface must
-   not do. 0.94 keeps the growth legible at 43px.
+/* How far the footer's CONTENTS lift, in px.
 
-   BLUR REUSES AN EXISTING TOKEN RATHER THAN INTRODUCING A NUMBER.  6px is
-   --reveal-blur-section, already the site's radius for a blur over body copy,
-   and the same value the example happens to use. Note the Focus-Pull Rule
-   (DESIGN.md §4) says nothing may REST out of focus: this clears to 0 well
-   before the plate is fully uncovered, and a reader parked mid-scrub is the one
-   case where it holds. Flagged rather than hidden. */
-const REST_SCALE = 0.94;
-const REST_BLUR_PX = 6;
+   This is `travel.enter` (24) from motion.theme.json, not `travel.section`
+   (48), and the difference is the whole point of the change. 48 is sized to
+   move a whole surface; here the surface is fixed and only what is printed on
+   it lifts. 48px of type sliding inside a stationary Ink band reads as two
+   planes — which is the floating card this rework exists to delete. 24 also
+   sits one step above `--reveal-rise-section`'s 20px, which is the right
+   relation: the footer is heavier than a section, not three times heavier. */
+const LIFT_PX = 24;
 
-/* Fallback for the first paint, before the plate has been measured: the scrub
-   completes over roughly a third of a viewport. Replaced on layout by the
-   plate's real height, so this only governs a frame. */
-const FALLBACK_REVEAL_AT = 0.35;
+/* The lift lands when 60% of the plate is uncovered, so the last 40% of the
+   uncover happens over settled type. Same shape as `--reveal-focus-span`: an
+   entrance finishes before the thing it is an entrance for does. */
+const LIFT_SPAN = 0.6;
+
+/* Fallback for the first paint, before the plate has been measured. Replaced
+   on layout by the plate's real height, so this only governs a frame. */
+const FALLBACK_PLATE_SPAN = 0.6;
 
 export default function FooterReveal({
   children,
@@ -85,8 +111,8 @@ export default function FooterReveal({
   children: ReactNode;
   /* The server-rendered <SiteFooter />, passed as a prop rather than imported.
      Importing it here would pull the whole footer — every inline SVG, the
-     disclaimer, the AI links — across the client boundary for the sake of two
-     transforms. As a prop it stays a server component and none of it ships. */
+     disclaimer, the AI links — across the client boundary for the sake of one
+     transform. As a prop it stays a server component and none of it ships. */
   footer: ReactNode;
   /* This component REPLACES each route's outer wrapper rather than nesting
      inside it, so that wrapper's classes come through here — which also keeps
@@ -97,7 +123,7 @@ export default function FooterReveal({
 }) {
   const coverRef = useRef<HTMLDivElement>(null);
   const plateRef = useRef<HTMLDivElement>(null);
-  const [revealAt, setRevealAt] = useState(FALLBACK_REVEAL_AT);
+  const [plateSpan, setPlateSpan] = useState(FALLBACK_PLATE_SPAN);
   const [enhanced, setEnhanced] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
@@ -105,14 +131,20 @@ export default function FooterReveal({
     const plate = plateRef.current;
     if (!plate) return;
 
-    /* The scrub should finish as the plate finishes arriving, so its length is
-       the plate's height expressed in viewports. A short footer on a tall
-       screen would otherwise still be fading long after it had stopped
-       moving. */
+    /* How much plate there is, expressed in viewports. This no longer says
+       "when the fade completes" — it says how much there is to uncover, and the
+       lift is authored as a fraction of it. Without the measurement the lift
+       would run over a constant fraction of a VIEWPORT rather than of the
+       PLATE, so a short footer on a tall screen would settle at 20% uncovered
+       and a tall one at 90%.
+
+       Upper clamp is 1, not 0.95: past 1 the plate is taller than the viewport
+       and can never be fully uncovered, and clamping there keeps
+       `plateSpan * LIFT_SPAN` at 0.6 or below, i.e. always reachable. */
     const update = () => {
       const viewportHeight = window.innerHeight || 1;
-      setRevealAt(
-        Math.min(0.95, Math.max(0.05, plate.offsetHeight / viewportHeight)),
+      setPlateSpan(
+        Math.min(1, Math.max(0.05, plate.offsetHeight / viewportHeight)),
       );
     };
 
@@ -127,14 +159,14 @@ export default function FooterReveal({
   }, []);
 
   /* Enhance after commit, never during render — see note 1 in the header.
-     Deferred through Reveal's `scheduleReveal` rather than called bare: it is
-     the repo's existing answer to this exact lint rule (no setState in an
-     effect body), and it is a timeout rather than a rAF for the reason stated
-     there — a backgrounded tab pauses rAF indefinitely, so an rAF-scheduled
-     enhancement would never run in a tab opened with cmd-click. */
+     Deferred through `defer` rather than called bare: it is the repo's answer
+     to this exact lint rule (no setState in an effect body), and it is a
+     timeout rather than a rAF for the reason stated there — a backgrounded tab
+     pauses rAF indefinitely, so an rAF-scheduled enhancement would never run in
+     a tab opened with cmd-click. */
   useEffect(() => {
     if (prefersReducedMotion) return;
-    const id = scheduleReveal(() => setEnhanced(true));
+    const id = defer(() => setEnhanced(true));
     return () => window.clearTimeout(id);
   }, [prefersReducedMotion]);
 
@@ -143,39 +175,28 @@ export default function FooterReveal({
     offset: ["end end", "end start"],
   });
 
-  const opacity = useTransform(scrollYProgress, [0, revealAt], [0, 1]);
-  const scale = useTransform(scrollYProgress, [0, revealAt], [REST_SCALE, 1]);
-  const blur = useTransform(scrollYProgress, [0, revealAt], [REST_BLUR_PX, 0]);
+  const liftAt = plateSpan * LIFT_SPAN;
 
-  /* ENDS ON `none`, NOT `blur(0px)` — and the example's `useMotionTemplate`
-     cannot do that, which is why it is not used here.
+  /* The only motion value on the plate.
 
-     This is the Focus-Pull Rule's first term (DESIGN.md §4, globals.css): a
-     settled `blur(0)` is not free. It keeps the element on its own compositor
-     layer and forces grayscale antialiasing on every glyph inside it for the
-     life of the page — and the thing inside this one is the entire footer,
-     including the disclaimer paragraph. Measured after this change: the plate
-     reports `filter: none` at rest, matching the 0-of-28 result the rest of the
-     site's entrances hold themselves to.
-
-     The epsilon is there because the scrub lands on a float. Snapping the last
-     hundredth of a pixel of blur is invisible; leaving the filter mounted is
-     not. */
-  const filter = useTransform(blur, (b) =>
-    b <= 0.01 ? "none" : `blur(${b}px)`,
-  );
+     THIS ENDS ON `transform: none` WITHOUT AN EPSILON, and that is a property
+     of Motion rather than luck: `buildTransform` returns the literal string
+     "none" when every transform value is at its default, and `useTransform`
+     with input/output ranges clamps by default, so any progress at or past
+     `liftAt` produces exactly 0 rather than a trailing float. The hand-rolled
+     `b <= 0.01 ? "none" : ...` guard the old `filter` needed has no analogue
+     here and must not be reintroduced — `filter` needed it because it is not a
+     transform key and Motion has no default-detection for it. */
+  const y = useTransform(scrollYProgress, [0, liftAt], [LIFT_PX, 0]);
 
   /* Promote only while the scrub is actually running. A standing `will-change`
      on a full-bleed plate holds a compositor layer the size of the viewport for
      the life of the page — the same reasoning globals.css states for
-     `.reveal:not(.is-revealed)`. */
-  const inScrub = (progress: number) =>
-    progress > 0.0001 && progress < revealAt;
-  const fadeWillChange = useTransform(scrollYProgress, (p) =>
-    inScrub(p) ? "opacity" : "auto",
-  );
-  const plateWillChange = useTransform(scrollYProgress, (p) =>
-    inScrub(p) ? "transform, filter" : "auto",
+     `.reveal:not(.is-revealed)`. Note this goes back to `auto` while 40% of the
+     plate is still to be uncovered, which is correct: nothing is animating
+     there. */
+  const liftWillChange = useTransform(scrollYProgress, (p) =>
+    p > 0.0001 && p < liftAt ? "transform" : "auto",
   );
 
   return (
@@ -186,26 +207,10 @@ export default function FooterReveal({
 
       <div ref={plateRef} className="footer-reveal__plate">
         <motion.div
-          className="footer-reveal__fade"
-          style={enhanced ? { opacity, willChange: fadeWillChange } : undefined}
+          className="footer-reveal__lift"
+          style={enhanced ? { y, willChange: liftWillChange } : undefined}
         >
-          <motion.div
-            className="footer-reveal__scale"
-            style={
-              enhanced
-                ? {
-                    scale,
-                    filter,
-                    /* Grows out of the bottom edge, so the plate reads as
-                       rising into the page rather than zooming at its middle. */
-                    transformOrigin: "50% 100%",
-                    willChange: plateWillChange,
-                  }
-                : undefined
-            }
-          >
-            {footer}
-          </motion.div>
+          {footer}
         </motion.div>
       </div>
     </div>

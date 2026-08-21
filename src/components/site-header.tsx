@@ -1,12 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+/* Every internal destination in the bar goes through the curtain rather than
+   through `next/link` directly. CurtainLink IS a Link — it forwards every prop
+   and only intercepts a plain left-click that actually changes the pathname, so
+   the two anchor items below still scroll the homepage rather than wiping it.
+   See curtain-link.tsx. */
+import CurtainLink from "./curtain-link";
 import NavClock from "./nav-clock";
+import { Stagger, StaggerItem } from "./stagger";
 import NewTabHint from "./new-tab-hint";
-import Reveal from "./reveal";
 
 type NavItem = { label: string; href: string; external?: boolean };
 
@@ -142,7 +147,13 @@ export default function SiteHeader() {
 
   return (
     <header className="site-header-shell">
-      <Reveal immediate variant="fade" as="div">
+      {/* The bar arrives on the same entrance as everything else, but as a
+          single item rather than a container: the masthead is one object, and
+          staggering a brand plate against its own links would read as the bar
+          assembling itself. `offsetY` is 0 for the same reason — a bar that
+          slides down from above the viewport edge is a cookie banner. */}
+      <Stagger>
+        <StaggerItem offsetY={0}>
         <nav ref={navRef} aria-label="Primary" className="site-nav">
           {/* Lead. The brand plate stretches the full row height and sits
               hard against the viewport edge — the one place the bar breaks
@@ -154,7 +165,7 @@ export default function SiteHeader() {
                 `/?_rsc=` payloads at about 2.1s to cache a route already in
                 the tab. The brand plate is a way back, not a way onward, so
                 nothing here is worth prefetching from anywhere. */}
-            <Link href="/" prefetch={false} className="site-nav__brand focus-ring">
+            <CurtainLink href="/" prefetch={false} className="site-nav__brand focus-ring">
               <Image
                 src="/cashu-no-bg.png"
                 alt=""
@@ -164,7 +175,7 @@ export default function SiteHeader() {
                 className="site-nav__logo"
               />
               <span className="site-nav__wordmark">Cashu</span>
-            </Link>
+            </CurtainLink>
             <NavClock />
           </div>
 
@@ -183,7 +194,7 @@ export default function SiteHeader() {
                       <NewTabHint />
                     </a>
                   ) : (
-                    <Link
+                    <CurtainLink
                       href={item.href}
                       className={`site-nav__link focus-ring--on-ink${
                         isCurrent(item) ? " is-current" : ""
@@ -191,7 +202,7 @@ export default function SiteHeader() {
                       aria-current={isCurrent(item) ? "page" : undefined}
                     >
                       <NavLabel label={item.label} />
-                    </Link>
+                    </CurtainLink>
                   )}
                 </li>
               ))}
@@ -246,7 +257,8 @@ export default function SiteHeader() {
             </div>
           </div>
         </nav>
-      </Reveal>
+        </StaggerItem>
+      </Stagger>
 
       {/* Mobile-only collapsible panel. Uses the grid-template-rows 0fr→1fr
           trick to animate to auto height without javascript measurement.
@@ -275,7 +287,7 @@ export default function SiteHeader() {
                     <NewTabHint />
                   </a>
                 ) : (
-                  <Link
+                  <CurtainLink
                     href={item.href}
                     className={`site-nav-panel__link focus-ring--on-ink${
                       isCurrent(item) ? " is-current" : ""
@@ -285,7 +297,7 @@ export default function SiteHeader() {
                     tabIndex={isOpen ? 0 : -1}
                   >
                     {item.label}
-                  </Link>
+                  </CurtainLink>
                 )}
               </li>
             ))}
