@@ -363,6 +363,11 @@
         "name": "stagger",
         "value": "opacity 0.02→1, y 40→0, filter blur(4px)→none; spring stiffness 120 damping 20; staggerChildren 0.1s. y is per surface: 40 display, 24 wallets directory, 0 masthead.",
         "purpose": "The site's ONE entrance (DESIGN.md section 4, Stagger Rule), from Motion's hero-stagger example, animation only. It replaced five bespoke entrances that were each rejected in turn — cipher pass, focus pull, hard clip-path glyph wipe, gradient sweep, line rise. They share no mechanism; they share being invented for this site. A stock entrance is the point. Three measured terms: it ends on filter:none never blur(0px) and the clear must be DEFERRED one turn because Motion writes the final value after onAnimationComplete (28 elements held a blur when synchronous, 0 when deferred); hidden opacity is 0.02 not 0 or the h1 stops being an LCP candidate (2244ms vs 776ms); and motion.create() must never run in render, hence the static TAGS registry."
+      },
+      {
+        "name": "site-cursor",
+        "value": "Motion+ Cursor, replace mode; 12px square / 28px square / 4px caret at the hovered font-size; #ffffff under mix-blend-mode: difference; morph on the theme's snap token",
+        "purpose": "The Adaptive-Caret Rule (DESIGN.md section 4, 2026-08-21). The browser cursor is replaced sitewide by the site's own, whose one idea is that it measures what it is over: at rest a 12px square, over a link or button a 28px square, and over anything selectable a 4px caret the exact height of the type (129px on the hero h1, 16px in the footer disclaimer). Adapted from motion.dev/examples/react-cursor. The fill is white under mix-blend-mode: difference so it computes |ground - 255| and needs no per-surface value: #000000 on Paper, which is --edge, and near-white on all five fixed dark surfaces. That does not widen the No-Colour Rule, because the difference of two greys is a grey, and it is not glass: no translucency, no blur, no softness. borderRadius: 0 overrides Motion's default of 20. Guards: not mounted without (pointer: fine), null under prefers-reduced-motion (both read through a live-tracked matchMedia, never Motion's useReducedMotion, which reads once), and nothing renders until the pointer first moves. Two costs: the injected `* { cursor: none !important }` erases every cursor declaration on the site, so .press-track's grab is repaired as a 28x8 bar via data-cursor-zone=\"rail\"; and a modal <dialog> is in the top layer while this element is not, so the ? sheet gets the platform cursor back document-wide while .keymap-help[open] matches (with cursor: auto, never revert, which inherits the none it is meant to undo). Measured free: 120 pointer sweeps at 1440x900 cost 40-49ms script with difference against 45.7ms with normal."
       }
     ],
     "breakpoints": [
@@ -583,6 +588,6 @@
       "Don't ship Chalk placeholder surfaces in final layouts. They are scaffolding only."
     ]
   },
-  "handPatchedAt": "2026-08-20",
-  "handPatchNote": "Hand-patched, not regenerated. 2026-08-20: motion extensions updated for the /impeccable animate pass — removed ease-out-quint, ease-out-expo and draw-on (all deleted from globals.css with their consumers), added reveal-group-wallets, sheet-open, press-feedback and reduced-motion, and amended ease-out-quart, dur-draw-on and dur-reveal. See DESIGN.md section 4."
+  "handPatchedAt": "2026-08-21",
+  "handPatchNote": "Hand-patched, not regenerated. 2026-08-21: added site-cursor to the motion extensions for the Adaptive-Caret Rule (the browser cursor is replaced sitewide by Motion+'s Cursor). Previous patch 2026-08-20: motion extensions updated for the /impeccable animate pass — removed ease-out-quint, ease-out-expo and draw-on (all deleted from globals.css with their consumers), added reveal-group-wallets, sheet-open, press-feedback and reduced-motion, and amended ease-out-quart, dur-draw-on and dur-reveal. See DESIGN.md section 4."
 }

@@ -341,7 +341,16 @@ export default function InThePress() {
         </StaggerItem>
 
         <StaggerItem className="press-rail">
-          <div ref={trackRef} className="press-track scrollbar-none">
+          {/* `data-cursor-zone` is read by site-cursor.tsx, which sizes the
+              custom cursor into a horizontal bar over the rail. It exists
+              because that component's `* { cursor: none }` erases the `grab`
+              stated on .press-track, and `grab` is the only cursor on this
+              site that was carrying information. */}
+          <div
+            ref={trackRef}
+            data-cursor-zone="rail"
+            className="press-track scrollbar-none"
+          >
             {STORIES.map((story) => (
               <a
                 key={story.href}

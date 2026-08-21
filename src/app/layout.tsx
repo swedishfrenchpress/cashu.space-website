@@ -4,6 +4,7 @@ import ConsoleSignature from "@/components/console-signature";
 import ButtonCipher from "@/components/button-cipher";
 import Keymap from "@/components/keymap";
 import MotionUITheme from "@/components/motion-ui/theme-provider";
+import SiteCursor from "@/components/site-cursor";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
@@ -209,7 +210,14 @@ export default function RootLayout({
         <ConsoleSignature />
         <ButtonCipher />
         <Keymap />
-        <MotionUITheme>{children}</MotionUITheme>
+        {/* Inside the provider, not beside it. SiteCursor resolves the
+            `snap` transition by name, and a Motion UI consumer mounted as a
+            sibling of <MotionUITheme> reads the bundled defaultTheme instead
+            — silently, because the fallback is by design. */}
+        <MotionUITheme>
+          <SiteCursor />
+          {children}
+        </MotionUITheme>
       </body>
     </html>
   );

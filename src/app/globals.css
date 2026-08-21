@@ -2347,6 +2347,57 @@ html {
   outline-offset: -3px;
 }
 
+/*
+ * THE SHEET IS IN THE TOP LAYER AND THE CURSOR IS NOT (2026-08-21).
+ *
+ * site-cursor.tsx mounts Motion+'s `Cursor`, which hides the browser cursor
+ * with an injected `* { cursor: none !important }` and draws its own element
+ * at `z-index: 99999`. A modal <dialog> paints in the TOP LAYER, which is
+ * above every z-index there is — so while this sheet is open the custom cursor
+ * is behind it and the real one is hidden, and there is no cursor on screen at
+ * all. Two rules, no JavaScript, and no coupling between the two components:
+ *
+ * 1. Give the platform cursor back for as long as the sheet is open. Scoped
+ *    to the whole document rather than to `.keymap-help`, because a modal
+ *    dialog is 360px wide and the other ~99% of the viewport is its backdrop —
+ *    which the pointer still crosses, and which is where you move to dismiss
+ *    it. `:has()` carries the specificity of its most specific argument, so
+ *    this is (0,2,1) against the universal rule's (0,0,0) and wins on
+ *    specificity at equal importance, wherever the two sit in the file. The
+ *    root is named as well as descended from: `<html>` matches the universal
+ *    rule too, and a `* `-only version left it computing `none` — which is
+ *    what the pointer resolves against wherever it is over neither.
+ *
+ *    IT MUST BE `auto`, NOT `revert`, and that looks like the wrong choice
+ *    until you try it. `cursor` is an INHERITED property, and `revert` rolls
+ *    an author declaration back to the UA origin — which states no `cursor`
+ *    for these elements, so the property falls through to the inherited value,
+ *    which is the `none` this rule is trying to undo. Measured: `revert` left
+ *    the sheet computing `cursor: none`. The cost of `auto` is that it flattens
+ *    a `pointer` too; the sheet is a static table of chords today, so if a link
+ *    is ever added to it, it needs its own `cursor: pointer !important`.
+ *
+ * 2. Hide the custom cursor underneath. The backdrop is Paper at 0.85, not
+ *    opaque, so without this a faint square tracks the real cursor through the
+ *    scrim. `visibility` and not `opacity`: Motion drives opacity from a
+ *    variant, which is an inline style, which no stylesheet can beat.
+ *
+ * The one gap is that `[open]` drops the moment `close()` is called while the
+ * sheet keeps its top layer for the 150ms exit (that is what
+ * `transition-behavior: allow-discrete` on `overlay` buys). So both cursors
+ * are on screen for those 150ms, one of them at 15% behind a white scrim.
+ * Taking that to zero costs a MutationObserver and a state flag in a component
+ * that currently knows nothing about the sheet, and it is not worth it.
+ */
+html:has(.keymap-help[open]),
+html:has(.keymap-help[open]) * {
+  cursor: auto !important;
+}
+
+html:has(.keymap-help[open]) [data-motion-cursor] {
+  visibility: hidden;
+}
+
 .keymap-help__sheet {
   padding: 24px 28px;
 }
