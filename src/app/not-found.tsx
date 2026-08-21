@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NewTabHint from "@/components/new-tab-hint";
 import Reveal from "@/components/reveal";
+import FooterReveal from "@/components/footer-reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
@@ -18,7 +19,10 @@ export default function NotFound() {
        wallets/page.tsx that the twilight stack closes *every* page. The bar
        marks nothing as current here, which is correct — no nav item owns
        this route. */
-    <div className="flex flex-col flex-1 bg-paper text-ink">
+    <FooterReveal
+      className="flex flex-col flex-1 bg-paper text-ink"
+      footer={<SiteFooter />}
+    >
       <SiteHeader />
 
       <main
@@ -57,8 +61,6 @@ export default function NotFound() {
           </Reveal>
         </div>
       </main>
-
-      <SiteFooter />
-    </div>
+    </FooterReveal>
   );
 }

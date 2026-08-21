@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./motion-theme.css";
 
 /*
  * Tonal ramp — the site's entire palette. **Light only.** Dark mode and its
@@ -443,6 +444,48 @@ html {
   --dur-base: 220ms;
   --dur-reveal: 620ms;
   --dur-reveal-slow: 880ms;
+
+  /*
+   * THE THIRD CURVE IS NOT A CURVE, IT IS A SPRING (2026-08-21).
+   *
+   * Added under the same terms the two paragraphs above set — with the surface
+   * that needs it, and with the reason stated — and the surface is press
+   * feedback: the 1.5px drop the .btn-* slabs and .press-arrow take on
+   * :active.
+   *
+   * A press is the one motion on this site the reader's own finger is still
+   * on. Everything else here is a settle the page performs and the reader
+   * watches, which is what quart is for and why it governs 40-odd
+   * declarations. A press is different in kind: the finger is down, the
+   * surface should feel like it has mass under it, and a fixed-length ease
+   * cannot express mass because its shape does not change with how it was
+   * entered. A spring can, and preserves velocity if the press is released
+   * mid-travel rather than restarting from wherever it had got to.
+   *
+   * It costs nothing on the wire. --motion-ui-transition-snap-spring is a
+   * linear() function that Motion's own generateLinearEasing sampled from the
+   * snap token's spring at build time (scripts/motion-theme-css.mjs), so this
+   * is the shape of a real spring with no library loaded and no runtime work.
+   * The site is still CSS all the way down.
+   *
+   * IT DOES NOT BOUNCE, and that is checked rather than hoped: snap resolves
+   * at stiffness 1218 / damping 70, which is past critical, and every one of
+   * its 30 samples is monotonic to 1.0 with no value above it. DESIGN.md §4
+   * rules out bounce and this does not spend that rule. `lively` DOES
+   * overshoot — to 1.31 — which is why it is emitted and deliberately not
+   * aliased here.
+   *
+   * THE DURATION IS NOT A TASTE VALUE AND MUST NOT BE SWAPPED FOR --dur-fast.
+   * 0.3s is the snap spring's own settle time, and a linear() easing is a
+   * sampled curve rather than a shape: run it over 150ms and it is no longer
+   * the spring it came from, it is a stretched approximation of one. The pair
+   * moves together or not at all. It reads as faster than the 150ms quart it
+   * replaces despite the longer nominal length, because a spring is ~90%
+   * resolved in its first third and spends the tail on an imperceptible
+   * settle — which is the entire reason the token carries two durations.
+   */
+  --ease-press: var(--motion-ui-transition-snap-spring);
+  --dur-press: var(--motion-ui-transition-snap-spring-duration);
 
   /*
    * The focus pull (2026-08-19, user-directed). Blur radii are per-consumer
@@ -1140,7 +1183,7 @@ html:not(.js) .reveal-group .reveal-item {
   white-space: nowrap;
   transform: translateY(0);
   transition:
-    transform var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-press) var(--ease-press),
     color var(--dur-base) var(--ease-out-quart),
     background-color var(--dur-base) var(--ease-out-quart),
     border-color var(--dur-base) var(--ease-out-quart);
@@ -1194,7 +1237,7 @@ html:not(.js) .reveal-group .reveal-item {
 .button-ciphering {
   color: transparent !important;
   transition:
-    transform var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-press) var(--ease-press),
     background-color var(--dur-base) var(--ease-out-quart),
     border-color var(--dur-base) var(--ease-out-quart);
 }
@@ -1313,6 +1356,65 @@ html:not(.js) .reveal-group .reveal-item {
  * seam is the point. Flat and sharp throughout; buttons use fill, border,
  * and the cipher pass for affordance rather than elevation.
  */
+/*
+ * FOOTER REVEAL (2026-08-21, user-directed, adapted from Motion's footer-reveal
+ * example). The Twilight Stack stops being the last thing you scroll to and
+ * becomes something the page is drawn back off. See footer-reveal.tsx for the
+ * scrub, the no-JS fallback and the reduced-motion branch; the geometry is
+ * here, and three declarations of it are load-bearing.
+ *
+ * 1. `isolation: isolate` on the root. The plate paints at `z-index: -1`, and a
+ *    negative z-index child paints after its parent's background but before its
+ *    in-flow content — which is exactly the layering this needs. Without an
+ *    explicit stacking context here the plate escapes upward and lands BEHIND
+ *    the page's own Paper ground, where it is invisible at every scroll
+ *    position and the bug looks like the scrub never runs.
+ *
+ * 2. The cover's opaque `--paper`. `<main>` carries no background of its own,
+ *    so without this the plate shows through the document from the first
+ *    screen. This is the surface that does the covering; the fade only decides
+ *    what the uncovered plate looks like.
+ *
+ * 3. `position: sticky; bottom: 0` on the plate. This is what puts the footer
+ *    under the page rather than after it. Sticky keeps the plate's flow height
+ *    at the end of the document while PAINTING it pinned to the bottom of the
+ *    viewport, so it is already sitting there — behind the cover — long before
+ *    you reach it. The reveal is the cover sliding off, not the footer arriving.
+ *
+ * The cover repeats the flex column it replaced: it took over as the parent of
+ * the header and <main>, and <main> still sizes off `flex: 1`.
+ */
+/* Deliberately no display/flex here. This class lands on the element that was
+   already the page's outer wrapper, and the three routes do not agree on how
+   that wrapper sizes itself (`flex-1` on / and the 404, `min-h-screen` on
+   /wallets). Those utilities keep owning the layout; this adds only the
+   stacking context. The flex column they used to provide for the header and
+   <main> moves down to `.footer-reveal__cover`, which is now their parent. */
+.footer-reveal {
+  position: relative;
+  isolation: isolate;
+}
+
+.footer-reveal__cover {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--paper);
+}
+
+.footer-reveal__plate {
+  position: sticky;
+  bottom: 0;
+  z-index: -1;
+  /* The blur sits on a child of this box and bleeds past its edges. Vertical
+     bleed is wanted — it is the haze the plate resolves out of — but horizontal
+     bleed on a full-bleed surface is a horizontal scrollbar, so clip that axis
+     only. */
+  overflow-x: clip;
+}
+
 .footer-specimen {
   position: relative;
   background-color: #000000;
@@ -3322,7 +3424,7 @@ html:not(.js) .reveal-group .reveal-item {
   transition:
     border-color var(--dur-base) var(--ease-out-quart),
     opacity var(--dur-base) var(--ease-out-quart),
-    transform var(--dur-fast) var(--ease-out-quart);
+    transform var(--dur-press) var(--ease-press);
 }
 
 .press-arrow:hover:not(:disabled) {

@@ -6,12 +6,16 @@ import NewTabHint from "@/components/new-tab-hint";
 import ProtocolParts from "@/components/protocol-parts";
 import ReferenceImplementations from "@/components/reference-implementations";
 import Reveal from "@/components/reveal";
+import FooterReveal from "@/components/footer-reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 bg-paper text-ink">
+    <FooterReveal
+      className="flex flex-col flex-1 bg-paper text-ink"
+      footer={<SiteFooter />}
+    >
       <SiteHeader />
 
       {/* The homepage was the one route with no <main>: /wallets and the 404
@@ -127,8 +131,6 @@ export default function Home() {
         </div>
         <InThePress />
       </main>
-
-      <SiteFooter />
-    </div>
+    </FooterReveal>
   );
 }

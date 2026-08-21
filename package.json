@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "motion:theme": "node scripts/motion-theme-css.mjs"
   },
   "dependencies": {
     "motion": "^13.1.1",

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/reveal";
 import RevealGroup from "@/components/reveal-group";
+import FooterReveal from "@/components/footer-reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
@@ -200,7 +201,15 @@ function WalletRow({
 
 export default function WalletsPage() {
   return (
-    <div className="flex flex-col bg-paper text-ink min-h-screen">
+    /* The twilight stack closes every page (DESIGN.md §5) — the wallet chooser
+       leaves past the disclaimer and the spec CTA, not into a dead end after
+       the last directory row. It is passed to FooterReveal rather than rendered
+       last because the footer is now a plate the page is drawn off, not the
+       element after the final row. */
+    <FooterReveal
+      className="flex flex-col bg-paper text-ink min-h-screen"
+      footer={<SiteFooter />}
+    >
       <SiteHeader />
 
       <main className="flex-1 pb-24 lg:pb-32">
@@ -305,11 +314,6 @@ export default function WalletsPage() {
         </div>
       </div>
       </main>
-
-      {/* The twilight stack closes every page (DESIGN.md §5) — the wallet
-          chooser leaves past the disclaimer and the spec CTA, not into a
-          dead end after the last directory row. */}
-      <SiteFooter />
-    </div>
+    </FooterReveal>
   );
 }
