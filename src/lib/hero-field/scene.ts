@@ -169,6 +169,16 @@ export type DitherScene = {
   /** Inject at uv (origin bottom-left, matching gl_FragCoord). */
   splat: (x: number, y: number, dx: number, dy: number) => void;
   step: (dt: number) => void;
+  /*
+   * The arrival wavefront, 0 (nothing has landed) to 1 (the resting field).
+   *
+   * Set once at 0 before the first render and animated to 1, or left alone
+   * entirely — it defaults to 1, so a caller that never touches it gets the
+   * field this scene drew before the entrance existed. The shape of the sweep
+   * and the argument for why a progress uniform is not the banned time uniform
+   * are both at COMPOSITE_FRAGMENT in `shaders.ts`.
+   */
+  setReveal: (progress: number) => void;
   render: () => void;
   /** Zero the wake so the next render is exactly the rest frame. */
   clearTrail: () => void;
@@ -211,6 +221,9 @@ export function createDitherScene(
   let width = 0;
   let height = 0;
   let dpr = 1;
+  /* Defaults to 1 — arrived. A caller that never calls setReveal gets exactly
+     the field this scene drew before there was an entrance. */
+  let reveal = 1;
   /** Centre and half-extents of the cleared zone, in device pixels, y-up. */
   let safeBox: [number, number, number, number] = [0, 0, 0, 0];
   /** Per-axis distance the ground's falloff spans, in device pixels. Computed
@@ -221,6 +234,27 @@ export function createDitherScene(
       loop — every value the composite needs is resolved before a frame starts. */
   let trailInset = TRAIL_INSET;
   let edgeFade: [number, number] = [EDGE_FADE_TOP, EDGE_FADE_BOTTOM];
+  /*
+   * THE ARRIVAL WAVE IS NORMALISED OVER THE FIELD, NOT OVER THE CANVAS, and
+   * that is the difference between a wave and a flash.
+   *
+   * The wave starts at the canvas's bottom-left corner, but in column mode the
+   * field does not: everything left of the type's right edge is cleared, so
+   * the visible cells all sit between 1088 and 1698 device pixels from that
+   * corner at 1440x900 — the last fifth of the sweep. Measured on the first
+   * build, which normalised over the raw canvas diagonal: the whole right-hand
+   * column crossed the threshold inside 13% of the progress and read as the
+   * field simply appearing, which is what it did before this existed.
+   *
+   * So the CPU subtracts the dead run. `revealNear` is the distance from the
+   * origin to the nearest cell that is not masked away, `revealSpan` the run
+   * from there to the far corner, and the shader's reach term spends the whole
+   * 0-to-1 on cells that are actually drawn. The two mask geometries give it
+   * different answers, which is exactly why it is computed here, beside the
+   * branch that decides them, rather than guessed at in the shader.
+   */
+  let revealNear = 0;
+  let revealSpan = 1;
 
   const measureSafeBox = () => {
     const element = safeBoxElement();
@@ -246,6 +280,8 @@ export function createDitherScene(
       // characters across type we failed to locate.
       safeBox = [width / 2, height / 2, width, height];
       safeGap = [1, 1];
+      revealNear = 0;
+      revealSpan = Math.max(1, Math.hypot(width, height));
       return;
     }
     let left = Infinity;
@@ -285,6 +321,10 @@ export function createDitherScene(
       const reach = Math.max(width, height) * 4;
       safeBox = [boundary - reach, height / 2, reach, reach];
       safeGap = [Math.max(1, width - boundary), Math.max(1, height)];
+      /* The cleared zone runs the full height here, so the first undrawn cell
+         the wave meets is the one at the boundary on the bottom edge. */
+      revealNear = boundary;
+      revealSpan = Math.max(1, Math.hypot(width, height) - boundary);
       return;
     }
 
@@ -310,6 +350,10 @@ export function createDitherScene(
     const boxY = centreY * scale;
 
     safeBox = [boxX, boxY, halfW, halfH];
+    /* The box floats clear of the corners here, so the origin cell is drawn
+       and there is no dead run to subtract. */
+    revealNear = 0;
+    revealSpan = Math.max(1, Math.hypot(width, height));
     safeGap = [
       Math.max(1, boxX - halfW, width - (boxX + halfW)),
       Math.max(1, boxY - halfH, height - (boxY + halfH)),
@@ -412,6 +456,12 @@ export function createDitherScene(
     gl.uniform1f(uniform(compositeProgram, "uSafeFeather"), SAFE_FEATHER);
     gl.uniform1f(uniform(compositeProgram, "uTrailInset"), trailInset);
     gl.uniform2f(uniform(compositeProgram, "uEdgeFade"), ...edgeFade);
+    gl.uniform1f(uniform(compositeProgram, "uReveal"), reveal);
+    /* The bottom-left corner of the framebuffer. gl_FragCoord is y-up, so
+       (0, 0) is the corner under the hero's own baseline, not above it. */
+    gl.uniform2f(uniform(compositeProgram, "uRevealOrigin"), 0, 0);
+    gl.uniform1f(uniform(compositeProgram, "uRevealNear"), revealNear);
+    gl.uniform1f(uniform(compositeProgram, "uRevealSpan"), revealSpan);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, field.texture);
@@ -443,6 +493,13 @@ export function createDitherScene(
     },
     splat: (x, y, dx, dy) => fluid?.splat(x, y, dx, dy),
     step: (dt) => fluid?.step(dt),
+    setReveal: (progress) => {
+      /* Clamped because the entrance is driven by a spring, and the site's
+         spring (120/20) is a hair underdamped — it can report a value just
+         past 1. Unclamped that would push the wavefront beyond the last cell
+         and then pull it back, un-setting the trailing ring on the way. */
+      reveal = Math.min(1, Math.max(0, progress));
+    },
     render,
     clearTrail: () => fluid?.clear(),
     dispose: () => {

@@ -286,8 +286,51 @@ uniform float uSafeFeather;
 uniform float uTrailInset;
 /** Distance over which the field dies into the section's top/bottom edges. */
 uniform vec2 uEdgeFade;
+/*
+ * THE ARRIVAL WAVEFRONT, AND WHY THIS IS NOT THE TIME UNIFORM THE RULE BANS.
+ *
+ * The Set-Once Rule readmitted a ground on four terms, and the first is that
+ * the field never drifts: "there is no time uniform in shaders.ts and there
+ * must not be one." That term is about a *clock* — a value that keeps moving
+ * after the reader has stopped, which is what turns a ground into an ambient
+ * loop. uReveal is not a clock. It is a one-shot progress that runs 0 to 1 at
+ * arrival, on the same spring as the hero's other entrance items, and then
+ * holds at 1 forever. At 1 the arithmetic below resolves to a no-op, so the
+ * settled frame is bit-identical to the one this shader drew before the
+ * wavefront existed. Nothing here can be sampled twice and give two answers
+ * once the entrance is over. If you ever find yourself wanting to feed this a
+ * modulo, a sine or a delta, that is the banned uniform and the answer is no.
+ */
+uniform float uReveal;
+/** Where the wave starts, in device pixels, gl_FragCoord space (y-up). */
+uniform vec2 uRevealOrigin;
+/** Origin to the first cell the mask actually draws, in device pixels. The
+    run before this is cleared field and the wave crosses it for free. */
+uniform float uRevealNear;
+/** From uRevealNear to the furthest cell, in device pixels. Never 0. */
+uniform float uRevealSpan;
 
 out vec4 fragColor;
+
+/*
+ * The two numbers that make the wavefront a front rather than a line.
+ *
+ * REVEAL_RAMP is how much of the whole sweep one cell spends crossing the
+ * occupancy threshold. It has to be wide enough that several rings of cells
+ * are mid-arrival at once, or the field lands as a hard travelling edge, which
+ * is a wipe and the site already has three of those.
+ *
+ * REVEAL_NOISE is the example's noise argument: a per-cell jitter on the
+ * delay so the front is ragged instead of a compass arc. Motion's version
+ * reaches for Math.random(); this one hashes the cell, because a random delay
+ * would be a different entrance on every load and, more to the point, the
+ * whole field is already built out of pure functions of the cell coordinate.
+ *
+ * They sum with the reach term to exactly 1.0 (see main), so the last cell to
+ * arrive finishes on the same frame the progress completes.
+ */
+const float REVEAL_RAMP = 0.22;
+const float REVEAL_NOISE = 0.13;
 
 /** Cheap per-cell hash. Deterministic, so the resting field never changes. */
 float hash21(vec2 p) {
@@ -372,6 +415,36 @@ void main() {
    * a paste-in, and it is the whole reason the two are separate numbers.
    */
   float density = texture(uField, cellUv).r * groundCoverage + wake * uWakeGain;
+
+  /*
+   * THE ARRIVAL, AND IT MULTIPLIES OCCUPANCY RATHER THAN ALPHA.
+   *
+   * After motion.dev/examples/react-staggered-grid, where each cell's delay is
+   * its physical distance from an origin cell. Same idea, one origin (the
+   * canvas's bottom-left corner, so the field grows up and to the right, out
+   * from behind the type and off the right edge — the direction every other
+   * wipe on this site runs).
+   *
+   * What could not be ported is the per-cell spring. Motion's cells fade and
+   * scale; a cell here is one bit, and the field's founding lesson is that
+   * fading type with alpha greys the letterforms into a smudge. So the
+   * wavefront is applied to density, upstream of the threshold: a cell is
+   * absent, then it is fully set, and the softness lives in the *order* the
+   * cells cross over rather than in any of them being half-drawn. Which is
+   * also why the ramp is wide — it is the only thing making this a front.
+   *
+   * The arithmetic is arranged so the maximum delay plus the ramp is exactly
+   * 1.0: reach maxes at 1, so delay maxes at (1 - RAMP - NOISE) + NOISE, and
+   * the furthest, unluckiest cell finishes precisely as uReveal lands. Nothing
+   * is still arriving after the progress says it has arrived.
+   */
+  float reach = clamp(
+    (distance((cell + 0.5) * uCell, uRevealOrigin) - uRevealNear) / uRevealSpan,
+    0.0, 1.0);
+  float delay = reach * (1.0 - REVEAL_RAMP - REVEAL_NOISE)
+              + hash21(cell + 71.0) * REVEAL_NOISE;
+  density *= smoothstep(delay, delay + REVEAL_RAMP, uReveal);
+
   float occupancy = step(uOccupancy, density);
 
   /*

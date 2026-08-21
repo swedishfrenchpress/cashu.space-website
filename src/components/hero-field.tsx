@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { animate, type AnimationPlaybackControls } from "motion/react";
 import { createDitherScene, type DitherScene, type SceneColors } from "@/lib/hero-field/scene";
+import { SPRING } from "@/components/stagger";
 
 /**
  * HeroField — the hero's ground: a frozen field of Geist Mono hex, and a wake
@@ -139,7 +141,19 @@ declare global {
 export default function HeroField() {
   const [mounted, setMounted] = useState(false);
   const [interactive, setInteractive] = useState(false);
+  const [entrance, setEntrance] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  /*
+   * ONCE, FOR THE LIFE OF THE PAGE — not once per effect run.
+   *
+   * The effect below re-runs whenever `interactive` or `entrance` flips, and
+   * both are driven by live matchMedia listeners. Without this a visitor who
+   * plugged in a mouse, or toggled reduced motion, would watch the hero's
+   * ground rebuild itself from the bottom-left corner in the middle of
+   * reading. An entrance is a thing that happens on arrival; a media query
+   * changing is not an arrival.
+   */
+  const hasEntered = useRef(false);
 
   /*
    * TWO TIERS, NOT ONE SWITCH.
@@ -167,6 +181,11 @@ export default function HeroField() {
     const evaluate = () => {
       setMounted(true);
       setInteractive(!motion.matches && pointer.matches);
+      /* The entrance is gated on reduced motion ALONE, unlike the plume. The
+         plume also needs a fine pointer because it needs something to cause
+         it; an arrival is caused by the page loading, which every device
+         does. A phone gets the wavefront. */
+      setEntrance(!motion.matches);
     };
     evaluate();
 
@@ -207,10 +226,54 @@ export default function HeroField() {
      * the hero's height, so the ResizeObserver never fires and the mask would
      * stay fitted to the fallback's metrics.
      */
+    /* The entrance's own driver. Motion owns the rAF, so this file does not
+       grow a second loop beside the plume's, and it stops itself. */
+    let entering: AnimationPlaybackControls | null = null;
+
     const cutGlyphs = () => {
       if (!scene.loadGlyphs(readMonoFamily())) return;
       scene.resize();
+
+      /*
+       * THE ENTRANCE IS DECIDED HERE, AT THE LAST POSSIBLE MOMENT, because
+       * `document.hidden` is the thing that decides it and a tab's visibility
+       * at mount says nothing about its visibility when the fonts land.
+       *
+       * A background tab freezes `document.timeline` — measured on the route
+       * curtain, which sat at `currentTime: 0` while 818ms went by. A spring
+       * that never advances would hold uReveal at 0, and uReveal at 0 is a
+       * blank field: the hero would have no ground at all until the reader
+       * came back to the tab, at which point it would perform an entrance
+       * they had already missed the cause of. Not visible, not animated, just
+       * arrived.
+       */
+      if (!entrance || document.hidden || hasEntered.current) {
+        scene.render();
+        return;
+      }
+      hasEntered.current = true;
+
+      scene.setReveal(0);
       scene.render();
+      entering = animate(0, 1, {
+        ...SPRING,
+        onUpdate: (progress) => {
+          /* Counted, and the counter's contract is unchanged: it proves there
+             is no rAF AT REST, and an arrival is not rest. Sample it across a
+             quiet interval after ~1.5s, as before. */
+          window.__heroFieldFrames = (window.__heroFieldFrames ?? 0) + 1;
+          scene.setReveal(progress);
+          scene.render();
+        },
+        /* Land on the resting frame explicitly. The spring's final sample is
+           1 to within a rounding error, and "within a rounding error" is the
+           difference between the settled field and a settled field with the
+           far corner's last ring of cells missing from it forever. */
+        onComplete: () => {
+          scene.setReveal(1);
+          scene.render();
+        },
+      });
     };
     if (document.fonts?.status === "loaded") cutGlyphs();
     else void document.fonts?.ready.then(cutGlyphs);
@@ -338,6 +401,7 @@ export default function HeroField() {
 
     return () => {
       stop();
+      entering?.stop();
       observer.disconnect();
       resizeObserver.disconnect();
       canvas.removeEventListener("webglcontextlost", onContextLost);
@@ -347,7 +411,7 @@ export default function HeroField() {
       document.removeEventListener("visibilitychange", onVisibility);
       scene.dispose();
     };
-  }, [mounted, interactive]);
+  }, [mounted, interactive, entrance]);
 
   if (!mounted) return null;
   return <canvas ref={canvasRef} className="hero-field" aria-hidden="true" />;

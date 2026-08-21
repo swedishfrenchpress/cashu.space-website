@@ -42,7 +42,13 @@ import { defer } from "@/lib/defer";
  *    literal string `"none"` when every transform value is at its default.
  */
 
-const SPRING: Transition = { type: "spring", stiffness: 120, damping: 20 };
+/* Exported because the hero's ground arrives on it too (`hero-field.tsx`).
+   The field is not a Motion element — it is one WebGL canvas — so it cannot be
+   a StaggerItem, but it can be driven by the same physics, and that is what
+   keeps its entrance part of the site's ONE entrance rather than a second one
+   invented for the hero. Same spring, same moment; the distance term in the
+   shader supplies the stagger a StaggerItem would have got from the parent. */
+export const SPRING: Transition = { type: "spring", stiffness: 120, damping: 20 };
 
 /* A STATIC REGISTRY RATHER THAN `motion.create(as)`. Building a motion
    component inside render gives it a fresh identity every time, which remounts
