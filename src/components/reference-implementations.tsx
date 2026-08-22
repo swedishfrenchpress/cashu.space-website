@@ -413,7 +413,9 @@ export default function ReferenceImplementations() {
       {/* One group for the section. The band is a heading, a lead, the Spec
           plate and a link out — four things that are one statement, and which
           used to arrive as four independent observations. The stagger between
-          them is authored in globals.css against the class names below. */}
+          them is Motion's own `staggerChildren`, set on the container in
+          stagger.tsx — it was a table of nth-child delays in globals.css until
+          the 2026-08-21 rewrite, and this comment outlived it. */}
       <Stagger inView className="page-shell flex flex-col gap-12 lg:gap-16">
         <div className="implementations-intro flex flex-col gap-6">
           <StaggerItem>

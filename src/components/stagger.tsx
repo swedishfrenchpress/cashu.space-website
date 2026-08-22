@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion, type Transition, type Variants } from "motion/react";
-import { useRef, type ReactNode } from "react";
+import { motion, type Transition, type Variants } from "motion/react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { defer } from "@/lib/defer";
 
 /*
@@ -41,6 +41,52 @@ import { defer } from "@/lib/defer";
  *    animation completes. `y` needs no equivalent: Motion already returns the
  *    literal string `"none"` when every transform value is at its default.
  */
+
+/* LIVE-TRACKED, AND MOTION'S OWN HOOK IS THE BUG THIS REPLACES (2026-08-22).
+ *
+ * This used Motion's `useReducedMotion()`, which is `useState(initial)` and
+ * reads the query exactly once — the correction `button-cipher.tsx` took on
+ * 2026-08-20 and that CLAUDE.md states as a rule. `stagger.tsx` was still in
+ * violation of it, and here the failure is worse than a stale preference:
+ * it left content permanently invisible.
+ *
+ * THE FAILURE, MEASURED. Motion resolves that hook from a module-level
+ * singleton that is not populated during the first hydration pass, so on a COLD
+ * load it answers `false` and never revises. The component therefore renders
+ * its motion branch, Motion serialises the `hidden` variant into the SSR
+ * `style` attribute, and under `prefers-reduced-motion` the entrance never runs
+ * to clear it. Measured on the production build at 1440x900 with reduced motion
+ * emulated, after scrolling the whole route: 13 of 13 wallet rows and 2 more
+ * elements on the homepage sat at `opacity: 0.02` with a 4px blur, for the life
+ * of the page. On a WARM load — any client navigation after the first — the
+ * singleton is populated, the hook answers `true`, and the same code is fine,
+ * which is exactly why this survived: it does not reproduce on the second page
+ * you look at.
+ *
+ * THE INITIAL VALUE MUST BE `false` HERE, and that is the opposite of the
+ * choice `curtain-link.tsx` makes for its copy of this hook. There the value
+ * changes no markup, so it can read the query eagerly. Here it decides whether
+ * an element renders as a motion component at all, so an eager read would
+ * disagree with the server's markup and hand React a hydration mismatch. Start
+ * false, match the server, then flip in the effect: the re-render swaps the
+ * motion element for a plain one, React drops the inline style with it, and the
+ * content is visible. The cost is that a reduced-motion visitor may see the
+ * first frame or two of an entrance before it is torn down, which is a great
+ * deal better than never seeing the content.
+ */
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduced(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return reduced;
+}
 
 /* Exported because the hero's ground arrives on it too (`hero-field.tsx`).
    The field is not a Motion element — it is one WebGL canvas — so it cannot be
@@ -110,7 +156,7 @@ export function Stagger({
   id,
   tabIndex,
 }: StaggerProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const Tag = TAGS[as ?? "div"];
 
   /* Substitute, don't kill — except there is nothing to substitute here. The
@@ -131,6 +177,12 @@ export function Stagger({
       className={className}
       id={id}
       tabIndex={tabIndex}
+      /* A marker with no functional consumer as of 2026-08-22: both rescues in
+         layout.tsx moved to `[data-stagger-item]`, which is where the hidden
+         state actually lives. Kept because it is the only way to see a stagger
+         container in a DOM inspector, and it is what the verification probes
+         count. Delete it with the next thing that makes it redundant, not
+         before — but do not start reading it again either. */
       data-stagger
       variants={containerVariants(stagger)}
       initial="hidden"
@@ -156,7 +208,7 @@ export function StaggerItem({
   as,
   offsetY = DEFAULT_OFFSET_Y,
 }: StaggerItemProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
   /* A callback ref rather than a typed `useRef` on the element: `TAGS` is a
      union of nine motion components, so a single `RefObject<HTMLElement>` does
      not satisfy the intersection of their ref types. The callback accepts the
@@ -175,6 +227,17 @@ export function StaggerItem({
         el.current = node;
       }}
       className={className}
+      /* MARKS EXACTLY THE ELEMENTS MOTION HIDES, AT ANY DEPTH (2026-08-22).
+         The `<noscript>` rule and the 1.5s failsafe in layout.tsx both used to
+         select `[data-stagger] > *`, which silently assumed every item is a
+         DIRECT child of its container. Variant propagation runs through plain
+         intervening elements, so that was never true in general and stopped
+         being true in practice when the wallet rows became items nested under
+         a <div> and a <ul>: with scripting off they kept the serialised hidden
+         style and never appeared. Marking the item itself is also strictly more
+         precise than the old selector, which forced `opacity: 1` onto plain
+         wrapper children that were never hidden in the first place. */
+      data-stagger-item
       variants={itemVariants(offsetY)}
       /* See point 2 in the header: Motion can only tween to `blur(0px)`, so the
          zeroed filter is cleared here rather than left standing. One line, and

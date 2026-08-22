@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCurtainNavigate } from "./curtain-link";
 
 type Chord = "idle" | "g";
 
@@ -19,6 +20,17 @@ const TOAST_LINGER_MS = 400;
 
 export default function Keymap() {
   const router = useRouter();
+  /* THE CHORDS TAKE THE CURTAIN TOO (2026-08-22). `g h` and `g w` called
+     `router.push()` straight, so the Curtain Rule — "a route change is a wipe,
+     not a cut" — was true of the mouse and false of the keyboard. It is the
+     same navigation to the same route; the input device is not a reason for it
+     to look different.
+
+     `navigate` returns false when it declines (already on that pathname,
+     reduced motion, hidden document), and every one of those cases still owes
+     the reader the navigation, so the plain push stays as the fallback rather
+     than being replaced. */
+  const navigate = useCurtainNavigate();
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const chordRef = useRef<Chord>("idle");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -100,9 +112,9 @@ export default function Keymap() {
         setToast(`g ${lower}`);
         e.preventDefault();
         if (lower === "h") {
-          router.push("/");
+          if (!navigate("/")) router.push("/");
         } else if (lower === "w") {
-          router.push("/wallets");
+          if (!navigate("/wallets")) router.push("/wallets");
         } else if (lower === "s") {
           // Same destination as every visible "Read the spec" CTA — one
           // canonical URL per label. The NUTs repo stays reachable from the
@@ -130,7 +142,11 @@ export default function Keymap() {
               block: "start",
             });
           } else {
-            router.push("/#implementations");
+            /* Off the homepage this is a real route change, so it earns the
+               wipe like any other. The hash is preserved through the curtain —
+               the navigate helper deliberately skips its scroll reset when the
+               target carries one, because Next resolves the anchor itself. */
+            if (!navigate("/#implementations")) router.push("/#implementations");
           }
         }
         resetChord();
@@ -143,7 +159,7 @@ export default function Keymap() {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (lingerRef.current) clearTimeout(lingerRef.current);
     };
-  }, [helpOpen, router]);
+  }, [helpOpen, navigate, router]);
 
   return (
     <>

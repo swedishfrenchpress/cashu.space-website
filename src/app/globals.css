@@ -532,12 +532,11 @@ html {
    * measured ground it has to stand on, and the objection above stands first.
    */
 
-  /*
-   * Section rise. Deliberately larger than the arrival's 8px: under editorial
-   * type at this scale 8px reads as a twitch rather than a settle, which was
-   * the whole of the complaint that produced this block. Transform-only
-   * movement does not contribute to CLS, so the amplitude costs nothing.
-   */
+  /* The section rise lived here as `--reveal-rise-section` and went with the
+     rest of the reveal system on 2026-08-21. Its argument survives in
+     `stagger.tsx`, which makes the rise a per-surface prop for the same reason:
+     40px under display type, 24px on the wallets directory, 0 on the masthead.
+     Nothing is declared below this point — the block ends here. */
 }
 
 /*
@@ -622,9 +621,6 @@ html {
  * geometry, and it should be written against that rather than inherited from a
  * shape nobody remembers.
  */
-
-@media (prefers-reduced-motion: reduce) {
-}
 
 .scrollbar-none {
   scrollbar-width: none;

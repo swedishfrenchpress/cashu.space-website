@@ -133,7 +133,9 @@ export default function ProtocolParts() {
              arrive; per element is what this replaced. Per entry, the row
              settles as a unit at reading pace, which is the granularity the
              layout already reads at. The stagger between the four cells is
-             authored in globals.css against these same class names. */
+             Motion's own `staggerChildren`, set on the container in
+             stagger.tsx — it was a table of nth-child delays in globals.css
+             until the 2026-08-21 rewrite, and this comment outlived it. */
           <Stagger inView as="article" key={part.id} className="protocol-part">
             <StaggerItem className="protocol-part__index">
               <span className="protocol-part__num">

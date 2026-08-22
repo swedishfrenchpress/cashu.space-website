@@ -169,7 +169,7 @@ export default function RootLayout({
           <style
             dangerouslySetInnerHTML={{
               __html:
-                "[data-stagger] > *{opacity:1 !important;transform:none !important;filter:none !important}",
+                "[data-stagger-item]{opacity:1 !important;transform:none !important;filter:none !important}",
             }}
           />
         </noscript>
@@ -193,7 +193,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'document.documentElement.classList.add("js");setTimeout(function(){document.querySelectorAll("[data-stagger] > *").forEach(function(e){var o=getComputedStyle(e).opacity;if(o!==""&&parseFloat(o)<0.9){e.style.opacity="";e.style.transform="";e.style.filter=""}})},1500)',
+              'document.documentElement.classList.add("js");setTimeout(function(){document.querySelectorAll("[data-stagger-item]").forEach(function(e){var o=getComputedStyle(e).opacity;if(o!==""&&parseFloat(o)<0.9){e.style.opacity="";e.style.transform="";e.style.filter=""}})},1500)',
           }}
         />
         <a href="#main-content" className="skip-link">
