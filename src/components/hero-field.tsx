@@ -169,6 +169,25 @@ export default function HeroField() {
    * cause it and a visitor who has not asked motion to stop. Without both, no
    * solver is allocated at all — see `createDitherScene`'s `interactive`.
    *
+   * A FINGER IS A POINTER (2026-08-22, user-directed). This used to require
+   * `(hover: hover) and (pointer: fine)`, which meant a phone never allocated a
+   * solver and therefore never saw the wake — and since the currency marks
+   * exist ONLY inside the wake, a phone visitor could not reach `₿ $ € ¥` at
+   * all. That was never a decision about touch; it was the mouse-shaped default
+   * carried over from the version that had a hover trail.
+   *
+   * It stays inside the Set-Once Rule for the reason the rule's first amendment
+   * gives, which is about causation rather than hardware: "a trail that exists
+   * only under the cursor answers a pointer". A finger dragged across the hero
+   * answers a touch in exactly the same way. What is still forbidden, and what
+   * was asked for and declined here, is CYCLING the glyphs on a timer — that is
+   * an idle loop, it answers nothing, and it was already built once and
+   * rejected for reading as a slot machine.
+   *
+   * The listener is passive and never calls preventDefault, so a drag that was
+   * meant as a scroll is still a scroll; the wake is just what the field does
+   * underneath it.
+   *
    * The canvas is still created only on the client, and only once these have
    * been evaluated: an invisible full-bleed element in the hero is exactly the
    * surface a contrast extension repaints as a solid plate (CLAUDE.md's
@@ -176,7 +195,11 @@ export default function HeroField() {
    */
   useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const pointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    /* Any real pointer, coarse or fine. The query is still asked rather than
+       assumed: `(pointer: none)` is a real configuration — a TV, a barcode
+       scanner, some kiosk browsers — and there is no reason to allocate four
+       render targets for input that cannot arrive. */
+    const pointer = window.matchMedia("(pointer: fine), (pointer: coarse)");
 
     const evaluate = () => {
       setMounted(true);
@@ -344,6 +367,18 @@ export default function HeroField() {
       last.valid = false;
     };
 
+    /* TOUCH HAS A BEGINNING AND AN END; A MOUSE ONLY HAS A POSITION.
+       `pointermove` fires continuously for a mouse, so invalidating on leave
+       was enough. A finger produces a stream, lifts, and starts a new stream
+       somewhere else — and without dropping the last position between the two,
+       the first move of the second touch splats a delta measured from wherever
+       the first one ended. That draws a streak straight across the hero that
+       the reader's finger never travelled. Both ends are handled: down starts
+       a fresh stream, up and cancel close it. */
+    const onPointerDown = () => {
+      last.valid = false;
+    };
+
     const idle = () => {
       stop();
       scene.clearTrail();
@@ -395,6 +430,11 @@ export default function HeroField() {
     if (interactive) {
       window.addEventListener("pointermove", onPointerMove, { passive: true });
       window.addEventListener("pointerleave", onPointerOut);
+      /* Passive on all three: none of them calls preventDefault, and saying so
+         keeps a touch-drag off the browser's "might block scrolling" path. */
+      window.addEventListener("pointerdown", onPointerDown, { passive: true });
+      window.addEventListener("pointerup", onPointerOut, { passive: true });
+      window.addEventListener("pointercancel", onPointerOut, { passive: true });
       document.addEventListener("mouseleave", onPointerOut);
       document.addEventListener("visibilitychange", onVisibility);
     }
@@ -407,6 +447,9 @@ export default function HeroField() {
       canvas.removeEventListener("webglcontextlost", onContextLost);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerleave", onPointerOut);
+      window.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("pointerup", onPointerOut);
+      window.removeEventListener("pointercancel", onPointerOut);
       document.removeEventListener("mouseleave", onPointerOut);
       document.removeEventListener("visibilitychange", onVisibility);
       scene.dispose();
