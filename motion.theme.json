@@ -1,0 +1,15 @@
+{
+  "$comment": "The site's motion vocabulary, and the ONE source for it. Read by motion.theme.ts (runtime, for Motion UI sections) and by scripts/motion-theme-css.mjs (build time, for the CSS custom properties the stylesheet consumes). It is JSON rather than TS because both consumers must read it and one of them is plain Node — see the script's header.",
+  "$damping": "These are Motion's own defaults rounded to integers, and the rounding moved two of them across a boundary — measured 2026-08-21 by generating each spring's linear() through Motion's generator. Vendored authored damping ratios: snap 1.000000, ui 0.950000, gentle 0.950000, lively 0.350000, ambient 1.000000. snap and ambient were authored EXACTLY critically damped; rounding pushed snap up (1.0029, harmlessly overdamped) and ambient DOWN (0.9912, nominally underdamped with a 5.7e-11 overshoot at t=3.6s, long after its 1.2s curve ends). ambient is therefore 14 here, not 13, restoring the authored intent. ui and gentle stay at 0.95: that is a deliberate hair of bounce (bounce: 0.05) from Motion, their peaks land after the sampler stops, and every emitted sample is monotonic to exactly 1.0. lively is the ONLY spring that actually overshoots (1.3196) and the only one the no-bounce argument applies to; for a monotonic lively damping is 50, for a sub-perceptual bounce it is about 43.",
+  "transitions": {
+    "snap": { "stiffness": 1218, "damping": 70 },
+    "ui": { "stiffness": 305, "damping": 33 },
+    "gentle": { "stiffness": 110, "damping": 20 },
+    "lively": { "stiffness": 622, "damping": 17 },
+    "ambient": { "stiffness": 43, "damping": 14 }
+  },
+  "stagger": { "tight": 0.04, "base": 0.08, "relaxed": 0.15 },
+  "travel": { "hover": 4, "enter": 24, "section": 48 },
+  "inView": { "amount": 0.4, "once": true },
+  "reducedMotion": "calm"
+}

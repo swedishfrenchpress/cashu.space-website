@@ -115,6 +115,82 @@ const MIN_SAFE_FRAC_X = 0.42;
 const MIN_SAFE_FRAC_Y = 0.34;
 
 /**
+ * BAND MODE — added 2026-08-22, for phones.
+ *
+ * THE FIELD FILLS WHICHEVER AXIS HAS SURPLUS, and that is the same rule column
+ * mode implements, applied to the other axis. Above COLUMN_MIN_WIDTH the type
+ * is width-capped and the surplus is horizontal, so the field takes a column on
+ * the right. On a phone the type fills the width — measured at 86.7% of the
+ * canvas at 360, 87.7% at 390, 88.0% at 430, which leaves 24-26px of margin
+ * before SAFE_PADDING_X has taken its 56 — so there is no horizontal surplus
+ * to take, and the surplus is vertical: the band between the CTAs and
+ * the closing hairline, which is exactly the "pooled emptiness" the Fold-Line
+ * Rule was written against.
+ *
+ * WHAT IT REPAIRS, because until now a phone got a blank hero and that is a bug
+ * rather than a composition. Three constants tuned against a 900px-tall desktop
+ * hero overlapped on a phone until nothing was left. `SAFE_PADDING_X` is 56 CSS
+ * px per side, so at 390 the cleared box came to 454px on a 390px canvas — 116%
+ * of the width, and the horizontal gap clamped to the `Math.max(1, ...)` floor.
+ * `EDGE_FADE_TOP` is 150 CSS px, larger than the entire 90-217px band above the
+ * type. And the box feather ramps the field UP toward the canvas edge while the
+ * edge fade ramps it DOWN at that edge, so on a 148px band the two cancel.
+ * Measured before this existed, in usable pixels of field after both falloffs:
+ * 0 top / 1 bottom at 360x800, 0 / 20 at 390x844, 26 / 49 at 430x932. The
+ * screenshot of that is three grey glyphs in a corner.
+ *
+ * SO THE BOX SPANS THE FULL CANVAS WIDTH HERE, deliberately. With half-extents
+ * that wide `max(q.x, 0.0)` is zero for every fragment, the shader's spread
+ * term reduces to the vertical distance alone, and the field is bands rather
+ * than slivers. The alternative — hugging the type so the field shows in the
+ * 24px margins either side — was rejected on sight of the numbers: a 24px
+ * ribbon of hex running down both sides of a headline is a border, and the
+ * Honest-Network Rule's 2026-08-20 amendment forbids giving the ground an edge.
+ *
+ * THE TOP BAND STAYS CLEAR ON PURPOSE. It keeps the full EDGE_FADE_TOP, which
+ * is wider than the band, so the strip under the masthead renders empty. That
+ * is the same call the retired `--nav-edge` records: texture against the bar's
+ * hard ink edge reads as fringing. The field rises off the hairline instead.
+ */
+/*
+ * THE TRIGGER IS ABSOLUTE SIDE ROOM, NOT A RATIO, and the difference is what
+ * separates a ground from a ribbon. The question band mode answers is "is there
+ * enough room beside the type for a FIELD, or only for a STRIP?", and that is a
+ * question about pixels: 64 CSS px of clear ground is about four cells of the
+ * hex lattice, below which the remainder reads as a border drawn down the edge
+ * rather than as paper the type is sitting on.
+ *
+ * Measured side room after SAFE_PADDING_X, by viewport: -32px at 390 and 430,
+ * -30 at 360, 36 at 600, 88 at 768, 113 at 900, 136 at 1023. So phones and the
+ * 600-class widths take bands and everything from 768 up is unchanged, which is
+ * deliberate — those viewports are not what was reported and they render the
+ * same pixels today as they did before this existed.
+ *
+ * NOTE FOR WHOEVER LOOKS AT A TABLET NEXT: 768 and 900 currently draw the field
+ * as a narrow vertical ribbon hugging the right edge, which is arguably the
+ * same edge-on-a-ground fault this rule exists to prevent, one size up. It is
+ * PRE-EXISTING and deliberately left alone here. Raising this constant to about
+ * 144 would fold those widths into band mode too; that is a composition change
+ * for a viewport nobody has complained about, so it wants a decision rather
+ * than a constant bump smuggled in beside a bug fix.
+ */
+const BAND_MODE_MIN_SIDE_ROOM = 64;
+
+/**
+ * Band mode's own falloffs, both shorter than the wide-viewport values because
+ * they have to fit inside a 148px band instead of a 400px one, and the whole
+ * failure above was two 150-200px ramps overlapping in a space that could not
+ * hold one of them.
+ *
+ * At 390x844 the bottom band is 148 CSS px. A 0.28 feather brings the field to
+ * full density about 41px below the CTAs, and a 40px edge fade takes it back
+ * out over the last 40px before the hairline, leaving roughly 67px of the band
+ * at full strength. Those are the numbers to re-measure if either is touched.
+ */
+const BAND_SAFE_FEATHER = 0.28;
+const BAND_EDGE_FADE_BOTTOM = 40;
+
+/**
  * COLUMN MODE — added 2026-08-20 with the split hero.
  *
  * Above this width the hero is two columns: type left, field right. The mask
@@ -169,6 +245,16 @@ export type DitherScene = {
   /** Inject at uv (origin bottom-left, matching gl_FragCoord). */
   splat: (x: number, y: number, dx: number, dy: number) => void;
   step: (dt: number) => void;
+  /*
+   * The arrival wavefront, 0 (nothing has landed) to 1 (the resting field).
+   *
+   * Set once at 0 before the first render and animated to 1, or left alone
+   * entirely — it defaults to 1, so a caller that never touches it gets the
+   * field this scene drew before the entrance existed. The shape of the sweep
+   * and the argument for why a progress uniform is not the banned time uniform
+   * are both at COMPOSITE_FRAGMENT in `shaders.ts`.
+   */
+  setReveal: (progress: number) => void;
   render: () => void;
   /** Zero the wake so the next render is exactly the rest frame. */
   clearTrail: () => void;
@@ -211,6 +297,9 @@ export function createDitherScene(
   let width = 0;
   let height = 0;
   let dpr = 1;
+  /* Defaults to 1 — arrived. A caller that never calls setReveal gets exactly
+     the field this scene drew before there was an entrance. */
+  let reveal = 1;
   /** Centre and half-extents of the cleared zone, in device pixels, y-up. */
   let safeBox: [number, number, number, number] = [0, 0, 0, 0];
   /** Per-axis distance the ground's falloff spans, in device pixels. Computed
@@ -221,6 +310,30 @@ export function createDitherScene(
       loop — every value the composite needs is resolved before a frame starts. */
   let trailInset = TRAIL_INSET;
   let edgeFade: [number, number] = [EDGE_FADE_TOP, EDGE_FADE_BOTTOM];
+  /** Per-mode as of 2026-08-22: band mode needs a shorter ramp than a wide
+      viewport, for the reason recorded at BAND_SAFE_FEATHER. */
+  let safeFeather = SAFE_FEATHER;
+  /*
+   * THE ARRIVAL WAVE IS NORMALISED OVER THE FIELD, NOT OVER THE CANVAS, and
+   * that is the difference between a wave and a flash.
+   *
+   * The wave starts at the canvas's bottom-left corner, but in column mode the
+   * field does not: everything left of the type's right edge is cleared, so
+   * the visible cells all sit between 1088 and 1698 device pixels from that
+   * corner at 1440x900 — the last fifth of the sweep. Measured on the first
+   * build, which normalised over the raw canvas diagonal: the whole right-hand
+   * column crossed the threshold inside 13% of the progress and read as the
+   * field simply appearing, which is what it did before this existed.
+   *
+   * So the CPU subtracts the dead run. `revealNear` is the distance from the
+   * origin to the nearest cell that is not masked away, `revealSpan` the run
+   * from there to the far corner, and the shader's reach term spends the whole
+   * 0-to-1 on cells that are actually drawn. The two mask geometries give it
+   * different answers, which is exactly why it is computed here, beside the
+   * branch that decides them, rather than guessed at in the shader.
+   */
+  let revealNear = 0;
+  let revealSpan = 1;
 
   const measureSafeBox = () => {
     const element = safeBoxElement();
@@ -229,6 +342,10 @@ export function createDitherScene(
     const scale = height / canvasRect.height;
     trailInset = TRAIL_INSET * scale;
     edgeFade = [EDGE_FADE_TOP * scale, EDGE_FADE_BOTTOM * scale];
+    /* Reset every pass: a resize can cross the band-mode boundary in either
+       direction, and a stale narrow feather on a desktop canvas would read as
+       the wall the 0.34 experiment produced. */
+    safeFeather = SAFE_FEATHER;
 
     /*
      * The union of the block's CHILDREN, not the block itself. `.hero-spec__
@@ -246,6 +363,8 @@ export function createDitherScene(
       // characters across type we failed to locate.
       safeBox = [width / 2, height / 2, width, height];
       safeGap = [1, 1];
+      revealNear = 0;
+      revealSpan = Math.max(1, Math.hypot(width, height));
       return;
     }
     let left = Infinity;
@@ -285,11 +404,46 @@ export function createDitherScene(
       const reach = Math.max(width, height) * 4;
       safeBox = [boundary - reach, height / 2, reach, reach];
       safeGap = [Math.max(1, width - boundary), Math.max(1, height)];
+      /* The cleared zone runs the full height here, so the first undrawn cell
+         the wave meets is the one at the boundary on the bottom edge. */
+      revealNear = boundary;
+      revealSpan = Math.max(1, Math.hypot(width, height) - boundary);
       return;
     }
 
     /*
-     * BOX MODE — one column, the field behind the type, as it has always been.
+     * ONE COLUMN — the field around the type rather than beside it. Below this
+     * point there are two geometries, band and box, and the vertical extent is
+     * the half they share: both clear the same run of type, and they differ
+     * only in what happens on the horizontal axis.
+     */
+    const halfH = Math.max(
+      ((bottom - top) / 2 + SAFE_PADDING_Y) * scale,
+      height * MIN_SAFE_FRAC_Y,
+    );
+    const boxY = centreY * scale;
+
+    /*
+     * BAND MODE. The type fills the width, so the field goes above and below it
+     * rather than beside it — see the note at BAND_MODE_MIN_SIDE_ROOM. The box
+     * is given half-extents of a full canvas width so `max(q.x, 0.0)` is zero
+     * everywhere and the shader's spread term becomes purely vertical; the
+     * horizontal component of safeGap is then a divisor of zero-over-something
+     * and its value is irrelevant, which is why it is left at the floor.
+     */
+    const sideRoom = (canvasRect.width - (right - left)) / 2 - SAFE_PADDING_X;
+    if (sideRoom < BAND_MODE_MIN_SIDE_ROOM) {
+      safeBox = [width / 2, boxY, width, halfH];
+      safeFeather = BAND_SAFE_FEATHER;
+      edgeFade = [EDGE_FADE_TOP * scale, BAND_EDGE_FADE_BOTTOM * scale];
+      revealNear = 0;
+      revealSpan = Math.max(1, Math.hypot(width, height));
+      safeGap = [1, Math.max(1, boxY - halfH, height - (boxY + halfH))];
+      return;
+    }
+
+    /*
+     * BOX MODE — the field behind and around the type, as it has always been.
      *
      * The gap is the LONGER of the two runs from the box's edge to the canvas
      * edge on each axis, which is the distance the falloff actually has to
@@ -302,14 +456,13 @@ export function createDitherScene(
       ((right - left) / 2 + SAFE_PADDING_X) * scale,
       width * MIN_SAFE_FRAC_X,
     );
-    const halfH = Math.max(
-      ((bottom - top) / 2 + SAFE_PADDING_Y) * scale,
-      height * MIN_SAFE_FRAC_Y,
-    );
     const boxX = centreX * scale;
-    const boxY = centreY * scale;
 
     safeBox = [boxX, boxY, halfW, halfH];
+    /* The box floats clear of the corners here, so the origin cell is drawn
+       and there is no dead run to subtract. */
+    revealNear = 0;
+    revealSpan = Math.max(1, Math.hypot(width, height));
     safeGap = [
       Math.max(1, boxX - halfW, width - (boxX + halfW)),
       Math.max(1, boxY - halfH, height - (boxY + halfH)),
@@ -409,9 +562,15 @@ export function createDitherScene(
     gl.uniform3f(uniform(compositeProgram, "uWake"), ...colors.wake);
     gl.uniform4f(uniform(compositeProgram, "uSafeBox"), ...safeBox);
     gl.uniform2f(uniform(compositeProgram, "uSafeGap"), ...safeGap);
-    gl.uniform1f(uniform(compositeProgram, "uSafeFeather"), SAFE_FEATHER);
+    gl.uniform1f(uniform(compositeProgram, "uSafeFeather"), safeFeather);
     gl.uniform1f(uniform(compositeProgram, "uTrailInset"), trailInset);
     gl.uniform2f(uniform(compositeProgram, "uEdgeFade"), ...edgeFade);
+    gl.uniform1f(uniform(compositeProgram, "uReveal"), reveal);
+    /* The bottom-left corner of the framebuffer. gl_FragCoord is y-up, so
+       (0, 0) is the corner under the hero's own baseline, not above it. */
+    gl.uniform2f(uniform(compositeProgram, "uRevealOrigin"), 0, 0);
+    gl.uniform1f(uniform(compositeProgram, "uRevealNear"), revealNear);
+    gl.uniform1f(uniform(compositeProgram, "uRevealSpan"), revealSpan);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, field.texture);
@@ -443,6 +602,13 @@ export function createDitherScene(
     },
     splat: (x, y, dx, dy) => fluid?.splat(x, y, dx, dy),
     step: (dt) => fluid?.step(dt),
+    setReveal: (progress) => {
+      /* Clamped because the entrance is driven by a spring, and the site's
+         spring (120/20) is a hair underdamped — it can report a value just
+         past 1. Unclamped that would push the wavefront beyond the last cell
+         and then pull it back, un-setting the trailing ring on the way. */
+      reveal = Math.min(1, Math.max(0, progress));
+    },
     render,
     clearTrail: () => fluid?.clear(),
     dispose: () => {

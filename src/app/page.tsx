@@ -1,17 +1,21 @@
-import Link from "next/link";
+import CurtainLink from "@/components/curtain-link";
+import { Stagger, StaggerItem } from "@/components/stagger";
 import HeroField from "@/components/hero-field";
 import HeroHeadline from "@/components/hero-headline";
 import InThePress from "@/components/in-the-press";
 import NewTabHint from "@/components/new-tab-hint";
 import ProtocolParts from "@/components/protocol-parts";
 import ReferenceImplementations from "@/components/reference-implementations";
-import Reveal from "@/components/reveal";
+import FooterReveal from "@/components/footer-reveal";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 bg-paper text-ink">
+    <FooterReveal
+      className="flex flex-col flex-1 bg-paper text-ink"
+      footer={<SiteFooter />}
+    >
       <SiteHeader />
 
       {/* The homepage was the one route with no <main>: /wallets and the 404
@@ -52,7 +56,7 @@ export default function Home() {
         <section className="hero-spec">
           <HeroField />
           <div className="hero-spec__inner">
-            <div className="hero-spec__content">
+            <Stagger className="hero-spec__content">
               {/* NO WRAPPER REVEAL, AND THAT IS THE CHANGE (2026-08-20).
                   The headline used to sit in a staged `Reveal` that faded and
                   rose the whole block out of an 18px blur while one word
@@ -63,11 +67,13 @@ export default function Home() {
                   precisely so the word wipe would not run behind a lens, which
                   is an admission that the two were fighting.
 
-                  The headline now sets itself glyph by glyph instead — see
-                  hero-headline.tsx for the markup and `.hero-glyph` in
-                  globals.css for the timing. One gesture, and it is the
-                  site's own travelling edge at the granularity of a single
-                  character rather than a whole block.
+                  The headline takes no entrance of its own now. It is one
+                  item in the hero's stagger — opacity, a 40px rise and a 4px
+                  blur, on the spring in stagger.tsx — which is the same
+                  entrance every other element on the site gets. Five bespoke
+                  treatments were tried on this headline and rejected; the
+                  sixth is stock, and that is the point. See the Stagger Rule
+                  in DESIGN.md §4 before proposing a seventh.
 
                   The h1 is a direct flex child now. That is deliberate and it
                   is measured: the old wrapper was shrink-to-fit around a child
@@ -75,7 +81,9 @@ export default function Home() {
                   ran 0 to 6.942em; the h1's own box runs -0.058em to 6.942em.
                   The right edge is identical, which is the edge the field's
                   mask measures at 1024px and up. */}
-              <HeroHeadline />
+              <StaggerItem>
+                <HeroHeadline />
+              </StaggerItem>
               {/* The deck stands alone. The body sentence explaining the
                   blind-signature mechanism was cut 2026-08-14 on the user's
                   direction, on the grounds that the field's morph depicted the
@@ -89,14 +97,14 @@ export default function Home() {
                   should come back as a figure (DESIGN.md §4, the Honest-Network
                   Rule), not as a paragraph bolted in here. Don't refill this
                   slot with prose. */}
-              <Reveal immediate delay={240}>
+              <StaggerItem>
                 <p className="hero-spec__deck">Instant, bearer, peer-to-peer.</p>
-              </Reveal>
-              <Reveal immediate delay={360}>
+              </StaggerItem>
+              <StaggerItem>
                 <div className="hero-spec__cta">
-                  <Link href="/wallets" className="btn-primary">
+                  <CurtainLink href="/wallets" className="btn-primary">
                     <span>Get a wallet</span>
-                  </Link>
+                  </CurtainLink>
                   <a
                     href="https://docs.cashu.space/"
                     target="_blank"
@@ -107,8 +115,8 @@ export default function Home() {
                     <NewTabHint />
                   </a>
                 </div>
-              </Reveal>
-            </div>
+              </StaggerItem>
+            </Stagger>
           </div>
         </section>
 
@@ -127,8 +135,6 @@ export default function Home() {
         </div>
         <InThePress />
       </main>
-
-      <SiteFooter />
-    </div>
+    </FooterReveal>
   );
 }

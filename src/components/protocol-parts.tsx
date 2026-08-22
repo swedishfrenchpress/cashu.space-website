@@ -1,6 +1,6 @@
 import type { OrbState } from "thinking-orbs";
 import OrbFigure from "./orb-figure";
-import RevealGroup from "./reveal-group";
+import { Stagger, StaggerItem } from "./stagger";
 
 type Part = {
   id: string;
@@ -108,19 +108,21 @@ export default function ProtocolParts() {
             heading and a paragraph that happen to be adjacent. Sticky suits
             the job — once the section is in view the element stays in view,
             so there is no window in which the trigger can be missed. */}
-        <RevealGroup className="protocol-parts__aside-inner">
-          <div className="reveal-item">
-            <h2 className="protocol-parts__title">The protocol, in four parts.</h2>
-          </div>
-          <div className="reveal-item">
+        <Stagger inView className="protocol-parts__aside-inner">
+          <StaggerItem>
+            <h2 className="protocol-parts__title">
+              The protocol, in four parts.
+            </h2>
+          </StaggerItem>
+          <StaggerItem>
             <p className="protocol-parts__lead">
               Cashu is an open protocol for Chaumian ecash on bitcoin. Mints
               issue bearer tokens against Lightning, wallets hold them, and
               blind signatures keep a mint from tying the withdrawal to the
               spend that follows it. Every part of it is specified in public.
             </p>
-          </div>
-        </RevealGroup>
+          </StaggerItem>
+        </Stagger>
       </div>
 
       <div className="protocol-parts__list">
@@ -131,27 +133,29 @@ export default function ProtocolParts() {
              arrive; per element is what this replaced. Per entry, the row
              settles as a unit at reading pace, which is the granularity the
              layout already reads at. The stagger between the four cells is
-             authored in globals.css against these same class names. */
-          <RevealGroup key={part.id} as="article" className="protocol-part">
-            <div className="reveal-item protocol-part__index">
+             Motion's own `staggerChildren`, set on the container in
+             stagger.tsx — it was a table of nth-child delays in globals.css
+             until the 2026-08-21 rewrite, and this comment outlived it. */
+          <Stagger inView as="article" key={part.id} className="protocol-part">
+            <StaggerItem className="protocol-part__index">
               <span className="protocol-part__num">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="protocol-part__name">{part.name}</span>
-            </div>
+            </StaggerItem>
 
-            <div className="reveal-item protocol-part__head">
+            <StaggerItem className="protocol-part__head">
               <h3 className="protocol-part__title">{part.title}</h3>
-            </div>
+            </StaggerItem>
 
-            <div className="reveal-item protocol-part__body">
+            <StaggerItem className="protocol-part__body">
               <p>{part.body}</p>
-            </div>
+            </StaggerItem>
 
-            <div className="reveal-item protocol-part__plate">
+            <StaggerItem className="protocol-part__plate">
               <OrbFigure state={part.orb} label={part.orbLabel} />
-            </div>
-          </RevealGroup>
+            </StaggerItem>
+          </Stagger>
         ))}
       </div>
     </section>

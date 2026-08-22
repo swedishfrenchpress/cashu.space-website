@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Reveal from "@/components/reveal";
-import RevealGroup from "@/components/reveal-group";
+import FooterReveal from "@/components/footer-reveal";
+import { Stagger, StaggerItem } from "@/components/stagger";
 import SiteFooter from "@/components/site-footer";
 import SiteHeader from "@/components/site-header";
 
@@ -147,19 +147,34 @@ function targetOf(href: string): string {
   }
 }
 
-/* One registry row. Extracted so the two arrival paths below render the
-   identical row and differ only in the class it carries: the first group is
-   an arrival and its rows are plain, every group under the fold is a
-   RevealGroup and its rows are that group's `.reveal-item`s. */
-function WalletRow({
-  entry,
-  className = "wallet-row",
-}: {
-  entry: Entry;
-  className?: string;
-}) {
+/* One registry row, and EVERY ROW IS AN ITEM IN EVERY GROUP (2026-08-22).
+   It was extracted so the two paths below could render the identical row and
+   differ only in the class it carried — the first group's rows were plain and
+   the rest were a container's items. That distinction is gone: both paths
+   stagger now, so there is one code path and the `className` prop has nothing
+   left to vary. Under reduced motion StaggerItem renders the plain
+   `<li className="wallet-row">` this replaced, so the DOM is unchanged for
+   anyone who asked for that. */
+/* 40ms between rows, against Stagger's 0.1s default, and the number is
+   recovered rather than invented: DESIGN.md records the ladder this route used
+   to render as "60/100/140/180/220/260ms", which is a 40ms step. It is also
+   `stagger.tight` in motion.theme.json.
+
+   The default is wrong here for a reason that only shows up at length. A group
+   staggers its rail plus every one of its rows in one context, so Mobile is
+   seven children: at 0.1s the last row would not begin until 600ms after the
+   first thing moved, and the group would still be settling most of a second
+   later. At 40ms the whole ladder is 240ms and reads as a list arriving in
+   order rather than as rows queuing up.
+
+   It is a literal here because the theme's `stagger` values currently have no
+   runtime consumer at all — every call site holds its own copy. Wiring that up
+   is its own change; this one is not the place to start it. */
+const ROW_STAGGER = 0.04;
+
+function WalletRow({ entry }: { entry: Entry }) {
   return (
-    <li className={className}>
+    <StaggerItem as="li" offsetY={24} className="wallet-row">
       {/* Plain text, not a second link. The wordmark and the OPEN slab
           pointed at the same href, so the registry spent 26 tab stops on
           13 destinations and announced every entry twice to a screen
@@ -194,29 +209,43 @@ function WalletRow({
       >
         Open
       </a>
-    </li>
+    </StaggerItem>
   );
 }
 
 export default function WalletsPage() {
   return (
-    <div className="flex flex-col bg-paper text-ink min-h-screen">
+    /* The twilight stack closes every page (DESIGN.md §5) — the wallet chooser
+       leaves past the disclaimer and the spec CTA, not into a dead end after
+       the last directory row. It is passed to FooterReveal rather than rendered
+       last because the footer is now a plate the page is drawn off, not the
+       element after the final row. */
+    <FooterReveal
+      className="flex flex-col bg-paper text-ink min-h-screen"
+      footer={<SiteFooter />}
+    >
       <SiteHeader />
 
       <main className="flex-1 pb-24 lg:pb-32">
 
       <div className="page-shell flex flex-col pt-16 lg:pt-24">
-        <Reveal immediate focus as="header">
-          <div id="main-content" tabIndex={-1} className="flex flex-col gap-6 max-w-[60ch]">
-            <h1 className="t-display">Wallets.</h1>
-            <p className="t-body-lead text-body">
+        <header>
+          <Stagger
+            id="main-content"
+            tabIndex={-1}
+            className="flex flex-col gap-6 max-w-[60ch]"
+          >
+            <StaggerItem as="h1" className="t-display">
+              Wallets.
+            </StaggerItem>
+            <StaggerItem as="p" className="t-body-lead text-body">
               Wallets first, then the libraries and mint tooling built on the
               same spec. Any client that implements the Cashu protocol is
               conformant. This list is non-exhaustive, a snapshot of what
               people use today, not an endorsement.
-            </p>
-          </div>
-        </Reveal>
+            </StaggerItem>
+          </Stagger>
+        </header>
 
         <div className="flex flex-col gap-[clamp(4rem,8vw,6.5rem)] mt-[clamp(3.5rem,7vw,6rem)]">
           {DIRECTORY_GROUPS.map((group, gi) => {
@@ -233,83 +262,86 @@ export default function WalletsPage() {
               </>
             );
 
-            /* THE FIRST GROUP IS AN ARRIVAL AND THE REST ARE GROUPS, AND THAT
-               SPLIT IS THE WHOLE DECISION HERE (2026-08-20, applying the
-               Section-Gesture Rule to the route it had skipped).
+            /* THE FIRST GROUP PLAYS ON MOUNT AND THE REST ON THE VIEWPORT,
+               AND THAT SPLIT IS THE WHOLE DECISION HERE.
 
-               This group's rail sits above the fold at every viewport, and a
-               RevealGroup is gated on an observer, therefore on hydration.
-               Making this one a group would put the top of the route back
-               behind React, which is exactly the regression `.reveal--arrival`
-               was measured to fix — see the arrival block in globals.css.
+               This group's rail sits above the fold at every viewport, and an
+               `inView` Stagger is gated on an observer. Making it one would put
+               the top of the route behind a scroll callback for content that is
+               already on screen — so it plays at mount instead, which is what
+               the route header directly above it does.
 
-               So it stays an arrival, and satisfies the rule's other half
-               instead: it arrives as TWO beats, the rail and then the list as
-               one block, rather than as the eight it used to be. The rows carry
-               no wrapper of their own. */
+               CORRECTED 2026-08-22. This branch used to render no entrance at
+               all. Its comment explained that it "stays an arrival" because
+               `.reveal--arrival` was a CSS keyframe that ran at parse time and
+               did not wait for hydration — but that whole system was deleted on
+               2026-08-21 when the site moved to `stagger.tsx`, and deleting it
+               left this branch as plain markup. The route header staggered on
+               mount and then six rows hard-cut in beneath it. A mount Stagger
+               is the surviving form of what the comment was asking for. */
             if (gi === 0) {
               return (
                 <section
                   key={group.heading}
                   aria-labelledby={headingId}
-                  className="wallet-group"
                 >
-                  <Reveal immediate delay={160} className="wallet-group__rail">
-                    {rail}
-                  </Reveal>
-                  <Reveal immediate delay={220}>
-                    <ul className="wallet-list">
-                      {group.entries.map((entry) => (
-                        <WalletRow key={entry.name} entry={entry} />
-                      ))}
-                    </ul>
-                  </Reveal>
+                  <Stagger className="wallet-group" stagger={ROW_STAGGER}>
+                    <StaggerItem offsetY={24} className="wallet-group__rail">
+                      {rail}
+                    </StaggerItem>
+                    <div>
+                      <ul className="wallet-list">
+                        {group.entries.map((entry) => (
+                          <WalletRow key={entry.name} entry={entry} />
+                        ))}
+                      </ul>
+                    </div>
+                  </Stagger>
                 </section>
               );
             }
 
             /* Everything under the fold is one gesture per group: one observer
-               for the rail and its entries, and the entries settle off that one
-               class. `aria-labelledby` stays on the <section> and the grid class
-               moves onto the group, so RevealGroup's prop surface is untouched.
+               for the rail and its entries, and the entries settle off it.
 
-               The <ul> is a plain grid child and deliberately NOT an item —
-               a `.reveal-item` list wrapping `.reveal-item` rows would blur and
-               translate every row twice. Its top hairline is structure, not
-               content: it holds the register open while the entries land in it.
+               THE <ul> IS A PLAIN GRID CHILD AND DELIBERATELY NOT AN ITEM. A
+               stagger item wrapping stagger-item rows would translate every row
+               twice. Its top hairline is structure, not content: it holds the
+               register open while the entries land in it — which is exactly
+               what this now does, because the rows are the items and the list
+               they land in does not move.
 
-               The stagger is in globals.css keyed on `.wallet-row`, not on a
-               `delay=` prop here. The props this replaced were
-               `280 + gi * 60 + i * 50`, which MAX_DELAY_MS clamped to a flat
-               360ms from the third row on — an authored ladder that never
-               rendered. */
+               THE LADDER IS MOTION'S OWN `staggerChildren`, AND THIS IS THE
+               THIRD ATTEMPT AT IT. The first was `delay={280 + gi * 60 + i * 50}`
+               props, which `MAX_DELAY_MS` clamped flat to 360ms from the third
+               row on — authored, committed and silently thrown away. The second
+               was this comment claiming "the stagger is in globals.css keyed on
+               `.wallet-row`", which was true of a stylesheet table that the
+               08-21 rewrite deleted and that a grep for `.wallet-row` now
+               disproves: the <ul> was one item and every row in a group arrived
+               together. Variant propagation runs through the plain <div> and
+               <ul> between this container and the rows, so the rows are its
+               stagger children with no wrapper of their own. */
             return (
               <section key={group.heading} aria-labelledby={headingId}>
-                <RevealGroup className="wallet-group">
-                  <div className="reveal-item wallet-group__rail">{rail}</div>
+                <Stagger inView className="wallet-group" stagger={ROW_STAGGER}>
+                  <StaggerItem offsetY={24} className="wallet-group__rail">
+                    {rail}
+                  </StaggerItem>
                   <div>
                     <ul className="wallet-list">
                       {group.entries.map((entry) => (
-                        <WalletRow
-                          key={entry.name}
-                          entry={entry}
-                          className="wallet-row reveal-item"
-                        />
+                        <WalletRow key={entry.name} entry={entry} />
                       ))}
                     </ul>
                   </div>
-                </RevealGroup>
+                </Stagger>
               </section>
             );
           })}
         </div>
       </div>
       </main>
-
-      {/* The twilight stack closes every page (DESIGN.md §5) — the wallet
-          chooser leaves past the disclaimer and the spec CTA, not into a
-          dead end after the last directory row. */}
-      <SiteFooter />
-    </div>
+    </FooterReveal>
   );
 }

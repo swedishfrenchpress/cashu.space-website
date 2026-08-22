@@ -8,7 +8,7 @@
  * The second was `hero-cipher.tsx`, which ran the sweep decrypt-only over one
  * word of the hero headline on arrival. The user cut it as corny and too on
  * the nose; the whole headline is a per-glyph clip-path cascade now
- * (`.hero-glyph` in globals.css). The split between `cipherText` and
+ * (the line rise in globals.css). The split between `cipherText` and
  * `decryptText` was there to serve two callers with one algorithm; with one
  * caller left, `decryptText` and `encryptedGlyph` are no longer exported.
  * They stay separate functions because the round trip genuinely is two legs

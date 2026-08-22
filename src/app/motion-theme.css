@@ -1,0 +1,56 @@
+/* GENERATED FILE — DO NOT EDIT.
+ *
+ * Source:    motion.theme.json
+ * Generator: scripts/motion-theme-css.mjs  (npm run motion:theme)
+ *
+ * The --motion-ui-* vocabulary, compiled from the theme's springs by Motion's
+ * own generateLinearEasing. Each transition emits four properties:
+ *
+ *   --motion-ui-transition-<name>                  cubic-bezier, the FADE
+ *     channel (opacity and colour), paired with
+ *   --motion-ui-transition-<name>-duration
+ *
+ *   --motion-ui-transition-<name>-spring           linear(), the TRAVEL
+ *     channel (transforms), paired with its natural settle time
+ *   --motion-ui-transition-<name>-spring-duration
+ *
+ * Pair a spring easing ONLY with its own -spring-duration. A linear() function
+ * is a sampled curve, not a shape: run it over a different length and it is no
+ * longer the spring it was sampled from.
+ *
+ * ONLY WHAT THE SITE CONSUMES IS HERE. The theme defines 26 properties and
+ * 24 are withheld, on the same reasoning that deleted --ease-out-quint
+ * and --signal: an unconsumed token is an invitation to reach for a curve
+ * without re-arguing it. The allowlist and the procedure for adding one are in
+ * the generator. Withheld:
+ *
+ *   --motion-ui-transition-snap
+ *   --motion-ui-transition-snap-duration
+ *   --motion-ui-transition-ui
+ *   --motion-ui-transition-ui-duration
+ *   --motion-ui-transition-ui-spring
+ *   --motion-ui-transition-ui-spring-duration
+ *   --motion-ui-transition-gentle
+ *   --motion-ui-transition-gentle-duration
+ *   --motion-ui-transition-gentle-spring
+ *   --motion-ui-transition-gentle-spring-duration
+ *   --motion-ui-transition-lively
+ *   --motion-ui-transition-lively-duration
+ *   --motion-ui-transition-lively-spring
+ *   --motion-ui-transition-lively-spring-duration
+ *   --motion-ui-transition-ambient
+ *   --motion-ui-transition-ambient-duration
+ *   --motion-ui-transition-ambient-spring
+ *   --motion-ui-transition-ambient-spring-duration
+ *   --motion-ui-stagger-tight
+ *   --motion-ui-stagger-base
+ *   --motion-ui-stagger-relaxed
+ *   --motion-ui-travel-hover
+ *   --motion-ui-travel-enter
+ *   --motion-ui-travel-section
+ */
+
+:root {
+  --motion-ui-transition-snap-spring: linear(0, 0.0514, 0.1633, 0.2944, 0.4226, 0.5378, 0.636, 0.717, 0.7822, 0.8338, 0.8741, 0.9052, 0.9289, 0.947, 0.9606, 0.9708, 0.9784, 0.9841, 0.9883, 0.9914, 0.9937, 0.9954, 0.9967, 0.9976, 0.9982, 0.9987, 0.9991, 0.9993, 1, 1);
+  --motion-ui-transition-snap-spring-duration: 0.3s;
+}

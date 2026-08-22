@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "motion:theme": "node scripts/motion-theme-css.mjs"
   },
   "dependencies": {
     "motion": "^13.1.1",
+    "motion-plus": "npm:@motionplus/core@^2.12.0",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
