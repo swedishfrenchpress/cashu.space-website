@@ -26,6 +26,11 @@ const TITLE = "Cashu Wallets";
 const DESCRIPTION =
   "A non-exhaustive directory of Cashu wallets, libraries, and mint tooling. Any client that implements the protocol is conformant.";
 
+/* `images` is restated here even though the root layout declares the same
+   file, and that is not a redundancy: Next merges metadata SHALLOWLY per
+   top-level key, so this segment's `openGraph` and `twitter` objects REPLACE
+   the root's entirely — before 2026-08-26 this route shipped no card image
+   at all. Delete these lines and the wallets card goes blank again. */
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
@@ -34,10 +39,19 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     url: "/wallets",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 640,
+        alt: "CASHU. Open source ecash for bitcoin. Black display type on white paper, beside a drift of grey hexadecimal cipher text.",
+      },
+    ],
   },
   twitter: {
     title: TITLE,
     description: DESCRIPTION,
+    images: ["/og-image.png"],
   },
 };
 

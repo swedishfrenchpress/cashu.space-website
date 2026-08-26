@@ -116,10 +116,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.png",
         width: 1200,
-        height: 630,
-        alt: "Two hands exchange US dollar bills against the NYC Flatiron district, flanked by a Cashu wallet showing a balance of ₿3,878 on an antifiat mint.",
+        height: 640,
+        alt: "CASHU. Open source ecash for bitcoin. Black display type on white paper, beside a drift of grey hexadecimal cipher text.",
       },
     ],
   },
@@ -128,7 +128,7 @@ export const metadata: Metadata = {
     title: "Cashu: Open source electronic cash",
     description:
       "Cashu is ecash for bitcoin. An open Chaumian protocol. No company, no token, no treasury.",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
   },
 };
 
