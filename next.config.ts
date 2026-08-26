@@ -13,6 +13,7 @@ import type { NextConfig } from "next";
 const STATIC_MEDIA = "public, max-age=2592000, stale-while-revalidate=86400";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   turbopack: {
     // Pin the workspace root to this project. A stray package-lock.json in a
     // parent directory (~/package-lock.json) otherwise makes Next infer the
