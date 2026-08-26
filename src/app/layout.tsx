@@ -147,9 +147,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        {/* THE NO-SCRIPT RESCUE, and it is the one place this stylesheet uses
-            `!important` — deliberately, because it is the only thing that can
-            beat an inline style.
+        {/* THE NO-SCRIPT RESCUE, and one of exactly two places `!important`
+            is used — deliberately, because it is the only thing that can beat
+            an inline style. The other is the SAME RULE, injected by the boot
+            script below when scripting is broken rather than off.
 
             The entrance is Motion-driven now (see stagger.tsx), and Motion
             serialises a variant's `initial` state into the SERVER-RENDERED
@@ -176,24 +177,47 @@ export default function RootLayout({
 
         {/* Stamps html.js, still the gate for the hero hairline's draw.
 
-            THE FAILSAFE NOW REPAIRS RATHER THAN RETREATS. It used to probe for
-            `.reveal.is-revealed` and, finding none, drop `html.js` so the
-            CSS-gated hidden states released. That system is gone; Motion's
-            hidden state is an inline style, so dropping a class cannot reach
-            it. Instead, after 1.5s, anything still sitting under an opacity of
-            0.9 inside a stagger container gets its inline opacity, transform
-            and filter cleared outright.
+            THE FAILSAFE REPAIRS ONLY ON EVIDENCE OF ABSENCE (2026-08-26). It
+            used to fire unconditionally at 1.5s, and that WAS a bug on every
+            normal load: it cleared the serialised hidden styles off the
+            below-fold items, Motion's values still held them, and the first
+            `whileInView` frame wrote them back onto content the reader was
+            already looking at — appear, vanish, reappear, for every section
+            reached after 1.5s. The repair is now gated on `data-stagger-live`,
+            the marker stagger.tsx sets from a delivered animation frame (the
+            note on useMarkStaggerLive says why a frame and not hydration).
+            Marker present: Motion is alive and the entrance clears the styles
+            itself. Marker absent at check time: the chunk never came, and the
+            repair runs — it lives inline so a chunk that never arrives cannot
+            take it with it.
 
-            The case this exists for is unchanged and is the one that actually
-            bites: not scripting-off (handled above) but scripting-SLOW and
-            scripting-BROKEN — a chunk that never arrives, or a backgrounded tab
-            where hydration completes while rAF stays paused. Those never
-            resolve on their own. It lives inline, not in a chunk, so a chunk
-            that never arrives cannot take the failsafe with it. */}
+            THE INSTRUMENT IS THE NOSCRIPT RULE, NOT A STYLE WIPE. Clearing
+            inline styles is exactly the fight described above waiting to
+            restart on late hydration, because Motion animates from its own
+            recorded values, never from the DOM. A held `!important` sheet
+            outranks every later inline write, so each failure mode — a chunk
+            that finally lands, even the one-frame race where the timer beats
+            the marker — degrades to "content visible, entrance suppressed",
+            never to a flash. On repaired loads Motion's springs still run
+            invisibly under the sheet; a wasted recalc, on broken loads only.
+            `data-stagger-repaired` is stamped for the verification probes.
+
+            A HIDDEN TAB DEFERS THE CHECK rather than repairing into the dark:
+            rAF is paused there, so the marker CANNOT be set even when
+            scripting is perfectly healthy — checking at 1.5s would repair
+            every backgrounded load and restage the fight on foreground. Wait
+            for visibilitychange, give the resumed frame loop the same 1.5s of
+            grace, and check again. The listener only attaches while hidden,
+            so its firing is necessarily a return to visible ({once:true}
+            suffices), and the post-grace call is `check`, not `repair`, so a
+            tab hidden again during the grace defers again.
+
+            The case this exists for is unchanged: not scripting-off (handled
+            above) but scripting-SLOW and scripting-BROKEN. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'document.documentElement.classList.add("js");setTimeout(function(){document.querySelectorAll("[data-stagger-item]").forEach(function(e){var o=getComputedStyle(e).opacity;if(o!==""&&parseFloat(o)<0.9){e.style.opacity="";e.style.transform="";e.style.filter=""}})},1500)',
+              'document.documentElement.classList.add("js");(function(){var d=document,h=d.documentElement;function repair(){if(h.hasAttribute("data-stagger-live"))return;var s=d.createElement("style");s.textContent="[data-stagger-item]{opacity:1 !important;transform:none !important;filter:none !important}";d.head.appendChild(s);h.setAttribute("data-stagger-repaired","")}function check(){if(d.hidden){d.addEventListener("visibilitychange",function(){setTimeout(check,1500)},{once:true})}else{repair()}}setTimeout(check,1500)})()',
           }}
         />
         <a href="#main-content" className="skip-link">

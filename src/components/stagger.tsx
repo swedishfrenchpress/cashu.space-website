@@ -88,6 +88,40 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
+/* THE LIVENESS MARKER THE 1.5s FAILSAFE IS GATED ON (2026-08-26).
+ *
+ * layout.tsx's failsafe exists for scripting that is SLOW or BROKEN, but it
+ * used to fire on every load: at 1.5s it stripped the serialised hidden
+ * styles off every still-below-fold item, Motion's values still held
+ * 0.02 / 40px / blur(4px), and the first `whileInView` frame wrote them BACK
+ * onto content the reader was already looking at — appear, vanish, reappear,
+ * deterministically, for anything scrolled to after 1.5s.
+ *
+ * The marker is the failsafe's evidence that Motion is alive. Hydration
+ * alone is NOT that evidence — the recorded failure case is a backgrounded
+ * tab where hydration completes while rAF stays paused — but a DELIVERED
+ * animation frame is: Motion's frameloop is rAF-driven, so a rAF that fired
+ * in this document is a frame Motion could have served. ONE frame, not two:
+ * a second buys no further evidence and widens the window in which the 1.5s
+ * timer can beat the marker. No cleanup — evidence, once true, does not
+ * become false on unmount, and the attribute is idempotent under
+ * StrictMode's double-invoke.
+ *
+ * It lives on <html> because its one consumer is an inline script that runs
+ * before React exists. One bit for the whole document is sound while every
+ * Stagger is in one client graph and hydrates in one pass — true today: no
+ * next/dynamic, no lazy, no Suspense around any consumer. A future
+ * dynamically-imported Stagger section would need its own evidence. */
+const LIVE_ATTR = "data-stagger-live";
+
+function useMarkStaggerLive() {
+  useEffect(() => {
+    const html = document.documentElement;
+    if (html.hasAttribute(LIVE_ATTR)) return;
+    requestAnimationFrame(() => html.setAttribute(LIVE_ATTR, ""));
+  }, []);
+}
+
 /* Exported because the hero's ground arrives on it too (`hero-field.tsx`).
    The field is not a Motion element — it is one WebGL canvas — so it cannot be
    a StaggerItem, but it can be driven by the same physics, and that is what
@@ -157,6 +191,11 @@ export function Stagger({
   tabIndex,
 }: StaggerProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  /* Above the reduced-motion return, unconditionally — hooks must be, and
+     the marker is per-document rather than per-branch anyway: under `reduce`
+     the plain branch serialises no hidden style, so the failsafe would find
+     nothing to repair; the marker just saves it the probe. */
+  useMarkStaggerLive();
   const Tag = TAGS[as ?? "div"];
 
   /* Substitute, don't kill — except there is nothing to substitute here. The
