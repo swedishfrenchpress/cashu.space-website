@@ -223,6 +223,50 @@ const COLUMN_PADDING_X = 64;
  */
 const MAX_SAFE_FRAC_X = 0.72;
 
+/**
+ * THE CTA ROW IS NOT PROTECTED IN COLUMN MODE, and that is the whole reason
+ * the glass slabs are glass (globals.css, "LIQUID GLASS SLAB", 2026-09-23).
+ *
+ * Every other element in the title block is type, and type over a field of hex
+ * is unreadable — so the cleared zone covers the headline and the deck, and
+ * stops just below them. The two buttons sit in the field instead of above it.
+ * A translucent slab over flat Paper is a flat slab: `backdrop-filter` blurs
+ * white into white, and the material has nothing to show. Over the field it
+ * has hex to blur, and the slab reads as a lens rather than as a shape with a
+ * rim drawn on it.
+ *
+ * COLUMN MODE ONLY. Below COLUMN_MIN_WIDTH the geometry is a box around the
+ * type rather than a half-plane beside it, the CTAs stack, and the field would
+ * be running under two full-width slabs on a phone. The desktop hero is where
+ * the field has room to be a ground at all; the narrow one keeps the union it
+ * always had.
+ *
+ * THE RAMP IS DERIVED, NOT CHOSEN, AND IT LANDS ON THE ROW'S TOP EDGE.
+ * `safeGap` is the run the falloff is normalised over, and the two obvious
+ * values for it are both wrong, each measured on a build:
+ *
+ *   cut to the canvas edge   the ramp reaches the buttons at 12% of density.
+ *                            A scatter of stray characters under a slab is
+ *                            not a ground, and the glass has nothing to
+ *                            refract after all.
+ *   cut to the row's FOOT    the field lands squarely UNDER the buttons and
+ *                            arrives behind them at roughly half — which is
+ *                            what shipped for one build and reads as two
+ *                            slabs sitting on a band rather than in it.
+ *
+ * So it solves smoothstep's upper end (`spread == SAFE_FEATHER`) for the row's
+ * TOP edge: the field is at full density from the first pixel of the slab
+ * downward, and the whole ramp happens in the gap between the deck's line box
+ * and the buttons. That gap is 32 CSS px at 1440x900, which is why the cut
+ * takes no SAFE_PADDING_Y of its own — spending 28 of those 32 on clearance
+ * leaves 4 px of ramp, and a feather with no room to feather is the hard edge
+ * the falloff exists to avoid. The deck is cleared by its own line box, which
+ * already sits below its ink.
+ *
+ * The floor is the guard for a layout that ever closes that gap entirely.
+ */
+const COLUMN_FOOT_MIN_GAP = 24;
+
 /** Hard ceiling on backing-store pixels, and on device pixel ratio. The type
     wants a real dpr — unlike the dot lattice this replaced, which was pinned
     to 1 — but 3x on a 6K display is fill rate nobody can see. */
@@ -388,20 +432,65 @@ export function createDitherScene(
 
     if (canvasRect.width >= COLUMN_MIN_WIDTH) {
       /*
-       * COLUMN MODE. One edge binds — the right edge of the type — and the
-       * cleared zone runs off the canvas's left, top and bottom.
+       * COLUMN MODE. Two edges bind — the right edge of the type, and a foot
+       * just below the last line of it — and the cleared zone runs off the
+       * canvas's left and top.
        *
        * It is expressed as an enormous box rather than as a separate SDF so
-       * the shader keeps a single path: with half-extents this large, q.y is
-       * negative everywhere and q.x reduces to (x - boundary), which is exactly
-       * the half-plane distance. The CPU decides the geometry; the shader just
+       * the shader keeps a single path: with half-extents this large, q.x
+       * reduces to (x - boundary) and q.y to (cut - y), which is exactly the
+       * quarter-plane distance. The CPU decides the geometry; the shader just
        * measures against it.
+       *
+       * The foot is what lets the CTA row sit IN the field — see
+       * COLUMN_FOOT_MIN_GAP. It is measured from the type only, so the row's
+       * own rect is excluded from the bottom the clearance is taken against.
        */
       const boundary = Math.min(
         (right - canvasRect.left + COLUMN_PADDING_X) * scale,
         width * MAX_SAFE_FRAC_X,
       );
       const reach = Math.max(width, height) * 4;
+
+      const row = parts.find(
+        (part) =>
+          part.classList.contains("hero-spec__cta") ||
+          part.querySelector(".hero-spec__cta") !== null,
+      );
+      let typeBottom = -Infinity;
+      let rowTop = -Infinity;
+      for (const part of parts) {
+        const r = part.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) continue;
+        if (part === row) rowTop = r.top;
+        else typeBottom = Math.max(typeBottom, r.bottom);
+      }
+
+      /* y-up from the canvas's own bottom edge, the frame the shader works in.
+         Both are clamped at 0: a hero short enough to push the type past the
+         fold would otherwise put the cut below the canvas and invert the box. */
+      const cut = Number.isFinite(typeBottom)
+        ? Math.max(0, (canvasRect.bottom - typeBottom) * scale)
+        : 0;
+      const head = Number.isFinite(rowTop)
+        ? Math.max(0, (canvasRect.bottom - rowTop) * scale)
+        : 0;
+
+      if (cut > 0 && cut > head) {
+        safeBox = [boundary - reach, cut + reach, reach, reach];
+        safeGap = [
+          Math.max(1, width - boundary),
+          Math.max(COLUMN_FOOT_MIN_GAP * scale, (cut - head) / safeFeather),
+        ];
+        /* The field reaches the canvas's bottom-left corner now, so the wave's
+           origin cell is drawn and there is no dead run to subtract. */
+        revealNear = 0;
+        revealSpan = Math.max(1, Math.hypot(width, height));
+        return;
+      }
+
+      /* No row to sit in the field, or no room under the type for one: the
+         half-plane this branch used to be, unchanged. */
       safeBox = [boundary - reach, height / 2, reach, reach];
       safeGap = [Math.max(1, width - boundary), Math.max(1, height)];
       /* The cleared zone runs the full height here, so the first undrawn cell
