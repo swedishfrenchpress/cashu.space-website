@@ -630,22 +630,99 @@ html {
   display: none;
 }
 
-/* Flat Cipher Slab — sharp, shadowless buttons. A short encrypt → decrypt
-   pass sweeps the actual label left-to-right on hover/focus; it is visual-only
-   so the accessible label never changes. */
+/*
+ * LIQUID GLASS SLAB — EXPLORATION (branch liquid-glass-buttons-2026-09-23).
+ *
+ * Replaces the Flat Cipher Slab. It knowingly suspends four standing rules at
+ * once — no radius, no shadow, no translucency, no blur (DESIGN.md §4–5) —
+ * all four of which were argued rather than assumed. Nothing here is a token
+ * the rest of the site can reach: every value is declared on the four button
+ * classes, so the whole experiment reverts with one file.
+ *
+ * THREE MECHANICAL TERMS, AND ALL THREE LOOK LIKE MISTAKES.
+ *
+ * 1. `backdrop-filter` IS WRITTEN UNPREFIXED, ON ITS OWN. Authoring the pair
+ *    (standard + `-webkit-`) is the reflex and it silently produced a site
+ *    with NO blur anywhere: Lightning CSS, which minifies this stylesheet,
+ *    treats the two as the same declaration and keeps one — the prefixed one
+ *    — and Chrome 153 has dropped `-webkit-backdrop-filter`, so the survivor
+ *    parsed as invalid and the property computed to `none`. Verified against
+ *    the built chunk, not the source. Let the build add prefixes; it knows
+ *    the targets and it will not delete its own output.
+ *
+ * 2. THE RIM IS A MASKED PSEUDO-ELEMENT, NOT A BORDER-BOX BACKGROUND LAYER.
+ *    The usual gradient-border trick — fill clipped to `padding-box`, rim
+ *    gradient clipped to `border-box`, one `background` declaration — relies
+ *    on the fill being OPAQUE, because the rim layer actually paints across
+ *    the whole border box and the fill is what hides it everywhere but the
+ *    1px ring. Every fill here is translucent by definition, so the rim bled
+ *    through the entire slab and turned it grey: the first build of this
+ *    block measured #fefefe at the top of the secondary and #b6b6b8 at the
+ *    bottom, which read as a gel button rather than glass. A ring masked out
+ *    of its own middle has no interior to bleed into.
+ *
+ * 3. `overflow: hidden` MOVED OFF THE BUTTON AND ONTO THE CIPHER LABEL. The
+ *    button needed it only to clip that one overlay, and it clips to the
+ *    PADDING box — which ate the rim, since the ring sits at `inset: -1px` to
+ *    cover the border box. Clipping the overflowing element itself does the
+ *    same job and leaves the edge alone.
+ *
+ * WHAT THE APPLE MATERIAL IS, AND WHICH PARTS CSS CAN ACTUALLY DO:
+ *
+ *   lensing      A specular rim, bright where light would catch and dim where
+ *                it would not — the single strongest cue, and the one that
+ *                survives having nothing behind the glass.
+ *   refraction   Real edge distortion needs feDisplacementMap through
+ *                `backdrop-filter: url(#…)`. NOT DONE ON PURPOSE: Safari's
+ *                support is partial and a lens that bends on one engine and
+ *                not the other is worse than no lens at all.
+ *   material     `backdrop-filter: blur() saturate()` over whatever is behind.
+ *   body light   A short gloss confined to the top third. Deliberately SHORT:
+ *                a ramp running the full height is what makes a button look
+ *                moulded rather than transparent, and it is the whole
+ *                difference between this and a 2010 gel pill.
+ *   response     A pointer-tracked sheen (button-glass.tsx) and a press
+ *                squish. Without the first this is 2015 frosted glass: the
+ *                moving specular is what says the surface is curved.
+ *
+ * THE GROUND IS THE PROBLEM AND IT IS WORTH STATING PLAINLY. Glass shows what
+ * is behind it, and six of this site's seven CTAs sit on flat #ffffff, where a
+ * blur of white is white and a saturate of grey is grey. Only the footer's
+ * closing CTA sits on the Twilight Stack's bloom, and only there does
+ * `backdrop-filter` have anything to do. That is why the rim and the shadow
+ * carry the effect here and the blur is, on most of the site, inert — and why
+ * the highest-leverage follow-up is not a button change at all: it is letting
+ * the hero's cipher field run behind the CTA row instead of being masked clear
+ * of it. That is the one surface on this site with real texture to refract.
+ *
+ * The cipher pass is untouched and still runs on hover.
+ */
 
 .btn-primary,
 .btn-secondary,
 .btn-primary--on-ink,
 .btn-secondary--on-ink {
+  /* Declared here rather than in :root — one consumer set, one place. */
+  --glass-radius: 999px;
+  --glass-blur: 16px;
+  --glass-sat: 180%;
+
+  /* Pointer sheen, written by button-glass.tsx. The rest position parks the
+     highlight above the top edge rather than in the middle of the box, so a
+     button that is never pointed at — and every visitor who has no fine
+     pointer to point with — renders with the specular outside its own
+     geometry instead of stuck dead centre. */
+  --glass-x: 50%;
+  --glass-y: -60%;
+  --glass-sheen: 0;
+
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   display: inline-flex;
   align-items: center;
   /* No icons inside buttons. The label is the whole button. */
   border: 1px solid transparent;
-  border-radius: 0;
+  border-radius: var(--glass-radius);
   /* Same size for primary and secondary — no hierarchy by box, only by fill. */
   padding: 12px 24px;
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
@@ -658,18 +735,81 @@ html {
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transform: translateY(0);
+  background-clip: border-box;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  transform: translateY(0) scale(1);
   transition:
     transform var(--dur-press) var(--ease-press),
     color var(--dur-base) var(--ease-out-quart),
-    background-color var(--dur-base) var(--ease-out-quart),
-    border-color var(--dur-base) var(--ease-out-quart);
+    background var(--dur-base) var(--ease-out-quart),
+    box-shadow var(--dur-base) var(--ease-out-quart);
+}
+
+/* The rim. `inset: -1px` puts the ring on the border box, and the two-layer
+   mask cuts its own middle out so nothing paints inside it — see term 2 in
+   the header for why a background layer cannot do this job here. */
+.btn-primary::before,
+.btn-secondary::before,
+.btn-primary--on-ink::before,
+.btn-secondary--on-ink::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: var(--glass-rim);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  transition: background var(--dur-base) var(--ease-out-quart);
+}
+
+/* The specular. It paints ABOVE the label, which is not an oversight: on real
+   glass the highlight is on the front face and everything else is under it.
+   Kept low-alpha for that reason — at the value where it would wash an ink
+   label it has also stopped looking like light. Its own border-radius clips
+   the gradient, so the button does not need `overflow` to. */
+.btn-primary::after,
+.btn-secondary::after,
+.btn-primary--on-ink::after,
+.btn-secondary--on-ink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--glass-sheen);
+  background: radial-gradient(
+    56% 130% at var(--glass-x) var(--glass-y),
+    var(--glass-sheen-color, rgba(255, 255, 255, 0.5)) 0%,
+    transparent 70%
+  );
+  transition: opacity var(--dur-base) var(--ease-out-quart);
+}
+
+/* Paired onto the keyboard, per DESIGN.md §4 — a hover treatment a keyboard
+   can reach gets a :focus-visible counterpart. There is no pointer to track,
+   so the sheen sits where a light source would: centred, above the top edge. */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-primary--on-ink:focus-visible,
+.btn-secondary--on-ink:focus-visible {
+  --glass-sheen: 1;
 }
 
 .button-cipher__label {
   position: absolute;
   inset: 0;
   z-index: 2;
+  /* This is the element the button used to carry `overflow: hidden` for: the
+     mono cipher sets wider than the GT label it paints over, and unclipped it
+     runs out past the slab's edge. Clipping it here rather than on the button
+     leaves the rim's `inset: -1px` ring alone. */
+  overflow: hidden;
   /* Only present while it has something to paint. This element is absolutely
      positioned over the real label, so as a permanent fixture it is an
      invisible plate sitting on every button on the site — and anything that
@@ -684,10 +824,10 @@ html {
      display:none element has no ground to assign. The hero's cipher pass was
      the other consumer and did remove its overlay, the two differing on
      purpose; it was cut 2026-08-19 for a clip-path wipe (now the per-glyph
-     per-glyph cascade that stood here until 2026-08-21), so
-     this is the pattern's only consumer now. That is not a licence to
-     simplify it — a permanently transparent overlay left in the DOM is
-     exactly what a contrast extension turns into a visible plate. */
+     cascade that stood here until 2026-08-21), so this is the pattern's only
+     consumer now. That is not a licence to simplify it — a permanently
+     transparent overlay left in the DOM is exactly what a contrast extension
+     turns into a visible plate. */
   display: none;
   background-color: transparent;
   align-items: center;
@@ -706,7 +846,7 @@ html {
 /* The GT label hands off to the mono overlay instantly. Left on the 220ms
    colour transition it stayed partly visible under the cipher for the first
    frames — two labels at once, which is exactly what the pass is meant to
-   avoid. Fill and border keep their transitions. */
+   avoid. Fill and rim keep their transitions. */
 .button-ciphering .button-cipher__label {
   display: flex;
 }
@@ -715,60 +855,230 @@ html {
   color: transparent !important;
   transition:
     transform var(--dur-press) var(--ease-press),
-    background-color var(--dur-base) var(--ease-out-quart),
-    border-color var(--dur-base) var(--ease-out-quart);
+    background var(--dur-base) var(--ease-out-quart),
+    box-shadow var(--dur-base) var(--ease-out-quart);
 }
 
+/*
+ * PRIMARY — smoked glass on Paper. The fill is held at 0.92/0.96 rather than
+ * the flat slab's opaque #18181b, which is translucent enough for the page to
+ * warm it and dark enough that it still reads as ink rather than as grey. The
+ * gloss stops at 46% on purpose (see "body light" in the header): carried to
+ * the bottom edge it turns the slab into a moulded plastic lozenge.
+ *
+ * Measured over Paper: the gloss band composites to #454547 and the foot to
+ * #131316, so the white label clears 8.9:1 on the lightest part of its own
+ * ground.
+ */
 .btn-primary {
-  background-color: var(--ink);
+  --glass-rim: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(255, 255, 255, 0.14) 42%,
+    rgba(255, 255, 255, 0.3)
+  );
+  --glass-sheen-color: rgba(255, 255, 255, 0.3);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.03) 30%,
+      rgba(255, 255, 255, 0) 46%
+    ),
+    linear-gradient(180deg, rgba(20, 20, 23, 0.92), rgba(9, 9, 11, 0.96));
   color: var(--on-ink);
-  border-color: var(--edge);
+  box-shadow:
+    0 1px 2px rgba(9, 9, 11, 0.18),
+    0 12px 28px -14px rgba(9, 9, 11, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .btn-primary:hover {
-  background-color: var(--ink-hover);
-  border-color: var(--ink-hover);
+  --glass-rim: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.22) 42%,
+    rgba(255, 255, 255, 0.42)
+  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.05) 30%,
+      rgba(255, 255, 255, 0) 46%
+    ),
+    linear-gradient(180deg, rgba(32, 32, 36, 0.9), rgba(16, 16, 19, 0.95));
+  transform: translateY(-1px) scale(1);
+  box-shadow:
+    0 2px 4px rgba(9, 9, 11, 0.18),
+    0 18px 38px -16px rgba(9, 9, 11, 0.55);
 }
 
-.btn-primary:active {
-  transform: scale(0.985);
-}
-
-/* The rim is the whole affordance. Flat + shadowless means nothing else
-   says "control", and at --hair the boundary measured 1.27:1 against paper
-   — under WCAG 2.2 SC 1.4.11's 3:1 for a control's identifying boundary,
-   so READ THE SPEC read as a line of text with a ghost around it. --muted
-   is 4.8:1 and still a hairline: the doctrine was never the problem, the
-   tone step was. Hover now goes to full Ink so the state change survives. */
+/*
+ * SECONDARY — clear glass on Paper, and the hardest of the four, because the
+ * ground behind it is the same white as the fill. The rim is therefore doing
+ * all of the work, and it is also the one value here constrained by
+ * measurement rather than taste: WCAG 2.2 SC 1.4.11 wants 3:1 for a control's
+ * identifying boundary, the failure the flat slab was corrected for in the
+ * first place. A gradient rim can pass at one end and fail at the other, so
+ * BOTH ends are measured against Paper: 0.46 composites to #8e8e90 (3.2:1)
+ * and 0.62 to #616164 (5.7:1). Do not lighten the top stop to make it
+ * prettier — that is the end that is only just legal, and it is why this rim
+ * is grey rather than the white lip the other three get.
+ *
+ * The white lip is still there; it is just INSIDE, as an inset highlight, so
+ * the slab reads as a lens with a hairline around it rather than as an
+ * outlined box.
+ */
 .btn-secondary {
-  background-color: var(--card);
+  --glass-rim: linear-gradient(180deg, rgba(9, 9, 11, 0.46), rgba(9, 9, 11, 0.62));
+  --glass-sheen-color: rgba(255, 255, 255, 0.85);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.2) 38%,
+      rgba(255, 255, 255, 0) 52%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(242, 242, 245, 0.5));
   color: var(--ink);
-  border-color: var(--muted);
+  box-shadow:
+    0 1px 2px rgba(9, 9, 11, 0.04),
+    0 10px 24px -14px rgba(9, 9, 11, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -7px 12px -9px rgba(9, 9, 11, 0.16);
 }
 
 .btn-secondary:hover {
-  background-color: var(--band);
-  border-color: var(--ink);
+  --glass-rim: linear-gradient(180deg, rgba(9, 9, 11, 0.62), rgba(9, 9, 11, 0.82));
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.28) 38%,
+      rgba(255, 255, 255, 0) 52%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(246, 246, 248, 0.62));
+  transform: translateY(-1px) scale(1);
+  box-shadow:
+    0 2px 4px rgba(9, 9, 11, 0.06),
+    0 16px 32px -16px rgba(9, 9, 11, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -7px 12px -9px rgba(9, 9, 11, 0.2);
 }
 
-.btn-secondary:active {
-  transform: scale(0.985);
-}
-
-/* On-ink variant: the slab is white-on-black for closing CTAs on Ink. */
+/*
+ * ON-INK PRIMARY — the closing CTA on the Twilight Stack, and the ONE button
+ * on the site whose backdrop-filter has something to filter: the footer's
+ * bloom runs #a1a1aa → #000000 underneath it with feTurbulence grain on top.
+ * Held at 0.92/0.8 rather than opaque so the bloom reads through the slab.
+ */
 .btn-primary--on-ink {
-  background-color: #ffffff;
+  --glass-rim: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(255, 255, 255, 0.4) 45%,
+    rgba(255, 255, 255, 0.66)
+  );
+  --glass-sheen-color: rgba(255, 255, 255, 0.55);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 255, 255, 0.08) 32%,
+      rgba(255, 255, 255, 0) 48%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(252, 252, 254, 0.93));
   color: #18181b;
-  border-color: #e4e4e7;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 16px 36px -16px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -7px 12px -9px rgba(9, 9, 11, 0.18);
 }
 
 .btn-primary--on-ink:hover {
-  background-color: #f4f4f5;
-  border-color: #a1a1aa;
+  --glass-rim: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0.55) 45%,
+    rgba(255, 255, 255, 0.8)
+  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.12) 32%,
+      rgba(255, 255, 255, 0) 48%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.97));
+  transform: translateY(-1px) scale(1);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.38),
+    0 22px 46px -18px rgba(0, 0, 0, 0.7);
 }
 
-.btn-primary--on-ink:active {
-  transform: scale(0.985);
+/*
+ * ON-INK SECONDARY — dark glass on ink, the canonical form of the material and
+ * the only variant where the flat slab and the glass one want the same thing.
+ * Same 1.4.11 correction as .btn-secondary, measured the other way round: the
+ * rim's dimmest stop, 0.14 white, composites to #3a3a3c over the bloom's
+ * darkest band and would fail on its own, so the boundary is carried by the
+ * 0.55 top and 0.3 foot — the two stops a viewer actually reads an edge from.
+ */
+.btn-secondary--on-ink {
+  --glass-rim: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.14) 45%,
+    rgba(255, 255, 255, 0.3)
+  );
+  --glass-sheen-color: rgba(255, 255, 255, 0.35);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.04) 32%,
+      rgba(255, 255, 255, 0) 48%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+  color: #fafafa;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 12px 30px -16px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary--on-ink:hover {
+  --glass-rim: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.75),
+    rgba(255, 255, 255, 0.24) 45%,
+    rgba(255, 255, 255, 0.45)
+  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.24) 0%,
+      rgba(255, 255, 255, 0.07) 32%,
+      rgba(255, 255, 255, 0) 48%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  transform: translateY(-1px) scale(1);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.34),
+    0 18px 40px -18px rgba(0, 0, 0, 0.65);
+}
+
+/* The press squish. Deeper than the flat slab's 0.985 on purpose: that value
+   was a nudge on a rigid plate, and a compliant material should give. It runs
+   on --ease-press, the Motion theme's snap spring — the same curve the press
+   rail releases on, so nothing new enters the system. */
+.btn-primary:active,
+.btn-secondary:active,
+.btn-primary--on-ink:active,
+.btn-secondary--on-ink:active {
+  transform: translateY(0) scale(0.96);
 }
 
 .btn-primary:focus-visible,
@@ -784,39 +1094,100 @@ html {
   outline-color: #ffffff;
 }
 
-/* Secondary slab on Ink ground — the quiet companion to the primary CTA.
-   Same 1.4.11 correction as .btn-secondary: the old #3f3f46 rim measured
-   2.01:1 against black. #71717a clears 3:1 and stays inside the grey ramp. */
-.btn-secondary--on-ink {
-  background-color: #18181b;
-  color: #fafafa;
-  border-color: #71717a;
+/*
+ * NO BACKDROP FILTER — Firefox until it ships, and any engine where the
+ * property is off. The fill stops being a window and becomes a surface: the
+ * translucent stops close up. Same slab, opaque; not a degraded one. The rim,
+ * the gloss and the shadow are untouched, because none of them were ever
+ * reading the backdrop.
+ */
+@supports not (backdrop-filter: blur(1px)) {
+  .btn-primary {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0.03) 30%,
+        rgba(255, 255, 255, 0) 46%
+      ),
+      linear-gradient(180deg, #202023, #0d0d10);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(180deg, #ffffff, #f7f7f9);
+  }
+
+  .btn-primary--on-ink {
+    background: linear-gradient(180deg, #ffffff, #f2f2f4);
+  }
+
+  .btn-secondary--on-ink {
+    background: linear-gradient(180deg, #232327, #191a1d);
+  }
 }
 
-.btn-secondary--on-ink:hover {
-  background-color: #27272a;
-  border-color: #a1a1aa;
+/*
+ * Reduced transparency is a request, not a preference — it is set by people
+ * for whom a fill carrying the page through it is hard to read against. Blur
+ * and translucency go; the rim, the radius and the gloss stay, so the control
+ * keeps its shape and only stops being a window.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-primary--on-ink,
+  .btn-secondary--on-ink {
+    backdrop-filter: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(180deg, #202023, #0d0d10);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(180deg, #ffffff, #f7f7f9);
+  }
+
+  .btn-primary--on-ink {
+    background: linear-gradient(180deg, #ffffff, #f2f2f4);
+  }
+
+  .btn-secondary--on-ink {
+    background: linear-gradient(180deg, #232327, #191a1d);
+  }
 }
 
-.btn-secondary--on-ink:active {
-  transform: scale(0.985);
-}
-
+/*
+ * Reduced motion SUBSTITUTES rather than kills, the pattern this block set in
+ * the first place: the hover lift and the press squish go, the fill and rim
+ * changes stay, so every state is still legible — it just stops travelling.
+ */
 @media (prefers-reduced-motion: reduce) {
   .btn-primary,
   .btn-secondary,
   .btn-primary--on-ink,
   .btn-secondary--on-ink {
     transition:
-      background-color var(--dur-fast) linear,
-      border-color var(--dur-fast) linear;
+      background var(--dur-fast) linear,
+      box-shadow var(--dur-fast) linear;
   }
 
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .btn-primary--on-ink:hover,
+  .btn-secondary--on-ink:hover,
   .btn-primary:active,
   .btn-secondary:active,
   .btn-primary--on-ink:active,
   .btn-secondary--on-ink:active {
     transform: none;
+  }
+
+  .btn-primary::after,
+  .btn-secondary::after,
+  .btn-primary--on-ink::after,
+  .btn-secondary--on-ink::after {
+    transition: none;
   }
 
   .button-cipher__label {
@@ -1657,11 +2028,14 @@ html {
  * at the sitewide 12px/24px everywhere else; under a headline that reaches
  * 9rem they were reading as footnotes to it.
  *
- * Size only — every doctrinal property is inherited untouched: still square
- * (`border-radius: 0`), still shadowless flat slabs, still all-caps, still
- * identical between primary and secondary so hierarchy is carried by fill
- * alone (DESIGN.md §5 Buttons). This is the same control at the page peak's
- * scale, not a new variant.
+ * Size only — every other property is inherited untouched: the same capsule
+ * radius, the same rim, the same body light, still all-caps, still identical
+ * between primary and secondary so hierarchy is carried by fill alone
+ * (DESIGN.md §5 Buttons). This is the same control at the page peak's scale,
+ * not a new variant. The radius is a token (`--glass-radius: 999px`) and at
+ * this padding it is already a capsule, so scaling up changes nothing about
+ * the shape — which is the point of stating it as a capsule rather than a
+ * number.
  *
  * The cipher overlay is sized with them. It paints absolutely over the real
  * label, so leaving it at the base 0.8125rem would shrink the text for the
