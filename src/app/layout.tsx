@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import ConsoleSignature from "@/components/console-signature";
 import ButtonCipher from "@/components/button-cipher";
+import ButtonGlass from "@/components/button-glass";
 import Keymap from "@/components/keymap";
 import MotionUITheme from "@/components/motion-ui/theme-provider";
 import SiteCursor from "@/components/site-cursor";
@@ -233,6 +234,7 @@ export default function RootLayout({
         />
         <ConsoleSignature />
         <ButtonCipher />
+        <ButtonGlass />
         <Keymap />
         {/* Inside the provider, not beside it. SiteCursor resolves the
             `snap` transition by name, and a Motion UI consumer mounted as a
