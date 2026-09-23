@@ -104,7 +104,7 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Mobile wallets",
     scope: "Ecash in your pocket. Hold bearer tokens on your phone.",
     entries: [
-      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["iOS, Android, and PWA", "Beta"] },
+      { name: "Cashu.me",  href: "https://cashu.me",           facts: ["iOS, Android, and PWA"] },
       { name: "eNuts",     href: "https://www.enuts.cash",     facts: ["iOS and Android"] },
       { name: "Macadamia", href: "https://macadamia.cash",     facts: ["iOS"] },
       { name: "Minibits",  href: "https://www.minibits.cash",  facts: ["iOS and Android"] },
@@ -116,7 +116,6 @@ const DIRECTORY_GROUPS: DirectoryGroup[] = [
     heading: "Web wallets",
     scope: "Runs in any browser. Nothing to install, portable anywhere.",
     entries: [
-      { name: "AGI Cash", href: "https://agi.cash/home", facts: ["Beta"] },
       { name: "Athenut",  href: "https://athenut.com" },
     ],
   },
