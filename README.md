@@ -130,6 +130,31 @@ separate line in the same file.
 None of this needs solving before the cutover. It needs solving before the
 staging deploy gets indexed.
 
+## Forgejo container image
+
+The workflow in `.forgejo/workflows/docker-publish.yml` publishes a
+`linux/amd64` image to `git.cashu.dev/cashubtc/cashu.space`. Each push to
+`main` publishes `sha-<full commit SHA>` and `latest`; a manual run publishes
+only the commit tag unless it runs on `main`. The workflow checks the pushed
+image with anonymous registry access and fails if it cannot be pulled publicly.
+
+The Forgejo repository is a mirror of the GitHub source. Enable Forgejo Actions
+on that mirror and add these repository Actions secrets:
+
+- `MOTION_TOKEN`: the Motion+ npm token required by the Dockerfile's `npm ci`.
+- `REGISTRY_USERNAME`: a Forgejo account with package write access for the
+  repository owner.
+- `REGISTRY_TOKEN`: that account's personal access token with package write
+  access.
+
+The `cashubtc` Forgejo organization is public, so its packages are publicly
+pullable. After the first successful run, anyone can pull the image without
+logging in:
+
+```bash
+docker pull git.cashu.dev/cashubtc/cashu.space:latest
+```
+
 ## Things that will surprise you
 
 - **This is not the Next.js you remember.** Version 16 has breaking changes

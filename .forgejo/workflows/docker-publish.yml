@@ -1,0 +1,70 @@
+name: Publish Docker image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: https://data.forgejo.org/actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build and publish image
+        shell: bash
+        env:
+          MOTION_TOKEN: ${{ secrets.MOTION_TOKEN }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+          REPOSITORY: ${{ forgejo.repository }}
+          REVISION: ${{ forgejo.sha }}
+          REF: ${{ forgejo.ref }}
+          SERVER_URL: ${{ forgejo.server_url }}
+        run: |
+          set -euo pipefail
+          : "${MOTION_TOKEN:?Set the MOTION_TOKEN Forgejo Actions secret}"
+          : "${REGISTRY_USERNAME:?Set the REGISTRY_USERNAME Forgejo Actions secret}"
+          : "${REGISTRY_TOKEN:?Set the REGISTRY_TOKEN Forgejo Actions secret}"
+
+          image="git.cashu.dev/$(printf '%s' "$REPOSITORY" | tr '[:upper:]' '[:lower:]')"
+          immutable_tag="$image:sha-$REVISION"
+          builder="cashu-space-${REVISION:0:12}"
+          context="$builder-daemon"
+          private_dir=$(mktemp -d)
+          export DOCKER_CONFIG="$private_dir/docker"
+          mkdir -p "$DOCKER_CONFIG"
+          cleanup() {
+            docker buildx rm "$builder" >/dev/null 2>&1 || true
+            docker context rm -f "$context" >/dev/null 2>&1 || true
+            rm -rf "$private_dir"
+          }
+          trap cleanup EXIT
+
+          printf '%s' "$REGISTRY_TOKEN" |
+            docker login git.cashu.dev --username "$REGISTRY_USERNAME" --password-stdin
+
+          # The Forgejo runner supplies a TLS Docker endpoint via DOCKER_HOST.
+          # Capture it in a context so the buildx container can reach the daemon.
+          docker context create "$context"
+          docker buildx create --name "$builder" --driver docker-container --use "$context"
+
+          tags=(--tag "$immutable_tag")
+          if [[ "$REF" == refs/heads/main ]]; then
+            tags+=(--tag "$image:latest")
+          fi
+
+          docker buildx build \
+            --platform linux/amd64 \
+            --secret id=MOTION_TOKEN,env=MOTION_TOKEN \
+            --label "org.opencontainers.image.source=$SERVER_URL/$REPOSITORY" \
+            "${tags[@]}" \
+            --push .
+
+          # Use a fresh credential store to prove anonymous pulls are allowed.
+          anonymous_config="$private_dir/anonymous"
+          mkdir -p "$anonymous_config"
+          DOCKER_CONFIG="$anonymous_config" docker manifest inspect "$immutable_tag" >/dev/null
+          echo "Published public image: $immutable_tag"
