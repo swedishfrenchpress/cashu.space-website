@@ -224,16 +224,17 @@ const COLUMN_PADDING_X = 64;
 const MAX_SAFE_FRAC_X = 0.72;
 
 /**
- * THE CTA ROW IS NOT PROTECTED IN COLUMN MODE, and that is the whole reason
- * the glass slabs are glass (globals.css, "LIQUID GLASS SLAB", 2026-09-23).
+ * THE CTA ROW IS NOT PROTECTED IN COLUMN MODE. Every other element in the
+ * title block is type, and type over a field of hex is unreadable — so the
+ * cleared zone covers the headline and the deck, and stops just below them.
+ * The two buttons sit in the field instead of above it.
  *
- * Every other element in the title block is type, and type over a field of hex
- * is unreadable — so the cleared zone covers the headline and the deck, and
- * stops just below them. The two buttons sit in the field instead of above it.
- * A translucent slab over flat Paper is a flat slab: `backdrop-filter` blurs
- * white into white, and the material has nothing to show. Over the field it
- * has hex to blur, and the slab reads as a lens rather than as a shape with a
- * rim drawn on it.
+ * It was cut this way (2026-09-23) so the glass slabs would have hex to blur.
+ * As of 2026-09-29 the hero's slabs carry a Paper base instead and the hex
+ * passes BEHIND them, cut by each capsule's edge: WebKit drew the field
+ * through the fill unblurred, so it read as printed on the buttons. The
+ * geometry stays, because the slabs sitting in the field, in front of it, is
+ * now the point. See `.hero-spec__cta` in globals.css.
  *
  * COLUMN MODE ONLY. Below COLUMN_MIN_WIDTH the geometry is a box around the
  * type rather than a half-plane beside it, the CTAs stack, and the field would

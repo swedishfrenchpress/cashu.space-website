@@ -2086,6 +2086,31 @@ html {
   font-size: 0.9375rem;
 }
 
+/*
+ * The field runs under this row (scene.ts, COLUMN_FOOT_MIN_GAP) and the slabs
+ * sit IN FRONT of it: a Paper base under the translucent fill, so the hex
+ * passes behind each capsule and is cut by its edge (user-directed
+ * 2026-09-29). On Paper this is pixel-identical to the glass, because Paper is
+ * what the glass was showing anyway.
+ *
+ * WebKit is why. Chromium's 20px backdrop blur smears a 14px cell to nothing,
+ * but WebKit (Safari, and every browser on iOS) composited the WebGL field
+ * through the fill UNBLURRED, measured in Playwright's WebKit 26.6: sharp
+ * digits inside the black slab, which read as printed on it rather than
+ * behind it. A lens that works on one engine is worse than none (the header's
+ * refraction note says the same), so the backdrop pass goes too; over an
+ * opaque base it would paint only where nobody can see it.
+ *
+ * Longhands on purpose, and after every state rule: the :hover and :active
+ * fills are `background` shorthands that reset the colour to transparent, and
+ * at equal specificity source order puts this last.
+ */
+.hero-spec__cta .btn-primary,
+.hero-spec__cta .btn-secondary {
+  background-color: var(--paper);
+  backdrop-filter: none;
+}
+
 /* Phones: the two slabs stack and the extra horizontal padding stops buying
    presence — it just pushes them toward the gutters. Trim the sides, keep
    the height. */
