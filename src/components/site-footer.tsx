@@ -66,13 +66,12 @@ export default function SiteFooter() {
     <footer className="footer-specimen relative isolate">
       <div className="page-shell relative" style={{ paddingBlock: "clamp(64px, 9vw, 160px)" }}>
         <div className="footer-card">
-          {/* Sign-off — the footer's compositional peak: Display wordmark and
-              one quiet line, with the closing CTA baseline-aligned right. */}
+          {/* Sign-off — the footer's compositional peak: the Display
+              wordmark alone, with the closing CTA baseline-aligned right.
+              It carried a tagline ("The open specification.") until
+              2026-09-29, cut on the user's direction. */}
           <div className="footer-signoff">
-            <div>
-              <div className="footer-signoff__mark">Cashu</div>
-              <p className="footer-signoff__line t-body-lead">The open specification.</p>
-            </div>
+            <div className="footer-signoff__mark">Cashu</div>
             {/* Same label, same destination as the hero's spec CTA — one
                 canonical URL per label. The NUTs repo stays reachable via
                 the metastrip context and the GitHub social link below. */}
@@ -85,17 +84,25 @@ export default function SiteFooter() {
             </ExternalLink>
           </div>
 
-          {/* RFC metadata strip. Was a two-cell device (spec repo left,
-              descriptor right) echoing the spec code pane's mono header; the
-              cashubtc/nuts cell was dropped 2026-08-14 on the user's
-              direction, so what remains is a ruled descriptor line. It sits
-              left with the rest of the page rather than stranded right where
-              its missing counterweight used to hold it. */}
+          {/* RFC metadata strip, two cells again: descriptor left, year and
+              licence right. The right cell was the cashubtc/nuts slug until
+              2026-08-14; the legal fields took it on 2026-09-29, moved out of
+              the links row below on the user's direction, because a year and
+              a licence are the document's metadata, not somewhere to go.
+              Fields separate by gap, not separator glyphs. The year is
+              derived at build rather than typed: a hardcoded one is wrong
+              from the first of January and nobody notices, which is a poor
+              look on the page whose closing argument is that this site
+              counts honestly. */}
           <div className="footer-metastrip t-mono">
             <span className="footer-metastrip__meta">Chaumian ecash for bitcoin</span>
+            <span className="footer-legal">
+              <span>© {new Date().getFullYear()}</span>
+              <span>MIT Licensed</span>
+            </span>
           </div>
 
-          {/* Bottom: socials + legal on left, Ask-AI on right */}
+          {/* Bottom: links on left (socials, then OpenCash), Ask-AI on right */}
           <div className="footer-card__bottom">
             <div className="footer-card__bottom-left">
               <div className="footer-socials">
@@ -127,15 +134,15 @@ export default function SiteFooter() {
                   </svg>
                 </ExternalLink>
               </div>
-              {/* Fields separate by layout (gap), not separator glyphs.
-                  The year is derived at build rather than typed: a hardcoded
-                  one is wrong from the first of January and nobody notices,
-                  which is a poor look on the page whose closing argument is
-                  that this site counts honestly. */}
-              <div className="footer-legal">
-                <span className="t-label">© {new Date().getFullYear()}</span>
-                <span className="t-label">MIT Licensed</span>
-              </div>
+              {/* OpenCash, the association that funds Cashu development
+                  (added 2026-09-29). Set as its name, not a mark. */}
+              <ExternalLink
+                href="https://opencash.dev/"
+                className="t-label footer-link focus-ring--on-ink"
+              >
+                OpenCash
+                <NewTabHint />
+              </ExternalLink>
             </div>
 
             <div className="footer-card__bottom-right">

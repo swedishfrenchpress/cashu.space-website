@@ -1355,11 +1355,6 @@ html {
   color: #ffffff;
 }
 
-.footer-signoff__line {
-  margin-top: 14px;
-  color: #a1a1aa;
-}
-
 /*
  * RFC metadata strip — echoes the spec-pane header device (two-cell mono:
  * spec path left, descriptor right), framed by a zinc-800 hairline. On the
@@ -1369,9 +1364,10 @@ html {
 .footer-metastrip {
   display: flex;
   align-items: center;
-  /* Single cell since the repo slug came out, so this is flex-start by
-     intent rather than by `space-between` happening to collapse to it. */
-  justify-content: flex-start;
+  /* Two cells again since the legal fields moved in (2026-09-29):
+     descriptor left, year and licence right. When the row wraps on a phone
+     the right cell drops under the left and sets flush left with it. */
+  justify-content: space-between;
   gap: 16px;
   padding-top: 18px;
   border-top: 1px solid #27272a;
@@ -1441,13 +1437,39 @@ html {
 }
 
 /* Two quiet fields separated by gap alone — no separator glyphs (the old
-   middot is retired with the rest of them). */
+   middot is retired with the rest of them). Lives in the metastrip. */
 .footer-legal {
   display: inline-flex;
   align-items: center;
   gap: 16px;
   color: #a1a1aa;
   flex-wrap: wrap;
+}
+
+/* The one text link in the links row, dressed as the marks beside it:
+   Fog at rest, Paper on hover, no underline (user-directed 2026-09-29).
+   Its place in the row is the affordance, as it is for the marks. */
+.footer-link {
+  position: relative;
+  color: #a1a1aa;
+  text-decoration: none;
+  transition: color var(--dur-base) var(--ease-out-quart);
+}
+
+/* 44px tall for touch, same device as .footer-social::before. */
+.footer-link::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
+.footer-link:hover,
+.footer-link:focus-visible {
+  color: #ffffff;
 }
 
 .footer-card__bottom-right {
