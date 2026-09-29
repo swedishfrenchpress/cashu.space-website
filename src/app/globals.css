@@ -1549,6 +1549,13 @@ html {
  * highest contrast against either site theme; doctrine-flat (no shadow,
  * sharp corner). Lives at the top of <body> in layout.tsx; each page sets
  * id="main-content" on the start of its meaningful content (past the nav).
+ *
+ * Above the page is not out of view. iOS rubber-band overscroll drags the
+ * document down and paints the strip above y=0, so a fast fling to the top
+ * showed a translated-away link sitting over the masthead. Opacity is what
+ * hides it; the translate is only the entrance. Not `visibility: hidden`,
+ * which would take it out of the tab order it exists for, and
+ * pointer-events off so the invisible slab can't catch a tap mid-bounce.
  */
 .skip-link {
   position: absolute;
@@ -1564,10 +1571,16 @@ html {
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
   transform: translateY(calc(-100% - 16px));
-  transition: transform var(--dur-fast) var(--ease-out-quart);
+  transition:
+    transform var(--dur-fast) var(--ease-out-quart),
+    opacity var(--dur-fast) var(--ease-out-quart);
 }
 .skip-link:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
   transform: translateY(0);
   outline: 2px solid #ffffff;
   outline-offset: 2px;
